@@ -1,0 +1,111 @@
+{
+    "amis": {
+        "ap-northeast-1": {
+            "hvm": "ami-0c63b39219b8123e5"
+        },
+        "ap-northeast-2": {
+            "hvm": "ami-073cba0913d2250a4"
+        },
+        "ap-south-1": {
+            "hvm": "ami-0270be11430101040"
+        },
+        "ap-southeast-1": {
+            "hvm": "ami-06eb9d35ede4f08a3"
+        },
+        "ap-southeast-2": {
+            "hvm": "ami-0d980796ce258b5d5"
+        },
+        "ca-central-1": {
+            "hvm": "ami-0f907257d1686e3f7"
+        },
+        "eu-central-1": {
+            "hvm": "ami-02fdd627029c0055b"
+        },
+        "eu-west-1": {
+            "hvm": "ami-0d4839574724ed3fa"
+        },
+        "eu-west-2": {
+            "hvm": "ami-053073b95aa285347"
+        },
+        "eu-west-3": {
+            "hvm": "ami-09deb5deb6567bcd5"
+        },
+        "sa-east-1": {
+            "hvm": "ami-068a2000546e1889d"
+        },
+        "us-east-1": {
+            "hvm": "ami-046fe691f52a953f9"
+        },
+        "us-east-2": {
+            "hvm": "ami-0649fd5d42859bdfc"
+        },
+        "us-west-1": {
+            "hvm": "ami-0c1d2b5606111ac8c"
+        },
+        "us-west-2": {
+            "hvm": "ami-00745fcbb14a863ed"
+        }
+    },
+    "baseURI": "https://releases-art-rhcos.svc.ci.openshift.org/art/storage/releases/ootpa/410.8.20190520.0/",
+    "buildid": "410.8.20190520.0",
+    "images": {
+        "aws": {
+            "path": "rhcos-410.8.20190520.0-aws.vmdk",
+            "sha256": "71f4190916b5cb26b0230adb54809b10f8f694245ec3e743d1773efc0359f027",
+            "size": "709180655",
+            "uncompressed-sha256": "eef6764cc8f571a87fff715430220711bd0a90f4f88cc6141cfdbd412b654f81",
+            "uncompressed-size": 742703616
+        },
+        "initramfs": {
+            "path": "rhcos-410.8.20190520.0-installer-initramfs.img",
+            "sha256": "9cbbdc92b687f87b511191ea866fc8dd080598954bd1a9ab7ed7157ac6a2adcc"
+        },
+        "iso": {
+            "path": "rhcos-410.8.20190520.0-installer.iso",
+            "sha256": "92fdbc5c95410fea73c6b200f6a10d4a8e043dd6933628237a5aed093f88701b"
+        },
+        "kernel": {
+            "path": "rhcos-410.8.20190520.0-installer-kernel",
+            "sha256": "fc984907fdd3674f8412e3ba5d9cdad461f04b7f9ea5e2ca142e3292997ed6bb"
+        },
+        "metal-bios": {
+            "path": "rhcos-410.8.20190520.0-metal-bios.raw.gz",
+            "sha256": "662fe69b6db719717d36a547828eb69b8f6a7787a99bcd4fdce408e083fc2ef4",
+            "size": "719954527",
+            "uncompressed-sha256": "312bcfca4ea966ee5167ac0c63f795768e7eb421a751e2d3d189b2e2ddd3d3e9",
+            "uncompressed-size": "3317694464"
+        },
+        "metal-uefi": {
+            "path": "rhcos-410.8.20190520.0-metal-uefi.raw.gz",
+            "sha256": "ecf494ff4ef8c709a089e72a164e675739bc92c833f435d2b639285017c2004d",
+            "size": "721567045",
+            "uncompressed-sha256": "eb98b9d2e527117e692c4b7abe4be72bea9e7705bd572924155e62337bafccda",
+            "uncompressed-size": "3317694464"
+        },
+        "openstack": {
+            "path": "rhcos-410.8.20190520.0-openstack.qcow2",
+            "sha256": "f2c22be84f262c60dfd75f0696987af683d1d384bb13b0cf95dc920986703dd6",
+            "size": "719500193",
+            "uncompressed-sha256": "280b1d7dce6bc67ffc03569b242ba741dbf2c7b645bdcb4e0f20b71792c45e77",
+            "uncompressed-size": "2018967552"
+        },
+        "qemu": {
+            "path": "rhcos-410.8.20190520.0-qemu.qcow2",
+            "sha256": "d22b308631bf9a13329f402fbb574dd4d07005a3c4c5d6f1505ecf2246a86676",
+            "size": "719492230",
+            "uncompressed-sha256": "e92ecd8ebe0c06a58cecf004733cf12fc835650beb2a6914c672d57e82d9011a",
+            "uncompressed-size": "2018902016"
+        },
+        "vmware": {
+            "path": "rhcos-410.8.20190520.0-vmware.ova",
+            "sha256": "eff088ec361f94258a4cd9400e8483b3fc14be7e205e645b372003e77de7ec3a",
+            "size": "742717440"
+        }
+    },
+    "oscontainer": {
+        "digest": "sha256:53389c9b4a00d7afebb98f7bd9d20348deb1d77ca4baf194f0ae1b582b7e965b",
+        "image": "quay.io/openshift-release-dev/ocp-v4.0-art-dev"
+    },
+    "ostree-commit": "d969dcf9e106044ba42a7dca0d445f5c2f1ba755276f433b4d166e6297627254",
+    "ostree-version": "410.8.20190520.0"
+}
