@@ -57,6 +57,10 @@ func NewEnvConfig(name string) (*EnvConfig, error) {
 		// temporary staging folder
 		directory := filepath.Join("_data/clusters", name)
 		c.Directory = directory
+		err := os.MkdirAll(directory, 0755)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return &c, nil
 }
@@ -90,7 +94,8 @@ func GetInstallConfig(name string, ec *EnvConfig) (*types.InstallConfig, error) 
 		if err != nil {
 			return nil, err
 		}
-		if writeToFile(pubKey, filepath.Join(ec.Directory, "id_rsa.pub")) != nil {
+		err = writeToFile(pubKey, filepath.Join(ec.Directory, "id_rsa.pub"))
+		if err != nil {
 			return nil, err
 		}
 		b, err := tls.PrivateKeyAsBytes(key)
@@ -98,6 +103,11 @@ func GetInstallConfig(name string, ec *EnvConfig) (*types.InstallConfig, error) 
 			return nil, err
 		}
 		if writeToFile(string(b), filepath.Join(ec.Directory, "id_rsa")) != nil {
+			return nil, err
+		}
+	} else {
+		pubKey, err = readFile(os.Getenv("SSH_KEY"))
+		if err != nil {
 			return nil, err
 		}
 	}
@@ -136,7 +146,7 @@ func GetInstallConfig(name string, ec *EnvConfig) (*types.InstallConfig, error) 
 		Platform: types.Platform{
 			Azure: &azure.Platform{
 				Region:                      ec.Region,
-				BaseDomainResourceGroupName: ec.DNSResourceGroup,
+				BaseDomainResourceGroupName: name,
 			},
 		},
 		PullSecret: string(pullSecret),
@@ -153,4 +163,13 @@ func writeToFile(data, saveFileTo string) error {
 
 	log.Printf("Data saved to: %s", saveFileTo)
 	return nil
+}
+
+func readFile(path string) (string, error) {
+	keyAsBytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+
+	return string(keyAsBytes), nil
 }

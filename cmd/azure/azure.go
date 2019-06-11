@@ -6,9 +6,11 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"fmt"
 
 	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	"github.com/openshift/installer/pkg/asset"
@@ -29,6 +31,10 @@ var (
 )
 
 func main() {
+	logrus.SetLevel(logrus.DebugLevel)
+	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
+	logrus.SetReportCaller(true)
+	log := logrus.NewEntry(logrus.StandardLogger())
 	// TODO: This should move to installer /pkg
 	if len(os.Args) > 0 {
 		base := filepath.Base(os.Args[0])
@@ -39,7 +45,7 @@ func main() {
 		}
 	}
 
-	if err := run(); err != nil {
+	if err := run(log); err != nil {
 		panic(err)
 	}
 }
@@ -54,12 +60,12 @@ func saveCredentials(credentials icazure.Credentials, filePath string) error {
 	return ioutil.WriteFile(filePath, jsonCreds, 0600)
 }
 
-func run() error {
+func run(log *logrus.Entry) error {
 	rootCmd := &cobra.Command{
 		Use:  "./azure [component]",
 		Long: "Azure Red Hat OpenShift dispatcher",
 	}
-	rootCmd.PersistentFlags().StringP("loglevel", "l", "Debug", "Valid values are [Debug, Info, Warning, Error]")
+	rootCmd.PersistentFlags().StringP("action", "a", "Create", "Valid values are [Create, Delete]")
 	rootCmd.PersistentFlags().StringP("name", "n", "demo-cluster", "Cluster name value")
 	rootCmd.Printf("gitCommit %s\n", gitCommit)
 	rootCmd.Execute()
@@ -68,6 +74,11 @@ func run() error {
 	if err != nil {
 		return err
 	}
+
+	//action, err := rootCmd.Flags().GetString("action")
+	//if err != nil {
+	//	return err
+	//}
 
 	// env variable configuration
 	ec, err := fakerpconfig.NewEnvConfig(name)
@@ -87,6 +98,8 @@ func run() error {
 	if err != nil {
 		return errors.Wrap(err, "failed to get InstallConfig")
 	}
+	fmt.Println(err)
+	fmt.Println(cfg)
 
 	// populates GetSession()
 	// TODO: This needs to become part of ctx object or a secret
@@ -98,10 +111,11 @@ func run() error {
 		TenantID:       ec.TenantID,
 	}, authLocation)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to persist osServicePrincipal.json")
 	}
-	if os.Setenv("AZURE_AUTH_LOCATION", authLocation) != nil {
-		return err
+	err = os.Setenv("AZURE_AUTH_LOCATION", authLocation) 
+	if err != nil {
+		return errors.Wrap(err, "failed to set AZURE_AUTH_LOCATION")
 	}
 
 	defaults.SetInstallConfigDefaults(cfg)
