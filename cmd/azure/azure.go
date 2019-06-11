@@ -199,7 +199,6 @@ func run() error {
 	if err := validation.ValidateInstallConfig(cfg, openstackvalidation.NewValidValuesFetcher()).ToAggregate(); err != nil {
 		return errors.Wrap(err, "invalid install config")
 	}
-	fmt.Println(cfg)
 
 	data, err := yaml.Marshal(cfg)
 	if err != nil {
@@ -213,7 +212,6 @@ func run() error {
 		Filename: "install-config.yaml",
 		Data:     data,
 	}
-	// TODO re-implement the store to not use the filesystem?
 	directory := path.Join("clusters", name)
 	assetStore, err := store.NewStore(directory)
 	if err != nil {
@@ -222,9 +220,6 @@ func run() error {
 	if err := asset.PersistToFile(ic, directory); err != nil {
 		return errors.Wrap(err, "failed to write install config")
 	}
-
-	// TODO: Start consuming assets. Assets need to be file system agnostic
-	// Like: https://github.com/openshift/installer/blob/master/pkg/asset/installconfig/ssh.go#L49
 
 	targets := targetassets.InstallConfig
 	targets = append(targets, targetassets.IgnitionConfigs...)
