@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -297,32 +296,16 @@ func (sc *SanityChecker) checkCanAccessServices(ctx context.Context) error {
 		pool := x509.NewCertPool()
 		pool.AddCert(svc.cert)
 
-		rt := &http.Transport{
-			// see net/http/transport.go: all values in first block are default
-			// except the dial timeout reduction from 30 to 10 seconds.
-			Proxy: http.ProxyFromEnvironment,
-			DialContext: (&net.Dialer{
-				Timeout:   10 * time.Second,
-				KeepAlive: 30 * time.Second,
-				DualStack: true,
-			}).DialContext,
-			MaxIdleConns:          100,
-			IdleConnTimeout:       90 * time.Second,
-			TLSHandshakeTimeout:   10 * time.Second,
-			ExpectContinueTimeout: 1 * time.Second,
-
-			DisableKeepAlives: true,
-			TLSClientConfig: &tls.Config{
-				RootCAs: pool,
-			},
-		}
-
 		cli := &http.Client{
 			Transport: &kubeclient.RetryingRoundTripper{
-				Log:          sc.Log,
-				RoundTripper: rt,
-				Retries:      5,
-				GetTimeout:   30 * time.Second,
+				Log: sc.Log,
+				RoundTripper: &http.Transport{
+					TLSClientConfig: &tls.Config{
+						RootCAs: pool,
+					},
+				},
+				Retries:    5,
+				GetTimeout: 30 * time.Second,
 			},
 			Timeout: 10 * time.Second,
 		}

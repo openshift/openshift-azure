@@ -1,7 +1,6 @@
 package openshift
 
 import (
-	"net"
 	"net/http"
 	"time"
 
@@ -80,14 +79,6 @@ func newClientFromKubeConfig(log *logrus.Entry, kc *v1.Config) (*Client, error) 
 	restconfig.WrapTransport = func(rt http.RoundTripper) http.RoundTripper {
 		// first, tweak values on the incoming RoundTripper, which we are
 		// relying on being an *http.Transport.
-
-		// see net/http/transport.go: all values are default except the dial
-		// timeout reduction from 30 to 10 seconds.
-		rt.(*http.Transport).DialContext = (&net.Dialer{
-			Timeout:   10 * time.Second,
-			KeepAlive: 30 * time.Second,
-			DualStack: true,
-		}).DialContext
 
 		rt.(*http.Transport).DisableKeepAlives = true
 
