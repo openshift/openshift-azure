@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -13,7 +12,6 @@ import (
 
 	"github.com/openshift/installer/pkg/asset/installconfig"
 	assetstore "github.com/openshift/installer/pkg/asset/store"
-	"github.com/openshift/installer/pkg/gather/ssh"
 	"github.com/openshift/installer/pkg/terraform"
 	gatheraws "github.com/openshift/installer/pkg/terraform/gather/aws"
 	gatherazure "github.com/openshift/installer/pkg/terraform/gather/azure"
@@ -47,7 +45,6 @@ var (
 	gatherBootstrapOpts struct {
 		bootstrap string
 		masters   []string
-		sshKeys   []string
 	}
 )
 
@@ -67,7 +64,6 @@ func newGatherBootstrapCmd() *cobra.Command {
 	}
 	cmd.PersistentFlags().StringVar(&gatherBootstrapOpts.bootstrap, "bootstrap", "", "Hostname or IP of the bootstrap host")
 	cmd.PersistentFlags().StringArrayVar(&gatherBootstrapOpts.masters, "master", []string{}, "Hostnames or IPs of all control plane hosts")
-	cmd.PersistentFlags().StringArrayVar(&gatherBootstrapOpts.sshKeys, "key", []string{}, "Path to SSH private keys that should be used for authentication. If no key was provided, SSH private keys from user's environment will be used")
 	return cmd
 }
 
@@ -75,7 +71,7 @@ func runGatherBootstrapCmd(directory string) error {
 	tfStateFilePath := filepath.Join(directory, terraform.StateFileName)
 	_, err := os.Stat(tfStateFilePath)
 	if os.IsNotExist(err) {
-		return unSupportedPlatformGather(directory)
+		return unSupportedPlatformGather()
 	}
 	if err != nil {
 		return err
@@ -99,29 +95,30 @@ func runGatherBootstrapCmd(directory string) error {
 	if err != nil {
 		if err2, ok := err.(errUnSupportedGatherPlatform); ok {
 			logrus.Error(err2)
-			return unSupportedPlatformGather(directory)
+			return unSupportedPlatformGather()
 		}
 		return errors.Wrapf(err, "failed to get bootstrap and control plane host addresses from %q", tfStateFilePath)
 	}
 
-	return logGatherBootstrap(bootstrap, port, masters, directory)
+	logGatherBootstrap(bootstrap, port, masters)
+	return nil
 }
 
-func logGatherBootstrap(bootstrap string, port int, masters []string, directory string) error {
-	logrus.Info("Pulling debug logs from the bootstrap machine")
-	client, err := ssh.NewClient("core", fmt.Sprintf("%s:%d", bootstrap, port), gatherBootstrapOpts.sshKeys)
-	if err != nil {
-		return errors.Wrap(err, "failed to create SSH client")
+func logGatherBootstrap(bootstrap string, port int, masters []string) {
+	var (
+		sshport string
+		scpport string
+	)
+	if port != 22 {
+		sshport = fmt.Sprintf(" -p %d", port)
+		scpport = fmt.Sprintf(" -P %d", port)
 	}
-	if err := ssh.Run(client, fmt.Sprintf("/usr/local/bin/installer-gather.sh %s", strings.Join(masters, " "))); err != nil {
-		return errors.Wrap(err, "failed to run remote command")
+	if s, ok := os.LookupEnv("SSH_AUTH_SOCK"); !ok || s == "" {
+		logrus.Info("Make sure ssh-agent is running, env SSH_AUTH_SOCK is set to the ssh-agent's UNIX socket and your private key is added to the agent.")
 	}
-	file := filepath.Join(directory, fmt.Sprintf("log-bundle-%s.tar.gz", time.Now().Format("20060102150405")))
-	if err := ssh.PullFileTo(client, "/home/core/log-bundle.tar.gz", file); err != nil {
-		return errors.Wrap(err, "failed to pull log file from remote")
-	}
-	logrus.Infof("Bootstrap gather logs captured here %q", file)
-	return nil
+	logrus.Info("Use the following commands to gather logs from the cluster")
+	logrus.Infof("ssh -A%s core@%s '/usr/local/bin/installer-gather.sh %s'", sshport, bootstrap, strings.Join(masters, " "))
+	logrus.Infof("scp%s core@%s:~/log-bundle.tar.gz .", scpport, bootstrap)
 }
 
 func extractHostAddresses(config *types.InstallConfig, tfstate *terraform.State) (bootstrap string, port int, masters []string, err error) {
@@ -178,10 +175,11 @@ func (e errUnSupportedGatherPlatform) Error() string {
 	return e.Message
 }
 
-func unSupportedPlatformGather(directory string) error {
+func unSupportedPlatformGather() error {
 	if gatherBootstrapOpts.bootstrap == "" || len(gatherBootstrapOpts.masters) == 0 {
 		return errors.New("boostrap host address and at least one control plane host address must be provided")
 	}
 
-	return logGatherBootstrap(gatherBootstrapOpts.bootstrap, 22, gatherBootstrapOpts.masters, directory)
+	logGatherBootstrap(gatherBootstrapOpts.bootstrap, 22, gatherBootstrapOpts.masters)
+	return nil
 }

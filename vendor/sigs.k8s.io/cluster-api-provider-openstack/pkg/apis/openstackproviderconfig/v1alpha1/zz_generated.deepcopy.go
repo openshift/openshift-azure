@@ -211,8 +211,11 @@ func (in *OpenstackProviderSpec) DeepCopyInto(out *OpenstackProviderSpec) {
 		**out = **in
 	}
 	out.RootVolume = in.RootVolume
-	out.Tags = in.Tags
-
+	if in.Tags != nil {
+		in, out := &in.Tags, &out.Tags
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	if in.ServerMetadata != nil {
 		in, out := &in.ServerMetadata, &out.ServerMetadata
 		*out = make(map[string]string, len(*in))
