@@ -29,6 +29,7 @@ import (
 	"github.com/openshift/installer/pkg/types/defaults"
 	openstackvalidation "github.com/openshift/installer/pkg/types/openstack/validation"
 	"github.com/openshift/installer/pkg/types/validation"
+	pkgvalidate "github.com/openshift/installer/pkg/validate"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 )
 
@@ -38,10 +39,13 @@ var (
 )
 
 type EnvConfig struct {
-	SubscriptionID string `envconfig:"AZURE_SUBSCRIPTION_ID" required:"true"`
-	ClientID       string `envconfig:"AZURE_CLIENT_ID" required:"true"`
-	ClientSecret   string `envconfig:"AZURE_CLIENT_SECRET" required:"true"`
-	TenantID       string `envconfig:"AZURE_TENANT_ID" required:"true"`
+	SubscriptionID   string `envconfig:"AZURE_SUBSCRIPTION_ID" required:"true"`
+	ClientID         string `envconfig:"AZURE_CLIENT_ID" required:"true"`
+	ClientSecret     string `envconfig:"AZURE_CLIENT_SECRET" required:"true"`
+	TenantID         string `envconfig:"AZURE_TENANT_ID" required:"true"`
+	DNSResourceGroup string `envconfig:"DNS_RESOURCEGROUP" required:"true"`
+
+	SSHKey string `envconfig:"SSH_KEY" required:"true"`
 
 	Region  string
 	Regions string `envconfig:"AZURE_REGIONS" required:"true"`
@@ -67,6 +71,22 @@ func newEnvConfig() (*EnvConfig, error) {
 	return &c, nil
 }
 
+func readSSHKey(path string) (string, error) {
+	keyAsBytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+
+	key := string(keyAsBytes)
+
+	err = pkgvalidate.SSHPublicKey(key)
+	if err != nil {
+		return "", err
+	}
+
+	return key, nil
+}
+
 func getInstallConfig(name string, ec *EnvConfig) (*types.InstallConfig, error) {
 	// TODO: move to util/secrets
 	fqdn, err := random.FQDN(baseDomain, 5)
@@ -84,6 +104,10 @@ func getInstallConfig(name string, ec *EnvConfig) (*types.InstallConfig, error) 
 		return nil, err
 	}
 
+	sshKey, err := readSSHKey(ec.SSHKey)
+	if err != nil {
+		return nil, err
+	}
 	cfg := types.InstallConfig{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: types.InstallConfigVersion,
@@ -117,10 +141,12 @@ func getInstallConfig(name string, ec *EnvConfig) (*types.InstallConfig, error) 
 		},
 		Platform: types.Platform{
 			Azure: &azure.Platform{
-				Region: ec.Region,
+				Region:                      ec.Region,
+				BaseDomainResourceGroupName: ec.DNSResourceGroup,
 			},
 		},
 		PullSecret: string(pullSecret),
+		SSHKey:     sshKey,
 	}
 	return &cfg, nil
 }
@@ -187,19 +213,20 @@ func run() error {
 		Filename: "install-config.yaml",
 		Data:     data,
 	}
-	waIc := []asset.WritableAsset{ic}
-
-	// TODO: Start consuming assets. Assets need to be file system agnostic
-	// Like: https://github.com/openshift/installer/blob/master/pkg/asset/installconfig/ssh.go#L49
-
 	// TODO re-implement the store to not use the filesystem?
 	directory := path.Join("clusters", name)
 	assetStore, err := store.NewStore(directory)
 	if err != nil {
 		return errors.Wrap(err, "failed to create asset store")
 	}
+	if err := asset.PersistToFile(ic, directory); err != nil {
+		return errors.Wrap(err, "failed to write install config")
+	}
 
-	targets := waIc
+	// TODO: Start consuming assets. Assets need to be file system agnostic
+	// Like: https://github.com/openshift/installer/blob/master/pkg/asset/installconfig/ssh.go#L49
+
+	targets := targetassets.InstallConfig
 	targets = append(targets, targetassets.IgnitionConfigs...)
 	targets = append(targets, targetassets.Manifests...)
 	targets = append(targets, targetassets.Cluster...)
