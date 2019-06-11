@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 	"fmt"
+	"context"
 
 	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
@@ -14,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/openshift/installer/pkg/asset"
+	"k8s.io/client-go/tools/clientcmd"
 	"github.com/openshift/installer/pkg/asset/installconfig"
 	icazure "github.com/openshift/installer/pkg/asset/installconfig/azure"
 	"github.com/openshift/installer/pkg/asset/store"
@@ -22,8 +24,10 @@ import (
 	"github.com/openshift/installer/pkg/types/defaults"
 	openstackvalidation "github.com/openshift/installer/pkg/types/openstack/validation"
 	"github.com/openshift/installer/pkg/types/validation"
+	destroybootstrap "github.com/openshift/installer/pkg/destroy/bootstrap"
 
 	fakerpconfig "github.com/openshift/openshift-azure/pkg/fakerp/config"
+	"github.com/openshift/openshift-azure/pkg/util/installer"
 )
 
 var (
@@ -163,10 +167,28 @@ func run(log *logrus.Entry) error {
 		}
 	}
 
-	// wait for the cluster to come up
-	//	err = waitForBootstrapComplete(ctx, config, rootOpts.dir)
-	//	err = destroybootstrap.Destroy(rootOpts.dir)
-	//	err = waitForInstallComplete(ctx, config, rootOpts.dir)
 
+	// waiting routine
+	config, err := clientcmd.BuildConfigFromFlags("", filepath.Join(ec.Directory, "auth", "kubeconfig"))
+				if err != nil {
+					logrus.Fatal(errors.Wrap(err, "loading kubeconfig"))
+				}
+
+	// TODO: Implement context
+	ctx:= context.Background()
+	// wait for the cluster to come up
+	// TODO: All these should become part of installer code base
+	err = installer.WaitForBootstrapComplete(ctx, config, ec.Directory)
+	if err!=nil{
+		return err
+	}
+	err = destroybootstrap.Destroy(ec.Directory)
+	if err!=nil{
+		return err
+	}
+	err = installer.WaitForInstallComplete(ctx, config, ec.Directory)
+	if err!=nil{
+		return err
+	}
 	return nil
 }

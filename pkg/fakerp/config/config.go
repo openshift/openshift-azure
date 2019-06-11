@@ -15,10 +15,10 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/openshift/installer/pkg/ipnet"
 	"github.com/openshift/installer/pkg/types"
-	"github.com/openshift/installer/pkg/types/azure"
+	azuretypes "github.com/openshift/installer/pkg/types/azure"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
@@ -67,12 +67,6 @@ func NewEnvConfig(name string) (*EnvConfig, error) {
 
 // GetInstallConfig returns pre-populated install config
 func GetInstallConfig(name string, ec *EnvConfig) (*types.InstallConfig, error) {
-	// TODO: move to util/secrets
-	fqdn, err := random.FQDN(baseDomain, 5)
-	if err != nil {
-		return nil, err
-	}
-
 	file, err := os.Open("secrets/pull-secret.txt")
 	if err != nil {
 		return nil, err
@@ -119,12 +113,18 @@ func GetInstallConfig(name string, ec *EnvConfig) (*types.InstallConfig, error) 
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
 		},
-		BaseDomain: fqdn,
+		BaseDomain: baseDomain,
 		Compute: []types.MachinePool{
 			{
 				Name:           "worker",
-				Replicas:       to.Int64Ptr(1),
+				Replicas:       to.Int64Ptr(3),
 				Hyperthreading: types.HyperthreadingEnabled,
+				Platform: types.MachinePoolPlatform{
+					Azure: &azuretypes.MachinePool{
+						Zones:        []string{"1", "2", "3"},
+						InstanceType: "Standard_D3_v2",
+					},
+				},
 			},
 		},
 		Networking: &types.Networking{
@@ -144,9 +144,9 @@ func GetInstallConfig(name string, ec *EnvConfig) (*types.InstallConfig, error) 
 			Hyperthreading: types.HyperthreadingEnabled,
 		},
 		Platform: types.Platform{
-			Azure: &azure.Platform{
+			Azure: &azuretypes.Platform{
 				Region:                      ec.Region,
-				BaseDomainResourceGroupName: name,
+				BaseDomainResourceGroupName: ec.DNSResourceGroup,
 			},
 		},
 		PullSecret: string(pullSecret),
