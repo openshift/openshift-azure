@@ -1,4 +1,4 @@
-/env.*
+/env*
 !/env.example
 .vscode
 .idea
@@ -6,4 +6,6 @@ coverage.out
 cscope.files
 cscope.out
 /secrets
-/_vendor*
+/vendor*
+/clusters
+/azure
