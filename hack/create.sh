@@ -6,5 +6,5 @@ if [[ $# -ne 1 ]]; then
 fi
 
 export RESOURCEGROUP=$1
-
+export OPENSHIFT_INSTALL_DATA=vendor/github.com/openshift/installer/data/data
 go run cmd/azure/azure.go -n $RESOURCEGROUP
