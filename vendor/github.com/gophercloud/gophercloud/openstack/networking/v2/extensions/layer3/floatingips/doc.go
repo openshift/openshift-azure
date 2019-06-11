@@ -52,7 +52,7 @@ Example to Disassociate a Floating IP with a Port
 	fipID := "2f245a7b-796b-4f26-9cf9-9e82d248fda7"
 
 	updateOpts := floatingips.UpdateOpts{
-		PortID: new(string),
+		PortID: nil,
 	}
 
 	fip, err := floatingips.Update(networkingClient, fipID, updateOpts).Extract()

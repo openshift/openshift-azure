@@ -1,4 +1,4 @@
-package v1helpers
+package v1
 
 import (
 	"bytes"

@@ -57,7 +57,7 @@ func (c *ELBV2) AddListenerCertificatesRequest(input *AddListenerCertificatesInp
 
 // AddListenerCertificates API operation for Elastic Load Balancing.
 //
-// Adds the specified certificate to the specified HTTPS listener.
+// Adds the specified certificate to the specified secure listener.
 //
 // If the certificate was already added, the call is successful but the certificate
 // is not added again.
@@ -257,9 +257,9 @@ func (c *ELBV2) CreateListenerRequest(input *CreateListenerInput) (req *request.
 // If you attempt to create multiple listeners with the same settings, each
 // call succeeds.
 //
-// For more information, see Listeners for Your Application Load Balancers (https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html)
+// For more information, see Listeners for Your Application Load Balancers (http://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html)
 // in the Application Load Balancers Guide and Listeners for Your Network Load
-// Balancers (https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-listeners.html)
+// Balancers (http://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-listeners.html)
 // in the Network Load Balancers Guide.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -392,17 +392,17 @@ func (c *ELBV2) CreateLoadBalancerRequest(input *CreateLoadBalancerInput) (req *
 // your current load balancers, see DescribeLoadBalancers. When you are finished
 // with a load balancer, you can delete it using DeleteLoadBalancer.
 //
-// For limit information, see Limits for Your Application Load Balancer (https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-limits.html)
+// For limit information, see Limits for Your Application Load Balancer (http://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-limits.html)
 // in the Application Load Balancers Guide and Limits for Your Network Load
-// Balancer (https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-limits.html)
+// Balancer (http://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-limits.html)
 // in the Network Load Balancers Guide.
 //
 // This operation is idempotent, which means that it completes at most one time.
 // If you attempt to create multiple load balancers with the same settings,
 // each call succeeds.
 //
-// For more information, see Application Load Balancers (https://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html)
-// in the Application Load Balancers Guide and Network Load Balancers (https://docs.aws.amazon.com/elasticloadbalancing/latest/network/network-load-balancers.html)
+// For more information, see Application Load Balancers (http://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html)
+// in the Application Load Balancers Guide and Network Load Balancers (http://docs.aws.amazon.com/elasticloadbalancing/latest/network/network-load-balancers.html)
 // in the Network Load Balancers Guide.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -524,7 +524,7 @@ func (c *ELBV2) CreateRuleRequest(input *CreateRuleInput) (req *request.Request,
 // Rules are evaluated in priority order, from the lowest value to the highest
 // value. When the conditions for a rule are met, its actions are performed.
 // If the conditions for no rules are met, the actions for the default rule
-// are performed. For more information, see Listener Rules (https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html#listener-rules)
+// are performed. For more information, see Listener Rules (http://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html#listener-rules)
 // in the Application Load Balancers Guide.
 //
 // To view your current rules, use DescribeRules. To update a rule, use ModifyRule.
@@ -661,9 +661,9 @@ func (c *ELBV2) CreateTargetGroupRequest(input *CreateTargetGroupInput) (req *re
 // call succeeds.
 //
 // For more information, see Target Groups for Your Application Load Balancers
-// (https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-target-groups.html)
+// (http://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-target-groups.html)
 // in the Application Load Balancers Guide or Target Groups for Your Network
-// Load Balancers (https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-target-groups.html)
+// Load Balancers (http://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-target-groups.html)
 // in the Network Load Balancers Guide.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -1182,9 +1182,9 @@ func (c *ELBV2) DescribeAccountLimitsRequest(input *DescribeAccountLimitsInput) 
 // Describes the current Elastic Load Balancing resource limits for your AWS
 // account.
 //
-// For more information, see Limits for Your Application Load Balancers (https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-limits.html)
+// For more information, see Limits for Your Application Load Balancers (http://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-limits.html)
 // in the Application Load Balancer Guide or Limits for Your Network Load Balancers
-// (https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-limits.html)
+// (http://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-limits.html)
 // in the Network Load Balancers Guide.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -1259,7 +1259,7 @@ func (c *ELBV2) DescribeListenerCertificatesRequest(input *DescribeListenerCerti
 
 // DescribeListenerCertificates API operation for Elastic Load Balancing.
 //
-// Describes the certificates for the specified HTTPS listener.
+// Describes the certificates for the specified secure listener.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -1398,7 +1398,7 @@ func (c *ELBV2) DescribeListenersWithContext(ctx aws.Context, input *DescribeLis
 //    // Example iterating over at most 3 pages of a DescribeListeners operation.
 //    pageNum := 0
 //    err := client.DescribeListenersPages(params,
-//        func(page *elbv2.DescribeListenersOutput, lastPage bool) bool {
+//        func(page *DescribeListenersOutput, lastPage bool) bool {
 //            pageNum++
 //            fmt.Println(page)
 //            return pageNum <= 3
@@ -1484,8 +1484,8 @@ func (c *ELBV2) DescribeLoadBalancerAttributesRequest(input *DescribeLoadBalance
 // Describes the attributes for the specified Application Load Balancer or Network
 // Load Balancer.
 //
-// For more information, see Load Balancer Attributes (https://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html#load-balancer-attributes)
-// in the Application Load Balancers Guide or Load Balancer Attributes (https://docs.aws.amazon.com/elasticloadbalancing/latest/network/network-load-balancers.html#load-balancer-attributes)
+// For more information, see Load Balancer Attributes (http://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html#load-balancer-attributes)
+// in the Application Load Balancers Guide or Load Balancer Attributes (http://docs.aws.amazon.com/elasticloadbalancing/latest/network/network-load-balancers.html#load-balancer-attributes)
 // in the Network Load Balancers Guide.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -1620,7 +1620,7 @@ func (c *ELBV2) DescribeLoadBalancersWithContext(ctx aws.Context, input *Describ
 //    // Example iterating over at most 3 pages of a DescribeLoadBalancers operation.
 //    pageNum := 0
 //    err := client.DescribeLoadBalancersPages(params,
-//        func(page *elbv2.DescribeLoadBalancersOutput, lastPage bool) bool {
+//        func(page *DescribeLoadBalancersOutput, lastPage bool) bool {
 //            pageNum++
 //            fmt.Println(page)
 //            return pageNum <= 3
@@ -1791,7 +1791,7 @@ func (c *ELBV2) DescribeSSLPoliciesRequest(input *DescribeSSLPoliciesInput) (req
 //
 // Describes the specified policies or all policies used for SSL negotiation.
 //
-// For more information, see Security Policies (https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies)
+// For more information, see Security Policies (http://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies)
 // in the Application Load Balancers Guide.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -1963,8 +1963,8 @@ func (c *ELBV2) DescribeTargetGroupAttributesRequest(input *DescribeTargetGroupA
 //
 // Describes the attributes for the specified target group.
 //
-// For more information, see Target Group Attributes (https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-target-groups.html#target-group-attributes)
-// in the Application Load Balancers Guide or Target Group Attributes (https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-target-groups.html#target-group-attributes)
+// For more information, see Target Group Attributes (http://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-target-groups.html#target-group-attributes)
+// in the Application Load Balancers Guide or Target Group Attributes (http://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-target-groups.html#target-group-attributes)
 // in the Network Load Balancers Guide.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
@@ -2105,7 +2105,7 @@ func (c *ELBV2) DescribeTargetGroupsWithContext(ctx aws.Context, input *Describe
 //    // Example iterating over at most 3 pages of a DescribeTargetGroups operation.
 //    pageNum := 0
 //    err := client.DescribeTargetGroupsPages(params,
-//        func(page *elbv2.DescribeTargetGroupsOutput, lastPage bool) bool {
+//        func(page *DescribeTargetGroupsOutput, lastPage bool) bool {
 //            pageNum++
 //            fmt.Println(page)
 //            return pageNum <= 3
@@ -2278,10 +2278,9 @@ func (c *ELBV2) ModifyListenerRequest(input *ModifyListenerInput) (req *request.
 // Modifies the specified properties of the specified listener.
 //
 // Any properties that you do not specify retain their current values. However,
-// changing the protocol from HTTPS to HTTP, or from TLS to TCP, removes the
-// security policy and server certificate properties. If you change the protocol
-// from HTTP to HTTPS, or from TCP to TLS, you must add the security policy
-// and server certificate properties.
+// changing the protocol from HTTPS to HTTP removes the security policy and
+// SSL certificate properties. If you change the protocol from HTTP to HTTPS,
+// you must add the security policy and server certificate.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -2875,7 +2874,7 @@ func (c *ELBV2) RemoveListenerCertificatesRequest(input *RemoveListenerCertifica
 
 // RemoveListenerCertificates API operation for Elastic Load Balancing.
 //
-// Removes the specified certificate from the specified HTTPS listener.
+// Removes the specified certificate from the specified secure listener.
 //
 // You can't remove the default certificate for a listener. To replace the default
 // certificate, call ModifyListener.
@@ -3380,11 +3379,11 @@ func (c *ELBV2) SetSubnetsWithContext(ctx aws.Context, input *SetSubnetsInput, o
 type Action struct {
 	_ struct{} `type:"structure"`
 
-	// [HTTPS listeners] Information for using Amazon Cognito to authenticate users.
+	// [HTTPS listener] Information for using Amazon Cognito to authenticate users.
 	// Specify only when Type is authenticate-cognito.
 	AuthenticateCognitoConfig *AuthenticateCognitoActionConfig `type:"structure"`
 
-	// [HTTPS listeners] Information about an identity provider that is compliant
+	// [HTTPS listener] Information about an identity provider that is compliant
 	// with OpenID Connect (OIDC). Specify only when Type is authenticate-oidc.
 	AuthenticateOidcConfig *AuthenticateOidcActionConfig `type:"structure"`
 
@@ -3671,8 +3670,7 @@ type AuthenticateCognitoActionConfig struct {
 	//
 	//    * allow - Allow the request to be forwarded to the target.
 	//
-	//    * authenticate - Redirect the request to the IdP authorization endpoint.
-	//    This is the default value.
+	// authenticate
 	OnUnauthenticatedRequest *string `type:"string" enum:"AuthenticateCognitoActionConditionalBehaviorEnum"`
 
 	// The set of user claims to be requested from the IdP. The default is openid.
@@ -3803,10 +3801,10 @@ type AuthenticateOidcActionConfig struct {
 	// ClientId is a required field
 	ClientId *string `type:"string" required:"true"`
 
-	// The OAuth 2.0 client secret. This parameter is required if you are creating
-	// a rule. If you are modifying a rule, you can omit this parameter if you set
-	// UseExistingClientSecret to true.
-	ClientSecret *string `type:"string"`
+	// The OAuth 2.0 client secret.
+	//
+	// ClientSecret is a required field
+	ClientSecret *string `type:"string" required:"true"`
 
 	// The OIDC issuer identifier of the IdP. This must be a full URL, including
 	// the HTTPS protocol, the domain, and the path.
@@ -3821,8 +3819,7 @@ type AuthenticateOidcActionConfig struct {
 	//
 	//    * allow - Allow the request to be forwarded to the target.
 	//
-	//    * authenticate - Redirect the request to the IdP authorization endpoint.
-	//    This is the default value.
+	// authenticate
 	OnUnauthenticatedRequest *string `type:"string" enum:"AuthenticateOidcActionConditionalBehaviorEnum"`
 
 	// The set of user claims to be requested from the IdP. The default is openid.
@@ -3844,10 +3841,6 @@ type AuthenticateOidcActionConfig struct {
 	//
 	// TokenEndpoint is a required field
 	TokenEndpoint *string `type:"string" required:"true"`
-
-	// Indicates whether to use the existing client secret when modifying a rule.
-	// If you are creating a rule, you can omit this parameter or set it to false.
-	UseExistingClientSecret *bool `type:"boolean"`
 
 	// The user info endpoint of the IdP. This must be a full URL, including the
 	// HTTPS protocol, the domain, and the path.
@@ -3874,6 +3867,9 @@ func (s *AuthenticateOidcActionConfig) Validate() error {
 	}
 	if s.ClientId == nil {
 		invalidParams.Add(request.NewErrParamRequired("ClientId"))
+	}
+	if s.ClientSecret == nil {
+		invalidParams.Add(request.NewErrParamRequired("ClientSecret"))
 	}
 	if s.Issuer == nil {
 		invalidParams.Add(request.NewErrParamRequired("Issuer"))
@@ -3948,12 +3944,6 @@ func (s *AuthenticateOidcActionConfig) SetSessionTimeout(v int64) *AuthenticateO
 // SetTokenEndpoint sets the TokenEndpoint field's value.
 func (s *AuthenticateOidcActionConfig) SetTokenEndpoint(v string) *AuthenticateOidcActionConfig {
 	s.TokenEndpoint = &v
-	return s
-}
-
-// SetUseExistingClientSecret sets the UseExistingClientSecret field's value.
-func (s *AuthenticateOidcActionConfig) SetUseExistingClientSecret(v bool) *AuthenticateOidcActionConfig {
-	s.UseExistingClientSecret = &v
 	return s
 }
 
@@ -4075,9 +4065,9 @@ func (s *Cipher) SetPriority(v int64) *Cipher {
 type CreateListenerInput struct {
 	_ struct{} `type:"structure"`
 
-	// [HTTPS and TLS listeners] The default SSL server certificate. You must provide
-	// exactly one certificate. Set CertificateArn to the certificate ARN but do
-	// not set IsDefault.
+	// [HTTPS listeners] The default SSL server certificate. You must provide exactly
+	// one certificate. Set CertificateArn to the certificate ARN but do not set
+	// IsDefault.
 	//
 	// To create a certificate list, use AddListenerCertificates.
 	Certificates []*Certificate `type:"list"`
@@ -4086,13 +4076,13 @@ type CreateListenerInput struct {
 	// or one or more fixed-response actions.
 	//
 	// If the action type is forward, you specify a target group. The protocol of
-	// the target group must be HTTP or HTTPS for an Application Load Balancer.
-	// The protocol of the target group must be TCP or TLS for a Network Load Balancer.
+	// the target group must be HTTP or HTTPS for an Application Load Balancer or
+	// TCP for a Network Load Balancer.
 	//
-	// [HTTPS listeners] If the action type is authenticate-oidc, you authenticate
+	// [HTTPS listener] If the action type is authenticate-oidc, you authenticate
 	// users through an identity provider that is OpenID Connect (OIDC) compliant.
 	//
-	// [HTTPS listeners] If the action type is authenticate-cognito, you authenticate
+	// [HTTPS listener] If the action type is authenticate-cognito, you authenticate
 	// users through the user pools supported by Amazon Cognito.
 	//
 	// [Application Load Balancer] If the action type is redirect, you redirect
@@ -4116,14 +4106,13 @@ type CreateListenerInput struct {
 
 	// The protocol for connections from clients to the load balancer. For Application
 	// Load Balancers, the supported protocols are HTTP and HTTPS. For Network Load
-	// Balancers, the supported protocols are TCP and TLS.
+	// Balancers, the supported protocol is TCP.
 	//
 	// Protocol is a required field
 	Protocol *string `type:"string" required:"true" enum:"ProtocolEnum"`
 
-	// [HTTPS and TLS listeners] The security policy that defines which ciphers
-	// and protocols are supported. The default is the current predefined security
-	// policy.
+	// [HTTPS listeners] The security policy that defines which ciphers and protocols
+	// are supported. The default is the current predefined security policy.
 	SslPolicy *string `type:"string"`
 }
 
@@ -4407,13 +4396,13 @@ type CreateRuleInput struct {
 	// actions: forward, fixed-response, or redirect.
 	//
 	// If the action type is forward, you specify a target group. The protocol of
-	// the target group must be HTTP or HTTPS for an Application Load Balancer.
-	// The protocol of the target group must be TCP or TLS for a Network Load Balancer.
+	// the target group must be HTTP or HTTPS for an Application Load Balancer or
+	// TCP for a Network Load Balancer.
 	//
-	// [HTTPS listeners] If the action type is authenticate-oidc, you authenticate
+	// [HTTPS listener] If the action type is authenticate-oidc, you authenticate
 	// users through an identity provider that is OpenID Connect (OIDC) compliant.
 	//
-	// [HTTPS listeners] If the action type is authenticate-cognito, you authenticate
+	// [HTTPS listener] If the action type is authenticate-cognito, you authenticate
 	// users through the user pools supported by Amazon Cognito.
 	//
 	// [Application Load Balancer] If the action type is redirect, you redirect
@@ -4570,10 +4559,10 @@ type CreateTargetGroupInput struct {
 	HealthCheckEnabled *bool `type:"boolean"`
 
 	// The approximate amount of time, in seconds, between health checks of an individual
-	// target. For Application Load Balancers, the range is 5–300 seconds. For
-	// Network Load Balancers, the supported values are 10 or 30 seconds. If the
-	// target type is instance or ip, the default is 30 seconds. If the target type
-	// is lambda, the default is 35 seconds.
+	// target. For Application Load Balancers, the range is 5–300 seconds. For Network
+	// Load Balancers, the supported values are 10 or 30 seconds. If the target
+	// type is instance or ip, the default is 30 seconds. If the target type is
+	// lambda, the default is 35 seconds.
 	HealthCheckIntervalSeconds *int64 `min:"5" type:"integer"`
 
 	// [HTTP/HTTPS health checks] The ping path that is the destination on the targets
@@ -4586,10 +4575,9 @@ type CreateTargetGroupInput struct {
 	HealthCheckPort *string `type:"string"`
 
 	// The protocol the load balancer uses when performing health checks on targets.
-	// For Application Load Balancers, the default is HTTP. For Network Load Balancers,
-	// the default is TCP. The TCP protocol is supported for health checks only
-	// if the protocol of the target group is TCP or TLS. The TLS protocol is not
-	// supported for health checks.
+	// The TCP protocol is supported only if the protocol of the target group is
+	// TCP. For Application Load Balancers, the default is HTTP. For Network Load
+	// Balancers, the default is TCP.
 	HealthCheckProtocol *string `type:"string" enum:"ProtocolEnum"`
 
 	// The amount of time, in seconds, during which no response from a target means
@@ -4625,8 +4613,8 @@ type CreateTargetGroupInput struct {
 
 	// The protocol to use for routing traffic to the targets. For Application Load
 	// Balancers, the supported protocols are HTTP and HTTPS. For Network Load Balancers,
-	// the supported protocols are TCP and TLS. If the target is a Lambda function,
-	// this parameter does not apply.
+	// the supported protocol is TCP. If the target is a Lambda function, this parameter
+	// does not apply.
 	Protocol *string `type:"string" enum:"ProtocolEnum"`
 
 	// The type of target that you must specify when registering targets with this
@@ -6075,80 +6063,6 @@ func (s *FixedResponseActionConfig) SetStatusCode(v string) *FixedResponseAction
 	return s
 }
 
-type HostHeaderConditionConfig struct {
-	_ struct{} `type:"structure"`
-
-	Values []*string `type:"list"`
-}
-
-// String returns the string representation
-func (s HostHeaderConditionConfig) String() string {
-	return awsutil.Prettify(s)
-}
-
-// GoString returns the string representation
-func (s HostHeaderConditionConfig) GoString() string {
-	return s.String()
-}
-
-// SetValues sets the Values field's value.
-func (s *HostHeaderConditionConfig) SetValues(v []*string) *HostHeaderConditionConfig {
-	s.Values = v
-	return s
-}
-
-type HttpHeaderConditionConfig struct {
-	_ struct{} `type:"structure"`
-
-	HttpHeaderName *string `type:"string"`
-
-	Values []*string `type:"list"`
-}
-
-// String returns the string representation
-func (s HttpHeaderConditionConfig) String() string {
-	return awsutil.Prettify(s)
-}
-
-// GoString returns the string representation
-func (s HttpHeaderConditionConfig) GoString() string {
-	return s.String()
-}
-
-// SetHttpHeaderName sets the HttpHeaderName field's value.
-func (s *HttpHeaderConditionConfig) SetHttpHeaderName(v string) *HttpHeaderConditionConfig {
-	s.HttpHeaderName = &v
-	return s
-}
-
-// SetValues sets the Values field's value.
-func (s *HttpHeaderConditionConfig) SetValues(v []*string) *HttpHeaderConditionConfig {
-	s.Values = v
-	return s
-}
-
-type HttpRequestMethodConditionConfig struct {
-	_ struct{} `type:"structure"`
-
-	Values []*string `type:"list"`
-}
-
-// String returns the string representation
-func (s HttpRequestMethodConditionConfig) String() string {
-	return awsutil.Prettify(s)
-}
-
-// GoString returns the string representation
-func (s HttpRequestMethodConditionConfig) GoString() string {
-	return s.String()
-}
-
-// SetValues sets the Values field's value.
-func (s *HttpRequestMethodConditionConfig) SetValues(v []*string) *HttpRequestMethodConditionConfig {
-	s.Values = v
-	return s
-}
-
 // Information about an Elastic Load Balancing resource limit for your AWS account.
 type Limit struct {
 	_ struct{} `type:"structure"`
@@ -6205,7 +6119,7 @@ type Listener struct {
 	_ struct{} `type:"structure"`
 
 	// The SSL server certificate. You must provide a certificate if the protocol
-	// is HTTPS or TLS.
+	// is HTTPS.
 	Certificates []*Certificate `type:"list"`
 
 	// The default actions for the listener.
@@ -6455,6 +6369,11 @@ type LoadBalancerAttribute struct {
 	// The following attributes are supported by both Application Load Balancers
 	// and Network Load Balancers:
 	//
+	//    * deletion_protection.enabled - Indicates whether deletion protection
+	//    is enabled. The value is true or false. The default is false.
+	//
+	// The following attributes are supported by only Application Load Balancers:
+	//
 	//    * access_logs.s3.enabled - Indicates whether access logs are enabled.
 	//    The value is true or false. The default is false.
 	//
@@ -6465,11 +6384,6 @@ type LoadBalancerAttribute struct {
 	//
 	//    * access_logs.s3.prefix - The prefix for the location in the S3 bucket
 	//    for the access logs.
-	//
-	//    * deletion_protection.enabled - Indicates whether deletion protection
-	//    is enabled. The value is true or false. The default is false.
-	//
-	// The following attributes are supported by only Application Load Balancers:
 	//
 	//    * idle_timeout.timeout_seconds - The idle timeout value, in seconds. The
 	//    valid range is 1-4000 seconds. The default is 60 seconds.
@@ -6592,9 +6506,9 @@ func (s *Matcher) SetHttpCode(v string) *Matcher {
 type ModifyListenerInput struct {
 	_ struct{} `type:"structure"`
 
-	// [HTTPS and TLS listeners] The default SSL server certificate. You must provide
-	// exactly one certificate. Set CertificateArn to the certificate ARN but do
-	// not set IsDefault.
+	// [HTTPS listeners] The default SSL server certificate. You must provide exactly
+	// one certificate. Set CertificateArn to the certificate ARN but do not set
+	// IsDefault.
 	//
 	// To create a certificate list, use AddListenerCertificates.
 	Certificates []*Certificate `type:"list"`
@@ -6603,13 +6517,13 @@ type ModifyListenerInput struct {
 	// or one or more fixed-response actions.
 	//
 	// If the action type is forward, you specify a target group. The protocol of
-	// the target group must be HTTP or HTTPS for an Application Load Balancer.
-	// The protocol of the target group must be TCP or TLS for a Network Load Balancer.
+	// the target group must be HTTP or HTTPS for an Application Load Balancer or
+	// TCP for a Network Load Balancer.
 	//
-	// [HTTPS listeners] If the action type is authenticate-oidc, you authenticate
+	// [HTTPS listener] If the action type is authenticate-oidc, you authenticate
 	// users through an identity provider that is OpenID Connect (OIDC) compliant.
 	//
-	// [HTTPS listeners] If the action type is authenticate-cognito, you authenticate
+	// [HTTPS listener] If the action type is authenticate-cognito, you authenticate
 	// users through the user pools supported by Amazon Cognito.
 	//
 	// [Application Load Balancer] If the action type is redirect, you redirect
@@ -6628,12 +6542,12 @@ type ModifyListenerInput struct {
 	Port *int64 `min:"1" type:"integer"`
 
 	// The protocol for connections from clients to the load balancer. Application
-	// Load Balancers support the HTTP and HTTPS protocols. Network Load Balancers
-	// support the TCP and TLS protocols.
+	// Load Balancers support HTTP and HTTPS and Network Load Balancers support
+	// TCP.
 	Protocol *string `type:"string" enum:"ProtocolEnum"`
 
-	// [HTTPS and TLS listeners] The security policy that defines which protocols
-	// and ciphers are supported. For more information, see Security Policies (https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies)
+	// [HTTPS listeners] The security policy that defines which protocols and ciphers
+	// are supported. For more information, see Security Policies (http://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies)
 	// in the Application Load Balancers Guide.
 	SslPolicy *string `type:"string"`
 }
@@ -6814,13 +6728,13 @@ type ModifyRuleInput struct {
 	// The actions.
 	//
 	// If the action type is forward, you specify a target group. The protocol of
-	// the target group must be HTTP or HTTPS for an Application Load Balancer.
-	// The protocol of the target group must be TCP or TLS for a Network Load Balancer.
+	// the target group must be HTTP or HTTPS for an Application Load Balancer or
+	// TCP for a Network Load Balancer.
 	//
-	// [HTTPS listeners] If the action type is authenticate-oidc, you authenticate
+	// [HTTPS listener] If the action type is authenticate-oidc, you authenticate
 	// users through an identity provider that is OpenID Connect (OIDC) compliant.
 	//
-	// [HTTPS listeners] If the action type is authenticate-cognito, you authenticate
+	// [HTTPS listener] If the action type is authenticate-cognito, you authenticate
 	// users through the user pools supported by Amazon Cognito.
 	//
 	// [Application Load Balancer] If the action type is redirect, you redirect
@@ -7023,8 +6937,8 @@ type ModifyTargetGroupInput struct {
 	HealthCheckEnabled *bool `type:"boolean"`
 
 	// The approximate amount of time, in seconds, between health checks of an individual
-	// target. For Application Load Balancers, the range is 5–300 seconds. For
-	// Network Load Balancers, the supported values are 10 or 30 seconds.
+	// target. For Application Load Balancers, the range is 5–300 seconds. For Network
+	// Load Balancers, the supported values are 10 or 30 seconds.
 	//
 	// If the protocol of the target group is TCP, you can't modify this setting.
 	HealthCheckIntervalSeconds *int64 `min:"5" type:"integer"`
@@ -7037,9 +6951,8 @@ type ModifyTargetGroupInput struct {
 	HealthCheckPort *string `type:"string"`
 
 	// The protocol the load balancer uses when performing health checks on targets.
-	// The TCP protocol is supported for health checks only if the protocol of the
-	// target group is TCP or TLS. The TLS protocol is not supported for health
-	// checks.
+	// The TCP protocol is supported only if the protocol of the target group is
+	// TCP.
 	//
 	// If the protocol of the target group is TCP, you can't modify this setting.
 	HealthCheckProtocol *string `type:"string" enum:"ProtocolEnum"`
@@ -7194,80 +7107,6 @@ func (s ModifyTargetGroupOutput) GoString() string {
 // SetTargetGroups sets the TargetGroups field's value.
 func (s *ModifyTargetGroupOutput) SetTargetGroups(v []*TargetGroup) *ModifyTargetGroupOutput {
 	s.TargetGroups = v
-	return s
-}
-
-type PathPatternConditionConfig struct {
-	_ struct{} `type:"structure"`
-
-	Values []*string `type:"list"`
-}
-
-// String returns the string representation
-func (s PathPatternConditionConfig) String() string {
-	return awsutil.Prettify(s)
-}
-
-// GoString returns the string representation
-func (s PathPatternConditionConfig) GoString() string {
-	return s.String()
-}
-
-// SetValues sets the Values field's value.
-func (s *PathPatternConditionConfig) SetValues(v []*string) *PathPatternConditionConfig {
-	s.Values = v
-	return s
-}
-
-type QueryStringConditionConfig struct {
-	_ struct{} `type:"structure"`
-
-	Values []*QueryStringKeyValuePair `type:"list"`
-}
-
-// String returns the string representation
-func (s QueryStringConditionConfig) String() string {
-	return awsutil.Prettify(s)
-}
-
-// GoString returns the string representation
-func (s QueryStringConditionConfig) GoString() string {
-	return s.String()
-}
-
-// SetValues sets the Values field's value.
-func (s *QueryStringConditionConfig) SetValues(v []*QueryStringKeyValuePair) *QueryStringConditionConfig {
-	s.Values = v
-	return s
-}
-
-type QueryStringKeyValuePair struct {
-	_ struct{} `type:"structure"`
-
-	Key *string `type:"string"`
-
-	Value *string `type:"string"`
-}
-
-// String returns the string representation
-func (s QueryStringKeyValuePair) String() string {
-	return awsutil.Prettify(s)
-}
-
-// GoString returns the string representation
-func (s QueryStringKeyValuePair) GoString() string {
-	return s.String()
-}
-
-// SetKey sets the Key field's value.
-func (s *QueryStringKeyValuePair) SetKey(v string) *QueryStringKeyValuePair {
-	s.Key = &v
-	return s
-}
-
-// SetValue sets the Value field's value.
-func (s *QueryStringKeyValuePair) SetValue(v string) *QueryStringKeyValuePair {
-	s.Value = &v
 	return s
 }
 
@@ -7668,18 +7507,6 @@ type RuleCondition struct {
 	// The name of the field. The possible values are host-header and path-pattern.
 	Field *string `type:"string"`
 
-	HostHeaderConfig *HostHeaderConditionConfig `type:"structure"`
-
-	HttpHeaderConfig *HttpHeaderConditionConfig `type:"structure"`
-
-	HttpRequestMethodConfig *HttpRequestMethodConditionConfig `type:"structure"`
-
-	PathPatternConfig *PathPatternConditionConfig `type:"structure"`
-
-	QueryStringConfig *QueryStringConditionConfig `type:"structure"`
-
-	SourceIpConfig *SourceIpConditionConfig `type:"structure"`
-
 	// The condition value.
 	//
 	// If the field name is host-header, you can specify a single host name (for
@@ -7725,42 +7552,6 @@ func (s RuleCondition) GoString() string {
 // SetField sets the Field field's value.
 func (s *RuleCondition) SetField(v string) *RuleCondition {
 	s.Field = &v
-	return s
-}
-
-// SetHostHeaderConfig sets the HostHeaderConfig field's value.
-func (s *RuleCondition) SetHostHeaderConfig(v *HostHeaderConditionConfig) *RuleCondition {
-	s.HostHeaderConfig = v
-	return s
-}
-
-// SetHttpHeaderConfig sets the HttpHeaderConfig field's value.
-func (s *RuleCondition) SetHttpHeaderConfig(v *HttpHeaderConditionConfig) *RuleCondition {
-	s.HttpHeaderConfig = v
-	return s
-}
-
-// SetHttpRequestMethodConfig sets the HttpRequestMethodConfig field's value.
-func (s *RuleCondition) SetHttpRequestMethodConfig(v *HttpRequestMethodConditionConfig) *RuleCondition {
-	s.HttpRequestMethodConfig = v
-	return s
-}
-
-// SetPathPatternConfig sets the PathPatternConfig field's value.
-func (s *RuleCondition) SetPathPatternConfig(v *PathPatternConditionConfig) *RuleCondition {
-	s.PathPatternConfig = v
-	return s
-}
-
-// SetQueryStringConfig sets the QueryStringConfig field's value.
-func (s *RuleCondition) SetQueryStringConfig(v *QueryStringConditionConfig) *RuleCondition {
-	s.QueryStringConfig = v
-	return s
-}
-
-// SetSourceIpConfig sets the SourceIpConfig field's value.
-func (s *RuleCondition) SetSourceIpConfig(v *SourceIpConditionConfig) *RuleCondition {
-	s.SourceIpConfig = v
 	return s
 }
 
@@ -8121,28 +7912,6 @@ func (s SetSubnetsOutput) GoString() string {
 // SetAvailabilityZones sets the AvailabilityZones field's value.
 func (s *SetSubnetsOutput) SetAvailabilityZones(v []*AvailabilityZone) *SetSubnetsOutput {
 	s.AvailabilityZones = v
-	return s
-}
-
-type SourceIpConditionConfig struct {
-	_ struct{} `type:"structure"`
-
-	Values []*string `type:"list"`
-}
-
-// String returns the string representation
-func (s SourceIpConditionConfig) String() string {
-	return awsutil.Prettify(s)
-}
-
-// GoString returns the string representation
-func (s SourceIpConditionConfig) GoString() string {
-	return s.String()
-}
-
-// SetValues sets the Values field's value.
-func (s *SourceIpConditionConfig) SetValues(v []*string) *SourceIpConditionConfig {
-	s.Values = v
 	return s
 }
 
@@ -8848,9 +8617,6 @@ const (
 
 	// ProtocolEnumTcp is a ProtocolEnum enum value
 	ProtocolEnumTcp = "TCP"
-
-	// ProtocolEnumTls is a ProtocolEnum enum value
-	ProtocolEnumTls = "TLS"
 )
 
 const (

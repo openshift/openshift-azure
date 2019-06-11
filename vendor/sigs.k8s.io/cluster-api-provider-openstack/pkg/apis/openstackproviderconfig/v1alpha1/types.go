@@ -40,9 +40,7 @@ type OpenstackProviderSpec struct {
 
 	// The flavor reference for the flavor for your server instance.
 	Flavor string `json:"flavor"`
-
 	// The name of the image to use for your server instance.
-	// If the RootVolume is specified, this will be ignored and use rootVolume directly.
 	Image string `json:"image"`
 
 	// The ssh key to inject in the instance
@@ -70,18 +68,14 @@ type OpenstackProviderSpec struct {
 	// Whether the server instance is created on a trunk port or not.
 	Trunk bool `json:"trunk,omitempty"`
 
-	// Machine tags
+	RootVolume RootVolume `json:"root_volume,omitempty"`
+
+	// Server tags
 	// Requires Nova api 2.52 minimum!
 	Tags []string `json:"tags,omitempty"`
 
 	// Metadata mapping. Allows you to create a map of key value pairs to add to the server instance.
 	ServerMetadata map[string]string `json:"serverMetadata,omitempty"`
-
-	// Config Drive support
-	ConfigDrive *bool `json:"configDrive,omitempty"`
-
-	// The volume metadata to boot from
-	RootVolume *RootVolume `json:"rootVolume,omitempty"`
 }
 
 type SecurityGroupParam struct {
@@ -97,23 +91,23 @@ type SecurityGroupFilter struct {
 	ID          string `json:"id,omitempty"`
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
-	TenantID    string `json:"tenantId,omitempty"`
-	ProjectID   string `json:"projectId,omitempty"`
+	TenantID    string `json:"tenant_id,omitempty"`
+	ProjectID   string `json:"project_id,omitempty"`
 	Limit       int    `json:"limit,omitempty"`
 	Marker      string `json:"marker,omitempty"`
-	SortKey     string `json:"sortKey,omitempty"`
-	SortDir     string `json:"sortDir,omitempty"`
+	SortKey     string `json:"sort_key,omitempty"`
+	SortDir     string `json:"sort_dir,omitempty"`
 	Tags        string `json:"tags,omitempty"`
-	TagsAny     string `json:"tagsAny,omitempty"`
-	NotTags     string `json:"notTags,omitempty"`
-	NotTagsAny  string `json:"notTagsAny,omitempty"`
+	TagsAny     string `json:"tags-any,omitempty"`
+	NotTags     string `json:"not-tags,omitempty"`
+	NotTagsAny  string `json:"not-tags-any,omitempty"`
 }
 
 type NetworkParam struct {
 	// The UUID of the network. Required if you omit the port attribute.
 	UUID string `json:"uuid,omitempty"`
 	// A fixed IPv4 address for the NIC.
-	FixedIp string `json:"fixedIp,omitempty"`
+	FixedIp string `json:"fixed_ip,omitempty"`
 	// Filters for optional network query
 	Filter Filter `json:"filter,omitempty"`
 	// Subnet within a network to use
@@ -124,19 +118,19 @@ type Filter struct {
 	Status       string `json:"status,omitempty"`
 	Name         string `json:"name,omitempty"`
 	Description  string `json:"description,omitempty"`
-	AdminStateUp *bool  `json:"adminStateUp,omitempty"`
-	TenantID     string `json:"tenantId,omitempty"`
-	ProjectID    string `json:"projectId,omitempty"`
+	AdminStateUp *bool  `json:"admin_state_up,omitempty"`
+	TenantID     string `json:"tenant_id,omitempty"`
+	ProjectID    string `json:"project_id,omitempty"`
 	Shared       *bool  `json:"shared,omitempty"`
 	ID           string `json:"id,omitempty"`
 	Marker       string `json:"marker,omitempty"`
 	Limit        int    `json:"limit,omitempty"`
-	SortKey      string `json:"sortKey,omitempty"`
-	SortDir      string `json:"sortDir,omitempty"`
+	SortKey      string `json:"sort_key,omitempty"`
+	SortDir      string `json:"sort_dir,omitempty"`
 	Tags         string `json:"tags,omitempty"`
-	TagsAny      string `json:"tagsAny,omitempty"`
-	NotTags      string `json:"notTags,omitempty"`
-	NotTagsAny   string `json:"notTagsAny,omitempty"`
+	TagsAny      string `json:"tags-any,omitempty"`
+	NotTags      string `json:"not-tags,omitempty"`
+	NotTagsAny   string `json:"not-tags-any,omitempty"`
 }
 
 type SubnetParam struct {
@@ -150,31 +144,29 @@ type SubnetParam struct {
 type SubnetFilter struct {
 	Name            string `json:"name,omitempty"`
 	Description     string `json:"description,omitempty"`
-	EnableDHCP      *bool  `json:"enableDhcp,omitempty"`
-	NetworkID       string `json:"networkId,omitempty"`
-	TenantID        string `json:"tenantId,omitempty"`
-	ProjectID       string `json:"projectId,omitempty"`
-	IPVersion       int    `json:"ipVersion,omitempty"`
+	EnableDHCP      *bool  `json:"enable_dhcp,omitempty"`
+	NetworkID       string `json:"network_id,omitempty"`
+	TenantID        string `json:"tenant_id,omitempty"`
+	ProjectID       string `json:"project_id,omitempty"`
+	IPVersion       int    `json:"ip_version,omitempty"`
 	GatewayIP       string `json:"gateway_ip,omitempty"`
 	CIDR            string `json:"cidr,omitempty"`
-	IPv6AddressMode string `json:"ipv6AddressMode,omitempty"`
-	IPv6RAMode      string `json:"ipv6RaMode,omitempty"`
+	IPv6AddressMode string `json:"ipv6_address_mode,omitempty"`
+	IPv6RAMode      string `json:"ipv6_ra_mode,omitempty"`
 	ID              string `json:"id,omitempty"`
-	SubnetPoolID    string `json:"subnetpoolId,omitempty"`
+	SubnetPoolID    string `json:"subnetpool_id,omitempty"`
 	Limit           int    `json:"limit,omitempty"`
 	Marker          string `json:"marker,omitempty"`
-	SortKey         string `json:"sortKey,omitempty"`
-	SortDir         string `json:"sortDir,omitempty"`
+	SortKey         string `json:"sort_key,omitempty"`
+	SortDir         string `json:"sort_dir,omitempty"`
 	Tags            string `json:"tags,omitempty"`
-	TagsAny         string `json:"tagsAny,omitempty"`
-	NotTags         string `json:"notTags,omitempty"`
-	NotTagsAny      string `json:"notTagsAny,omitempty"`
+	TagsAny         string `json:"tags-any,omitempty"`
+	NotTags         string `json:"not-tags,omitempty"`
+	NotTagsAny      string `json:"not-tags-any,omitempty"`
 }
 
 type RootVolume struct {
-	SourceType string `json:"sourceType,omitempty"`
-	SourceUUID string `json:"sourceUUID,omitempty"`
-	DeviceType string `json:"deviceType"`
+	VolumeType string `json:"volumeType"`
 	Size       int    `json:"diskSize,omitempty"`
 }
 
@@ -202,12 +194,6 @@ type OpenstackClusterProviderSpec struct {
 	// and API access from everywhere, and another one that allows all traffic to/from
 	// machines belonging to that group. In the future, we could make this more flexible.
 	ManagedSecurityGroups bool `json:"managedSecurityGroups"`
-
-	// Tags for all resources in cluster
-	Tags []string `json:"tags,omitempty"`
-
-	// Default: True. In case of server tag errors, set to False
-	DisableServerTags bool `json:"disableServerTags,omitempty"`
 }
 
 // +genclient
