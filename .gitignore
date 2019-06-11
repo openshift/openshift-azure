@@ -7,5 +7,5 @@ cscope.files
 cscope.out
 /secrets
 /vendor*
-/clusters
+/_data
 /azure
