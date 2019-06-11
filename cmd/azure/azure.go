@@ -18,6 +18,7 @@ import (
 	"github.com/spf13/cobra"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/openshift/installer/pkg/terraform/exec/plugins"
 	"github.com/openshift/installer/pkg/asset"
 	"github.com/openshift/installer/pkg/asset/installconfig"
 	icazure "github.com/openshift/installer/pkg/asset/installconfig/azure"
@@ -52,6 +53,16 @@ type EnvConfig struct {
 }
 
 func main() {
+
+	if len(os.Args) > 0 {
+		base := filepath.Base(os.Args[0])
+		cname := strings.TrimSuffix(base, filepath.Ext(base))
+		if pluginRunner, ok := plugins.KnownPlugins[cname]; ok {
+			pluginRunner()
+			return
+		}
+	}
+
 	if err := run(); err != nil {
 		panic(err)
 	}
