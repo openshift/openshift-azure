@@ -122,7 +122,7 @@ func GetInstallConfig(name string, ec *EnvConfig) (*types.InstallConfig, error) 
 				Platform: types.MachinePoolPlatform{
 					Azure: &azuretypes.MachinePool{
 						Zones:        []string{"1", "2", "3"},
-						InstanceType: "Standard_D3_v2",
+						InstanceType: "Standard_DS4_v2",
 					},
 				},
 			},

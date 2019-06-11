@@ -175,7 +175,7 @@ func run(log *logrus.Entry) error {
 				}
 
 	// TODO: Implement context
-	ctx:= context.Background()
+	ctx := context.Background()
 	// wait for the cluster to come up
 	// TODO: All these should become part of installer code base
 	err = installer.WaitForBootstrapComplete(ctx, config, ec.Directory)
