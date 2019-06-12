@@ -13,6 +13,7 @@ vendor:
 .PHONY: verify
 verify:
 	./hack/verify/validate-codecov.sh
+	./hack/verify/validate-code-format.sh
 	go run ./hack/validate-imports/validate-imports.go cmd hack pkg
 
 .PHONY: create
