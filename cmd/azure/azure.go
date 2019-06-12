@@ -75,23 +75,23 @@ func run(log *logrus.Entry) error {
 	p := api.NewPlugin(ec.Directory, assetStore)
 
 	ctx := context.Background()
-	context.WithValue(ctx, api.ContextClientID, ec.ClientID)
-	context.WithValue(ctx, api.ContextClientSecret, ec.ClientSecret)
-	context.WithValue(ctx, api.ContextTenantID, ec.TenantID)
-	context.WithValue(ctx, api.ContextSubscriptionID, ec.SubscriptionID)
+	ctx = context.WithValue(ctx, api.ContextClientID, ec.ClientID)
+	ctx = context.WithValue(ctx, api.ContextClientSecret, ec.ClientSecret)
+	ctx = context.WithValue(ctx, api.ContextTenantID, ec.TenantID)
+	ctx = context.WithValue(ctx, api.ContextSubscriptionID, ec.SubscriptionID)
 
 	if action == "Create" {
 		cfg, err := p.GenerateConfig(ctx, name)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "failed to generate InstallConfig")
 		}
 
 		err = fakerpconfig.EnrichInstallConfig(name, ec, cfg)
 		if err != nil {
 			return errors.Wrap(err, "failed to enrich InstallConfig")
 		}
-
-		return p.Create(ctx, name, cfg)
+		log.Infof("%v", cfg)
+		return p.Create(ctx, log, name, cfg)
 	}
-	return p.Delete(ctx, name)
+	return p.Delete(ctx, log, name)
 }

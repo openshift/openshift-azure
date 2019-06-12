@@ -9,10 +9,12 @@ import (
 	"path/filepath"
 
 	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/ghodss/yaml"
 	"github.com/openshift/installer/pkg/asset"
 	"github.com/openshift/installer/pkg/asset/installconfig"
 	icazure "github.com/openshift/installer/pkg/asset/installconfig/azure"
 	targetassets "github.com/openshift/installer/pkg/asset/targets"
+	"github.com/openshift/installer/pkg/destroy"
 	destroybootstrap "github.com/openshift/installer/pkg/destroy/bootstrap"
 	"github.com/openshift/installer/pkg/ipnet"
 	"github.com/openshift/installer/pkg/types"
@@ -22,7 +24,6 @@ import (
 	"github.com/openshift/installer/pkg/types/validation"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/clientcmd"
 
@@ -47,10 +48,10 @@ type Plugin interface {
 	ValidateConfig(ctx context.Context, cfg *types.InstallConfig) error
 
 	// Create deploys the cluster
-	Create(ctx context.Context, name string, cfg *types.InstallConfig) error
+	Create(ctx context.Context, log *logrus.Entry, name string, cfg *types.InstallConfig) error
 
 	// Delete destroys the cluster
-	Delete(ctx context.Context, name string) error
+	Delete(ctx context.Context, log *logrus.Entry, name string) error
 }
 
 type plugin struct {
@@ -140,7 +141,8 @@ func (p *plugin) setupServicePrincipal(ctx context.Context) error {
 	return nil
 }
 
-func (p *plugin) Create(ctx context.Context, name string, cfg *types.InstallConfig) error {
+func (p *plugin) Create(ctx context.Context, log *logrus.Entry, name string, cfg *types.InstallConfig) error {
+	log.Infof("Creating cluster %s", name)
 	err := p.setupServicePrincipal(ctx)
 	if err != nil {
 		return err
@@ -209,6 +211,27 @@ func (p *plugin) Create(ctx context.Context, name string, cfg *types.InstallConf
 	return nil
 }
 
-func (p *plugin) Delete(ctx context.Context, name string) error {
+func (p *plugin) Delete(ctx context.Context, log *logrus.Entry, name string) error {
+	log.Infof("Deleting cluster %s", name)
+	destroyer, err := destroy.New(log, p.directory)
+	if err != nil {
+		return errors.Wrap(err, "Failed while preparing to destroy cluster")
+	}
+	if err := destroyer.Run(); err != nil {
+		return errors.Wrap(err, "Failed to destroy cluster")
+	}
+
+	for _, asset := range targetassets.Cluster {
+		if err := p.store.Destroy(asset); err != nil {
+			return errors.Wrapf(err, "failed to destroy asset %q", asset.Name())
+		}
+	}
+	// delete the state file as well
+	err = p.store.DestroyState()
+	if err != nil {
+		return errors.Wrap(err, "failed to remove state file")
+	}
+
 	return nil
+
 }

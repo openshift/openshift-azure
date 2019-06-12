@@ -16,6 +16,9 @@ verify:
 	go run ./hack/validate-imports/validate-imports.go cmd hack pkg
 
 .PHONY: create
-create: azure
+create:
 	./hack/create.sh ${RESOURCEGROUP}
 
+.PHONY: delete
+delete:
+	./hack/delete.sh ${RESOURCEGROUP}
