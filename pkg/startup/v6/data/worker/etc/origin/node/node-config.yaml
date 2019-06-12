@@ -65,9 +65,5 @@ servingInfo:
   clientCA: ca.crt
 volumeConfig:
   localQuota:
-{{- if eq .Role "infra" }}
-    perFSGroup: null
-{{- else }}
     perFSGroup: 1Gi
-{{- end }}
 volumeDirectory: /var/lib/origin/openshift.local.volumes
