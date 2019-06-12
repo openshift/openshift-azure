@@ -11,13 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/openshift/installer/pkg/ipnet"
 	"github.com/openshift/installer/pkg/types"
 	azuretypes "github.com/openshift/installer/pkg/types/azure"
-
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
@@ -65,16 +61,16 @@ func NewEnvConfig(name string) (*EnvConfig, error) {
 	return &c, nil
 }
 
-// GetInstallConfig returns pre-populated install config
-func GetInstallConfig(name string, ec *EnvConfig) (*types.InstallConfig, error) {
+// EnrichInstallConfig returns pre-populated install config
+func EnrichInstallConfig(name string, ec *EnvConfig, cfg *types.InstallConfig) error {
 	file, err := os.Open("secrets/pull-secret.txt")
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer file.Close()
 	pullSecret, err := ioutil.ReadAll(file)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	var key *rsa.PrivateKey
@@ -82,77 +78,41 @@ func GetInstallConfig(name string, ec *EnvConfig) (*types.InstallConfig, error) 
 	if os.Getenv("SSH_KEY") == "" {
 		var err error
 		if key, err = tls.NewPrivateKey(); err != nil {
-			return nil, err
+			return err
 		}
 		pubKey, err = tls.SSHPublicKeyAsString(&key.PublicKey)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		err = writeToFile(pubKey, filepath.Join(ec.Directory, "id_rsa.pub"))
 		if err != nil {
-			return nil, err
+			return err
 		}
 		b, err := tls.PrivateKeyAsBytes(key)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		if writeToFile(string(b), filepath.Join(ec.Directory, "id_rsa")) != nil {
-			return nil, err
+			return err
 		}
 	} else {
 		pubKey, err = readFile(os.Getenv("SSH_KEY"))
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
 
-	cfg := types.InstallConfig{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: types.InstallConfigVersion,
+	cfg.Platform = types.Platform{
+		Azure: &azuretypes.Platform{
+			Region:                      ec.Region,
+			BaseDomainResourceGroupName: ec.DNSResourceGroup,
 		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name: name,
-		},
-		BaseDomain: baseDomain,
-		Compute: []types.MachinePool{
-			{
-				Name:           "worker",
-				Replicas:       to.Int64Ptr(3),
-				Hyperthreading: types.HyperthreadingEnabled,
-				Platform: types.MachinePoolPlatform{
-					Azure: &azuretypes.MachinePool{
-						Zones:        []string{"1", "2", "3"},
-						InstanceType: "Standard_DS4_v2",
-					},
-				},
-			},
-		},
-		Networking: &types.Networking{
-			MachineCIDR:    ipnet.MustParseCIDR("10.0.0.0/16"),
-			NetworkType:    "OpenShiftSDN",
-			ServiceNetwork: []ipnet.IPNet{*ipnet.MustParseCIDR("172.30.0.0/16")},
-			ClusterNetwork: []types.ClusterNetworkEntry{
-				{
-					CIDR:       *ipnet.MustParseCIDR("10.128.0.0/14"),
-					HostPrefix: 23,
-				},
-			},
-		},
-		ControlPlane: &types.MachinePool{
-			Name:           "master",
-			Replicas:       to.Int64Ptr(3),
-			Hyperthreading: types.HyperthreadingEnabled,
-		},
-		Platform: types.Platform{
-			Azure: &azuretypes.Platform{
-				Region:                      ec.Region,
-				BaseDomainResourceGroupName: ec.DNSResourceGroup,
-			},
-		},
-		PullSecret: string(pullSecret),
-		SSHKey:     pubKey,
 	}
-	return &cfg, nil
+	cfg.BaseDomain = baseDomain
+	cfg.PullSecret = string(pullSecret)
+	cfg.SSHKey = pubKey
+
+	return nil
 }
 
 func writeToFile(data, saveFileTo string) error {
