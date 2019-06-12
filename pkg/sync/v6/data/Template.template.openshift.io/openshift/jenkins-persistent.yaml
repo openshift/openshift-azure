@@ -83,6 +83,8 @@ objects:
             value: ${JNLP_SERVICE_NAME}
           - name: ENABLE_FATAL_ERROR_LOG_FILE
             value: ${ENABLE_FATAL_ERROR_LOG_FILE}
+          - name: JENKINS_UC_INSECURE
+            value: ${JENKINS_UC_INSECURE}
           image: ' '
           imagePullPolicy: IfNotPresent
           livenessProbe:
@@ -220,4 +222,10 @@ parameters:
     and the state obtained at the time of the fatal error.
   displayName: Fatal Error Log File
   name: ENABLE_FATAL_ERROR_LOG_FILE
+  value: "false"
+- description: Whether to allow use of a Jenkins Update Center that uses invalid certificate
+    (self-signed, unknown CA). If any value other than 'false', certificate check
+    is bypassed. By default, certificate check is enforced.
+  displayName: Allows use of Jenkins Update Center repository with invalid SSL certificate
+  name: JENKINS_UC_INSECURE
   value: "false"
