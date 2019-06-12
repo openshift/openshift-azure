@@ -393,6 +393,7 @@
 // data/Role.rbac.authorization.k8s.io/kube-system/system-controller-cloud-provider.yaml
 // data/Role.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml
 // data/Role.rbac.authorization.k8s.io/openshift/shared-resource-viewer.yaml
+// data/Role.rbac.authorization.k8s.io/openshift-infra/prometheus-k8s.yaml
 // data/Role.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/kube-public/system-controller-bootstrap-signer.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/kube-service-catalog/cluster-info-configmap-binding.yaml
@@ -406,6 +407,7 @@
 // data/RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/openshift/shared-resource-viewers.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/openshift-azure-monitoring/etcd-metrics-viewer.yaml
+// data/RoleBinding.rbac.authorization.k8s.io/openshift-infra/prometheus-k8s.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml
 // data/Route.route.openshift.io/default/docker-registry.yaml
 // data/Route.route.openshift.io/default/registry-console.yaml
@@ -8608,6 +8610,26 @@ func roleRbacAuthorizationK8sIoOpenshiftSharedResourceViewerYaml() (*asset, erro
 	return a, nil
 }
 
+var _roleRbacAuthorizationK8sIoOpenshiftInfraPrometheusK8sYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x2c\x8c\x31\x6e\xc3\x30\x0c\x45\x77\x9d\x82\xc8\x2e\x17\xdd\x02\x5d\xa0\x7b\x87\xee\x8c\xc4\xc0\x84\x6d\x92\x20\x29\x0f\x3d\x7d\x91\xc6\xdb\x7f\x0f\x1f\x0f\x8d\x7f\xc8\x83\x55\x1a\xf8\x03\xfb\x82\x33\x57\x75\xfe\xc5\x64\x95\x65\xbb\xc7\xc2\xfa\x71\x7e\x96\x8d\x65\x34\xf8\xd6\x9d\xca\x41\x89\x03\x13\x5b\x01\x10\x3c\xa8\x81\xb9\x1e\x94\x2b\xcd\xa8\xdb\x3d\x2e\x1d\x86\x9d\x1a\xa8\x91\xc4\xca\xcf\xac\x2c\x4f\xc7\xe2\x73\xa7\x68\xa5\x02\x1a\x7f\xb9\x4e\x8b\x57\xa7\xc2\xed\x56\x00\x9c\x42\xa7\x77\xba\x5c\x90\x9f\xdc\x29\xfe\x81\x64\x98\xb2\xe4\x9b\x4c\xc7\x6b\x9c\xe4\x8f\xeb\xbc\x73\x64\xf9\x0b\x00\x00\xff\xff\x3f\x7b\x6c\x49\xd0\x00\x00\x00")
+
+func roleRbacAuthorizationK8sIoOpenshiftInfraPrometheusK8sYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_roleRbacAuthorizationK8sIoOpenshiftInfraPrometheusK8sYaml,
+		"Role.rbac.authorization.k8s.io/openshift-infra/prometheus-k8s.yaml",
+	)
+}
+
+func roleRbacAuthorizationK8sIoOpenshiftInfraPrometheusK8sYaml() (*asset, error) {
+	bytes, err := roleRbacAuthorizationK8sIoOpenshiftInfraPrometheusK8sYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/openshift-infra/prometheus-k8s.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _roleRbacAuthorizationK8sIoOpenshiftTemplateServiceBrokerTemplateservicebrokerAuthReaderYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x6c\xce\xb1\x4e\xc6\x30\x0c\x04\xe0\x3d\x4f\x61\xfd\x7b\x8a\xd8\x50\x5e\x80\x8d\x81\x81\xdd\x4d\x0f\x7e\xab\x6d\x1c\xd9\x6e\x07\x9e\x1e\x55\x7f\x90\x18\x58\x4f\xf7\x9d\xcd\x5d\x3e\x60\x2e\xda\x0a\xd9\xcc\x75\xe2\x23\xee\x6a\xf2\xcd\x21\xda\xa6\xf5\xc5\x27\xd1\xa7\xf3\x39\xad\xd2\x96\x42\xef\xba\x21\xed\x08\x5e\x38\xb8\x24\xa2\xc6\x3b\x0a\x05\xf6\xbe\x71\xc0\x61\xa7\x54\xcc\xa6\x2b\x2c\x5f\x53\xd9\xc0\x0b\x6c\x34\xbd\x73\x45\x21\xed\x68\x7e\x97\xcf\xc8\xbf\x30\x0f\x99\x1f\x34\xd9\xb1\xc1\x4b\xca\xc4\x5d\x5e\x4d\x8f\xee\xd7\xb1\x4c\xb7\x5b\x22\x32\xb8\x1e\x56\xf1\x76\x2d\x3e\xf2\xff\x1f\xa8\x9b\xa0\xc5\x1f\x31\xda\x8e\x6a\x08\x4f\x44\x27\x6c\x1e\xe1\x17\x22\xfd\x04\x00\x00\xff\xff\x99\x8d\x8f\xd8\x0e\x01\x00\x00")
 
 func roleRbacAuthorizationK8sIoOpenshiftTemplateServiceBrokerTemplateservicebrokerAuthReaderYamlBytes() ([]byte, error) {
@@ -8864,6 +8886,26 @@ func rolebindingRbacAuthorizationK8sIoOpenshiftAzureMonitoringEtcdMetricsViewerY
 	}
 
 	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/openshift-azure-monitoring/etcd-metrics-viewer.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _rolebindingRbacAuthorizationK8sIoOpenshiftInfraPrometheusK8sYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x94\xcf\xb1\x4e\xc5\x30\x0c\x05\xd0\x3d\x5f\xe1\x1f\x68\x11\xdb\x53\x36\x58\xd8\x1f\x12\xbb\x9b\xba\xd4\xb4\xb1\x23\xdb\xe9\xc0\xd7\xa3\x4a\x95\x98\x40\x7a\xab\xe5\xab\x7b\x2e\x36\xfe\x20\x73\x56\xc9\x60\x13\x96\x11\x7b\xac\x6a\xfc\x8d\xc1\x2a\xe3\x76\xf3\x91\xf5\xe9\x78\x4e\x1b\xcb\x9c\xe1\xae\x3b\xbd\xb2\xcc\x2c\x9f\xa9\x52\xe0\x8c\x81\x39\x01\x08\x56\xca\xd0\x4c\x2b\xc5\x4a\xdd\x87\xed\xe6\xd7\xd9\x1b\x16\xca\xa0\x8d\xc4\x57\x5e\x62\x60\x59\x0c\x93\xe9\x4e\x77\x5a\xce\x30\x36\x7e\x33\xed\xed\x1f\x41\x02\xf8\x05\xfc\xd5\xe7\x7d\xfa\xa2\x12\x9e\xd3\x70\x7d\xbf\x93\x1d\x5c\xe8\xa5\x14\xed\x12\x0f\x3a\xab\x0a\x87\xda\x39\xf5\x27\x00\x00\xff\xff\x27\xe2\x12\x9d\x26\x01\x00\x00")
+
+func rolebindingRbacAuthorizationK8sIoOpenshiftInfraPrometheusK8sYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_rolebindingRbacAuthorizationK8sIoOpenshiftInfraPrometheusK8sYaml,
+		"RoleBinding.rbac.authorization.k8s.io/openshift-infra/prometheus-k8s.yaml",
+	)
+}
+
+func rolebindingRbacAuthorizationK8sIoOpenshiftInfraPrometheusK8sYaml() (*asset, error) {
+	bytes, err := rolebindingRbacAuthorizationK8sIoOpenshiftInfraPrometheusK8sYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/openshift-infra/prometheus-k8s.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -14853,6 +14895,7 @@ var _bindata = map[string]func() (*asset, error){
 	"Role.rbac.authorization.k8s.io/kube-system/system-controller-cloud-provider.yaml":                                                   roleRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYaml,
 	"Role.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml":                                                    roleRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml,
 	"Role.rbac.authorization.k8s.io/openshift/shared-resource-viewer.yaml":                                                               roleRbacAuthorizationK8sIoOpenshiftSharedResourceViewerYaml,
+	"Role.rbac.authorization.k8s.io/openshift-infra/prometheus-k8s.yaml":                                                                 roleRbacAuthorizationK8sIoOpenshiftInfraPrometheusK8sYaml,
 	"Role.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml":                            roleRbacAuthorizationK8sIoOpenshiftTemplateServiceBrokerTemplateservicebrokerAuthReaderYaml,
 	"RoleBinding.rbac.authorization.k8s.io/kube-public/system-controller-bootstrap-signer.yaml":                                          rolebindingRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYaml,
 	"RoleBinding.rbac.authorization.k8s.io/kube-service-catalog/cluster-info-configmap-binding.yaml":                                     rolebindingRbacAuthorizationK8sIoKubeServiceCatalogClusterInfoConfigmapBindingYaml,
@@ -14866,6 +14909,7 @@ var _bindata = map[string]func() (*asset, error){
 	"RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml":                                             rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml,
 	"RoleBinding.rbac.authorization.k8s.io/openshift/shared-resource-viewers.yaml":                                                       rolebindingRbacAuthorizationK8sIoOpenshiftSharedResourceViewersYaml,
 	"RoleBinding.rbac.authorization.k8s.io/openshift-azure-monitoring/etcd-metrics-viewer.yaml":                                          rolebindingRbacAuthorizationK8sIoOpenshiftAzureMonitoringEtcdMetricsViewerYaml,
+	"RoleBinding.rbac.authorization.k8s.io/openshift-infra/prometheus-k8s.yaml":                                                          rolebindingRbacAuthorizationK8sIoOpenshiftInfraPrometheusK8sYaml,
 	"RoleBinding.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml":                     rolebindingRbacAuthorizationK8sIoOpenshiftTemplateServiceBrokerTemplateservicebrokerAuthReaderYaml,
 	"Route.route.openshift.io/default/docker-registry.yaml":                                                                              routeRouteOpenshiftIoDefaultDockerRegistryYaml,
 	"Route.route.openshift.io/default/registry-console.yaml":                                                                             routeRouteOpenshiftIoDefaultRegistryConsoleYaml,
@@ -15664,6 +15708,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"openshift": {nil, map[string]*bintree{
 			"shared-resource-viewer.yaml": {roleRbacAuthorizationK8sIoOpenshiftSharedResourceViewerYaml, map[string]*bintree{}},
 		}},
+		"openshift-infra": {nil, map[string]*bintree{
+			"prometheus-k8s.yaml": {roleRbacAuthorizationK8sIoOpenshiftInfraPrometheusK8sYaml, map[string]*bintree{}},
+		}},
 		"openshift-template-service-broker": {nil, map[string]*bintree{
 			"templateservicebroker-auth-reader.yaml": {roleRbacAuthorizationK8sIoOpenshiftTemplateServiceBrokerTemplateservicebrokerAuthReaderYaml, map[string]*bintree{}},
 		}},
@@ -15690,6 +15737,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		}},
 		"openshift-azure-monitoring": {nil, map[string]*bintree{
 			"etcd-metrics-viewer.yaml": {rolebindingRbacAuthorizationK8sIoOpenshiftAzureMonitoringEtcdMetricsViewerYaml, map[string]*bintree{}},
+		}},
+		"openshift-infra": {nil, map[string]*bintree{
+			"prometheus-k8s.yaml": {rolebindingRbacAuthorizationK8sIoOpenshiftInfraPrometheusK8sYaml, map[string]*bintree{}},
 		}},
 		"openshift-template-service-broker": {nil, map[string]*bintree{
 			"templateservicebroker-auth-reader.yaml": {rolebindingRbacAuthorizationK8sIoOpenshiftTemplateServiceBrokerTemplateservicebrokerAuthReaderYaml, map[string]*bintree{}},
