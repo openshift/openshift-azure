@@ -9,6 +9,10 @@ import (
 	"strings"
 	"time"
 
+	configv1 "github.com/openshift/api/config/v1"
+	configclient "github.com/openshift/client-go/config/clientset/versioned"
+	routeclient "github.com/openshift/client-go/route/clientset/versioned"
+	cov1helpers "github.com/openshift/library-go/pkg/config/clusteroperator/v1helpers"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
@@ -22,11 +26,6 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	clientwatch "k8s.io/client-go/tools/watch"
-
-	configv1 "github.com/openshift/api/config/v1"
-	configclient "github.com/openshift/client-go/config/clientset/versioned"
-	routeclient "github.com/openshift/client-go/route/clientset/versioned"
-	cov1helpers "github.com/openshift/library-go/pkg/config/clusteroperator/v1helpers"
 )
 
 // TODO: All this should be in the installer package
@@ -78,7 +77,6 @@ func WaitForBootstrapComplete(ctx context.Context, config *rest.Config, director
 
 	return waitForBootstrapConfigMap(ctx, client)
 }
-
 
 // waitForConsole returns the console URL from the route 'console' in namespace openshift-console
 func WaitForConsole(ctx context.Context, config *rest.Config, directory string) (string, error) {
@@ -170,7 +168,6 @@ func logComplete(directory, consoleURL string) error {
 	logrus.Infof("Login to the console with user: kubeadmin, password: %s", pw)
 	return nil
 }
-
 
 // addRouterCAToClusterCA adds router CA to cluster CA in kubeconfig
 func addRouterCAToClusterCA(config *rest.Config, directory string) (err error) {
