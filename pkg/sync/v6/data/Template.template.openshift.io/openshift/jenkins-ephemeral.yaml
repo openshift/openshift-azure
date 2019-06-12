@@ -73,6 +73,8 @@ objects:
             value: ${JENKINS_SERVICE_NAME}
           - name: JNLP_SERVICE_NAME
             value: ${JNLP_SERVICE_NAME}
+          - name: JENKINS_UC_INSECURE
+            value: ${JENKINS_UC_INSECURE}
           image: ' '
           imagePullPolicy: IfNotPresent
           livenessProbe:
@@ -201,3 +203,9 @@ parameters:
   displayName: Jenkins ImageStreamTag
   name: JENKINS_IMAGE_STREAM_TAG
   value: jenkins:2
+- description: Whether to allow use of a Jenkins Update Center that uses invalid certificate
+    (self-signed, unknown CA). If any value other than 'false', certificate check
+    is bypassed. By default, certificate check is enforced.
+  displayName: Allows use of Jenkins Update Center repository with invalid SSL certificate
+  name: JENKINS_UC_INSECURE
+  value: "false"
