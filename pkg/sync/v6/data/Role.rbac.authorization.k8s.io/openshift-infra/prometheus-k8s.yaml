@@ -11,4 +11,6 @@ rules:
   - endpoints
   - pods
   verbs:
+  - get
   - list
+  - watch
