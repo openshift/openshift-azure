@@ -6,6 +6,5 @@ coverage.out
 cscope.files
 cscope.out
 /secrets
-/vendor*
 /_data
 /azure
