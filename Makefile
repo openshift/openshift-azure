@@ -25,7 +25,7 @@ vendor:
 verify:
 	./hack/verify/validate-codecov.sh
 	./hack/verify/validate-code-format.sh
-	go run ./hack/validate-imports/validate-imports.go cmd hack pkg
+	go run ./hack/validate-imports/validate-imports.go cmd hack pkg test
 
 .PHONY: create
 create:

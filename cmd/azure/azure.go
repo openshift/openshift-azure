@@ -90,7 +90,6 @@ func run(log *logrus.Entry) error {
 		if err != nil {
 			return errors.Wrap(err, "failed to enrich InstallConfig")
 		}
-		log.Infof("%v", cfg)
 		return p.Create(ctx, log, name, cfg)
 	}
 	return p.Delete(ctx, log, name)
