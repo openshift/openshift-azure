@@ -16,6 +16,7 @@ import (
 	icazure "github.com/openshift/installer/pkg/asset/installconfig/azure"
 	targetassets "github.com/openshift/installer/pkg/asset/targets"
 	"github.com/openshift/installer/pkg/destroy"
+	_ "github.com/openshift/installer/pkg/destroy/azure"
 	destroybootstrap "github.com/openshift/installer/pkg/destroy/bootstrap"
 	"github.com/openshift/installer/pkg/ipnet"
 	"github.com/openshift/installer/pkg/types"
@@ -227,6 +228,11 @@ func (p *plugin) Create(ctx context.Context, log *logrus.Entry, name string, cfg
 
 func (p *plugin) Delete(ctx context.Context, log *logrus.Entry, name string) error {
 	log.Infof("Deleting cluster %s", name)
+	authLocation := filepath.Join(p.directory, ".azure", "osServicePrincipal.json")
+	err := os.Setenv("AZURE_AUTH_LOCATION", authLocation)
+	if err != nil {
+		return errors.Wrap(err, "failed to set AZURE_AUTH_LOCATION")
+	}
 	destroyer, err := destroy.New(log, p.directory)
 	if err != nil {
 		return errors.Wrap(err, "Failed while preparing to destroy cluster")
