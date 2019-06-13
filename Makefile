@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-GITCOMMIT=$(shell git describe --tags HEAD)$(shell [[ $$(git status --porcelain) = "" ]] || echo -dirty)
+GITCOMMIT=$(shell git describe --always --tags HEAD)$(shell [[ $$(git status --porcelain) = "" ]] || echo -dirty)
 LDFLAGS="-X main.gitCommit=$(GITCOMMIT)"
 OPENSHIFT_INSTALL_DATA := ./vendor/github.com/openshift/installer/data/data
 
