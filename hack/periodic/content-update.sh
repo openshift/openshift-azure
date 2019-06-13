@@ -6,7 +6,7 @@ go generate ./...
 
 . hack/tests/ci-prepare.sh
 
-git add pkg/sync/v$(ls -d pkg/sync/v* | sed -e 's/.*v//' | sort -n | tail -1)
+git add --all pkg/sync/v$(ls -d pkg/sync/v* | sed -e 's/.*v//' | sort -n | tail -1)
 GIT_COMMITTER_NAME=openshift-azure-robot GIT_COMMITTER_EMAIL=aos-azure@redhat.com git commit --no-gpg-sign --author 'openshift-azure-robot <aos-azure@redhat.com>' -m "Content update" || exit 0
 
 git push https://openshift-azure-robot:$GITHUB_TOKEN@github.com/openshift-azure-robot/openshift-azure.git HEAD:content-update -f
