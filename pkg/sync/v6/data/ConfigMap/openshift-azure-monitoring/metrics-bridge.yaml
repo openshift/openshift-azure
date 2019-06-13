@@ -186,6 +186,11 @@ data:
       name: grpc_server_handled_rate
     - query: 'etcd_disk_backend_commit_duration_seconds_count{namespace="openshift-azure-monitoring"} != 0'
     - query: 'etcd_disk_backend_commit_duration_seconds_sum{namespace="openshift-azure-monitoring"} != 0'
+    - query: 'sync_info'
+    - query: 'rate(sync_errors_total[5m])'
+      name: sync_errors_rate
+    - query: 'rate(sync_duration_seconds_sum[5m]) / rate(sync_duration_seconds_count[5m])'
+      name: sync_average_duration
     account: '*** GENERATED ***'
     namespace: Prometheus
     region: '*** GENERATED ***'
