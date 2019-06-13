@@ -2,8 +2,8 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   labels:
-    app: sync
     azure-app: sync
+    k8s-app: sync
   name: sync
   namespace: openshift-monitoring
 spec:
@@ -12,6 +12,7 @@ spec:
     metrics_path: /metrics
     port: http
     scheme: http
+  jobLabel: k8s-app
   namespaceSelector:
     matchNames:
     - kube-system

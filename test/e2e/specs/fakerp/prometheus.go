@@ -91,6 +91,8 @@ var _ = Describe("Prometheus E2E tests [Fake]", func() {
 			"node-exporter":               nodes,
 			"prometheus-k8s":              2,
 			"prometheus-operator":         1,
+			"sync":                        1,
+			"azure-controllers":           1,
 		}))
 	})
 })

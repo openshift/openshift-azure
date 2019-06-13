@@ -150,6 +150,7 @@ func (u *Kubeclientset) EnsureSyncPod(ctx context.Context, syncImage string, has
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
 					{
+						Name: "http",
 						Port: 8080,
 					},
 				},
