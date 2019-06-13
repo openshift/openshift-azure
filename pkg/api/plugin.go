@@ -4,6 +4,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -25,6 +26,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/openshift/openshift-azure/pkg/util/installer"
@@ -67,9 +69,21 @@ func NewPlugin(directory string, store asset.Store) Plugin {
 }
 
 func (p *plugin) ValidateConfig(ctx context.Context, cfg *types.InstallConfig) error {
-	// TODO make sure only azure platform is configured
-	// TODO make sure all options that if missing will cause questions are answered
-	return validation.ValidateInstallConfig(cfg, openstackvalidation.NewValidValuesFetcher()).ToAggregate()
+	if cfg == nil {
+		return fmt.Errorf("InstallConfig required, but was nil")
+	}
+	if cfg.Platform.Azure == nil {
+		return fmt.Errorf("Platform Azure must be specified")
+	}
+
+	allErrs := validation.ValidateInstallConfig(cfg, openstackvalidation.NewValidValuesFetcher())
+	if cfg.Platform.Azure.Region == "" {
+		allErrs = append(allErrs, field.Required(field.NewPath("Platform", "Azure", "Region"), "azure region"))
+	}
+	if cfg.Platform.Azure.BaseDomainResourceGroupName == "" {
+		allErrs = append(allErrs, field.Required(field.NewPath("Platform", "Azure", "BaseDomainResourceGroupName"), "azure resource group where the domain is"))
+	}
+	return allErrs.ToAggregate()
 }
 
 func (p *plugin) GenerateConfig(ctx context.Context, name string) (*types.InstallConfig, error) {
