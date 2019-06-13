@@ -12,11 +12,13 @@ import (
 	"fmt"
 	"net/http"
 	"sort"
+	concurrency "sync"
 	"sync/atomic"
 	"time"
 
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/sync/errgroup"
 	kapiextensions "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -67,27 +69,35 @@ func unmarshal(b []byte) (unstructured.Unstructured, error) {
 func (s *sync) readDB() error {
 	s.db = map[string]unstructured.Unstructured{}
 
+	var g errgroup.Group
 	for _, asset := range AssetNames() {
-		b, err := Asset(asset)
-		if err != nil {
-			return err
-		}
+		asset := asset // https://golang.org/doc/faq#closures_and_goroutines
+		g.Go(func() error {
+			b, err := Asset(asset)
+			if err != nil {
+				return err
+			}
 
-		o, err := unmarshal(b)
-		if err != nil {
-			return err
-		}
+			o, err := unmarshal(b)
+			if err != nil {
+				return err
+			}
 
-		o, err = translateAsset(o, s.cs)
-		if err != nil {
-			return err
-		}
+			o, err = translateAsset(o, s.cs)
+			if err != nil {
+				return err
+			}
+			s.dbLock.Lock()
+			defer s.dbLock.Unlock()
 
-		s.db[keyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())] = o
+			s.db[keyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())] = o
+			return nil
+		})
 	}
-
+	if err := g.Wait(); err != nil {
+		return err
+	}
 	s.syncWorkloadsConfig()
-
 	return nil
 }
 
@@ -459,10 +469,11 @@ func (s *sync) PrintDB() error {
 type sync struct {
 	log *logrus.Entry
 
-	kc    kubernetes.Interface
-	cs    *api.OpenShiftManagedCluster
-	db    map[string]unstructured.Unstructured
-	ready atomic.Value
+	kc     kubernetes.Interface
+	cs     *api.OpenShiftManagedCluster
+	dbLock concurrency.Mutex
+	db     map[string]unstructured.Unstructured
+	ready  atomic.Value
 
 	restconfig *rest.Config
 	ac         *kaggregator.Clientset
