@@ -71,6 +71,15 @@ func (o *ClusterUninstaller) Run() error {
 		o.Logger.Debug(err)
 		return errors.Wrap(err, "failed to delete public DNS records")
 	}
+
+	// FIXME: Arm api is not able to delete RG if it contains private DNS record.
+	// ARM/RG API is using old DNS API. Private zone feature is not supported in version '2016-04-01'
+	// remove when this is solved upstream https://github.com/openshift/installer/issues/1851
+	if err := deleteDNSRecord(context.TODO(), o.zonesClient, o.Logger, group); err != nil {
+		o.Logger.Debug(err)
+		return errors.Wrap(err, "failed to delete internal DNS records")
+	}
+
 	o.Logger.Debug("deleting resource group")
 	if err := deleteResourceGroup(context.TODO(), o.resourceGroupsClient, o.Logger, group); err != nil {
 		o.Logger.Debug(err)
@@ -216,4 +225,31 @@ func deleteResourceGroup(ctx context.Context, client resources.GroupsGroupClient
 
 func wasNotFound(resp *http.Response) bool {
 	return resp != nil && resp.StatusCode == http.StatusNotFound
+}
+
+func deleteDNSRecord(ctx context.Context, dnsClient dns.ZonesClient, logger logrus.FieldLogger, rgName string) error {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Minute)
+	defer cancel()
+
+	for zonesPage, err := dnsClient.ListByResourceGroup(ctx, rgName, to.Int32Ptr(100)); zonesPage.NotDone(); err = zonesPage.NextWithContext(ctx) {
+		if err != nil {
+			return err
+		}
+		for _, zone := range zonesPage.Values() {
+			logrus.Debugf("delete dns %s:%s", rgName, *zone.Name)
+			future, err := dnsClient.Delete(ctx, rgName, *zone.Name, "")
+			if err != nil {
+				return err
+			}
+			err = future.WaitForCompletionRef(ctx, dnsClient.Client)
+			if err != nil {
+				if wasNotFound(future.Response()) {
+					logger.Debug("already deleted")
+					return nil
+				}
+				return errors.Wrapf(err, "failed to delete %s", *zone.Name)
+			}
+		}
+	}
+	return nil
 }
