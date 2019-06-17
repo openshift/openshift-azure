@@ -252,6 +252,12 @@ func (p *plugin) Delete(ctx context.Context, log *logrus.Entry, name string) err
 		return errors.Wrap(err, "failed to remove state file")
 	}
 
+	// delete all temporary files
+	err = os.RemoveAll(p.directory)
+	if err != nil {
+		return err
+	}
+
 	return nil
 
 }
