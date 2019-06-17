@@ -179,7 +179,7 @@ rm /etc/yum.repos.d/kickstart.repo /var/lib/yum/client-cert.pem /var/lib/yum/cli
 mkdir /var/lib/etcd
 
 # we also need openshift.local.volumes dir created before xfs quota code runs
-mkdir -m 0750 /var/lib/origin/openshift.local.volumes
+mkdir -m 0750 -p /var/lib/origin/openshift.local.volumes
 
 chmod 0755 /etc/NetworkManager/dispatcher.d/99-origin-dns.sh
 

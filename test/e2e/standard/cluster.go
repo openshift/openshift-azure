@@ -10,7 +10,6 @@ import (
 	"time"
 
 	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 
 	"github.com/Azure/go-autorest/autorest/to"
 	apiappsv1 "k8s.io/api/apps/v1"
@@ -414,141 +413,70 @@ func (sc *SanityChecker) checkCanUseAzureFileStorage(ctx context.Context) error 
 }
 
 func (sc *SanityChecker) checkEnforcesEmptyDirQuotas(ctx context.Context) error {
+	var major, minor int
+	_, err := fmt.Sscanf(sc.cs.Config.PluginVersion, "v%d.%d", &major, &minor)
+	if err != nil {
+		return err
+	}
+	By("Verifying that plugin version is over v6 otherwise skip")
+	if major < 6 {
+		return nil
+	}
+
 	namespace, err := sc.createProject(ctx)
 	if err != nil {
 		return err
 	}
 	defer sc.deleteProject(ctx, namespace)
 
-	Context("when writing to emptydir respecting quotas", func() {
-		// create test pod
-		podName := "busybox"
-		By("Creating busybox pod to test EmptyDir Quotas")
-		_, err = sc.Client.EndUser.CoreV1.Pods(namespace).Create(&corev1.Pod{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: podName,
-			},
-			Spec: corev1.PodSpec{
-				Containers: []corev1.Container{
-					{
-						Name:  podName,
-						Image: podName,
-						Command: []string{
-							"/bin/dd",
-							"if=/dev/urandom",
-							fmt.Sprintf("of=/cache/%s.bin", namespace),
-							"bs=1M",
-							"count=500",
-						},
-						VolumeMounts: []corev1.VolumeMount{
-							{
-								Name:      "cache-volume",
-								MountPath: "/cache",
-							},
-						},
-					},
-				},
-				Volumes: []corev1.Volume{
-					{
-						Name: "cache-volume",
-						VolumeSource: v1.VolumeSource{
-							EmptyDir: &corev1.EmptyDirVolumeSource{},
-						},
-					},
-				},
-				RestartPolicy: corev1.RestartPolicyNever,
-			},
-		})
-		It("should not error", func() {
-			Expect(err).NotTo(HaveOccurred())
-		})
-		By("Created pod")
-		By(fmt.Sprintf("Waiting for pod %s to finish", podName))
-		err = wait.PollImmediate(2*time.Second, 10*time.Minute, ready.CheckPodHasPhase(sc.Client.Admin.CoreV1.Pods(namespace), podName, corev1.PodSucceeded))
-		It("should not error", func() {
-			Expect(err).NotTo(HaveOccurred())
-		})
-		By(fmt.Sprintf("Pod %s finished", podName))
-	})
-	Context("when writing to emptydir NOT respecting quotas", func() {
-		// create test pod
-		podName := "busybox"
-		By("Creating busybox pod to test EmptyDir Quotas")
-		_, err = sc.Client.EndUser.CoreV1.Pods(namespace).Create(&corev1.Pod{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: podName,
-			},
-			Spec: corev1.PodSpec{
-				Containers: []corev1.Container{
-					{
-						Name:  podName,
-						Image: podName,
-						Command: []string{
-							"/bin/dd",
-							"if=/dev/urandom",
-							fmt.Sprintf("of=/cache/%s.bin", namespace),
-							"bs=1M",
-							"count=2000",
-						},
-						VolumeMounts: []corev1.VolumeMount{
-							{
-								Name:      "cache-volume",
-								MountPath: "/cache",
-							},
-						},
-					},
-				},
-				Volumes: []corev1.Volume{
-					{
-						Name: "cache-volume",
-						VolumeSource: v1.VolumeSource{
-							EmptyDir: &corev1.EmptyDirVolumeSource{},
-						},
-					},
-				},
-				RestartPolicy: corev1.RestartPolicyNever,
-			},
-		})
-		It("should not error", func() {
-			Expect(err).NotTo(HaveOccurred())
-		})
-		By("Created pod")
-		By(fmt.Sprintf("Waiting for pod %s to finish", podName))
-		err = wait.PollImmediate(2*time.Second, 10*time.Minute, ready.CheckPodHasPhase(sc.Client.Admin.CoreV1.Pods(namespace), podName, corev1.PodSucceeded))
-		It("should error", func() {
-			Expect(err).To(HaveOccurred())
-		})
-		By(fmt.Sprintf("Pod %s finished", podName))
-	})
-
-	return nil
-}
-
-func (sc *SanityChecker) checkCantDoDockerBuild(ctx context.Context) error {
-	namespace, err := sc.createProject(ctx)
-	if err != nil {
-		return err
-	}
-	defer sc.deleteProject(ctx, namespace)
-
-	_, err = sc.Client.EndUser.BuildV1.BuildConfigs(namespace).Create(&buildv1.BuildConfig{
+	// create test pod
+	podName := "busybox"
+	By("Creating busybox pod to test EmptyDir Quotas")
+	_, err = sc.Client.EndUser.CoreV1.Pods(namespace).Create(&corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Namespace: namespace,
-			Name:      "test",
+			Name: podName,
 		},
-		Spec: buildv1.BuildConfigSpec{
-			CommonSpec: buildv1.CommonSpec{
-				Source: buildv1.BuildSource{
-					Dockerfile: to.StringPtr("FROM scratch"),
-				},
-				Strategy: buildv1.BuildStrategy{
-					Type: buildv1.DockerBuildStrategyType,
+		Spec: corev1.PodSpec{
+			Containers: []corev1.Container{
+				{
+					Name:  podName,
+					Image: podName,
+					Command: []string{
+						"/bin/dd",
+						"if=/dev/urandom",
+						fmt.Sprintf("of=/cache/%s.bin", namespace),
+						"bs=1M",
+						"count=2000",
+					},
+					VolumeMounts: []corev1.VolumeMount{
+						{
+							Name:      "cache-volume",
+							MountPath: "/cache",
+						},
+					},
 				},
 			},
+			Volumes: []corev1.Volume{
+				{
+					Name: "cache-volume",
+					VolumeSource: v1.VolumeSource{
+						EmptyDir: &corev1.EmptyDirVolumeSource{},
+					},
+				},
+			},
+			RestartPolicy: corev1.RestartPolicyNever,
 		},
 	})
-	if !kerrors.IsForbidden(err) {
-		return fmt.Errorf("unexpected error %s", err)
+	if err != nil {
+		return err
 	}
+	By("Created pod")
+	By(fmt.Sprintf("Waiting for pod %s to finish", podName))
+	err = wait.PollImmediate(2*time.Second, 10*time.Minute, ready.CheckPodHasPhase(sc.Client.EndUser.CoreV1.Pods(namespace), podName, corev1.PodFailed))
+	if err != nil {
+		return err
+	}
+	By(fmt.Sprintf("Pod %s finished", podName))
+
 	return nil
 }
