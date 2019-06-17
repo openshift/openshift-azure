@@ -106,11 +106,18 @@ func EnrichInstallConfig(name string, ec *EnvConfig, cfg *types.InstallConfig) e
 		Azure: &azuretypes.Platform{
 			Region:                      ec.Region,
 			BaseDomainResourceGroupName: ec.DNSResourceGroup,
+			UserTags: map[string]string{
+				"now": string(time.Now().Unix()),
+				"ttl": "72h",
+			},
 		},
 	}
 	cfg.BaseDomain = baseDomain
 	cfg.PullSecret = string(pullSecret)
-	cfg.SSHKey = pubKey
+	// setup ssh access only with RUNNING_UNDER_TEST
+	if os.Getenv("RUNNING_UNDER_TEST") != "" {
+		cfg.SSHKey = pubKey
+	}
 
 	return nil
 }
