@@ -25,3 +25,14 @@ create a cluster:
 ```
 make create
 ```
+
+## SSH into the VM
+
+First, cluster has to be created with `RUNNING_UNDER_TEST` flag to have ssh enabled.
+Export resource group variable:
+```
+export RESOURCEGROUP=clustername
+```
+
+SSH into Bastion: `./hack/ssh.sh`
+SSH into Master0: `./hack.ssh.sh 1`

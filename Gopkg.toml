@@ -8,6 +8,12 @@
 #  name = "github.com/openshift/installer"
 #  branch = "release-4.2"
 
+# HACK:
+# cp -r ../openshift-azure-copy/vendor/github.com/kelseyhightower ./vendor/github.com/
+#[[constraint]]
+#  name = "github.com/kelseyhightower/envconfig"
+#  version = "1.4.0"
+
 [[constraint]]
   name = "github.com/Azure/go-autorest"
   version = "12.1.0"
@@ -16,9 +22,6 @@
   name = "github.com/ghodss/yaml"
   version = "1.0.0"
 
-[[constraint]]
-  name = "github.com/kelseyhightower/envconfig"
-  version = "1.4.0"
 
 [[constraint]]
   name = "github.com/pkg/errors"

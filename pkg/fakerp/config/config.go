@@ -114,7 +114,10 @@ func EnrichInstallConfig(name string, ec *EnvConfig, cfg *types.InstallConfig) e
 	}
 	cfg.BaseDomain = baseDomain
 	cfg.PullSecret = string(pullSecret)
-	cfg.SSHKey = pubKey
+	// setup ssh access only with RUNNING_UNDER_TEST
+	if os.Getenv("RUNNING_UNDER_TEST") != "" {
+		cfg.SSHKey = pubKey
+	}
 
 	return nil
 }
