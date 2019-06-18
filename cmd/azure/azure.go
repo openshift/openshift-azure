@@ -105,6 +105,7 @@ func run(log *logrus.Entry) error {
 		if err != nil && metrics {
 			m.Stop(false)
 		}
+		m.Stop(true)
 		return err
 	}
 
@@ -112,5 +113,6 @@ func run(log *logrus.Entry) error {
 	if err != nil && metrics {
 		m.Stop(false)
 	}
+	m.Stop(true)
 	return err
 }
