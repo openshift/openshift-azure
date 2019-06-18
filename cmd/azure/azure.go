@@ -14,6 +14,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	fakerpconfig "github.com/openshift/openshift-azure/pkg/fakerp/config"
+	"github.com/openshift/openshift-azure/test/util/insights"
 )
 
 var (
@@ -80,6 +81,15 @@ func run(log *logrus.Entry) error {
 	ctx = context.WithValue(ctx, api.ContextTenantID, ec.TenantID)
 	ctx = context.WithValue(ctx, api.ContextSubscriptionID, ec.SubscriptionID)
 
+	// set create-delete metrics
+	m, err := insights.NewAzureAppInsightsReporter()
+	metrics := false
+	if err != nil {
+		log.Warn("running without metrics")
+	} else {
+		metrics = true
+		m.Start(action)
+	}
 	if action == "Create" {
 		cfg, err := p.GenerateConfig(ctx, name)
 		if err != nil {
@@ -90,7 +100,17 @@ func run(log *logrus.Entry) error {
 		if err != nil {
 			return errors.Wrap(err, "failed to enrich InstallConfig")
 		}
-		return p.Create(ctx, log, name, cfg)
+
+		err = p.Create(ctx, log, name, cfg)
+		if err != nil && metrics {
+			m.Stop(false)
+		}
+		return err
 	}
-	return p.Delete(ctx, log, name)
+
+	err = p.Delete(ctx, log, name)
+	if err != nil && metrics {
+		m.Stop(false)
+	}
+	return err
 }

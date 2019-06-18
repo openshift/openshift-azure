@@ -8,11 +8,19 @@
 #  name = "github.com/openshift/installer"
 #  branch = "release-4.2"
 
-# HACK:
+# HACK for pkg/config:
 # cp -r ../openshift-azure-copy/vendor/github.com/kelseyhightower ./vendor/github.com/
 #[[constraint]]
 #  name = "github.com/kelseyhightower/envconfig"
 #  version = "1.4.0"
+
+# HACK for pkg/insights:
+# cp -r ../openshift-azure-copy/vendor/github.com/microsoft ./vendor/github.com/
+# transient dependency:
+# cp -r ../openshift-azure-copy/vendor/github.com/satori ./vendor/github.com/
+# cp -r ../openshift-azure-copy/vendor/code.cloudfoundry.org ./vendor/
+#[[constraint]]
+#  name = "github.com/microsoft/ApplicationInsights-Go/appinsights"
 
 [[constraint]]
   name = "github.com/Azure/go-autorest"
