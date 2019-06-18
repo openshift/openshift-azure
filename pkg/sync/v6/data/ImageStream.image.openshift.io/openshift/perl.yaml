@@ -79,7 +79,7 @@ spec:
       type: Local
   - annotations:
       description: |-
-        Build and run Perl applications on RHEL 7. For more information about using this builder image, including OpenShift considerations, see https://github.com/sclorg/s2i-perl-container/blob/master/5.20/README.md.
+        Build and run Perl applications on RHEL 7. For more information about using this builder image, including OpenShift considerations, see https://github.com/sclorg/s2i-perl-container/blob/master/5.26/README.md.
 
         WARNING: By selecting this tag, your application will automatically update to use the latest version of Perl available on OpenShift, including major version updates.
       iconClass: icon-perl
