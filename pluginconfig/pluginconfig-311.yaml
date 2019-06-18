@@ -217,6 +217,47 @@ versions:
       startup: quay.io/openshift-on-azure/azure:v5.1
       sync: quay.io/openshift-on-azure/azure:v5.1
       tlsProxy: quay.io/openshift-on-azure/azure:v5.1
+  v5.2:
+    ## Node image and version configurables
+    imageOffer: osa
+    imagePublisher: redhat
+    imageSku: osa_311
+    imageVersion: 311.104.20190617
+    images:
+      alertManager: registry.access.redhat.com/openshift3/prometheus-alertmanager:v3.11.104
+      ansibleServiceBroker: registry.access.redhat.com/openshift3/ose-ansible-service-broker:v3.11.104
+      clusterMonitoringOperator: registry.access.redhat.com/openshift3/ose-cluster-monitoring-operator:v3.11.104
+      configReloader: registry.access.redhat.com/openshift3/ose-configmap-reloader:v3.11.104
+      console: registry.access.redhat.com/openshift3/ose-console:v3.11.104
+      controlPlane: registry.access.redhat.com/openshift3/ose-control-plane:v3.11.104
+      grafana: registry.access.redhat.com/openshift3/grafana:v3.11.104
+      kubeRbacProxy: registry.access.redhat.com/openshift3/ose-kube-rbac-proxy:v3.11.104
+      kubeStateMetrics: registry.access.redhat.com/openshift3/ose-kube-state-metrics:v3.11.104
+      node: registry.access.redhat.com/openshift3/ose-node:v3.11.104
+      nodeExporter: registry.access.redhat.com/openshift3/prometheus-node-exporter:v3.11.104
+      oAuthProxy: registry.access.redhat.com/openshift3/oauth-proxy:v3.11.104
+      prometheus: registry.access.redhat.com/openshift3/prometheus:v3.11.104
+      prometheusConfigReloader: registry.access.redhat.com/openshift3/ose-prometheus-config-reloader:v3.11.104
+      prometheusOperator: registry.access.redhat.com/openshift3/ose-prometheus-operator:v3.11.104
+      registry: registry.access.redhat.com/openshift3/ose-docker-registry:v3.11.104
+      registryConsole: registry.access.redhat.com/openshift3/registry-console:v3.11.104
+      router: registry.access.redhat.com/openshift3/ose-haproxy-router:v3.11.104
+      serviceCatalog: registry.access.redhat.com/openshift3/ose-service-catalog:v3.11.104
+      templateServiceBroker: registry.access.redhat.com/openshift3/ose-template-service-broker:v3.11.104
+      webConsole: registry.access.redhat.com/openshift3/ose-web-console:v3.11.104
+      format: registry.access.redhat.com/openshift3/ose-${component}:v3.11.104
+      httpd: registry.access.redhat.com/rhscl/httpd-24-rhel7:2.4-86
+      masterEtcd: registry.access.redhat.com/rhel7/etcd:3.2.22-28
+      genevaLogging: osarpint.azurecr.io/acs/mdsd:master.20190228.1
+      genevaStatsd: osarpint.azurecr.io/acs/mdm:git-a909a2e76
+      genevaTDAgent: osarpint.azurecr.io/acs/td-agent:master.20190228.1
+      azureControllers: quay.io/openshift-on-azure/azure:v5.2
+      canary: quay.io/openshift-on-azure/azure:v5.2
+      etcdBackup: quay.io/openshift-on-azure/azure:v5.2
+      metricsBridge: quay.io/openshift-on-azure/azure:v5.2
+      startup: quay.io/openshift-on-azure/azure:v5.2
+      sync: quay.io/openshift-on-azure/azure:v5.2
+      tlsProxy: quay.io/openshift-on-azure/azure:v5.2
 ## certificates, used to authenticate to external systems
 ## Geneva integration certificates. Example:
 #certificates:

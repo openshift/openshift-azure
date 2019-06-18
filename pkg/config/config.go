@@ -28,7 +28,7 @@ func New(cs *api.OpenShiftManagedCluster, runningUnderTest bool) (Interface, err
 		return v3.New(cs, runningUnderTest), nil
 	case "v4.2", "v4.3", "v4.4":
 		return v4.New(cs), nil
-	case "v5.1":
+	case "v5.1", "v5.2":
 		return v5.New(cs), nil
 	}
 
