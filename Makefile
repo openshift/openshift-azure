@@ -31,6 +31,16 @@ verify:
 create:
 	./hack/create.sh ${RESOURCEGROUP}
 
+.PHONY: test-create
+test-create:
+	./hack/tests/create.sh
+
+.PHONY: secrets
+secrets:
+	@rm -rf secrets
+	@mkdir secrets
+	@oc extract -n azure secret/cluster-secrets-azure --to=secrets >/dev/null
+
 .PHONY: delete
 delete:
 	./hack/delete.sh ${RESOURCEGROUP}
