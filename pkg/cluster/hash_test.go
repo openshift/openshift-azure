@@ -217,6 +217,10 @@ func TestHashSyncPodStability(t *testing.T) {
 			// this value should not change
 			expectedHash: "fac2ba9ab18ad8d26f99b9f2d694529463b024974efdfd2a964a12df7a1e545a",
 		},
+		"v5.2": {
+			// this value should not change
+			expectedHash: "fac2ba9ab18ad8d26f99b9f2d694529463b024974efdfd2a964a12df7a1e545a",
+		},
 	}
 
 	// check we're testing all versions in our pluginconfig
