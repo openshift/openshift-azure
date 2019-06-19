@@ -24,7 +24,7 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (
 	switch cs.Config.PluginVersion {
 	case "v4.2", "v4.3", "v4.4":
 		return v4.New(log, cs, initClients)
-	case "v5.1":
+	case "v5.1", "v5.2":
 		return v5.New(log, cs, initClients)
 	case "v6.0":
 		return v6.New(log, cs, initClients)
