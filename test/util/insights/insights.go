@@ -1,4 +1,3 @@
-// Package reporters implements gingo Reporter for  Azure App Insights
 package insights
 
 import (
@@ -16,9 +15,8 @@ type azureAppInsightsReporter struct {
 }
 
 type metrics struct {
-	action   string
-	duration time.Duration
-	result   bool
+	action string
+	result bool
 
 	start time.Time
 }
@@ -35,7 +33,7 @@ func NewAzureAppInsightsReporter() (*azureAppInsightsReporter, error) {
 			metrics: metrics{},
 		}, nil
 	}
-	return nil, fmt.Errorf("AZURE_APP_INSIGHTS_KEY variable not set")
+	return nil, fmt.Errorf("AZURE_APP_INSIGHTS_KEY not set")
 }
 
 func (r *azureAppInsightsReporter) Start(action string) {
@@ -43,20 +41,20 @@ func (r *azureAppInsightsReporter) Start(action string) {
 	r.metrics.action = action
 }
 
-func (r *azureAppInsightsReporter) Stop(result bool) {
-	r.metrics.duration = time.Since(r.metrics.start)
+func (r *azureAppInsightsReporter) Stop(result bool) error {
 	data := map[string]interface{}{
 		"action":   r.metrics.action,
-		"duration": r.metrics.duration,
+		"duration": time.Since(r.metrics.start),
 	}
 	dataJSON, err := json.Marshal(data)
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
-
-	r.c.TrackMetric(string(dataJSON), btof(r.metrics.result))
+	r.c.TrackAvailability(r.metrics.action, time.Since(r.metrics.start), result)
 	// For debug comment out TrackEvent and output to stdout
-	// fmt.Println(string(resultJSON))
+	fmt.Println(string(dataJSON))
+
+	return nil
 }
 
 func btof(b bool) float64 {
