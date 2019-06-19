@@ -1,3 +1,9 @@
+# v5.2
+
+## Kernel security fix
+
+* release new VM image
+
 # v5.1
 
 ## Security fix for Microarchitectural Data Sampling (MDS)

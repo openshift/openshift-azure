@@ -2,7 +2,7 @@
 ## Plugin config template.
 ## This template file is manually curated for the particular OSA version
 ##
-pluginVersion: v5.1
+pluginVersion: v5.2
 ## Openshift component logging levels
 componentLogLevel:
   apiServer: 2
