@@ -11,3 +11,9 @@ done
 for crash in $(ls -dt /var/crash/* | tail -n +2); do
     rm -rf $crash
 done
+
+## Image Hardening
+# file_permissions_sshd_pub_key
+chmod 0644 /etc/ssh/*.pub
+# file_permissions_sshd_private_key
+chmod 0600 /etc/ssh/*_key
