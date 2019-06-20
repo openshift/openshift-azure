@@ -24,9 +24,11 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/log"
 )
 
-// TODO(charlesakalugwu): Add unit tests for the handling of these metrics once
-//  the upstream library supports it
 var (
+	syncMetricsRegistry = prometheus.NewRegistry()
+
+	// TODO(charlesakalugwu): Add unit tests for the handling of these metrics once
+	//  the upstream library supports it
 	syncInfoGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "sync_info",
@@ -65,11 +67,15 @@ var (
 )
 
 func init() {
-	prometheus.MustRegister(syncInfoGauge)
-	prometheus.MustRegister(syncErrorsCounter)
-	prometheus.MustRegister(syncDurationSummary)
-	prometheus.MustRegister(syncInFlightGauge)
-	prometheus.MustRegister(syncLastExecutedGauge)
+	syncMetricsRegistry.MustRegister(
+		prometheus.NewGoCollector(),
+		prometheus.NewProcessCollector(prometheus.ProcessCollectorOpts{}),
+	)
+	syncMetricsRegistry.MustRegister(syncInfoGauge)
+	syncMetricsRegistry.MustRegister(syncErrorsCounter)
+	syncMetricsRegistry.MustRegister(syncDurationSummary)
+	syncMetricsRegistry.MustRegister(syncInFlightGauge)
+	syncMetricsRegistry.MustRegister(syncLastExecutedGauge)
 }
 
 func start(cfg *cmdConfig) error {
@@ -154,7 +160,7 @@ func start(cfg *cmdConfig) error {
 
 	mux := &http.ServeMux{}
 	mux.Handle("/healthz/ready", http.HandlerFunc(s.ReadyHandler))
-	mux.Handle(cfg.metricsEndpoint, promhttp.Handler())
+	mux.Handle(cfg.metricsEndpoint, promhttp.HandlerFor(syncMetricsRegistry, promhttp.HandlerOpts{}))
 
 	go http.Serve(l, mux)
 
