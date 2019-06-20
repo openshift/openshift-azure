@@ -83,12 +83,15 @@ func run(log *logrus.Entry) error {
 
 	// set create-delete metrics
 	m, iErr := insights.NewAzureAppInsightsReporter()
+	failed := false
 	if iErr != nil {
 		log.Warn("running without metrics")
 	} else {
 		log.Debug("running with metrics")
 		m.Start(action)
+		defer m.Stop(failed)
 	}
+
 	if action == "Create" {
 		cfg, err := p.GenerateConfig(ctx, name)
 		if err != nil {
@@ -101,23 +104,15 @@ func run(log *logrus.Entry) error {
 		}
 
 		err = p.Create(ctx, log, name, cfg)
-		if iErr == nil {
-			if err != nil {
-				m.Stop(false)
-			} else {
-				m.Stop(true)
-			}
+		if err != nil {
+			failed = true
 		}
 		return err
 	}
 
 	err = p.Delete(ctx, log, name)
-	if iErr == nil {
-		if err != nil {
-			m.Stop(false)
-		} else {
-			m.Stop(true)
-		}
+	if err != nil {
+		failed = true
 	}
 	return err
 }

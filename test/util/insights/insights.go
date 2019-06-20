@@ -50,7 +50,7 @@ func (r *azureAppInsightsReporter) Stop(result bool) error {
 	if err != nil {
 		return err
 	}
-	r.c.TrackAvailability(r.metrics.action, time.Since(r.metrics.start), result)
+	r.c.TrackMetric(string(dataJSON), btof(result))
 	// For debug comment out TrackEvent and output to stdout
 	fmt.Println(string(dataJSON))
 

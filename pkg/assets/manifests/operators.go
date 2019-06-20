@@ -4,11 +4,10 @@ import (
 	"path/filepath"
 
 	"github.com/ghodss/yaml"
+	"github.com/openshift/installer/pkg/asset"
 	"github.com/pkg/errors"
 	v1core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"github.com/openshift/installer/pkg/asset"
 )
 
 const (
