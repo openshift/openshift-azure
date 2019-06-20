@@ -155,7 +155,7 @@ func testJSONMarshal(t *testing.T, v interface{}, want string) {
 	// now go the other direction and make sure things unmarshal as expected
 	u := reflect.ValueOf(v).Interface()
 	if err := json.Unmarshal([]byte(want), u); err != nil {
-		t.Errorf("Unable to unmarshal JSON for %v", want)
+		t.Errorf("Unable to unmarshal JSON for %v: %v", want, err)
 	}
 
 	if !reflect.DeepEqual(v, u) {
@@ -171,6 +171,11 @@ func TestNewClient(t *testing.T) {
 	}
 	if got, want := c.UserAgent, userAgent; got != want {
 		t.Errorf("NewClient UserAgent is %v, want %v", got, want)
+	}
+
+	c2 := NewClient(nil)
+	if c.client == c2.client {
+		t.Error("NewClient returned same http.Clients, but they should differ")
 	}
 }
 

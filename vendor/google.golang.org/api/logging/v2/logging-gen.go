@@ -1127,17 +1127,20 @@ type LogEntry struct {
 
 	// ProtoPayload: The log entry payload, represented as a protocol
 	// buffer. Some Google Cloud Platform services use this field for their
-	// log entry payloads.
+	// log entry payloads.The following protocol buffer types are supported;
+	// user-defined types are not
+	// supported:"type.googleapis.com/google.cloud.audit.AuditLog"
+	// "type.googleapis.com/google.appengine.logging.v1.RequestLog"
 	ProtoPayload googleapi.RawMessage `json:"protoPayload,omitempty"`
 
 	// ReceiveTimestamp: Output only. The time the log entry was received by
 	// Logging.
 	ReceiveTimestamp string `json:"receiveTimestamp,omitempty"`
 
-	// Resource: Required. The primary monitored resource associated with
-	// this log entry.Example: a log entry that reports a database error
-	// would be associated with the monitored resource designating the
-	// particular database that reported the error.
+	// Resource: Required. The monitored resource that produced this log
+	// entry.Example: a log entry that reports a database error would be
+	// associated with the monitored resource designating the particular
+	// database that reported the error.
 	Resource *MonitoredResource `json:"resource,omitempty"`
 
 	// Severity: Optional. The severity of the log entry. The default value
