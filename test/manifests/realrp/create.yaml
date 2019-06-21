@@ -33,5 +33,3 @@ properties:
     vmSize: Standard_D4s_v3
     subnetCidr: 10.0.0.0/24
     osType: Linux
-  routerProfiles:
-    - name: default
