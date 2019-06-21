@@ -68,7 +68,7 @@ spec:
       openshift.io/provider-display-name: Red Hat, Inc.
       sampleRepo: https://github.com/sclorg/django-ex.git
       supports: python:3.5,python
-      tags: builder,python
+      tags: hidden,builder,python
       version: "3.5"
     from:
       kind: DockerImage
