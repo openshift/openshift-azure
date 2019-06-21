@@ -4,7 +4,7 @@ LDFLAGS="-X main.gitCommit=$(GITCOMMIT)"
 
 AZURE_IMAGE ?= quay.io/openshift-on-azure/azure:$(GITCOMMIT)
 
-.PHONY: all artifacts azure-image azure-push clean create delete e2e generate monitoring monitoring-run monitoring-stop secrets sync-run test unit upgrade verify vmimage
+.PHONY: all artifacts azure-image azure-push clean create delete e2e generate monitoring monitoring-run monitoring-stop secrets sync-run test testinsights unit upgrade verify vmimage
 
 all: azure
 
@@ -14,7 +14,7 @@ secrets:
 	@oc extract -n azure secret/cluster-secrets-azure --to=secrets >/dev/null
 
 clean:
-	rm -f coverage.out azure releasenotes
+	rm -f coverage.out azure releasenotes testinsights
 
 generate:
 	@[[ -e /var/run/secrets/kubernetes.io ]] || go generate ./...
@@ -69,12 +69,14 @@ verify:
 	./hack/verify/validate-codecov.sh
 	go run ./hack/validate-imports/validate-imports.go cmd hack pkg test
 
-unit: generate
-	go test ./... -coverprofile=coverage.out -covermode=atomic
+testinsights:
+	go build -ldflags ${LDFLAGS} ./cmd/$@
+
+unit: generate testinsights
+	go test ./... -coverprofile=coverage.out -covermode=atomic -json | ./testinsights
 
 e2e:
 	FOCUS="\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh
 
 vmimage:
 	./hack/vmimage.sh
-
