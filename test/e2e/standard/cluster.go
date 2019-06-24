@@ -12,7 +12,6 @@ import (
 	. "github.com/onsi/ginkgo"
 
 	"github.com/Azure/go-autorest/autorest/to"
-	buildv1 "github.com/openshift/api/build/v1"
 	apiappsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
@@ -410,34 +409,5 @@ func (sc *SanityChecker) checkCanUseAzureFileStorage(ctx context.Context) error 
 	}
 	By(fmt.Sprintf("Pod %s finished", podName))
 
-	return nil
-}
-
-func (sc *SanityChecker) checkCantDoDockerBuild(ctx context.Context) error {
-	namespace, err := sc.createProject(ctx)
-	if err != nil {
-		return err
-	}
-	defer sc.deleteProject(ctx, namespace)
-
-	_, err = sc.Client.EndUser.BuildV1.BuildConfigs(namespace).Create(&buildv1.BuildConfig{
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: namespace,
-			Name:      "test",
-		},
-		Spec: buildv1.BuildConfigSpec{
-			CommonSpec: buildv1.CommonSpec{
-				Source: buildv1.BuildSource{
-					Dockerfile: to.StringPtr("FROM scratch"),
-				},
-				Strategy: buildv1.BuildStrategy{
-					Type: buildv1.DockerBuildStrategyType,
-				},
-			},
-		},
-	})
-	if !kerrors.IsForbidden(err) {
-		return fmt.Errorf("unexpected error %s", err)
-	}
 	return nil
 }
