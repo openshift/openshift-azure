@@ -337,6 +337,14 @@ type AddonsConfig struct {
 	IstioConfig *IstioConfig `json:"istioConfig,omitempty"`
 
 	// KubernetesDashboard: Configuration for the Kubernetes Dashboard.
+	// This addon is deprecated, and will be disabled in 1.15. It is
+	// recommended
+	// to use the Cloud Console to manage and monitor your Kubernetes
+	// clusters,
+	// workloads and applications. For more information,
+	// see:
+	// https://cloud.google.com/kubernetes-engine/docs/concepts/dashboar
+	// ds
 	KubernetesDashboard *KubernetesDashboard `json:"kubernetesDashboard,omitempty"`
 
 	// NetworkPolicyConfig: Configuration for NetworkPolicy. This only
@@ -1031,6 +1039,9 @@ type Cluster struct {
 	// the name.
 	Subnetwork string `json:"subnetwork,omitempty"`
 
+	// TierSettings: Cluster tier settings.
+	TierSettings *TierSettings `json:"tierSettings,omitempty"`
+
 	// TpuIpv4CidrBlock: [Output only] The IP address range of the Cloud
 	// TPUs in this cluster,
 	// in
@@ -1089,6 +1100,11 @@ func (s *Cluster) MarshalJSON() ([]byte, error) {
 // the size of the cluster and create/delete
 // node pools based on the current needs.
 type ClusterAutoscaling struct {
+	// AutoprovisioningLocations: The list of Google Compute Engine
+	// [zones](/compute/docs/zones#available)
+	// in which the NodePool's nodes can be created by NAP.
+	AutoprovisioningLocations []string `json:"autoprovisioningLocations,omitempty"`
+
 	// AutoprovisioningNodePoolDefaults: AutoprovisioningNodePoolDefaults
 	// contains defaults for a node pool
 	// created by NAP.
@@ -1104,7 +1120,7 @@ type ClusterAutoscaling struct {
 	ResourceLimits []*ResourceLimit `json:"resourceLimits,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g.
-	// "AutoprovisioningNodePoolDefaults") to unconditionally include in API
+	// "AutoprovisioningLocations") to unconditionally include in API
 	// requests. By default, fields with empty values are omitted from API
 	// requests. However, any non-pointer, non-interface field appearing in
 	// ForceSendFields will be sent to the server regardless of whether the
@@ -1113,10 +1129,10 @@ type ClusterAutoscaling struct {
 	ForceSendFields []string `json:"-"`
 
 	// NullFields is a list of field names (e.g.
-	// "AutoprovisioningNodePoolDefaults") to include in API requests with
-	// the JSON null value. By default, fields with empty values are omitted
-	// from API requests. However, any field with an empty value appearing
-	// in NullFields will be sent to the server as null. It is an error if a
+	// "AutoprovisioningLocations") to include in API requests with the JSON
+	// null value. By default, fields with empty values are omitted from API
+	// requests. However, any field with an empty value appearing in
+	// NullFields will be sent to the server as null. It is an error if a
 	// field in this list has a non-empty value. This may be used to include
 	// null fields in Patch requests.
 	NullFields []string `json:"-"`
@@ -2432,9 +2448,6 @@ type MasterAuth struct {
 	// to the cluster endpoint.
 	ClientKey string `json:"clientKey,omitempty"`
 
-	// ClusterCaCertificate: [Output only] Base64-encoded public certificate
-	// that is the root of
-	// trust for the cluster.
 	ClusterCaCertificate string `json:"clusterCaCertificate,omitempty"`
 
 	// Password: The password to use for HTTP basic authentication to the
@@ -2801,7 +2814,13 @@ type NodeConfig struct {
 	//  "kube-env"
 	//  "startup-script"
 	//  "user-data"
-	//
+	//  "disable-address-manager"
+	//  "windows-startup-script-ps1"
+	//  "common-psm1"
+	//  "k8s-node-setup-psm1"
+	//  "install-ssh-psm1"
+	//  "user-profile-psm1"
+	//  "serial-port-logging-enable"
 	// Values are free-form strings, and only have meaning as interpreted
 	// by
 	// the image running in the instance. The only restriction placed on
@@ -2864,6 +2883,9 @@ type NodeConfig struct {
 	// no Service Account is specified, the "default" service account is
 	// used.
 	ServiceAccount string `json:"serviceAccount,omitempty"`
+
+	// ShieldedInstanceConfig: Shielded Instance options.
+	ShieldedInstanceConfig *ShieldedInstanceConfig `json:"shieldedInstanceConfig,omitempty"`
 
 	// Tags: The list of instance tags applied to all nodes. Tags are used
 	// to identify
@@ -2983,6 +3005,11 @@ type NodePool struct {
 	// ged-instances)
 	// associated with this node pool.
 	InstanceGroupUrls []string `json:"instanceGroupUrls,omitempty"`
+
+	// Locations: The list of Google Compute Engine
+	// [zones](/compute/docs/zones#available)
+	// in which the NodePool's nodes should be located.
+	Locations []string `json:"locations,omitempty"`
 
 	// Management: NodeManagement configuration for this NodePool.
 	Management *NodeManagement `json:"management,omitempty"`
@@ -4334,6 +4361,55 @@ func (s *SetNodePoolSizeRequest) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// ShieldedInstanceConfig: A set of Shielded Instance options.
+type ShieldedInstanceConfig struct {
+	// EnableIntegrityMonitoring: Defines whether the instance has integrity
+	// monitoring enabled.
+	//
+	// Enables monitoring and attestation of the boot integrity of the
+	// instance.
+	// The attestation is performed against the integrity policy baseline.
+	// This
+	// baseline is initially derived from the implicitly trusted boot image
+	// when
+	// the instance is created.
+	EnableIntegrityMonitoring bool `json:"enableIntegrityMonitoring,omitempty"`
+
+	// EnableSecureBoot: Defines whether the instance has Secure Boot
+	// enabled.
+	//
+	// Secure Boot helps ensure that the system only runs authentic software
+	// by
+	// verifying the digital signature of all boot components, and halting
+	// the
+	// boot process if signature verification fails.
+	EnableSecureBoot bool `json:"enableSecureBoot,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g.
+	// "EnableIntegrityMonitoring") to unconditionally include in API
+	// requests. By default, fields with empty values are omitted from API
+	// requests. However, any non-pointer, non-interface field appearing in
+	// ForceSendFields will be sent to the server regardless of whether the
+	// field is empty or not. This may be used to include empty fields in
+	// Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g.
+	// "EnableIntegrityMonitoring") to include in API requests with the JSON
+	// null value. By default, fields with empty values are omitted from API
+	// requests. However, any field with an empty value appearing in
+	// NullFields will be sent to the server as null. It is an error if a
+	// field in this list has a non-empty value. This may be used to include
+	// null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *ShieldedInstanceConfig) MarshalJSON() ([]byte, error) {
+	type NoMethod ShieldedInstanceConfig
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // StartIPRotationRequest: StartIPRotationRequest creates a new IP for
 // the cluster and then performs
 // a node upgrade on each node pool to point to the new IP.
@@ -4430,6 +4506,42 @@ type StatusCondition struct {
 
 func (s *StatusCondition) MarshalJSON() ([]byte, error) {
 	type NoMethod StatusCondition
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// TierSettings: Cluster tier settings.
+type TierSettings struct {
+	// Tier: Cluster tier.
+	//
+	// Possible values:
+	//   "UNSPECIFIED" - UNSPECIFIED is the default value. If this value is
+	// set during create or
+	// update, it defaults to the project level tier setting.
+	//   "STANDARD" - Represents the standard tier or base Google Kubernetes
+	// Engine offering.
+	//   "ADVANCED" - Represents the advanced tier.
+	Tier string `json:"tier,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Tier") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Tier") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *TierSettings) MarshalJSON() ([]byte, error) {
+	type NoMethod TierSettings
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -4560,6 +4672,17 @@ type UpdateNodePoolRequest struct {
 
 	// ImageType: The desired image type for the node pool.
 	ImageType string `json:"imageType,omitempty"`
+
+	// Locations: The desired list of Google Compute
+	// Engine
+	// [zones](/compute/docs/zones#available) in which the node pool's
+	// nodes
+	// should be located. Changing the locations for a node pool will
+	// result
+	// in nodes being either created or removed from the node pool,
+	// depending
+	// on whether locations are being added or removed.
+	Locations []string `json:"locations,omitempty"`
 
 	// Name: The name (project, location, cluster, node pool) of the node
 	// pool to

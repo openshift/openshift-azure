@@ -1,6 +1,8 @@
 package matchers_test
 
 import (
+	"encoding/json"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/matchers"
@@ -28,6 +30,10 @@ var _ = Describe("MatchJSONMatcher", func() {
 			Expect([]byte("{}")).Should(MatchJSON([]byte("{}")))
 			Expect("{}").Should(MatchJSON([]byte("{}")))
 			Expect([]byte("{}")).Should(MatchJSON("{}"))
+		})
+
+		It("should work with json.RawMessage", func() {
+			Expect([]byte(`{"a": 1}`)).Should(MatchJSON(json.RawMessage(`{"a": 1}`)))
 		})
 	})
 
@@ -93,5 +99,12 @@ var _ = Describe("MatchJSONMatcher", func() {
 			Expect(err).Should(HaveOccurred())
 			Expect(err.Error()).Should(ContainSubstring("MatchJSONMatcher matcher requires a string, stringer, or []byte.  Got actual:\n    <nil>: nil"))
 		})
+	})
+
+	It("shows negated failure message", func() {
+		failuresMessages := InterceptGomegaFailures(func() {
+			Expect("1").ToNot(MatchJSON("1"))
+		})
+		Expect(failuresMessages).To(Equal([]string{"Expected\n    <string>: 1\nnot to match JSON of\n    <string>: 1"}))
 	})
 })
