@@ -89,7 +89,6 @@ func run(log *logrus.Entry) error {
 	} else {
 		log.Debug("running with metrics")
 		m.Start(action)
-		defer m.Stop(failed)
 	}
 
 	if action == "Create" {
@@ -106,13 +105,18 @@ func run(log *logrus.Entry) error {
 		err = p.Create(ctx, log, name, cfg)
 		if err != nil {
 			failed = true
+			m.Stop(failed)
 		}
+		m.Stop(false)
 		return err
 	}
 
 	err = p.Delete(ctx, log, name)
 	if err != nil {
 		failed = true
+		m.Stop(failed)
+		return err
 	}
+	m.Stop(false)
 	return err
 }
