@@ -54,9 +54,13 @@ func (r *azureAppInsightsReporter) Stop(result bool) error {
 	r.c.TrackMetric(string(dataJSON), btof(result))
 	// For debug comment out TrackEvent and output to stdout
 	fmt.Println(string(dataJSON))
-	chann := r.c.Channel()
-	defer chann.Close()
-	chann.Flush()
+
+	select {
+	case <-r.c.Channel().Close(10 * time.Second):
+		// gradual shutdown
+	case <-time.After(30 * time.Second):
+		// hard shutdown after 30s
+	}
 
 	return nil
 }

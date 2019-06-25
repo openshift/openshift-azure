@@ -1,6 +1,8 @@
 
 # HACK: Current vendoring in broken. To work around we 
 # construct fake vendoring by:
+# clean old vendor
+# rm -rf ./vendor/*
 # cp -r ../installer/vendor ./
 # cp -r ../installer ./vendor/github.com/openshift/
 # rm -rf ./vendor/github.com/openshift/installer/vendor
