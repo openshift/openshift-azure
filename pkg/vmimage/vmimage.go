@@ -26,22 +26,22 @@ import (
 
 // Builder is the VM image configuration struct
 type Builder struct {
-	GitCommit                string
-	Log                      *logrus.Entry
-	Deployments              resources.DeploymentsClient
-	Groups                   resources.GroupsClient
-	SubscriptionID           string
-	Location                 string
-	BuildResourceGroup       string
-	DeleteBuildResourceGroup bool
-	DomainNameLabel          string
-	Image                    string
-	ImageResourceGroup       string
-	ImageStorageAccount      string
-	ImageContainer           string
-	SSHKey                   *rsa.PrivateKey
-	ClientKey                *rsa.PrivateKey
-	ClientCert               *x509.Certificate
+	GitCommit                  string
+	Log                        *logrus.Entry
+	Deployments                resources.DeploymentsClient
+	Groups                     resources.GroupsClient
+	SubscriptionID             string
+	Location                   string
+	BuildResourceGroup         string
+	PreserveBuildResourceGroup bool
+	DomainNameLabel            string
+	Image                      string
+	ImageResourceGroup         string
+	ImageStorageAccount        string
+	ImageContainer             string
+	SSHKey                     *rsa.PrivateKey
+	ClientKey                  *rsa.PrivateKey
+	ClientCert                 *x509.Certificate
 
 	Validate bool
 }
@@ -122,8 +122,8 @@ func (builder *Builder) Run(ctx context.Context) error {
 	}
 
 	defer func() {
-		if builder.DeleteBuildResourceGroup {
-			builder.Log.Infof("deleteBuildResourceGroup set, deleting build resource group")
+		if !builder.PreserveBuildResourceGroup {
+			builder.Log.Infof("PerserveBuildResourceGroup not set, deleting build resource group")
 			builder.Groups.Delete(ctx, builder.BuildResourceGroup)
 		}
 	}()

@@ -25,17 +25,17 @@ var (
 
 	timestamp = time.Now().UTC().Format("200601021504")
 
-	logLevel                 = flag.String("loglevel", "Debug", "Valid values are Debug, Info, Warning, Error")
-	location                 = flag.String("location", "eastus", "location")
-	buildResourceGroup       = flag.String("buildResourceGroup", "vmimage-"+timestamp, "build resource group")
-	deleteBuildResourceGroup = flag.Bool("deleteBuildResourceGroup", true, "delete build resource group after build")
-	image                    = flag.String("image", "rhel7-3.11-"+timestamp, "image name")
-	imageResourceGroup       = flag.String("imageResourceGroup", "images", "image resource group")
-	imageStorageAccount      = flag.String("imageStorageAccount", "openshiftimages", "image storage account")
-	imageContainer           = flag.String("imageContainer", "images", "image container")
-	clientKey                = flag.String("clientKey", "secrets/client-key.pem", "cdn client key")
-	clientCert               = flag.String("clientCert", "secrets/client-cert.pem", "cdn client cert")
-	validate                 = flag.Bool("validate", false, "If set, will create VM with provided image and will try to update it")
+	logLevel                   = flag.String("loglevel", "Debug", "Valid values are Debug, Info, Warning, Error")
+	location                   = flag.String("location", "eastus", "location")
+	buildResourceGroup         = flag.String("buildResourceGroup", "vmimage-"+timestamp, "build resource group")
+	preserveBuildResourceGroup = flag.Bool("preserveBuildResourceGroup", false, "preserve build resource group after build")
+	image                      = flag.String("image", "rhel7-3.11-"+timestamp, "image name")
+	imageResourceGroup         = flag.String("imageResourceGroup", "images", "image resource group")
+	imageStorageAccount        = flag.String("imageStorageAccount", "openshiftimages", "image storage account")
+	imageContainer             = flag.String("imageContainer", "images", "image container")
+	clientKey                  = flag.String("clientKey", "secrets/client-key.pem", "cdn client key")
+	clientCert                 = flag.String("clientCert", "secrets/client-cert.pem", "cdn client cert")
+	validate                   = flag.Bool("validate", false, "If set, will create VM with provided image and will try to update it")
 )
 
 func run(ctx context.Context, log *logrus.Entry) error {
@@ -85,27 +85,32 @@ func run(ctx context.Context, log *logrus.Entry) error {
 	}
 
 	builder := vmimage.Builder{
-		GitCommit:                gitCommit,
-		Log:                      log,
-		Deployments:              resources.NewDeploymentsClient(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer),
-		Groups:                   resources.NewGroupsClient(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer),
-		SubscriptionID:           os.Getenv("AZURE_SUBSCRIPTION_ID"),
-		Location:                 *location,
-		BuildResourceGroup:       *buildResourceGroup,
-		DeleteBuildResourceGroup: *deleteBuildResourceGroup,
-		DomainNameLabel:          domainNameLabel,
-		Image:                    *image,
-		ImageResourceGroup:       *imageResourceGroup,
-		ImageStorageAccount:      *imageStorageAccount,
-		ImageContainer:           *imageContainer,
-		SSHKey:                   sshkey,
-		ClientKey:                clientKey,
-		ClientCert:               clientCert,
-		Validate:                 *validate,
+		GitCommit:                  gitCommit,
+		Log:                        log,
+		Deployments:                resources.NewDeploymentsClient(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer),
+		Groups:                     resources.NewGroupsClient(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer),
+		SubscriptionID:             os.Getenv("AZURE_SUBSCRIPTION_ID"),
+		Location:                   *location,
+		BuildResourceGroup:         *buildResourceGroup,
+		PreserveBuildResourceGroup: *preserveBuildResourceGroup,
+		DomainNameLabel:            domainNameLabel,
+		Image:                      *image,
+		ImageResourceGroup:         *imageResourceGroup,
+		ImageStorageAccount:        *imageStorageAccount,
+		ImageContainer:             *imageContainer,
+		SSHKey:                     sshkey,
+		ClientKey:                  clientKey,
+		ClientCert:                 clientCert,
+		Validate:                   *validate,
 	}
 	err = builder.Run(ctx)
 	if err != nil {
 		return err
+	}
+
+	// for debug purposes
+	if *preserveBuildResourceGroup {
+		return nil
 	}
 
 	return os.Remove("id_rsa")
