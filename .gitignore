@@ -4,6 +4,7 @@
 /env.*
 !/env.example
 /azure
+/testinsights
 /kubeconfig*
 .vscode
 .idea
