@@ -138,7 +138,7 @@ func nic(subscriptionID, resourceGroup, location string) *network.Interface {
 	}
 }
 
-func vm(subscriptionID, resourceGroup, location, sshPublicKey, image string, verify bool) *compute.VirtualMachine {
+func vm(subscriptionID, resourceGroup, location, sshPublicKey, image, imageResourceGroup string, verify bool) *compute.VirtualMachine {
 	var imageReference compute.ImageReference
 	if !verify {
 		imageReference = compute.ImageReference{
@@ -151,7 +151,7 @@ func vm(subscriptionID, resourceGroup, location, sshPublicKey, image string, ver
 		imageReference = compute.ImageReference{
 			ID: to.StringPtr(resourceid.ResourceID(
 				subscriptionID,
-				"images",
+				imageResourceGroup,
 				"Microsoft.Compute/images",
 				image,
 			)),

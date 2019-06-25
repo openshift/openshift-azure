@@ -67,7 +67,6 @@ zerombr
 @^minimal
 -NetworkManager-team
 -Red_Hat_Enterprise_Linux-Release_Notes-7-en-US
--audit*
 -biosdevname
 -btrfs-progs
 -dracut-config-rescue
@@ -128,6 +127,7 @@ yum -y install \
     atomic-openshift-clients \
     atomic-openshift-docker-excluder \
     atomic-openshift-node \
+    audit \
     bind-utils \
     ceph-common \
     chrony \
@@ -203,6 +203,34 @@ sed -i -e 's/^ResourceDisk.Format=.*/ResourceDisk.Format=n/' /etc/waagent.conf
 
 rpm -q kernel --last | sed -n '1 {s/^[^-]*-//; s/ .*$//; p}' >/var/tmp/kernel-version
 rpm -q atomic-openshift-node --qf '%{VERSION}-%{RELEASE}.%{ARCH}' >/var/tmp/openshift-version
+
+# Image hardening
+
+# accounts_minimum_age_login_defs
+sed -i -e 's/PASS_MIN_DAYS.*/PASS_MIN_DAYS     1/g' /etc/login.defs
+sed -i -e 's/PASS_MAX_DAYS.*/PASS_MAX_DAYS     60/g' /etc/login.defs
+
+# no_empty_passwords
+sed --follow-symlinks -i 's/\<nullok\>//g' /etc/pam.d/system-auth
+sed --follow-symlinks -i 's/\<nullok\>//g' /etc/pam.d/password-auth
+
+# disable_ctrlaltdel_reboot
+systemctl mask ctrl-alt-del.target
+
+# accounts_logon_fail_delay
+echo 'FAIL_DELAY 4' >> /etc/login.defs
+
+# accounts_tmout
+echo -e '\n# Set TMOUT to 600 per security requirements' >> /etc/profile
+echo 'TMOUT=600' >> /etc/profile
+
+# accounts_max_concurrent_login_sessions
+echo '*	hard	maxlogins	10' >> /etc/security/limits.conf
+
+# ensure_gpgcheck_repo_metadata
+# echo 'repo_gpgcheck=1' >> /etc/yum.conf
+# ensure_gpgcheck_local_packages
+# echo 'localpkg_gpgcheck=1' >> /etc/yum.conf
 
 >/var/tmp/kickstart_completed
 %end
