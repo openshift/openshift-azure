@@ -99,6 +99,9 @@ logger -t master-startup.sh "restore done"
 
 tuned-adm profile openshift-control-plane
 
+# we also need openshift.local.volumes dir created before xfs quota code runs
+mkdir -m 0750 -p /var/lib/origin/openshift.local.volumes
+
 # note: atomic-openshift-node crash loops until master is up
 systemctl enable atomic-openshift-node.service
 systemctl start atomic-openshift-node.service &

@@ -204,6 +204,12 @@ func (sc *SanityChecker) ValidateCluster(ctx context.Context) (errs []*TestError
 		sc.Client.EndUser.DumpInfo("", "checkCanUseAzureFile")
 		errs = append(errs, &TestError{Err: err, Bucket: "checkCanUseAzureFile"})
 	}
+	sc.Log.Debugf("validating that the cluster enforces emptydir quotas")
+	err = sc.checkEnforcesEmptyDirQuotas(ctx)
+	if err != nil {
+		sc.Log.Error(err)
+		errs = append(errs, &TestError{Err: err, Bucket: "checkEnforcesEmptyDirQuotas"})
+	}
 	return
 }
 

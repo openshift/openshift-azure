@@ -411,3 +411,72 @@ func (sc *SanityChecker) checkCanUseAzureFileStorage(ctx context.Context) error 
 
 	return nil
 }
+
+func (sc *SanityChecker) checkEnforcesEmptyDirQuotas(ctx context.Context) error {
+	var major, minor int
+	_, err := fmt.Sscanf(sc.cs.Config.PluginVersion, "v%d.%d", &major, &minor)
+	if err != nil {
+		return err
+	}
+	By("Verifying that plugin version is over v6 otherwise skip")
+	if major < 6 {
+		return nil
+	}
+
+	namespace, err := sc.createProject(ctx)
+	if err != nil {
+		return err
+	}
+	defer sc.deleteProject(ctx, namespace)
+
+	// create test pod
+	podName := "busybox"
+	By("Creating busybox pod to test EmptyDir Quotas")
+	_, err = sc.Client.EndUser.CoreV1.Pods(namespace).Create(&corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: podName,
+		},
+		Spec: corev1.PodSpec{
+			Containers: []corev1.Container{
+				{
+					Name:  podName,
+					Image: podName,
+					Command: []string{
+						"/bin/dd",
+						"if=/dev/urandom",
+						fmt.Sprintf("of=/cache/%s.bin", namespace),
+						"bs=1M",
+						"count=2000",
+					},
+					VolumeMounts: []corev1.VolumeMount{
+						{
+							Name:      "cache-volume",
+							MountPath: "/cache",
+						},
+					},
+				},
+			},
+			Volumes: []corev1.Volume{
+				{
+					Name: "cache-volume",
+					VolumeSource: v1.VolumeSource{
+						EmptyDir: &corev1.EmptyDirVolumeSource{},
+					},
+				},
+			},
+			RestartPolicy: corev1.RestartPolicyNever,
+		},
+	})
+	if err != nil {
+		return err
+	}
+	By("Created pod")
+	By(fmt.Sprintf("Waiting for pod %s to finish", podName))
+	err = wait.PollImmediate(2*time.Second, 10*time.Minute, ready.CheckPodHasPhase(sc.Client.EndUser.CoreV1.Pods(namespace), podName, corev1.PodFailed))
+	if err != nil {
+		return err
+	}
+	By(fmt.Sprintf("Pod %s finished", podName))
+
+	return nil
+}
