@@ -30,6 +30,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/client-go/tools/clientcmd"
 
+	aroassets "github.com/openshift/openshift-azure/pkg/assets"
 	"github.com/openshift/openshift-azure/pkg/util/installer"
 )
 
@@ -182,6 +183,8 @@ func (p *plugin) Create(ctx context.Context, log *logrus.Entry, name string, cfg
 	targets := targetassets.InstallConfig
 	targets = append(targets, targetassets.IgnitionConfigs...)
 	targets = append(targets, targetassets.Manifests...)
+	// inject azure assets
+	targets = append(targets, aroassets.AroManifests...)
 	targets = append(targets, targetassets.Cluster...)
 
 	for _, a := range targets {

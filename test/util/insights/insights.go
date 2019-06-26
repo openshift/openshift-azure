@@ -24,6 +24,7 @@ type metrics struct {
 // NewAzureAppInsightsReporter returns reporter for Azure App Insights.
 func NewAzureAppInsightsReporter() (*azureAppInsightsReporter, error) {
 	if os.Getenv("AZURE_APP_INSIGHTS_KEY") != "" {
+		fmt.Println("Create az")
 		c := appinsights.NewTelemetryClient(os.Getenv("AZURE_APP_INSIGHTS_KEY"))
 		c.Context().CommonProperties["type"] = "install"
 		c.Context().CommonProperties["version"] = "v4"
@@ -50,9 +51,16 @@ func (r *azureAppInsightsReporter) Stop(result bool) error {
 	if err != nil {
 		return err
 	}
-	r.c.TrackAvailability(r.metrics.action, time.Since(r.metrics.start), result)
+	r.c.TrackMetric(string(dataJSON), btof(result))
 	// For debug comment out TrackEvent and output to stdout
 	fmt.Println(string(dataJSON))
+
+	select {
+	case <-r.c.Channel().Close(10 * time.Second):
+		// gradual shutdown
+	case <-time.After(30 * time.Second):
+		// hard shutdown after 30s
+	}
 
 	return nil
 }

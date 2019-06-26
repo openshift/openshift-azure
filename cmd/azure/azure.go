@@ -89,6 +89,7 @@ func run(log *logrus.Entry) error {
 		log.Debug("running with metrics")
 		m.Start(action)
 	}
+
 	if action == "Create" {
 		cfg, err := p.GenerateConfig(ctx, name)
 		if err != nil {
