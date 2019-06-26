@@ -11,9 +11,11 @@ all: clean azure
 clean:
 	rm -f azure
 
+# not a PHONY
 azure:
 	go build -ldflags ${LDFLAGS} ./cmd/$@
 
+.PHONY: unit
 unit:
 	go test ./... -coverprofile=coverage.out -covermode=atomic
 

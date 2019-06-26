@@ -49,6 +49,7 @@ type Plugin interface {
 	// for an Openshift cluster.
 	GenerateConfig(ctx context.Context, name string) (*types.InstallConfig, error)
 
+	// ValidateConfig validates the given install config
 	ValidateConfig(ctx context.Context, cfg *types.InstallConfig) error
 
 	// Create deploys the cluster
@@ -63,6 +64,7 @@ type plugin struct {
 	store     asset.Store
 }
 
+// NewPlugin creates a new plugin instance
 func NewPlugin(directory string, store asset.Store) Plugin {
 	return &plugin{
 		directory: directory,
