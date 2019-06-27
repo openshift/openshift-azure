@@ -83,6 +83,9 @@ func mergePropertiesAdmin(oc *OpenShiftManagedCluster, cs *api.OpenShiftManagedC
 	if oc.Properties.ClusterVersion != nil {
 		cs.Properties.ClusterVersion = *oc.Properties.ClusterVersion
 	}
+	if oc.Properties.ClusterVersion != nil {
+		cs.Properties.ClusterVersion = *oc.Properties.ClusterVersion
+	}
 	if oc.Properties.PublicHostname != nil {
 		cs.Properties.PublicHostname = *oc.Properties.PublicHostname
 	}
@@ -334,6 +337,9 @@ func convertIdentityProviderAdmin(in IdentityProvider, old *api.IdentityProvider
 func mergeConfig(oc *OpenShiftManagedCluster, cs *api.OpenShiftManagedCluster) {
 	in, out := oc.Config, &cs.Config
 
+	if in.SecurityPatchPackages != nil {
+		out.SecurityPatchPackages = *in.SecurityPatchPackages
+	}
 	if in.PluginVersion != nil {
 		out.PluginVersion = *in.PluginVersion
 	}

@@ -105,6 +105,7 @@ func FromInternal(cs *api.OpenShiftManagedCluster) *OpenShiftManagedCluster {
 
 func convertConfigToAdmin(cs *api.Config) *Config {
 	return &Config{
+		SecurityPatchPackages:                &cs.SecurityPatchPackages,
 		PluginVersion:                        &cs.PluginVersion,
 		ComponentLogLevel:                    convertComponentLogLevelToAdmin(cs.ComponentLogLevel),
 		SSHSourceAddressPrefixes:             &cs.SSHSourceAddressPrefixes,

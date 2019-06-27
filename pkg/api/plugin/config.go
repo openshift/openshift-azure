@@ -7,6 +7,9 @@ import (
 
 // Config holds the api plugin config structure
 type Config struct {
+	// SecurityPatchPackages defines a list of rpm packages for rapid cve mitigation
+	SecurityPatchPackages []string `json:"securityPatchPackages,omitempty"`
+
 	// PluginVersion defines release version of the plugin used to build the cluster
 	PluginVersion string `json:"pluginVersion,omitempty"`
 
