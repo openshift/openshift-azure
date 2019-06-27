@@ -336,3 +336,42 @@ func TestIsValidBlobContainerName(t *testing.T) {
 		}
 	}
 }
+
+func TestIsValidRpmPackageName(t *testing.T) {
+	for _, tt := range []struct {
+		name  string
+		valid bool
+	}{
+		{
+			name:  "nano-2.3.1-10.el7.x86_64",
+			valid: true,
+		},
+		{
+			name:  "nano-2.3.1-10",
+			valid: true,
+		},
+		{
+			name:  "nano",
+			valid: true,
+		},
+		{
+			name:  "n",
+			valid: true,
+		},
+		{
+			name:  "Patch_1-+.",
+			valid: true,
+		},
+		{
+			name: "package.rpm",
+		},
+		{
+			name: "",
+		},
+	} {
+		valid := isValidRpmPackageName(tt.name)
+		if valid != tt.valid {
+			t.Errorf("%s: wanted valid %v, got %v", tt.name, tt.valid, valid)
+		}
+	}
+}

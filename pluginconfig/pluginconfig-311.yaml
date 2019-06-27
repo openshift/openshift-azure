@@ -3,6 +3,8 @@
 ## This template file is manually curated for the particular OSA version
 ##
 pluginVersion: v6.0
+## List of RPM packages that fix security issues
+securityPatchPackages: []
 ## Openshift component logging levels
 componentLogLevel:
   apiServer: 2

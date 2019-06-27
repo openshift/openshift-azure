@@ -43,6 +43,9 @@ var (
 	// This regexp is to check plugin version format
 	rxPluginVersion = regexp.MustCompile(`^v\d+\.\d+$`)
 
+	// This regexp checks rpm package name format
+	rxRpmPackage = regexp.MustCompile(`^[a-zA-Z0-9_\-\.+]+$`)
+
 	rxResourceGroupName = regexp.MustCompile(`^[-\w._()]{1,90}$`)
 
 	rxKeyVaultSecretURL = regexp.MustCompile(`^https://[-a-zA-Z0-9]{3,24}\.vault\.azure\.net/secrets/[-a-zA-Z0-9]{1,127}$`)
@@ -228,4 +231,11 @@ func isValidComputeVMSize(size api.VMSize, runningUnderTest bool) bool {
 
 	_, found := validComputeVMSizes[size]
 	return found
+}
+
+func isValidRpmPackageName(name string) bool {
+	if strings.HasSuffix(name, ".rpm") || !rxRpmPackage.MatchString(name) {
+		return false
+	}
+	return true
 }

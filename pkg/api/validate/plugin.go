@@ -26,6 +26,7 @@ func (v *PluginAPIValidator) Validate(c *pluginapi.Config) (errs []error) {
 		errs = append(errs, fmt.Errorf("invalid pluginVersion %q", c.PluginVersion))
 	}
 
+	errs = append(errs, validateSecurityPatchPackages(c.SecurityPatchPackages)...)
 	errs = append(errs, validateComponentLogLevel(&c.ComponentLogLevel)...)
 
 	for _, prefix := range c.SSHSourceAddressPrefixes {
@@ -85,6 +86,16 @@ func (v *PluginAPIValidator) Validate(c *pluginapi.Config) (errs []error) {
 
 	if len(c.ImagePullSecret) == 0 {
 		errs = append(errs, fmt.Errorf("invalid imagePullSecret %q", c.ImagePullSecret))
+	}
+
+	return
+}
+
+func validateSecurityPatchPackages(names []string) (errs []error) {
+	for _, name := range names {
+		if !isValidRpmPackageName(name) {
+			errs = append(errs, fmt.Errorf("invalid securityUpdatePackage %q", name))
+		}
 	}
 
 	return

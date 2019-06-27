@@ -79,6 +79,9 @@ var marshalled = []byte(`{
 		"Tags.key": "Tags.val"
 	},
 	"config": {
+		"securityPatchPackages": [
+			"Config.SecurityPatchPackages[0]"
+		],
 		"pluginVersion": "Config.PluginVersion",
 		"componentLogLevel": {
 			"apiServer": 1,

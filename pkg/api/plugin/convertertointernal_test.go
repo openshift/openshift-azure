@@ -24,7 +24,8 @@ func internalPluginConfig() api.Config {
 	// this is the expected internal equivalent to
 	// internal API Config
 	return api.Config{
-		PluginVersion: "Versions.key",
+		SecurityPatchPackages: []string{"SecurityPatchPackages[0]"},
+		PluginVersion:         "Versions.key",
 		ComponentLogLevel: api.ComponentLogLevel{
 			APIServer:         to.IntPtr(1),
 			ControllerManager: to.IntPtr(1),

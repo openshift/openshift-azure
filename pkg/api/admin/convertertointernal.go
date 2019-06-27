@@ -334,6 +334,9 @@ func convertIdentityProviderAdmin(in IdentityProvider, old *api.IdentityProvider
 func mergeConfig(oc *OpenShiftManagedCluster, cs *api.OpenShiftManagedCluster) {
 	in, out := oc.Config, &cs.Config
 
+	if in.SecurityPatchPackages != nil {
+		out.SecurityPatchPackages = *in.SecurityPatchPackages
+	}
 	if in.PluginVersion != nil {
 		out.PluginVersion = *in.PluginVersion
 	}

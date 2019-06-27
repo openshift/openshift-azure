@@ -17,6 +17,10 @@ func ToInternal(in *Config, old *api.Config, setVersionFields bool) (*api.Config
 		c = old.DeepCopy()
 	}
 
+	if c.SecurityPatchPackages == nil {
+		c.SecurityPatchPackages = in.SecurityPatchPackages
+	}
+
 	// setting c.PluginVersion = in.PluginVersion is done up-front by the plugin
 	// code.  It could be done here as well (gated by setVersionFields) but
 	// would/should be a no-op.  To simplify the logic, we don't do it.

@@ -469,6 +469,11 @@ func TestHowAdminConfigChangesCausesRotations(t *testing.T) {
 			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: true, rotationCompute: false},
 			change:         func(cs *api.OpenShiftManagedCluster) { cs.Config.Images.WebConsole = "newImage" },
 		},
+		{
+			name:           "change security patch packages",
+			expectRotation: map[rotationType]bool{rotationMaster: true, rotationInfra: true, rotationSync: false, rotationCompute: true},
+			change:         func(cs *api.OpenShiftManagedCluster) { cs.Config.SecurityPatchPackages = []string{"patch-rpm"} },
+		},
 	}
 
 	log := logrus.NewEntry(logrus.StandardLogger())
