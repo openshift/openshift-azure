@@ -106,10 +106,11 @@ func EnrichInstallConfig(name string, ec *EnvConfig, cfg *types.InstallConfig) e
 		Azure: &azuretypes.Platform{
 			Region:                      ec.Region,
 			BaseDomainResourceGroupName: ec.DNSResourceGroup,
-			UserTags: map[string]string{
-				"now": string(time.Now().Unix()),
-				"ttl": "72h",
-			},
+			// FIXME: https://github.com/openshift/installer/pull/1913 rollback
+			//UserTags: map[string]string{
+			//	"now": string(time.Now().Unix()),
+			//	"ttl": "72h",
+			//},
 		},
 	}
 	cfg.BaseDomain = baseDomain

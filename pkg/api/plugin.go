@@ -105,7 +105,6 @@ func (p *plugin) GenerateConfig(ctx context.Context, name string) (*types.Instal
 				Hyperthreading: types.HyperthreadingEnabled,
 				Platform: types.MachinePoolPlatform{
 					Azure: &azuretypes.MachinePool{
-						Zones:        []string{"1", "2", "3"},
 						InstanceType: "Standard_DS4_v2",
 					},
 				},
