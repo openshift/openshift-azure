@@ -195,6 +195,14 @@ data:
       name: azure_controllers_errors_rate
     - query: 'rate(azure_controllers_duration_seconds_sum[2m]) / rate(azure_controllers_duration_seconds_count[2m])'
       name: azure_controllers_average_duration
+    - query: 'rate(metrics_bridge_errors_total[2m])'
+      name: metrics_bridge_errors_rate
+    - query: 'rate(metrics_bridge_bytes_transferred_total[2m])'
+      name: metrics_bridge_bytes_transferred_rate
+    - query: 'rate(metrics_bridge_metrics_transferred_total[2m])'
+      name: metrics_bridge_metrics_transferred_rate
+    - query: 'rate(metrics_bridge_processing_duration_seconds_sum[2m]) / rate(metrics_bridge_processing_duration_seconds_count[2m])'
+      name: metrics_bridge_processing_average_duration
     account: '*** GENERATED ***'
     namespace: Prometheus
     region: '*** GENERATED ***'
