@@ -201,6 +201,7 @@ func (c *MetricsConfig) run() error {
 
 	for {
 		if err := c.runOnce(context.Background()); err != nil {
+			metricsBridgeErrorsCounter.Inc()
 			c.log.Warn(err)
 		}
 		<-t.C
@@ -208,7 +209,12 @@ func (c *MetricsConfig) run() error {
 }
 
 func (c *MetricsConfig) runOnce(ctx context.Context) error {
-	var metricsCount int
+	startTime := time.Now()
+	defer func() {
+		metricsBridgeProcessingDurationSummary.Observe(time.Now().Sub(startTime).Seconds())
+	}()
+
+	var metricsCount, bytesCount int
 	hostnameMap := make(map[string]string)
 
 	c.log.Debug("fetching nodename")
@@ -268,15 +274,19 @@ func (c *MetricsConfig) runOnce(ctx context.Context) error {
 			if err != nil {
 				return err
 			}
-			if _, err = c.conn.Write(b); err != nil {
+			bytesSent, err := c.conn.Write(b)
+			if err != nil {
 				return err
 			}
-
+			bytesCount += bytesSent
 			metricsCount++
+
+			metricsBridgeMetricsTransferredCounter.Inc()
+			metricsBridgeBytesTransferredCounter.Add(float64(bytesSent))
 		}
 	}
 
-	c.log.Infof("sent %d metrics", metricsCount)
+	c.log.Infof("sent %d metrics (%d bytes)", metricsCount, bytesCount)
 
 	return nil
 }
@@ -294,6 +304,7 @@ func start(cfg *cmdConfig) error {
 
 	mux := &http.ServeMux{}
 	mux.Handle("/healthz/ready", http.HandlerFunc(readyHandler))
+	mux.Handle(cfg.metricsEndpoint, MetricsHandler())
 
 	go http.Serve(l, mux)
 
@@ -304,6 +315,7 @@ func start(cfg *cmdConfig) error {
 	}
 
 	if err := run(log, cfg.configDir); err != nil {
+		metricsBridgeErrorsCounter.Inc()
 		return err
 	}
 	return nil

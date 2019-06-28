@@ -93,6 +93,7 @@ var _ = Describe("Prometheus E2E tests [Fake]", func() {
 			"prometheus-operator":         1,
 			"sync":                        1,
 			"azure-controllers":           1,
+			"metrics-bridge":              1,
 		}))
 	})
 })

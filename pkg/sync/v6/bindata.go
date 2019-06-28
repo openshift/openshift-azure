@@ -525,6 +525,7 @@
 // data/ServiceMonitor.monitoring.coreos.com/openshift-monitoring/azure-controllers.yaml
 // data/ServiceMonitor.monitoring.coreos.com/openshift-monitoring/canary.yaml
 // data/ServiceMonitor.monitoring.coreos.com/openshift-monitoring/etcd-metrics.yaml
+// data/ServiceMonitor.monitoring.coreos.com/openshift-monitoring/metrics-bridge.yaml
 // data/ServiceMonitor.monitoring.coreos.com/openshift-monitoring/router-stats.yaml
 // data/ServiceMonitor.monitoring.coreos.com/openshift-monitoring/sync.yaml
 // data/StatefulSet.apps/openshift-azure-monitoring/canary.yaml
@@ -11238,6 +11239,26 @@ func servicemonitorMonitoringCoreosComOpenshiftMonitoringEtcdMetricsYaml() (*ass
 	return a, nil
 }
 
+var _servicemonitorMonitoringCoreosComOpenshiftMonitoringMetricsBridgeYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x74\x90\x4d\x4e\xc3\x40\x0c\x85\xf7\x39\x85\x2f\x90\x16\xc4\x06\xcd\x19\x0a\x9b\x4a\x6c\x91\x33\x31\x8d\x69\x66\x6c\xd9\x26\x0b\x4e\x8f\xf2\x83\x88\x44\xbb\x9b\xe7\x37\x33\xfe\xde\x43\xe5\x37\x32\x67\xa9\x09\x8a\x54\x0e\x31\xae\x97\x43\x16\x23\xf1\x43\x96\x72\x9c\x1e\x9b\x2b\xd7\x3e\xc1\x99\x6c\xe2\x4c\x2f\xeb\xad\xa6\x50\x60\x8f\x81\xa9\x01\x18\xb1\xa3\xd1\xe7\x13\x00\x7e\x7f\x19\xb5\xa8\x9a\xa0\x50\x18\x67\x6f\x3b\xe3\xfe\x42\x8b\x7b\x7d\xf6\x3b\x5e\xc5\x42\x77\xc6\xae\x98\x29\x81\x28\x55\x1f\xf8\x23\xda\x3f\xd2\xc6\x95\xf2\xbc\x98\x6a\xaf\xc2\x35\x16\x8a\x16\xb8\x06\xd9\x84\x63\x82\xa7\x07\x5f\x36\x6f\x3f\xbf\x2b\xc6\x90\xe0\xb8\xc9\xc5\x52\xb1\x48\x30\x44\xe8\x22\x3d\x0f\x34\xb3\x6c\x83\x4f\xe9\x4e\x73\xbe\xf4\x0b\xbf\xa7\x3a\xd3\x48\x39\xc4\xd6\xec\x05\x23\x0f\xaf\xb3\xb7\xea\x76\xc7\xbc\xf6\xb2\x23\x07\xf0\xff\x8f\x4f\xbb\x26\x01\x6e\x35\xf5\x13\x00\x00\xff\xff\x73\x1e\xec\xfe\xb2\x01\x00\x00")
+
+func servicemonitorMonitoringCoreosComOpenshiftMonitoringMetricsBridgeYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_servicemonitorMonitoringCoreosComOpenshiftMonitoringMetricsBridgeYaml,
+		"ServiceMonitor.monitoring.coreos.com/openshift-monitoring/metrics-bridge.yaml",
+	)
+}
+
+func servicemonitorMonitoringCoreosComOpenshiftMonitoringMetricsBridgeYaml() (*asset, error) {
+	bytes, err := servicemonitorMonitoringCoreosComOpenshiftMonitoringMetricsBridgeYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ServiceMonitor.monitoring.coreos.com/openshift-monitoring/metrics-bridge.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _servicemonitorMonitoringCoreosComOpenshiftMonitoringRouterStatsYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x84\x51\xbb\x6e\xc3\x30\x0c\xdc\xf5\x15\xfc\x01\x27\xc8\x56\x68\xeb\x9e\x76\x09\xd0\xb5\x60\x64\xa6\x52\x63\x89\x02\x49\xbb\xe8\xdf\x17\xb2\x93\xf4\xe5\xa2\x9a\x74\x77\xc4\xdd\x81\xc4\x9a\x9e\x48\x34\x71\xf1\x90\xb9\x24\x63\x49\xe5\x65\x13\x58\x88\x75\x13\x38\x6f\xa7\x9d\x3b\xa7\xd2\x7b\x38\x90\x4c\x29\xd0\xc3\x32\xe5\x32\x19\xf6\x68\xe8\x1d\xc0\x80\x47\x1a\xb4\xfd\x00\xce\x77\xda\x61\xad\x1e\x84\x47\x23\xe9\xd4\xd0\xd4\x01\x14\xcc\xb4\x4a\x6a\xc5\x40\x1e\xb8\x52\xd1\x98\x4e\xd6\x7d\xf6\x70\x5a\x29\x34\x5b\x2a\x7d\xe5\x54\x6c\xce\xe8\xe0\x88\x9a\xc2\xfd\x68\x71\x89\x04\xa8\xa8\xfa\xc6\xd2\x5f\x31\xc0\x99\xde\xfd\x8d\xbe\xb1\xab\x25\xda\x1b\x95\x64\x16\xbf\x1b\x5c\xe9\xff\x0c\x52\x31\x92\x09\x07\x0f\xbb\x3c\x13\x99\x4c\x52\xd0\xe7\x8a\x16\x3d\x6c\x2f\x70\x96\x2a\x8b\xad\x58\x68\x88\xd4\xbc\xa3\x59\x75\x00\xaf\x7c\xdc\xb7\xad\xfe\xbd\xb2\x03\x0d\x14\x8c\x65\xa9\x9c\xd1\x42\x7c\x6c\xda\x82\x3b\xe8\xe9\x84\xe3\x60\x0e\x40\x7f\x4f\xee\xbf\x5c\x0c\x2e\x11\x3f\xa2\x3e\x02\x00\x00\xff\xff\xce\xcf\x80\x31\x1b\x02\x00\x00")
 
 func servicemonitorMonitoringCoreosComOpenshiftMonitoringRouterStatsYamlBytes() ([]byte, error) {
@@ -14775,6 +14796,7 @@ var _bindata = map[string]func() (*asset, error){
 	"ServiceMonitor.monitoring.coreos.com/openshift-monitoring/azure-controllers.yaml":                                                   servicemonitorMonitoringCoreosComOpenshiftMonitoringAzureControllersYaml,
 	"ServiceMonitor.monitoring.coreos.com/openshift-monitoring/canary.yaml":                                                              servicemonitorMonitoringCoreosComOpenshiftMonitoringCanaryYaml,
 	"ServiceMonitor.monitoring.coreos.com/openshift-monitoring/etcd-metrics.yaml":                                                        servicemonitorMonitoringCoreosComOpenshiftMonitoringEtcdMetricsYaml,
+	"ServiceMonitor.monitoring.coreos.com/openshift-monitoring/metrics-bridge.yaml":                                                      servicemonitorMonitoringCoreosComOpenshiftMonitoringMetricsBridgeYaml,
 	"ServiceMonitor.monitoring.coreos.com/openshift-monitoring/router-stats.yaml":                                                        servicemonitorMonitoringCoreosComOpenshiftMonitoringRouterStatsYaml,
 	"ServiceMonitor.monitoring.coreos.com/openshift-monitoring/sync.yaml":                                                                servicemonitorMonitoringCoreosComOpenshiftMonitoringSyncYaml,
 	"StatefulSet.apps/openshift-azure-monitoring/canary.yaml":                                                                            statefulsetAppsOpenshiftAzureMonitoringCanaryYaml,
@@ -15683,6 +15705,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"azure-controllers.yaml": {servicemonitorMonitoringCoreosComOpenshiftMonitoringAzureControllersYaml, map[string]*bintree{}},
 			"canary.yaml":            {servicemonitorMonitoringCoreosComOpenshiftMonitoringCanaryYaml, map[string]*bintree{}},
 			"etcd-metrics.yaml":      {servicemonitorMonitoringCoreosComOpenshiftMonitoringEtcdMetricsYaml, map[string]*bintree{}},
+			"metrics-bridge.yaml":    {servicemonitorMonitoringCoreosComOpenshiftMonitoringMetricsBridgeYaml, map[string]*bintree{}},
 			"router-stats.yaml":      {servicemonitorMonitoringCoreosComOpenshiftMonitoringRouterStatsYaml, map[string]*bintree{}},
 			"sync.yaml":              {servicemonitorMonitoringCoreosComOpenshiftMonitoringSyncYaml, map[string]*bintree{}},
 		}},
