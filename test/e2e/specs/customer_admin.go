@@ -2,6 +2,7 @@ package specs
 
 import (
 	"errors"
+	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -251,8 +252,13 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fa
 				return err == nil, err
 			})
 			Expect(err).ToNot(HaveOccurred())
-			Expect(g.Users).To(HaveLen(1))
-			Expect(g.Users[0]).To(HavePrefix("testuserdisabled"))
+			found := false
+			for _, user := range g.Users {
+				if strings.HasPrefix(user, "testuserdisabled") {
+					found = true
+				}
+			}
+			Expect(found).To(Equal(true))
 		}
 	})
 	// Placeholder to test that a ded admin cannot delete pods in the default or openshift- namespaces
