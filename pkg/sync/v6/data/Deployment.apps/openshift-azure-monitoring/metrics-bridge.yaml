@@ -44,6 +44,15 @@ spec:
         - /config/config.yaml
         image: '*** GENERATED ***'
         name: metricsbridge
+        ports:
+        - containerPort: 8080
+          name: http
+        readinessProbe:
+          httpGet:
+            path: /healthz/ready
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 10
         resources:
           limits:
             cpu: 200m

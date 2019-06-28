@@ -286,6 +286,17 @@ func start(cfg *cmdConfig) error {
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
 	log := logrus.NewEntry(logrus.StandardLogger())
 
+	log.Info("starting metrics endpoint")
+	l, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.httpPort))
+	if err != nil {
+		return err
+	}
+
+	mux := &http.ServeMux{}
+	mux.Handle("/healthz/ready", http.HandlerFunc(readyHandler))
+
+	go http.Serve(l, mux)
+
 	log.Printf("metricsbridge starting")
 
 	if cfg.configDir == "" {
@@ -296,4 +307,8 @@ func start(cfg *cmdConfig) error {
 		return err
 	}
 	return nil
+}
+
+func readyHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
 }
