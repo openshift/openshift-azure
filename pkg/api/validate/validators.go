@@ -15,11 +15,11 @@ func validateContainerService(c *api.OpenShiftManagedCluster, externalOnly bool)
 
 	errs = append(errs, validateProperties(&c.Properties, c.Location, externalOnly)...)
 
-	if !isValidClusterName(c.Name) {
+	if c.Name == "" {
 		errs = append(errs, fmt.Errorf("invalid name %q", c.Name))
 	}
 
-	if !isValidLocation(c.Location) {
+	if c.Location == "" {
 		errs = append(errs, fmt.Errorf("invalid location %q", c.Location))
 	}
 
