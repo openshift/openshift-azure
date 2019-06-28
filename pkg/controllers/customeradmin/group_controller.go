@@ -7,6 +7,7 @@ import (
 
 	"github.com/ghodss/yaml"
 	userv1client "github.com/openshift/client-go/user/clientset/versioned/typed/user/v1"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/event"
@@ -97,8 +98,20 @@ func (r *reconcileGroup) load(path string) error {
 
 func (r *reconcileGroup) pollEvent(event.GenericEvent) bool {
 	r.log.Debug("AAD Group Reconciler (poll)..")
+
+	startTime := time.Now()
+	metricLabels := prometheus.Labels{"controller": "customeradmin-group-controller"}
+
+	azureControllersInFlightGauge.With(metricLabels).Inc()
+	defer func() {
+		azureControllersDurationSummary.With(metricLabels).Observe(time.Now().Sub(startTime).Seconds())
+		azureControllersInFlightGauge.With(metricLabels).Dec()
+		azureControllersLastExecutedGauge.With(metricLabels).SetToCurrentTime()
+	}()
+
 	err := reconcileGroups(r.log, r.aadClient, r.userV1, r.groupMap)
 	if err != nil {
+		azureControllersErrorsCounter.With(metricLabels).Inc()
 		r.log.Error(err)
 	}
 
