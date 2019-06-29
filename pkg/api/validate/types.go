@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	rxClusterName = regexp.MustCompile(`(?i)^([a-z0-9]|[a-z0-9][-a-z0-9]{0,61}[a-z0-9])$`)
+	rxClusterName = regexp.MustCompile(`^[-\w\._\(\)]+$`)
 
 	rxLocation = regexp.MustCompile(`(?i)^[a-z0-9]+$`)
 
