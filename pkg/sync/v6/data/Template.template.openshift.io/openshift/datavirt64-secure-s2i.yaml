@@ -1,7 +1,7 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  jdv64: 1.5.0
+  jdv64: 1.6.0
   template: datavirt64-secure-s2i
 message: 'A new data service has been created in your project.  The username/password
   for accessing the service is ${TEIID_USERNAME}/${TEIID_PASSWORD}.  Please be sure
@@ -24,7 +24,7 @@ metadata:
       configuration, application deployment configuration and ability to configure
       certificates for serving secure content.
     template.openshift.io/support-url: https://access.redhat.com
-    version: 1.5.0
+    version: 1.6.0
   name: datavirt64-secure-s2i
   namespace: openshift
 objects:
@@ -138,7 +138,7 @@ objects:
         forcePull: true
         from:
           kind: ImageStreamTag
-          name: jboss-datavirt64-openshift:1.5
+          name: jboss-datavirt64-openshift:1.6
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: Source
     triggers:

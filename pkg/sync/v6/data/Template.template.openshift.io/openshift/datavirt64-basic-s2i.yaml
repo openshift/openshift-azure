@@ -1,7 +1,7 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  jdv64: 1.5.0
+  jdv64: 1.6.0
   template: datavirt64-basic-s2i
 message: A new data service has been created in your project.  The username/password
   for accessing the service is ${TEIID_USERNAME}/${TEIID_PASSWORD}.  Please be sure
@@ -89,7 +89,7 @@ objects:
         forcePull: true
         from:
           kind: ImageStreamTag
-          name: jboss-datavirt64-openshift:1.5
+          name: jboss-datavirt64-openshift:1.6
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: Source
     triggers:
