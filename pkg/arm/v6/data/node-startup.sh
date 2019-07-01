@@ -1,5 +1,21 @@
 #!/bin/bash -ex
 
+{{ if gt (len .Config.SecurityPatchPackages) 0 }}
+# enable RHUI extended update support (EUS) and lock current minor version
+yum -y --config='https://rhelimage.blob.core.windows.net/repositories/rhui-microsoft-azure-rhel7-eus.config' install 'rhui-azure-rhel7-eus'
+echo $(. /etc/os-release && echo $VERSION_ID) > /etc/yum/vars/releasever
+yum update -y
+
+# install cve-fixing rpm packages
+{{ range .Config.SecurityPatchPackages }}
+yum install -y {{.}}
+{{end}}
+
+# disable RHUI extended update support (EUS) and remove version lock
+rm -rf /etc/yum/vars/releasever
+yum -y --disablerepo='*' remove 'rhui-azure-rhel7-eus'
+{{end}}
+
 if ! grep /var/lib/docker /etc/fstab; then
   systemctl stop docker-cleanup.timer
   systemctl stop docker-cleanup.service
