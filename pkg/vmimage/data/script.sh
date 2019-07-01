@@ -44,7 +44,6 @@ done
 
 firewall-cmd --zone=public --add-port=8080/tcp
 
-exit
 IMAGE="{{ .Builder.Image }}"
 DISKGIB=${DISKGIB:-32}
 IP=$(ifconfig eth0 | awk '/inet / { print $2 }')
