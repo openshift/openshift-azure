@@ -2,7 +2,9 @@ package customeradmin
 
 import (
 	"context"
+	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
@@ -48,6 +50,16 @@ var _ reconcile.Reconciler = &reconcileNamespace{}
 // error is non-nil or Result.Requeue is true, otherwise upon completion it will
 // remove the work from the queue.
 func (r *reconcileNamespace) Reconcile(request reconcile.Request) (reconcile.Result, error) {
+	startTime := time.Now()
+	metricLabels := prometheus.Labels{"controller": "customeradmin-namespace-controller"}
+
+	azureControllersInFlightGauge.With(metricLabels).Inc()
+	defer func() {
+		azureControllersDurationSummary.With(metricLabels).Observe(time.Now().Sub(startTime).Seconds())
+		azureControllersInFlightGauge.With(metricLabels).Dec()
+		azureControllersLastExecutedGauge.With(metricLabels).SetToCurrentTime()
+	}()
+
 	ctx := context.Background()
 
 	if ignoredNamespace(request.Name) {
@@ -62,7 +74,8 @@ func (r *reconcileNamespace) Reconcile(request reconcile.Request) (reconcile.Res
 		if kerrors.IsNotFound(err) {
 			return reconcile.Result{}, nil
 		}
-		r.log.Infof("NSC: error getting namespace: %s", err)
+		r.log.Errorf("NSC: error getting namespace: %s", err)
+		azureControllersErrorsCounter.With(metricLabels).Inc()
 		return reconcile.Result{}, err
 	}
 	if ns.Status.Phase == corev1.NamespaceTerminating {
@@ -81,6 +94,7 @@ func (r *reconcileNamespace) Reconcile(request reconcile.Request) (reconcile.Res
 			// e.g. a namespace relist + the end-user deletes the rolebinding.
 		case err != nil:
 			r.log.Infof("NSC: error creating rolebinding: %s", err)
+			azureControllersErrorsCounter.With(metricLabels).Inc()
 			return reconcile.Result{}, err
 		}
 	}

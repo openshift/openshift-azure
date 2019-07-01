@@ -47,6 +47,12 @@ var desiredRolebindings = map[string]rbacv1.RoleBinding{
 	},
 }
 
+var knownControllers = []string{
+	"customeradmin-group-controller",
+	"customeradmin-namespace-controller",
+	"customeradmin-rolebinding-controller",
+}
+
 // AddToManager adds all Controllers to the Manager
 func AddToManager(ctx context.Context, log *logrus.Entry, m manager.Manager, stopCh <-chan struct{}) error {
 	if err := addGroupController(ctx, log, m, stopCh); err != nil {

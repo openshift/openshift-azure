@@ -6,7 +6,6 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -33,7 +32,7 @@ func start(cfg *cmdConfig) error {
 
 	mux := &http.ServeMux{}
 	mux.Handle("/healthz/ready", http.HandlerFunc(readyHandler))
-	mux.Handle(cfg.metricsEndpoint, promhttp.Handler())
+	mux.Handle(cfg.metricsEndpoint, customeradmin.MetricsHandler())
 
 	go http.Serve(l, mux)
 

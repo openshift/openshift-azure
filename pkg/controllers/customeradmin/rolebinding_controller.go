@@ -3,7 +3,9 @@ package customeradmin
 import (
 	"context"
 	"reflect"
+	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -51,6 +53,16 @@ var _ reconcile.Reconciler = &reconcileRolebinding{}
 // error is non-nil or Result.Requeue is true, otherwise upon completion it will
 // remove the work from the queue.
 func (r *reconcileRolebinding) Reconcile(request reconcile.Request) (reconcile.Result, error) {
+	startTime := time.Now()
+	metricLabels := prometheus.Labels{"controller": "customeradmin-rolebinding-controller"}
+
+	azureControllersInFlightGauge.With(metricLabels).Inc()
+	defer func() {
+		azureControllersDurationSummary.With(metricLabels).Observe(time.Now().Sub(startTime).Seconds())
+		azureControllersInFlightGauge.With(metricLabels).Dec()
+		azureControllersLastExecutedGauge.With(metricLabels).SetToCurrentTime()
+	}()
+
 	ctx := context.Background()
 
 	if ignoredNamespace(request.Namespace) {
@@ -70,7 +82,8 @@ func (r *reconcileRolebinding) Reconcile(request reconcile.Request) (reconcile.R
 		if kerrors.IsNotFound(err) {
 			return reconcile.Result{}, nil
 		}
-		r.log.Infof("RBC: error getting namespace: %s", err)
+		r.log.Errorf("RBC: error getting namespace: %s", err)
+		azureControllersErrorsCounter.With(metricLabels).Inc()
 		return reconcile.Result{}, err
 	}
 	if ns.Status.Phase == corev1.NamespaceTerminating {
@@ -93,13 +106,15 @@ func (r *reconcileRolebinding) Reconcile(request reconcile.Request) (reconcile.R
 			// already exists.  This can happen when the two controllers race,
 			// e.g. a namespace relist + the end-user deletes the rolebinding.
 		case err != nil:
-			r.log.Infof("RBC: error creating rolebinding: %s", err)
+			r.log.Errorf("RBC: error creating rolebinding: %s", err)
+			azureControllersErrorsCounter.With(metricLabels).Inc()
 			return reconcile.Result{}, err
 		}
 		return reconcile.Result{}, nil
 
 	case err != nil:
-		r.log.Infof("RBC: error getting rolebinding: %s", err)
+		r.log.Errorf("RBC: error getting rolebinding: %s", err)
+		azureControllersErrorsCounter.With(metricLabels).Inc()
 		return reconcile.Result{}, err
 	}
 
@@ -122,7 +137,8 @@ func (r *reconcileRolebinding) Reconcile(request reconcile.Request) (reconcile.R
 	r.log.Debugf("RBC: updating rolebinding %s/%s", request.Namespace, request.Name)
 	err = r.client.Update(ctx, &rb)
 	if err != nil {
-		r.log.Infof("RBC: error updating rolebinding: %s", err)
+		r.log.Errorf("RBC: error updating rolebinding: %s", err)
+		azureControllersErrorsCounter.With(metricLabels).Inc()
 		return reconcile.Result{}, err
 	}
 
