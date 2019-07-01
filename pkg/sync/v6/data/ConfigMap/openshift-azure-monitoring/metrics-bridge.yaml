@@ -191,6 +191,10 @@ data:
       name: sync_errors_rate
     - query: 'rate(sync_duration_seconds_sum[5m]) / rate(sync_duration_seconds_count[5m])'
       name: sync_average_duration
+    - query: 'rate(azure_controllers_errors_total[2m])'
+      name: azure_controllers_errors_rate
+    - query: 'rate(azure_controllers_duration_seconds_sum[2m]) / rate(azure_controllers_duration_seconds_count[2m])'
+      name: azure_controllers_average_duration
     account: '*** GENERATED ***'
     namespace: Prometheus
     region: '*** GENERATED ***'
