@@ -1,4 +1,5 @@
 [rhel-7-server-rpms]
+name=Red Hat Enterprise Linux 7 Server (RPMs)
 baseurl=https://cdn.redhat.com/content/dist/rhel/server/7/7Server/$basearch/os
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
 sslcacert=/etc/rhsm/ca/redhat-uep.pem
@@ -7,6 +8,7 @@ sslclientkey=/var/lib/yum/client-key.pem
 enabled=yes
 
 [rhel-7-server-extras-rpms]
+name=Red Hat Enterprise Linux 7 Server - Extras (RPMs)
 baseurl=https://cdn.redhat.com/content/dist/rhel/server/7/7Server/$basearch/extras/os
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
 sslcacert=/etc/rhsm/ca/redhat-uep.pem
@@ -15,6 +17,7 @@ sslclientkey=/var/lib/yum/client-key.pem
 enabled=yes
 
 [rhel-7-server-ose-3.11-rpms]
+name=Red Hat OpenShift Container Platform 3.11 (RPMs)
 baseurl=https://cdn.redhat.com/content/dist/rhel/server/7/7Server/$basearch/ose/3.11/os
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
 sslcacert=/etc/rhsm/ca/redhat-uep.pem
