@@ -20,7 +20,7 @@ func updateKubeGroup(log *logrus.Entry, userV1 userv1client.UserV1Interface, kub
 		// update path which won't work when the group does not exist.
 		kubeGroup = nil
 	}
-	kubeGroupDef, changed := fromMSGraphGroup(log, kubeGroup, kubeGroupName, msGroupMembers)
+	kubeGroupDef, changed := fromMSGraphGroup(log, userV1, kubeGroup, kubeGroupName, msGroupMembers)
 	if kubeGroup == nil {
 		log.Debugf("Creating new kube group %s", kubeGroupName)
 		_, err = userV1.Groups().Create(kubeGroupDef)
