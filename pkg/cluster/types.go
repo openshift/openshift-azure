@@ -46,6 +46,7 @@ type Upgrader interface {
 	SortedAgentPoolProfilesForRole(role api.AgentPoolProfileRole) []api.AgentPoolProfile
 	WaitForNodesInAgentPoolProfile(ctx context.Context, app *api.AgentPoolProfile, suffix string) error
 	UpdateMasterAgentPool(ctx context.Context, app *api.AgentPoolProfile) *api.PluginError
+	UpdateMasterAgentPoolTogether(ctx context.Context, app *api.AgentPoolProfile) *api.PluginError
 	UpdateWorkerAgentPool(ctx context.Context, app *api.AgentPoolProfile, suffix string) *api.PluginError
 	CreateOrUpdateSyncPod(ctx context.Context) error
 	EtcdListBackups(ctx context.Context) ([]azstorage.Blob, error)

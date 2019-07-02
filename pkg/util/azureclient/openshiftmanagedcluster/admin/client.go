@@ -132,6 +132,16 @@ func (c *Client) RotateSecrets(ctx context.Context, resourceGroupName, resourceN
 	return
 }
 
+func (c *Client) RotateCertificates(ctx context.Context, resourceGroupName, resourceName string) (err error) {
+	err = c.do(http.MethodPut, resourceGroupName, resourceName, "/rotate/certificates", nil, nil)
+	return
+}
+
+func (c *Client) RotateCertificatesAndSecrets(ctx context.Context, resourceGroupName, resourceName string) (err error) {
+	err = c.do(http.MethodPut, resourceGroupName, resourceName, "/rotate/certificatesAndSecrets", nil, nil)
+	return
+}
+
 func (c *Client) RunCommand(ctx context.Context, resourceGroupName, resourceName, hostname, command string) (err error) {
 	err = c.do(http.MethodPut, resourceGroupName, resourceName, "/runCommand/"+hostname+"/"+command, nil, nil)
 	return

@@ -190,8 +190,26 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 	return nil
 }
 
+const (
+	updateTypeCreate = iota
+	updateTypeNormal
+	updateTypeMasterFast
+)
+
 func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, deployFn api.DeployFn) *api.PluginError {
+	if isUpdate {
+		return p.createOrUpdateExt(ctx, cs, updateTypeNormal, deployFn)
+	}
+	return p.createOrUpdateExt(ctx, cs, updateTypeCreate, deployFn)
+}
+
+func (p *plugin) createOrUpdateExt(ctx context.Context, cs *api.OpenShiftManagedCluster, updateType int, deployFn api.DeployFn) *api.PluginError {
 	suffix := fmt.Sprintf("%d", p.now().Unix())
+
+	isUpdate := true
+	if updateType == updateTypeCreate {
+		isUpdate = false
+	}
 
 	p.log.Info("creating clients")
 	clusterUpgrader, err := p.upgraderFactory(ctx, p.log, cs, false, true, p.testConfig)
@@ -244,8 +262,14 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 
 	if isUpdate {
 		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleMaster) {
-			if perr := clusterUpgrader.UpdateMasterAgentPool(ctx, &app); perr != nil {
-				return perr
+			if updateType == updateTypeMasterFast {
+				if perr := clusterUpgrader.UpdateMasterAgentPoolTogether(ctx, &app); perr != nil {
+					return perr
+				}
+			} else {
+				if perr := clusterUpgrader.UpdateMasterAgentPool(ctx, &app); perr != nil {
+					return perr
+				}
 			}
 		}
 		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleInfra) {
@@ -325,8 +349,61 @@ func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftMana
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepRegenerateClusterSecrets}
 	}
+
 	p.log.Info("running CreateOrUpdate")
-	if err := p.CreateOrUpdate(ctx, cs, true, deployFn); err != nil {
+	if err := p.createOrUpdateExt(ctx, cs, updateTypeNormal, deployFn); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *plugin) RotateClusterCertificates(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn) *api.PluginError {
+	p.log.Info("invalidating certificates")
+	configInterface, err := p.configInterfaceFactory(cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+	}
+
+	err = configInterface.InvalidateCertificates()
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepInvalidateClusterCertificates}
+	}
+	p.log.Info("regenerating config including certificates and private keys")
+	err = p.GenerateConfig(ctx, cs, true)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepRegenerateClusterSecrets}
+	}
+
+	p.log.Info("running CreateOrUpdate")
+	if err := p.createOrUpdateExt(ctx, cs, updateTypeMasterFast, deployFn); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *plugin) RotateClusterCertificatesAndSecrets(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn) *api.PluginError {
+	p.log.Info("invalidating certificates, private keys and secrets")
+	configInterface, err := p.configInterfaceFactory(cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+	}
+
+	err = configInterface.InvalidateSecrets()
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepInvalidateClusterSecrets}
+	}
+	err = configInterface.InvalidateCertificates()
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepInvalidateClusterCertificates}
+	}
+	p.log.Info("regenerating config including certificates, private keys and secrets")
+	err = p.GenerateConfig(ctx, cs, true)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepRegenerateClusterSecrets}
+	}
+
+	p.log.Info("running CreateOrUpdate")
+	if err := p.createOrUpdateExt(ctx, cs, updateTypeMasterFast, deployFn); err != nil {
 		return err
 	}
 	return nil

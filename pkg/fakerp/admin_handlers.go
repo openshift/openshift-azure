@@ -83,6 +83,38 @@ func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	s.store.Put(cs)
+	err := writeHelpers(s.log, cs)
+	s.adminreply(w, err, nil)
+}
+
+// handleRotateCertificates handles admin requests for the rotation of cluster secrets
+func (s *Server) handleRotateCertificates(w http.ResponseWriter, req *http.Request) {
+	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
+
+	deployer := GetDeployer(s.log, cs, s.testConfig)
+	pluginErr := s.plugin.RotateClusterCertificates(req.Context(), cs, deployer)
+	if pluginErr != nil {
+		s.badRequest(w, pluginErr.Error())
+		return
+	}
+	s.store.Put(cs)
+	err := writeHelpers(s.log, cs)
+	s.adminreply(w, err, nil)
+}
+
+// handleRotateCertificatesAndSecrets handles admin requests for the rotation of cluster secrets
+func (s *Server) handleRotateCertificatesAndSecrets(w http.ResponseWriter, req *http.Request) {
+	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
+
+	deployer := GetDeployer(s.log, cs, s.testConfig)
+	pluginErr := s.plugin.RotateClusterCertificatesAndSecrets(req.Context(), cs, deployer)
+	if pluginErr != nil {
+		s.badRequest(w, pluginErr.Error())
+		return
+	}
+
+	s.store.Put(cs)
 	err := writeHelpers(s.log, cs)
 	s.adminreply(w, err, nil)
 }

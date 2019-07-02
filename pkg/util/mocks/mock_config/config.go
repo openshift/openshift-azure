@@ -62,3 +62,17 @@ func (mr *MockInterfaceMockRecorder) InvalidateSecrets() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InvalidateSecrets", reflect.TypeOf((*MockInterface)(nil).InvalidateSecrets))
 }
+
+// InvalidateCertificates mocks base method
+func (m *MockInterface) InvalidateCertificates() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InvalidateCertificates")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// InvalidateCertificates indicates an expected call of InvalidateCertificates
+func (mr *MockInterfaceMockRecorder) InvalidateCertificates() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InvalidateCertificates", reflect.TypeOf((*MockInterface)(nil).InvalidateCertificates))
+}

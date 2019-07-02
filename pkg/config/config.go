@@ -19,6 +19,7 @@ import (
 type Interface interface {
 	Generate(template *pluginapi.Config, setVersionFields bool) error
 	InvalidateSecrets() error
+	InvalidateCertificates() error
 }
 
 func New(cs *api.OpenShiftManagedCluster) (Interface, error) {
