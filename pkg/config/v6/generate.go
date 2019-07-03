@@ -439,6 +439,11 @@ func (g *simpleGenerator) InvalidateCertificates() (err error) {
 	g.cs.Config.Certificates.EtcdClient = api.CertKeyPair{}
 	g.cs.Config.Certificates.EtcdServer = api.CertKeyPair{}
 	g.cs.Config.Certificates.EtcdPeer = api.CertKeyPair{}
+
+	g.cs.Config.Certificates.MasterProxyClient = api.CertKeyPair{}
+	g.cs.Config.Certificates.MasterServer = api.CertKeyPair{}
+	g.cs.Config.Certificates.AggregatorFrontProxy = api.CertKeyPair{}
+
 	return nil
 }
 
