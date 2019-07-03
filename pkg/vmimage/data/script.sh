@@ -44,7 +44,6 @@ done
 
 firewall-cmd --zone=public --add-port=8080/tcp
 
-exit
 IMAGE="{{ .Builder.Image }}"
 DISKGIB=${DISKGIB:-32}
 IP=$(ifconfig eth0 | awk '/inet / { print $2 }')
@@ -210,10 +209,10 @@ rpm -q atomic-openshift-node --qf '%{VERSION}-%{RELEASE}.%{ARCH}' >/var/tmp/open
 
 # Image hardening
 # Setup fips inside of grub
-dracut -f
-sed -i -re 's/GRUB_CMDLINE_LINUX="(.*)"$/GRUB_CMDLINE_LINUX="\1 fips=1"/' /etc/default/grub
-grub2-mkconfig -o /boot/grub2/grub.cfg
-grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
+# dracut -f
+# sed -i -re 's/GRUB_CMDLINE_LINUX="(.*)"$/GRUB_CMDLINE_LINUX="\1 fips=1"/' /etc/default/grub
+# grub2-mkconfig -o /boot/grub2/grub.cfg
+# grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
 
 # accounts_minimum_age_login_defs
 sed -i -e 's/PASS_MIN_DAYS.*/PASS_MIN_DAYS     1/g' /etc/login.defs
