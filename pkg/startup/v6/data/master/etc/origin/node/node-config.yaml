@@ -33,6 +33,14 @@ kubeletArguments:
   - RotateKubeletClientCertificate=true,RotateKubeletServerCertificate=true
   max-pods:
   - "50"
+  image-gc-low-threshold: 
+  - "60"
+  maximum-dead-containers:
+  - "250"
+  maximum-dead-containers-per-container:
+  - "2"
+  minimum-container-ttl-duration:
+  - "5m"
   node-labels:
   - node-role.kubernetes.io/{{ .Role }}=true
   - openshift-infra=apiserver
