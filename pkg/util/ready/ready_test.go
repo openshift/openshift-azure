@@ -107,7 +107,7 @@ func TestCheckNodeIsReady(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		got, err := CheckNodeIsReady(tt.kc.CoreV1().Nodes(), tt.hostname)()
+		got, err := CheckNodeIsReady(tt.kc.CoreV1().Nodes(), tt.hostname)
 		if (err != nil) != tt.wantErr {
 			t.Errorf("nodeIsReady() error = %v, wantErr %v", err, tt.wantErr)
 			return

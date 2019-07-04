@@ -5,6 +5,7 @@ import (
 	"syscall"
 	"time"
 
+	certificates "k8s.io/api/certificates/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -18,7 +19,7 @@ func (u *Kubeclientset) WaitForReadyMaster(ctx context.Context, hostname string)
 }
 
 func (u *Kubeclientset) masterIsReady(hostname string) (bool, error) {
-	r, err := ready.CheckNodeIsReady(u.Client.CoreV1().Nodes(), hostname)()
+	r, err := ready.CheckNodeIsReady(u.Client.CoreV1().Nodes(), hostname)
 	if !r || err != nil {
 		return r, err
 	}
@@ -37,12 +38,18 @@ func (u *Kubeclientset) masterIsReady(hostname string) (bool, error) {
 }
 
 func (u *Kubeclientset) WaitForReadyWorker(ctx context.Context, hostname string) error {
-	return wait.PollImmediateUntil(time.Second, ready.CheckNodeIsReady(u.Client.CoreV1().Nodes(), hostname), ctx.Done())
+	return wait.PollImmediateUntil(time.Second,
+		func() (bool, error) {
+			u.approvePendingCSRs(ctx)
+			return ready.CheckNodeIsReady(u.Client.CoreV1().Nodes(), hostname)
+		},
+		ctx.Done())
 }
 
 func (u *Kubeclientset) WaitForReadySyncPod(ctx context.Context) error {
 	return wait.PollImmediateUntil(10*time.Second,
 		func() (bool, error) {
+			u.approvePendingCSRs(ctx)
 			d, err := u.Client.AppsV1().Deployments("kube-system").Get("sync", metav1.GetOptions{})
 			switch {
 			case errors.IsNotFound(err):
@@ -78,4 +85,30 @@ func (u *Kubeclientset) WaitForReadySyncPod(ctx context.Context) error {
 			return false, err
 		},
 		ctx.Done())
+}
+
+// list CSRs and approve any in the pending state
+// https://github.com/openshift/installer/blob/master/data/data/bootstrap/files/usr/local/bin/approve-csr.sh
+func (u *Kubeclientset) approvePendingCSRs(ctx context.Context) {
+	csrList, err := u.Client.Certificates().CertificateSigningRequests().List(metav1.ListOptions{})
+	if err != nil {
+		u.Log.Warnf("approvePendingCSRs: CSR List error %v", err)
+		return
+	}
+	for _, csr := range csrList.Items {
+		needsApproval := false
+		for _, cond := range csr.Status.Conditions {
+			if cond.Type == certificates.CertificateApproved {
+				needsApproval = false
+			}
+		}
+		if needsApproval {
+			_, err = u.Client.Certificates().CertificateSigningRequests().UpdateApproval(&csr)
+			if err != nil {
+				u.Log.Warnf("approvePendingCSRs: CSR %s approval error %v", csr.Name, err)
+			} else {
+				u.Log.Infof("approvePendingCSRs: CSR %s approved", csr.Name)
+			}
+		}
+	}
 }

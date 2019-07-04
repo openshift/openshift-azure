@@ -197,20 +197,17 @@ func NodeIsReady(node *corev1.Node) bool {
 	return false
 }
 
-// CheckNodeIsReady returns a function which polls a Node and returns its
-// readiness
-func CheckNodeIsReady(cli corev1client.NodeInterface, name string) func() (bool, error) {
-	return func() (bool, error) {
-		node, err := cli.Get(name, metav1.GetOptions{})
-		switch {
-		case errors.IsNotFound(err):
-			return false, nil
-		case err != nil:
-			return false, err
-		}
-
-		return NodeIsReady(node), nil
+// CheckNodeIsReady returns its readiness
+func CheckNodeIsReady(cli corev1client.NodeInterface, name string) (bool, error) {
+	node, err := cli.Get(name, metav1.GetOptions{})
+	switch {
+	case errors.IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, err
 	}
+
+	return NodeIsReady(node), nil
 }
 
 // PodIsReady returns true if a Pod is considered ready
