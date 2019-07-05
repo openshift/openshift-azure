@@ -24,9 +24,9 @@ import (
 )
 
 var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fake][EveryPR]", func() {
-	It("should not read nodes", func() {
+	It("should read nodes", func() {
 		_, err := sanity.Checker.Client.CustomerAdmin.CoreV1.Nodes().Get("master-000000", metav1.GetOptions{})
-		Expect(kerrors.IsForbidden(err)).To(Equal(true))
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	It("should have full access on all non-infrastructure namespaces", func() {
@@ -76,9 +76,9 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fa
 		Expect(kerrors.IsForbidden(err)).To(Equal(true))
 	})
 
-	It("should not able to query groups", func() {
+	It("should be able to query groups", func() {
 		_, err := sanity.Checker.Client.CustomerAdmin.UserV1.Groups().Get("osa-customer-admins", metav1.GetOptions{})
-		Expect(kerrors.IsForbidden(err)).To(Equal(true))
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	It("should not be able to escalate privileges", func() {

@@ -29,3 +29,15 @@ rules:
   - delete
   - patch
   - update
+- apiGroups:
+  - extensions
+  resources:
+  - daemonsets
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+  - patch
+  - update
