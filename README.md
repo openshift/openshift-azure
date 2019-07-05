@@ -21,6 +21,10 @@ have permissions that you may not have.
       Glide 0.13.1 is known to be broken.
    1. [jq](https://stedolan.github.io/jq/) (can also use package manager)
 
+   Development helper scripts assume an up-to-date GNU tools environment. Recent Linux distros should work out-of-the-box.
+
+   macOS ships with outdated BSD-based tools. We recommend installing [macOS GNU tools](https://www.topbug.net/blog/2013/04/14/install-and-use-gnu-command-line-tools-in-mac-os-x).
+
 1. **Environment variables**.  Ensure that $GOPATH/bin is in your path:
 
    `export PATH=$PATH:${GOPATH:-$HOME/go}/bin`.
