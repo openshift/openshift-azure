@@ -161,6 +161,7 @@ oauthConfig:
     authorizeTokenMaxAgeSeconds: 500
 projectConfig:
   defaultNodeSelector: node-role.kubernetes.io/compute=true
+  projectRequestTemplate: "openshift/project-request"
   securityAllocator:
     mcsAllocatorRange: s0:/2
     mcsLabelsPerProject: 5

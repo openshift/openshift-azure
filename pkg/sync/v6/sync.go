@@ -43,6 +43,7 @@ const (
 	ownedBySyncPodLabelKey            = "azure.openshift.io/owned-by-sync-pod"
 	syncPodWaitForReadinessLabelKey   = "azure.openshift.io/sync-pod-wait-for-readiness"
 	syncPodReadinessPathAnnotationKey = "azure.openshift.io/sync-pod-readiness-path"
+	deployOnceSyncPodLabelKey         = "azure.openshift.io/deploy-once"
 )
 
 // unmarshal has to reimplement yaml.unmarshal because it universally mangles yaml
@@ -278,7 +279,6 @@ var (
 	storageClassFilter = func(o unstructured.Unstructured) bool {
 		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "storage.k8s.io", Kind: "StorageClass"}
 	}
-
 	everythingElseFilter = func(o unstructured.Unstructured) bool {
 		return !crdFilter(o) &&
 			!nsFilter(o) &&
@@ -288,7 +288,6 @@ var (
 			!scFilter(o) &&
 			!monitoringCrdFilter(o)
 	}
-
 	scFilter = func(o unstructured.Unstructured) bool {
 		return o.GroupVersionKind().Group == "servicecatalog.k8s.io"
 	}

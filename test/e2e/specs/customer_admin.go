@@ -81,6 +81,17 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fa
 		Expect(err).ToNot(HaveOccurred())
 	})
 
+	It("should be able to edit project-request", func() {
+		projectTemplate, err := sanity.Checker.Client.CustomerAdmin.TemplateV1.Templates("openshift").Get("project-request", metav1.GetOptions{})
+		Expect(err).ToNot(HaveOccurred())
+		// modify project template object
+		projectTemplate.SetAnnotations(map[string]string{
+			"foo.annotation.com": "bar",
+		})
+		_, err = sanity.Checker.Client.CustomerAdmin.TemplateV1.Templates("openshift").Update(projectTemplate)
+		Expect(err).ToNot(HaveOccurred())
+	})
+
 	It("should not be able to escalate privileges", func() {
 		_, err := sanity.Checker.Client.CustomerAdmin.RbacV1.ClusterRoleBindings().Create(&rbacv1.ClusterRoleBinding{
 			ObjectMeta: metav1.ObjectMeta{

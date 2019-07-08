@@ -1,0 +1,16 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  name: shared-resource-editor
+  namespace: openshift
+rules:
+- apiGroups:
+  - ""
+  - template.openshift.io
+  resources:
+  - templates
+  verbs:
+  - update
+  - patch
