@@ -4,6 +4,7 @@ metadata:
   annotations:
     authorization.openshift.io/system-only: "true"
     openshift.io/description: A user that can request projects.
+    openshift.io/reconcile-protect: "true"
     rbac.authorization.kubernetes.io/autoupdate: "true"
   name: self-provisioner
 rules:

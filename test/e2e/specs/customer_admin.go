@@ -92,6 +92,39 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fa
 		Expect(err).ToNot(HaveOccurred())
 	})
 
+	It("should be able to edit self-provisioners clusterrolebinding", func() {
+		crbOriginal, err := sanity.Checker.Client.CustomerAdmin.RbacV1.ClusterRoleBindings().Get("self-provisioners", metav1.GetOptions{})
+		Expect(err).ToNot(HaveOccurred())
+		crb := crbOriginal.DeepCopy()
+
+		// create ClusterRoleBinding which would allow us to test edit
+		// and would not break any other tests
+		subject := []rbacv1.Subject{
+			{
+				Name: "system:authenticated:oauth",
+				Kind: "Group",
+			},
+			{
+				Name: "osa-customer-admins",
+				Kind: "Group",
+			},
+		}
+
+		crb.Subjects = subject
+
+		_, err = sanity.Checker.Client.CustomerAdmin.RbacV1.ClusterRoleBindings().Update(crb)
+		Expect(err).ToNot(HaveOccurred())
+
+		// HACK: openshift reconciler should not touch this role because of:
+		// openshift.io/reconcile-protect: "true"
+		// we need to confirm this
+		time.Sleep(5 * time.Second)
+
+		crbUpdated, err := sanity.Checker.Client.CustomerAdmin.RbacV1.ClusterRoleBindings().Get("self-provisioners", metav1.GetOptions{})
+		Expect(err).ToNot(HaveOccurred())
+		Expect(len(crbUpdated.Subjects)).To(Equal(len(crb.Subjects)))
+	})
+
 	It("should not be able to escalate privileges", func() {
 		_, err := sanity.Checker.Client.CustomerAdmin.RbacV1.ClusterRoleBindings().Create(&rbacv1.ClusterRoleBinding{
 			ObjectMeta: metav1.ObjectMeta{

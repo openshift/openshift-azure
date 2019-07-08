@@ -234,7 +234,7 @@ func needsUpdate(log *logrus.Entry, existing, o *unstructured.Unstructured) bool
 	}
 
 	// check if object is marked deploy-only and deploy once
-	if o.GetAnnotations()[deployOnceSyncPodLabelKey] != "" {
+	if o.GetAnnotations()[reconcileProtectKeyAnnotationKey] != "" {
 		log.Infof("Deploy once resource %s detected, ignore update", o.GetName())
 		return false
 	}

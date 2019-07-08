@@ -43,7 +43,7 @@ const (
 	ownedBySyncPodLabelKey            = "azure.openshift.io/owned-by-sync-pod"
 	syncPodWaitForReadinessLabelKey   = "azure.openshift.io/sync-pod-wait-for-readiness"
 	syncPodReadinessPathAnnotationKey = "azure.openshift.io/sync-pod-readiness-path"
-	deployOnceSyncPodLabelKey         = "azure.openshift.io/deploy-once"
+	reconcileProtectKeyAnnotationKey  = "azure.openshift.io/reconcile-protect"
 )
 
 // unmarshal has to reimplement yaml.unmarshal because it universally mangles yaml
