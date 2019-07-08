@@ -32,57 +32,6 @@ func TestHashScaleSetStability(t *testing.T) {
 		role         api.AgentPoolProfileRole
 		expectedHash string
 	}{
-		"v4.2": {
-			{
-				role: api.AgentPoolProfileRoleMaster,
-				// this value should not change
-				expectedHash: "9a4b049bda1bda0bf394b6e5a21c89bb8b219346261de0e6b01d2efb100f3e01",
-			},
-			{
-				role: api.AgentPoolProfileRoleInfra,
-				// this value should not change
-				expectedHash: "a3dd5cb39b243e4e67a2d59cdda59d9179e39a87d6b6201ae7e6ce78c6317a72",
-			},
-			{
-				role: api.AgentPoolProfileRoleCompute,
-				// this value should not change
-				expectedHash: "0b9ada416dcffb9b0ecc5e96bc21b2a9ceaa78e74af82819040cdc14854a3a12",
-			},
-		},
-		"v4.3": {
-			{
-				role: api.AgentPoolProfileRoleMaster,
-				// this value should not change
-				expectedHash: "87d0e3642432a78bd3b65d753116e2988324a22a22468c54e7b59fc31185524c",
-			},
-			{
-				role: api.AgentPoolProfileRoleInfra,
-				// this value should not change
-				expectedHash: "afa8a3e0cbe7264b811f231ca7577f213022ae7a8a7a3c92da715c5c813213c3",
-			},
-			{
-				role: api.AgentPoolProfileRoleCompute,
-				// this value should not change
-				expectedHash: "f6f60ca20f23036807e7c54686c304a653830028864830dd31b58de7358e3fee",
-			},
-		},
-		"v4.4": {
-			{
-				role: api.AgentPoolProfileRoleMaster,
-				// this value should not change
-				expectedHash: "87d0e3642432a78bd3b65d753116e2988324a22a22468c54e7b59fc31185524c",
-			},
-			{
-				role: api.AgentPoolProfileRoleInfra,
-				// this value should not change
-				expectedHash: "afa8a3e0cbe7264b811f231ca7577f213022ae7a8a7a3c92da715c5c813213c3",
-			},
-			{
-				role: api.AgentPoolProfileRoleCompute,
-				// this value should not change
-				expectedHash: "f6f60ca20f23036807e7c54686c304a653830028864830dd31b58de7358e3fee",
-			},
-		},
 		"v5.1": {
 			{
 				role: api.AgentPoolProfileRoleMaster,
@@ -201,18 +150,6 @@ func TestHashSyncPodStability(t *testing.T) {
 	tests := map[string]struct {
 		expectedHash string
 	}{
-		"v4.2": {
-			// this value should not change
-			expectedHash: "f731d62dc04f805314b912c3720189679cc404a35ee41ee3569fb3f642c8bd29",
-		},
-		"v4.3": {
-			// this value should not change
-			expectedHash: "f731d62dc04f805314b912c3720189679cc404a35ee41ee3569fb3f642c8bd29",
-		},
-		"v4.4": {
-			// this value should not change
-			expectedHash: "f731d62dc04f805314b912c3720189679cc404a35ee41ee3569fb3f642c8bd29",
-		},
 		"v5.1": {
 			// this value should not change
 			expectedHash: "fac2ba9ab18ad8d26f99b9f2d694529463b024974efdfd2a964a12df7a1e545a",
