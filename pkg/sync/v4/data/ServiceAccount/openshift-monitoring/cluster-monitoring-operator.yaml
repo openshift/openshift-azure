@@ -1,5 +1,0 @@
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: cluster-monitoring-operator
-  namespace: openshift-monitoring
