@@ -11,7 +11,8 @@ if ! grep /var/lib/docker /etc/fstab; then
 {{- if eq .Role "infra" }}
   cat >/etc/docker/daemon.json <<'EOF'
 {
-  "log-driver": "journald"
+  "log-driver": "journald",
+  "disable-legacy-registry": true
 }
 EOF
 {{- end }}
