@@ -10,7 +10,8 @@ if ! grep /var/lib/docker /etc/fstab; then
   restorecon -R /var/lib/docker
   cat >/etc/docker/daemon.json <<'EOF'
 {
-  "log-driver": "journald"
+  "log-driver": "journald",
+  "disable-legacy-registry": true
 }
 EOF
   systemctl start docker.service
