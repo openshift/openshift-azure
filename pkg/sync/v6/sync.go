@@ -276,6 +276,12 @@ var (
 		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Kind: "Secret"} ||
 			o.GroupVersionKind().GroupKind() == schema.GroupKind{Kind: "ConfigMap"}
 	}
+	sharedResourceFilter = func(o unstructured.Unstructured) bool {
+		// if Template OR ImageStream in openshift namespace
+		return o.GetNamespace() == "openshift" &&
+			(o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "image.openshift.io", Kind: "ImageStream"} ||
+				o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "template.openshift.io", Kind: "Template"})
+	}
 	storageClassFilter = func(o unstructured.Unstructured) bool {
 		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "storage.k8s.io", Kind: "StorageClass"}
 	}
@@ -286,7 +292,8 @@ var (
 			!cfgFilter(o) &&
 			!storageClassFilter(o) &&
 			!scFilter(o) &&
-			!monitoringCrdFilter(o)
+			!monitoringCrdFilter(o) &&
+			!sharedResourceFilter(o)
 	}
 	scFilter = func(o unstructured.Unstructured) bool {
 		return o.GroupVersionKind().Group == "servicecatalog.k8s.io"
@@ -301,6 +308,9 @@ var (
 // objects with db.
 // TODO: need to implement deleting objects which we don't want any more.
 func (s *sync) writeDB() error {
+	// set default resource management values
+	s.config.managedSharedResource = true
+
 	// impose an order to improve debuggability.
 	var keys []string
 	for k := range s.db {
@@ -327,6 +337,13 @@ func (s *sync) writeDB() error {
 	s.log.Debug("applying cfg resources")
 	if err := s.applyResources(cfgFilter, keys); err != nil {
 		return err
+	}
+	// if SharedResources are managed - update/create
+	if s.config.managedSharedResource {
+		s.log.Debug("applying storageClass resources")
+		if err := s.applyResources(sharedResourceFilter, keys); err != nil {
+			return err
+		}
 	}
 	// default storage class must be created before PVCs as the admission controller is edge-triggered
 	s.log.Debug("applying storageClass resources")
@@ -480,6 +497,19 @@ type sync struct {
 	cli        *discovery.DiscoveryClient
 	dyn        dynamic.ClientPool
 	grs        []*discovery.APIGroupResources
+
+	config config
+}
+
+// config defines sync pod behaviour based on conditional logic in the cluster.
+// if set to false - components becomes unmanaged.
+// we need to make sure this for the nested dependencies (example: resource in the namespace)
+// we set these flags right time in the sync process
+type config struct {
+	// managedSharedResource is defines by annotation reconcileProtectKeyAnnotationKey
+	// on openshift namespace. If set all resources in openshift namespace becomes
+	// unmanaged by sync pod. Default: true
+	managedSharedResource bool
 }
 
 func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (*sync, error) {

@@ -14,3 +14,37 @@ rules:
   verbs:
   - update
   - patch
+  - delete
+  - create
+- apiGroups:
+  - ""
+  - image.openshift.io
+  resources:
+  - imagestreamimages
+  - imagestreams
+  - imagestreamtags
+  verbs:
+  - update
+  - patch
+  - delete
+  - create
+- apiGroups:
+  - ""
+  - image.openshift.io
+  resources:
+  - imagestreams/layers
+  verbs:
+  - update
+  - patch
+  - delete
+  - create
+- apiGroups:
+  - ""
+  - project.openshift.io
+  resources:
+  - projects
+  - namespaces
+  verbs:
+  - get
+  - update
+  - patch
