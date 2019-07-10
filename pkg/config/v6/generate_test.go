@@ -5,11 +5,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/go-test/deep"
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
+	"github.com/openshift/openshift-azure/pkg/util/cmp"
 	"github.com/openshift/openshift-azure/test/util/populate"
 	"github.com/openshift/openshift-azure/test/util/tls"
 )
@@ -208,6 +208,6 @@ func TestInvalidateSecrets(t *testing.T) {
 
 	// compare certs from saved and cs
 	if !reflect.DeepEqual(cs, saved) {
-		t.Errorf("expected saved and cs config blobs to be equal: %s", deep.Equal(cs, saved))
+		t.Errorf("expected saved and cs config blobs to be equal: %s", cmp.Diff(cs, saved))
 	}
 }

@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/go-test/deep"
 	"github.com/sirupsen/logrus"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -15,6 +14,8 @@ import (
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/util/retry"
+
+	"github.com/openshift/openshift-azure/pkg/util/cmp"
 )
 
 // updateDynamicClient updates the client's server API group resource
@@ -237,8 +238,8 @@ func printDiff(log *logrus.Entry, existing, o *unstructured.Unstructured) bool {
 	gk := o.GroupVersionKind().GroupKind()
 	diffShown := false
 	if gk.String() != "Secret" {
-		for _, diff := range deep.Equal(*existing, *o) {
-			log.Info("- " + diff)
+		if diff := cmp.Diff(*existing, *o); diff != "" {
+			log.Info(diff)
 			diffShown = true
 		}
 	}
