@@ -1,8 +1,6 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
-  annotations:
-    azure.openshift.io/reconcile-protect: "true"
   name: project-request
   namespace: openshift
 objects:

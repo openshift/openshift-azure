@@ -25,7 +25,5 @@ var _ = Describe("sync pod tests [Fake][EveryPR]", func() {
 		runs := rx.FindAllString(string(b), -1)
 		// check for constantly updated objects
 		Expect(runs).To(ContainElement(Not(ContainSubstring("Update"))))
-		// check for update once objects
-		Expect(runs).To(ContainElement(Not(ContainSubstring("Deploy once resource project-request detected"))))
 	})
 })

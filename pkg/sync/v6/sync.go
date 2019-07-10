@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"net/http"
 	"sort"
+	"strings"
 	concurrency "sync"
 	"sync/atomic"
 	"time"
@@ -20,6 +21,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 	kapiextensions "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -43,7 +45,7 @@ const (
 	ownedBySyncPodLabelKey            = "azure.openshift.io/owned-by-sync-pod"
 	syncPodWaitForReadinessLabelKey   = "azure.openshift.io/sync-pod-wait-for-readiness"
 	syncPodReadinessPathAnnotationKey = "azure.openshift.io/sync-pod-readiness-path"
-	reconcileProtectKeyAnnotationKey  = "azure.openshift.io/reconcile-protect"
+	reconcileProtectAnnotationKey     = "openshift.io/reconcile-protect"
 )
 
 // unmarshal has to reimplement yaml.unmarshal because it universally mangles yaml
@@ -301,6 +303,20 @@ var (
 // objects with db.
 // TODO: need to implement deleting objects which we don't want any more.
 func (s *sync) writeDB() error {
+	// openshift namespace is special. It hosts sharedResources.
+	// Reconcile protection logic is isReconcileProtected func,
+	// but we check if openshift namespace has protection annotation
+	// to check if we need to apply sharedResourceFilter or not
+	// default - resources are managed
+	s.managedSharedResources = true
+	namespace, err := s.kc.CoreV1().Namespaces().Get("openshift", metav1.GetOptions{})
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	if namespace != nil && strings.ToLower(namespace.GetAnnotations()[reconcileProtectAnnotationKey]) == "true" {
+		s.managedSharedResources = false
+	}
+
 	// impose an order to improve debuggability.
 	var keys []string
 	for k := range s.db {
@@ -480,6 +496,8 @@ type sync struct {
 	cli        *discovery.DiscoveryClient
 	dyn        dynamic.ClientPool
 	grs        []*discovery.APIGroupResources
+
+	managedSharedResources bool
 }
 
 func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (*sync, error) {

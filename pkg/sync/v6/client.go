@@ -42,7 +42,7 @@ func (s *sync) applyResources(filter func(unstructured.Unstructured) bool, keys 
 			continue
 		}
 
-		if err := write(s.log, s.dyn, s.grs, &o); err != nil {
+		if err := s.write(&o); err != nil {
 			return err
 		}
 	}
@@ -128,14 +128,14 @@ func contains(haystack []string, needle string) bool {
 }
 
 // write synchronises a single object with the API server.
-func write(log *logrus.Entry, dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstructured.Unstructured) error {
-	dc, err := dyn.ClientForGroupVersionKind(o.GroupVersionKind())
+func (s *sync) write(o *unstructured.Unstructured) error {
+	dc, err := s.dyn.ClientForGroupVersionKind(o.GroupVersionKind())
 	if err != nil {
 		return err
 	}
 
 	var gr *discovery.APIGroupResources
-	for _, g := range grs {
+	for _, g := range s.grs {
 		if g.Group.Name == o.GroupVersionKind().Group {
 			gr = g
 			break
@@ -165,7 +165,7 @@ func write(log *logrus.Entry, dyn dynamic.ClientPool, grs []*discovery.APIGroupR
 		var existing *unstructured.Unstructured
 		existing, err = dc.Resource(res, o.GetNamespace()).Get(o.GetName(), metav1.GetOptions{})
 		if kerrors.IsNotFound(err) {
-			log.Info("Create " + keyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
+			s.log.Info("Create " + keyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
 			markSyncPodOwned(o)
 			_, err = dc.Resource(res, o.GetNamespace()).Create(o)
 			if kerrors.IsAlreadyExists(err) {
@@ -193,15 +193,15 @@ func write(log *logrus.Entry, dyn dynamic.ClientPool, grs []*discovery.APIGroupR
 
 		markSyncPodOwned(o)
 
-		if !needsUpdate(log, existing, o) {
+		if !s.needsUpdate(existing, o) {
 			return
 		}
-		printDiff(log, existing, o)
+		printDiff(s.log, existing, o)
 
 		o.SetResourceVersion(rv)
 		_, err = dc.Resource(res, o.GetNamespace()).Update(o)
 		if err != nil && strings.Contains(err.Error(), "updates to parameters are forbidden") {
-			log.Infof("object %s is not updateable, will delete and re-create", o.GetName())
+			s.log.Infof("object %s is not updateable, will delete and re-create", o.GetName())
 			err = dc.Resource(res, o.GetNamespace()).Delete(o.GetName(), &metav1.DeleteOptions{})
 			if err != nil {
 				return
@@ -226,20 +226,19 @@ func markSyncPodOwned(o *unstructured.Unstructured) {
 	o.SetLabels(l)
 }
 
-func needsUpdate(log *logrus.Entry, existing, o *unstructured.Unstructured) bool {
+func (s *sync) needsUpdate(existing, o *unstructured.Unstructured) bool {
 	handleSpecialObjects(*existing, *o)
 
 	if reflect.DeepEqual(*existing, *o) {
 		return false
 	}
 
-	// check if object is marked deploy-only and deploy once
-	if o.GetAnnotations()[reconcileProtectKeyAnnotationKey] != "" {
-		log.Infof("Deploy once resource %s detected, ignore update", o.GetName())
+	// check if object is marked for reconcile exclusion
+	if s.isReconcileProtected(existing, o) {
 		return false
 	}
 
-	log.Info("Update " + keyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
+	s.log.Info("Update " + keyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
 
 	return true
 }
@@ -259,4 +258,38 @@ func printDiff(log *logrus.Entry, existing, o *unstructured.Unstructured) bool {
 		}
 	}
 	return diffShown
+}
+
+// isReconcileProtected check if object is marked with reconcile protection annotation
+// this will remove certain objects from being updated post cluster creation
+// access to modify these objects is limited by RBAC
+// list of the objects is whitelisted only
+func (s *sync) isReconcileProtected(existing, o *unstructured.Unstructured) bool {
+	// if openshift namespace has annotation so we skip all
+	// templates and image-streams in the namespace
+	if o.GetNamespace() == "openshift" && s.managedSharedResources == false &&
+		(o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "image.openshift.io", Kind: "ImageStream"} ||
+			o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "template.openshift.io", Kind: "Template"}) {
+		return true
+	}
+
+	if strings.ToLower(existing.GetAnnotations()[reconcileProtectAnnotationKey]) == "true" {
+		// openshift namespace for shared-resources
+		if (o.GetName() == "openshift" &&
+			o.GroupVersionKind().GroupKind() == schema.GroupKind{Kind: "Namespace"}) {
+			return true
+		}
+		// individual shared-resources object in openshift namespace
+		if o.GetNamespace() == "openshift" &&
+			(o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "image.openshift.io", Kind: "ImageStream"} ||
+				o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "template.openshift.io", Kind: "Template"}) {
+			return true
+		}
+		if o.GetName() == "self-provisioners" &&
+			(o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "rbac.authorization.k8s.io", Kind: "ClusterRoleBinding"}) {
+			return true
+		}
+	}
+
+	return false
 }

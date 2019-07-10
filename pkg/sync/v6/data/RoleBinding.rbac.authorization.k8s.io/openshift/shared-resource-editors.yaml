@@ -1,8 +1,6 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  annotations:
-    rbac.authorization.kubernetes.io/autoupdate: "true"
   name: shared-resource-editors
   namespace: openshift
 roleRef:

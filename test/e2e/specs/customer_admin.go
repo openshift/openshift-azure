@@ -86,12 +86,17 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fa
 		Expect(err).ToNot(HaveOccurred())
 		// modify project template object
 		projectTemplate.SetAnnotations(map[string]string{
-			"foo.annotation.com": "bar",
+			"openshift.io/reconcile-protect": "true",
 		})
 		_, err = sanity.Checker.Client.CustomerAdmin.TemplateV1.Templates("openshift").Update(projectTemplate)
 		Expect(err).ToNot(HaveOccurred())
 	})
 
+	// Flow:
+	// 1. Read rolebinding with default system:authenticated:oauth value
+	// 2. Update it with 2 values (group + system:authenticated:oauth)
+	// 3. Commit to API
+	// 4. Confirm what we committed is still in api/etcd
 	It("should be able to edit self-provisioners clusterrolebinding", func() {
 		crbOriginal, err := sanity.Checker.Client.CustomerAdmin.RbacV1.ClusterRoleBindings().Get("self-provisioners", metav1.GetOptions{})
 		Expect(err).ToNot(HaveOccurred())
@@ -99,7 +104,7 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fa
 
 		// create ClusterRoleBinding which would allow us to test edit
 		// and would not break any other tests
-		subject := []rbacv1.Subject{
+		subjects := []rbacv1.Subject{
 			{
 				Name: "system:authenticated:oauth",
 				Kind: "Group",
@@ -110,19 +115,22 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fa
 			},
 		}
 
-		crb.Subjects = subject
+		crb.Subjects = subjects
+		crb.Annotations = map[string]string{}
+		crb.Annotations["openshift.io/reconcile-protect"] = "true"
 
 		_, err = sanity.Checker.Client.CustomerAdmin.RbacV1.ClusterRoleBindings().Update(crb)
 		Expect(err).ToNot(HaveOccurred())
 
-		// HACK: openshift reconciler should not touch this role because of:
-		// openshift.io/reconcile-protect: "true"
-		// we need to confirm this
-		time.Sleep(5 * time.Second)
-
 		crbUpdated, err := sanity.Checker.Client.CustomerAdmin.RbacV1.ClusterRoleBindings().Get("self-provisioners", metav1.GetOptions{})
 		Expect(err).ToNot(HaveOccurred())
 		Expect(len(crbUpdated.Subjects)).To(Equal(len(crb.Subjects)))
+	})
+
+	It("should not be able to edit system namespaces", func() {
+		_, err := sanity.Checker.Client.CustomerAdmin.CoreV1.Namespaces().Get("openshift-infra", metav1.GetOptions{})
+		Expect(kerrors.ReasonForError(err)).To(Equal(metav1.StatusReasonForbidden))
+
 	})
 
 	It("should not be able to escalate privileges", func() {
