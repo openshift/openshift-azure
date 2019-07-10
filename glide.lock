@@ -1,5 +1,5 @@
-hash: a433937b99a1a8e684d131e383faf2a80064256dca74e7389af2154e3463d87f
-updated: 2019-07-10T14:57:17.674294+01:00
+hash: 79e7ba906351ec5add2944be4ff5a551a0f7cc5d35ab57458b4f2f978c91368b
+updated: 2019-07-10T15:11:09.989502+01:00
 imports:
 - name: code.cloudfoundry.org/clock
   version: 02e53af36e6c978af692887ed449b74026d76fec
@@ -126,6 +126,10 @@ imports:
   - ptypes/struct
   - ptypes/timestamp
   - ptypes/wrappers
+- name: github.com/google/go-cmp
+  version: 6f77996f0c42f7b84e5a2b252227263f93432e9b
+  subpackages:
+  - cmp
 - name: github.com/google/go-github
   version: 7a8ff7a9b90963cdf49e959a5e8009ea03138ff1
   subpackages:

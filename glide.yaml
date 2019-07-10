@@ -88,3 +88,7 @@ import:
   repo: https://github.com/openshift/service-catalog.git
 - package: github.com/spf13/cobra
   version: v0.0.3
+- package: github.com/google/go-cmp
+  version: v0.3.0
+  subpackages:
+  - cmp
