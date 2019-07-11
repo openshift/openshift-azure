@@ -3,9 +3,8 @@ package fakerp
 import (
 	"context"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net"
-	"os"
 	"strconv"
 	"time"
 
@@ -24,7 +23,7 @@ type ssher struct {
 	masterIPs []string
 }
 
-func newSSHer(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster) (*ssher, error) {
+func NewSSHer(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster) (*ssher, error) {
 	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 	if err != nil {
 		return nil, err
@@ -113,28 +112,29 @@ func (s *ssher) Dial(ctx context.Context, hostname string) (*ssh.Client, error) 
 }
 
 func (s *ssher) RunRemoteCommandAndSaveToFile(client *ssh.Client, cmd, filename string) error {
-	f, err := os.Create(filename)
+	result, err := s.RunRemoteCommand(client, cmd)
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	return ioutil.WriteFile(filename, result, 0666)
+}
 
+func (s *ssher) RunRemoteCommand(client *ssh.Client, cmd string) ([]byte, error) {
 	session, err := client.NewSession()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer session.Close()
 
 	stdout, err := session.StdoutPipe()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = session.Start(cmd)
 	if err != nil {
-		return err
+		return nil, err
 	}
-
-	_, err = io.Copy(f, stdout)
-	return err
+	b, err := ioutil.ReadAll(stdout)
+	return b, err
 }
