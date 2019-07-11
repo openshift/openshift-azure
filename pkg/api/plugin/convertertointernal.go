@@ -104,6 +104,12 @@ func ToInternal(in *Config, old *api.Config, setVersionFields bool) (*api.Config
 	if c.Certificates.GenevaMetrics.Cert == nil {
 		c.Certificates.GenevaMetrics.Cert = in.Certificates.GenevaMetrics.Cert
 	}
+	if c.Certificates.PackageRepository.Key == nil {
+		c.Certificates.PackageRepository.Key = in.Certificates.PackageRepository.Key
+	}
+	if c.Certificates.PackageRepository.Cert == nil {
+		c.Certificates.PackageRepository.Cert = in.Certificates.PackageRepository.Cert
+	}
 
 	// Geneva integration configurables
 	if c.GenevaLoggingSector == "" {

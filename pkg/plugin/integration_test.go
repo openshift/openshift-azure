@@ -219,6 +219,8 @@ func setupNewCluster(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftMa
 	template.Certificates.GenevaLogging.Key = testtls.DummyPrivateKey
 	template.Certificates.GenevaMetrics.Cert = testtls.DummyCertificate
 	template.Certificates.GenevaMetrics.Key = testtls.DummyPrivateKey
+	template.Certificates.PackageRepository.Cert = testtls.DummyCertificate
+	template.Certificates.PackageRepository.Key = testtls.DummyPrivateKey
 	template.GenevaImagePullSecret = []byte("pullSecret")
 	template.ImagePullSecret = []byte("imagePullSecret")
 

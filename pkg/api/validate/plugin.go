@@ -296,6 +296,8 @@ func validateCertificateConfig(c *pluginapi.CertificateConfig) (errs []error) {
 
 	errs = append(errs, validateCertKeyPair("certificates.genevaMetrics", &c.GenevaMetrics)...)
 
+	errs = append(errs, validateCertKeyPair("certificates.packageRepository", &c.PackageRepository)...)
+
 	return
 }
 

@@ -145,6 +145,9 @@ type CertificateConfig struct {
 	// geneva integration certificates
 	GenevaLogging *Certificate `json:"genevaLogging,omitempty"`
 	GenevaMetrics *Certificate `json:"genevaMetrics,omitempty"`
+
+	// red hat cdn client certificates
+	PackageRepository *Certificate `json:"packageRepository,omitempty"`
 }
 
 // Certificate is an x509 certificate.

@@ -56,6 +56,8 @@ func TestPluginTemplateValidate(t *testing.T) {
 			errors.New(`invalid certificates.genevaLogging.cert`),
 			errors.New(`invalid certificates.genevaMetrics.key`),
 			errors.New(`invalid certificates.genevaMetrics.cert`),
+			errors.New(`invalid certificates.packageRepository.key`),
+			errors.New(`invalid certificates.packageRepository.cert`),
 			errors.New(`invalid genevaLoggingSector ""`),
 			errors.New(`invalid genevaLoggingAccount ""`),
 			errors.New(`invalid genevaLoggingNamespace ""`),

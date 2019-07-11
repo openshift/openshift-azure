@@ -488,6 +488,9 @@ func mergeCertificateConfig(in *CertificateConfig, out *api.CertificateConfig) {
 	if in.GenevaMetrics != nil {
 		mergeCertKeyPair(in.GenevaMetrics, &out.GenevaMetrics)
 	}
+	if in.PackageRepository != nil {
+		mergeCertKeyPair(in.PackageRepository, &out.PackageRepository)
+	}
 	return
 }
 

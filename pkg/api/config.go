@@ -177,6 +177,9 @@ type CertificateConfig struct {
 	// geneva integration certificates
 	GenevaLogging CertKeyPair `json:"genevaLogging,omitempty"`
 	GenevaMetrics CertKeyPair `json:"genevaMetrics,omitempty"`
+
+	// red hat cdn client certificates
+	PackageRepository CertKeyPair `json:"packageRepository,omitempty"`
 }
 
 // CertKeyPair is an rsa private key and x509 certificate pair.

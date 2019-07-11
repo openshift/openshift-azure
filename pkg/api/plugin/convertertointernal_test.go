@@ -55,6 +55,10 @@ func internalPluginConfig() api.Config {
 				Cert: tls.DummyCertificate,
 				Key:  tls.DummyPrivateKey,
 			},
+			PackageRepository: api.CertKeyPair{
+				Cert: tls.DummyCertificate,
+				Key:  tls.DummyPrivateKey,
+			},
 		},
 		// Container images configuration
 		Images: api.ImageConfig{
