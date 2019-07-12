@@ -133,12 +133,9 @@ func execute(
 	// If no MANIFEST has been provided and this is a cluster
 	// creation, default to the test manifest.
 	if !shared.IsUpdate() && manifest == "" {
-		if *useProd {
-			manifest = "test/manifests/realrp/create.yaml"
-		} else {
-			manifest = "test/manifests/fakerp/create.yaml"
-		}
+		manifest = "test/manifests/fakerp/create.yaml"
 	}
+
 	// If this is a cluster upgrade, reuse the existing manifest.
 	if manifest == "" {
 		manifest = defaultManifestFile

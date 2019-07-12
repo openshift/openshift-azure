@@ -62,11 +62,6 @@ delete() {
       return
   fi
 
-  # only delete for fakerp
-  if [[ -z "$realrp" ]]; then
-    make delete
-  fi
-
   az group delete -g "$RESOURCEGROUP" --yes --no-wait
 }
 

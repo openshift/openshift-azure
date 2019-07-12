@@ -66,13 +66,8 @@ func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry, realRP boo
 	}
 
 	var rpURL string
-	if realRP {
-		fmt.Println("configuring the real resource provider")
-		rpURL = externalapi.DefaultBaseURI
-	} else {
-		fmt.Println("configuring the fake resource provider")
-		rpURL = fmt.Sprintf("http://%s", shared.LocalHttpAddr)
-	}
+	fmt.Println("configuring the fake resource provider")
+	rpURL = fmt.Sprintf("http://%s", shared.LocalHttpAddr)
 
 	rpc := externalapi.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, subscriptionID)
 	rpc.Authorizer = authorizer
