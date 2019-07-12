@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 PATH="$(go env GOPATH)/bin":$PATH
 TEST_SUITE="${TEST_SUITE:-openshift/conformance/parallel/minimal}"
