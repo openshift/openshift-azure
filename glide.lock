@@ -1,5 +1,5 @@
-hash: 79e7ba906351ec5add2944be4ff5a551a0f7cc5d35ab57458b4f2f978c91368b
-updated: 2019-07-10T15:11:09.989502+01:00
+hash: 0e94f8fae85c523e148deebd141a4e3de1f6e6267636254c4bdb00a410135b39
+updated: 2019-07-12T12:34:47.05752+01:00
 imports:
 - name: code.cloudfoundry.org/clock
   version: 02e53af36e6c978af692887ed449b74026d76fec
@@ -94,8 +94,6 @@ imports:
   version: 9fb12b3b21c5415d16ac18dc5cd42c1cfdd40c4e
 - name: github.com/go-logr/zapr
   version: 03f06a783fbb7dfaf3f629c7825480e43a7105e6
-- name: github.com/go-test/deep
-  version: 6592d9cc0a499ad2d5f574fde80a2b5c5cc3b4f5
 - name: github.com/gogo/protobuf
   version: c0656edd0d9eab7c66d1eb0c568f9039345796f7
   subpackages:
@@ -130,6 +128,10 @@ imports:
   version: 6f77996f0c42f7b84e5a2b252227263f93432e9b
   subpackages:
   - cmp
+  - cmp/internal/diff
+  - cmp/internal/flags
+  - cmp/internal/function
+  - cmp/internal/value
 - name: github.com/google/go-github
   version: 7a8ff7a9b90963cdf49e959a5e8009ea03138ff1
   subpackages:
