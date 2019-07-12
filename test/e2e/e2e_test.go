@@ -16,7 +16,6 @@ import (
 
 	_ "github.com/openshift/openshift-azure/test/e2e/specs"
 	_ "github.com/openshift/openshift-azure/test/e2e/specs/fakerp"
-	_ "github.com/openshift/openshift-azure/test/e2e/specs/realrp"
 	"github.com/openshift/openshift-azure/test/reporters"
 )
 

@@ -139,6 +139,7 @@ func execute(
 			manifest = "test/manifests/fakerp/create.yaml"
 		}
 	}
+
 	// If this is a cluster upgrade, reuse the existing manifest.
 	if manifest == "" {
 		manifest = defaultManifestFile

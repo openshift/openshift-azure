@@ -14,13 +14,10 @@ if [[ -z "$TIMEOUT" ]]; then
     TIMEOUT=60m
 fi
 
-# start the fake rp server if needed
-if [[ "$FOCUS" == *"\[Fake\]"* ]]; then
-    [[ -e /var/run/secrets/kubernetes.io ]] || go generate ./...
-    go run cmd/fakerp/main.go &
-    while [[ "$(curl -s -o /dev/null -w '%{http_code}' localhost:8080)" == "000" ]]; do sleep 2; done
-    trap 'return_id=$?; set +ex; kill $(lsof -t -i :8080); wait $(lsof -t -i :8080); exit $return_id' EXIT
-fi
+[[ -e /var/run/secrets/kubernetes.io ]] || go generate ./...
+go run cmd/fakerp/main.go &
+while [[ "$(curl -s -o /dev/null -w '%{http_code}' localhost:8080)" == "000" ]]; do sleep 2; done
+trap 'return_id=$?; set +ex; kill $(lsof -t -i :8080); wait $(lsof -t -i :8080); exit $return_id' EXIT
 
 go test \
 -race \
