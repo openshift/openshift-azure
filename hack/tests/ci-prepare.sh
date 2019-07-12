@@ -1,5 +1,20 @@
 #!/bin/bash -e
 
+# turn off xtrace if enabled
+xtrace=false
+if echo $SHELLOPTS | egrep -q ':?xtrace:?'; then
+  xtrace=true
+  set +x
+fi
+
+reset_xtrace() {
+    if $xtrace; then
+        set -x
+    else
+        set +x
+    fi
+}
+
 set_build_images() {
     if [[ ! -e /var/run/secrets/kubernetes.io ]]; then
         return
@@ -56,6 +71,7 @@ delete() {
 }
 
 if [[ ! -e /var/run/secrets/kubernetes.io ]]; then
+    reset_xtrace
     return
 fi
 
@@ -81,3 +97,5 @@ export AZURE_LEGACY_WORKER_CLIENT_ID="$AZURE_CI_LEGACY_WORKER_CLIENT_ID"
 export AZURE_LEGACY_WORKER_CLIENT_SECRET="$AZURE_CI_LEGACY_WORKER_CLIENT_SECRET"
 
 az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${AZURE_TENANT_ID} >/dev/null
+
+reset_xtrace
