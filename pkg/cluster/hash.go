@@ -36,50 +36,24 @@ var _ Hasher = &Hash{}
 
 // HashScaleSet returns the hash of a scale set
 func (h *Hash) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) ([]byte, error) {
-	hash := sha256.New()
-
-	if armhd, ok := h.Arm.(interface {
-		HashData(*api.AgentPoolProfile) ([]byte, error)
-	}); ok {
-		b, err := armhd.HashData(app) // legacy code path only for v3
-		if err != nil {
-			return nil, err
-		}
-
-		hash.Write(b)
-
-	} else {
-		b, err := h.Arm.Hash(app)
-		if err != nil {
-			return nil, err
-		}
-
-		hash.Write(b)
+	b, err := h.Arm.Hash(app)
+	if err != nil {
+		return nil, err
 	}
+
+	hash := sha256.New()
+	hash.Write(b)
 
 	s, err := h.StartupFactory(h.Log, cs, h.TestConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	if shd, ok := s.(interface {
-		HashData(api.AgentPoolProfileRole) ([]byte, error)
-	}); ok {
-		b, err := shd.HashData(app.Role) // legacy code path only for v3
-		if err != nil {
-			return nil, err
-		}
-
-		hash.Write(b)
-
-	} else {
-		b, err := s.Hash(app.Role)
-		if err != nil {
-			return nil, err
-		}
-
-		hash.Write(b)
+	b, err = s.Hash(app.Role)
+	if err != nil {
+		return nil, err
 	}
+	hash.Write(b)
 
 	if app.Role == api.AgentPoolProfileRoleMaster {
 		// add certificates pulled from keyvault by the master to the hash, to

@@ -330,7 +330,6 @@ func TestAPIParity(t *testing.T) {
 
 	// TODO: why don't we just include all of these in the admin type?
 	notInExternal := []*regexp.Regexp{
-		regexp.MustCompile(`^\.Config\.DeprecatedRunningUnderTest$`),
 		regexp.MustCompile(`^\.Config\.Images\.ImagePullSecret$`),
 		regexp.MustCompile(`^\.Config\.EtcdMetrics`),
 		regexp.MustCompile(`^\.Config\.(Master|Worker)StartupSASURI$`),
