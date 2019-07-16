@@ -80,3 +80,6 @@ e2e:
 
 vmimage:
 	./hack/vmimage.sh
+
+vmimage-validate:
+	./hack/vmimage-validate.sh

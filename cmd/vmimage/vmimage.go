@@ -103,6 +103,11 @@ func run(ctx context.Context, log *logrus.Entry) error {
 		ClientCert:                 clientCert,
 		Validate:                   *validate,
 	}
+
+	if *logLevel == "Debug" {
+		log.Printf("using image %s/%s/%s/%s", builder.ImageResourceGroup, builder.ImageStorageAccount, builder.ImageContainer, builder.Image)
+	}
+
 	err = builder.Run(ctx)
 	if err != nil {
 		return err
