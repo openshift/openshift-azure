@@ -1,5 +1,12 @@
 #!/bin/bash -ex
 
+# For testing: log and drop all traffic that would route via the master ELB
+# RESOURCEGROUP="your-resource-group"
+# OS_FQDN="openshift.$RESOURCEGROUP.osadev.cloud"
+#
+# iptables -I INPUT -s $(dig +short "$OS_FQDN" | tail -1) -j LOG --log-prefix "KUBE FQDN DROP:"
+# iptables -I INPUT -s $(dig +short "$OS_FQDN" | tail -1) -j DROP
+
 if ! grep /var/lib/docker /etc/fstab; then
   systemctl stop docker-cleanup.timer
   systemctl stop docker-cleanup.service
@@ -50,8 +57,11 @@ unset SASURI
 
 update-ca-trust
 
+# Pin kubeconfigs to use local api-server
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/master/openshift-master.kubeconfig
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/node/node.kubeconfig
+sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/node/sdn.kubeconfig
+sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /root/.kube/config
 
 {{- if ne $.BackupBlobName "" }}
 logger -t master-startup.sh "starting recovery on $(hostname)"
