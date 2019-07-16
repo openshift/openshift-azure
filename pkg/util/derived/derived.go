@@ -7,7 +7,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 )
 
-func baseCloudProviderConf(cs *api.OpenShiftManagedCluster, useInstanceMetadata bool, cloudProviderBackoff bool) *cloudprovider.Config {
+func baseCloudProviderConf(cs *api.OpenShiftManagedCluster, cloudProviderBackoff bool) *cloudprovider.Config {
 	cfg := cloudprovider.Config{
 		TenantID:             cs.Properties.AzProfile.TenantID,
 		SubscriptionID:       cs.Properties.AzProfile.SubscriptionID,
@@ -18,7 +18,7 @@ func baseCloudProviderConf(cs *api.OpenShiftManagedCluster, useInstanceMetadata 
 		VMType:               "vmss",
 		SubnetName:           "default",
 		VnetName:             "vnet",
-		UseInstanceMetadata:  useInstanceMetadata, // TODO: hard-wire to true after v3 has gone
+		UseInstanceMetadata:  true,
 		CloudProviderBackoff: cloudProviderBackoff,
 	}
 	if cloudProviderBackoff {
@@ -33,15 +33,15 @@ func baseCloudProviderConf(cs *api.OpenShiftManagedCluster, useInstanceMetadata 
 	return &cfg
 }
 
-func MasterCloudProviderConf(cs *api.OpenShiftManagedCluster, useInstanceMetadata bool, cloudProviderBackoff bool) ([]byte, error) {
-	cpc := baseCloudProviderConf(cs, useInstanceMetadata, cloudProviderBackoff)
+func MasterCloudProviderConf(cs *api.OpenShiftManagedCluster, cloudProviderBackoff bool) ([]byte, error) {
+	cpc := baseCloudProviderConf(cs, cloudProviderBackoff)
 	cpc.AadClientID = cs.Properties.MasterServicePrincipalProfile.ClientID
 	cpc.AadClientSecret = cs.Properties.MasterServicePrincipalProfile.Secret
 	return yaml.Marshal(cpc)
 }
 
-func WorkerCloudProviderConf(cs *api.OpenShiftManagedCluster, useInstanceMetadata bool, cloudProviderBackoff bool) ([]byte, error) {
-	cpc := baseCloudProviderConf(cs, useInstanceMetadata, cloudProviderBackoff)
+func WorkerCloudProviderConf(cs *api.OpenShiftManagedCluster, cloudProviderBackoff bool) ([]byte, error) {
+	cpc := baseCloudProviderConf(cs, cloudProviderBackoff)
 	cpc.AadClientID = cs.Properties.WorkerServicePrincipalProfile.ClientID
 	cpc.AadClientSecret = cs.Properties.WorkerServicePrincipalProfile.Secret
 	return yaml.Marshal(cpc)

@@ -87,7 +87,7 @@ vnetName: vnet
 	}
 
 	for _, tt := range tests {
-		got, err := MasterCloudProviderConf(&tt.cs, true, true)
+		got, err := MasterCloudProviderConf(&tt.cs, true)
 		if err != nil {
 			t.Fatal(err)
 			return
@@ -95,7 +95,7 @@ vnetName: vnet
 		if !reflect.DeepEqual(got, tt.wantMaster) {
 			t.Errorf("derived.MasterCloudProviderConf() = \"%v\", want \"%v\"", string(got), string(tt.wantMaster))
 		}
-		got, err = WorkerCloudProviderConf(&tt.cs, true, true)
+		got, err = WorkerCloudProviderConf(&tt.cs, true)
 		if err != nil {
 			t.Fatal(err)
 			return
