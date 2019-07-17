@@ -164,6 +164,7 @@ func TestInvalidateSecrets(t *testing.T) {
 	pluginConfig.ImagePullSecret = []byte("imagePullSecret")
 	pluginConfig.Certificates.GenevaLogging.Cert = tls.DummyCertificate
 	pluginConfig.Certificates.GenevaMetrics.Cert = tls.DummyCertificate
+	pluginConfig.Certificates.PackageRepository.Cert = tls.DummyCertificate
 
 	err = g.Generate(pluginConfig, false)
 	if err != nil {
@@ -174,6 +175,7 @@ func TestInvalidateSecrets(t *testing.T) {
 	assert(!reflect.DeepEqual(cs.Config.SSHKey, saved.Config.SSHKey), "sshKey")
 	assert(!reflect.DeepEqual(cs.Config.Certificates.GenevaLogging, saved.Config.Certificates.GenevaLogging), "certificates.genevaLogging")
 	assert(!reflect.DeepEqual(cs.Config.Certificates.GenevaMetrics, saved.Config.Certificates.GenevaMetrics), "certificates.genevaMetrics")
+	assert(!reflect.DeepEqual(cs.Config.Certificates.PackageRepository, saved.Config.Certificates.PackageRepository), "certificates.packageRepository")
 	assert(!bytes.Equal(cs.Config.Images.GenevaImagePullSecret, saved.Config.Images.GenevaImagePullSecret), "images.genevaImagePullSecret")
 	assert(!bytes.Equal(cs.Config.Images.ImagePullSecret, saved.Config.Images.ImagePullSecret), "images.imagePullSecret")
 	assert(!bytes.Equal(cs.Config.SessionSecretAuth, saved.Config.SessionSecretAuth), "sessionSecretAuth")
@@ -192,6 +194,7 @@ func TestInvalidateSecrets(t *testing.T) {
 	cs.Config.SSHKey = saved.Config.SSHKey
 	cs.Config.Certificates.GenevaLogging = saved.Config.Certificates.GenevaLogging
 	cs.Config.Certificates.GenevaMetrics = saved.Config.Certificates.GenevaMetrics
+	cs.Config.Certificates.PackageRepository = saved.Config.Certificates.PackageRepository
 	cs.Config.Images.GenevaImagePullSecret = saved.Config.Images.GenevaImagePullSecret
 	cs.Config.Images.ImagePullSecret = saved.Config.Images.ImagePullSecret
 	cs.Config.SessionSecretAuth = saved.Config.SessionSecretAuth

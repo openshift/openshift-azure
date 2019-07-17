@@ -12,6 +12,7 @@ func TestPluginTemplateValidate(t *testing.T) {
 	expectedErrs :=
 		[]error{
 			errors.New(`invalid pluginVersion ""`),
+			errors.New(`invalid securityUpdatePackage ""`),
 			errors.New(`invalid versions[""]`),
 			errors.New(`invalid versions[""].imageOffer ""`),
 			errors.New(`invalid versions[""].imagePublisher ""`),
@@ -55,6 +56,8 @@ func TestPluginTemplateValidate(t *testing.T) {
 			errors.New(`invalid certificates.genevaLogging.cert`),
 			errors.New(`invalid certificates.genevaMetrics.key`),
 			errors.New(`invalid certificates.genevaMetrics.cert`),
+			errors.New(`invalid certificates.packageRepository.key`),
+			errors.New(`invalid certificates.packageRepository.cert`),
 			errors.New(`invalid genevaLoggingSector ""`),
 			errors.New(`invalid genevaLoggingAccount ""`),
 			errors.New(`invalid genevaLoggingNamespace ""`),
@@ -71,6 +74,7 @@ func TestPluginTemplateValidate(t *testing.T) {
 		Versions: map[string]pluginapi.VersionConfig{
 			"": {},
 		},
+		SecurityPatchPackages: []string{""},
 	}
 	v := PluginAPIValidator{}
 	errs := v.Validate(&template)

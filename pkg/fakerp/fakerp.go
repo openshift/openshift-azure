@@ -46,9 +46,9 @@ func debugDeployerError(ctx context.Context, log *logrus.Entry, cs *api.OpenShif
 		if testConfig.ArtifactDir != "" &&
 			op.Properties.TargetResource != nil &&
 			*op.Properties.TargetResource.ResourceType == "Microsoft.Compute/virtualMachineScaleSets" {
-			s, err := newSSHer(ctx, log, cs)
+			s, err := NewSSHer(ctx, log, cs)
 			if err != nil {
-				log.Warnf("newSSHer failed: %v", err)
+				log.Warnf("NewSSHer failed: %v", err)
 				continue
 			}
 

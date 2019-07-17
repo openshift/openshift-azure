@@ -453,6 +453,7 @@ func (g *simpleGenerator) InvalidateSecrets() (err error) {
 
 	g.cs.Config.Certificates.GenevaLogging = api.CertKeyPair{}
 	g.cs.Config.Certificates.GenevaMetrics = api.CertKeyPair{}
+	g.cs.Config.Certificates.PackageRepository = api.CertKeyPair{}
 
 	g.cs.Config.Images.GenevaImagePullSecret = nil
 	g.cs.Config.Images.ImagePullSecret = nil

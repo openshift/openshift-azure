@@ -3,6 +3,8 @@
 ## This template file is manually curated for the particular OSA version
 ##
 pluginVersion: v6.0
+## List of RPM packages that fix security issues
+securityPatchPackages: []
 ## Openshift component logging levels
 componentLogLevel:
   apiServer: 2
@@ -136,6 +138,10 @@ versions:
       sync: quay.io/openshift-on-azure/azure:latest
       tlsProxy: quay.io/openshift-on-azure/azure:latest
 ## certificates, used to authenticate to external systems
+## Red Hat CDN client certificates
+  #packageRepository:
+  #  key: <Red Hat CDN client key value. Format: Base64 in YAML, rsa.PrivateKey in struct>
+  #  cert: <Red Hat CDN client certificate Format: Base64 in YAML, x509.Certificate struct>
 ## Geneva integration certificates. Example:
 #certificates:
   #genevaLogging:

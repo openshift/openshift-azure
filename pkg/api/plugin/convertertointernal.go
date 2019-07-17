@@ -17,6 +17,10 @@ func ToInternal(in *Config, old *api.Config, setVersionFields bool) (*api.Config
 		c = old.DeepCopy()
 	}
 
+	if c.SecurityPatchPackages == nil {
+		c.SecurityPatchPackages = in.SecurityPatchPackages
+	}
+
 	// setting c.PluginVersion = in.PluginVersion is done up-front by the plugin
 	// code.  It could be done here as well (gated by setVersionFields) but
 	// would/should be a no-op.  To simplify the logic, we don't do it.
@@ -99,6 +103,12 @@ func ToInternal(in *Config, old *api.Config, setVersionFields bool) (*api.Config
 	}
 	if c.Certificates.GenevaMetrics.Cert == nil {
 		c.Certificates.GenevaMetrics.Cert = in.Certificates.GenevaMetrics.Cert
+	}
+	if c.Certificates.PackageRepository.Key == nil {
+		c.Certificates.PackageRepository.Key = in.Certificates.PackageRepository.Key
+	}
+	if c.Certificates.PackageRepository.Cert == nil {
+		c.Certificates.PackageRepository.Cert = in.Certificates.PackageRepository.Cert
 	}
 
 	// Geneva integration configurables

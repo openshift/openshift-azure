@@ -8,6 +8,9 @@ import (
 
 // Config holds the cluster admin config structure
 type Config struct {
+	// SecurityPatchPackages defines a list of rpm packages that fix security issues
+	SecurityPatchPackages *[]string `json:"securityPatchPackages,omitempty"`
+
 	// PluginVersion defines release version of the plugin used to build the cluster
 	PluginVersion *string `json:"pluginVersion,omitempty"`
 
@@ -142,6 +145,9 @@ type CertificateConfig struct {
 	// geneva integration certificates
 	GenevaLogging *Certificate `json:"genevaLogging,omitempty"`
 	GenevaMetrics *Certificate `json:"genevaMetrics,omitempty"`
+
+	// red hat cdn client certificates
+	PackageRepository *Certificate `json:"packageRepository,omitempty"`
 }
 
 // Certificate is an x509 certificate.

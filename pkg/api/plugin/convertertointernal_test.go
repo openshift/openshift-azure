@@ -24,7 +24,8 @@ func internalPluginConfig() api.Config {
 	// this is the expected internal equivalent to
 	// internal API Config
 	return api.Config{
-		PluginVersion: "Versions.key",
+		SecurityPatchPackages: []string{"SecurityPatchPackages[0]"},
+		PluginVersion:         "Versions.key",
 		ComponentLogLevel: api.ComponentLogLevel{
 			APIServer:         to.IntPtr(1),
 			ControllerManager: to.IntPtr(1),
@@ -51,6 +52,10 @@ func internalPluginConfig() api.Config {
 				Key:  tls.DummyPrivateKey,
 			},
 			GenevaMetrics: api.CertKeyPair{
+				Cert: tls.DummyCertificate,
+				Key:  tls.DummyPrivateKey,
+			},
+			PackageRepository: api.CertKeyPair{
 				Cert: tls.DummyCertificate,
 				Key:  tls.DummyPrivateKey,
 			},

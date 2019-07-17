@@ -219,6 +219,8 @@ func setupNewCluster(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftMa
 	template.Certificates.GenevaLogging.Key = testtls.DummyPrivateKey
 	template.Certificates.GenevaMetrics.Cert = testtls.DummyCertificate
 	template.Certificates.GenevaMetrics.Key = testtls.DummyPrivateKey
+	template.Certificates.PackageRepository.Cert = testtls.DummyCertificate
+	template.Certificates.PackageRepository.Key = testtls.DummyPrivateKey
 	template.GenevaImagePullSecret = []byte("pullSecret")
 	template.ImagePullSecret = []byte("imagePullSecret")
 
@@ -468,6 +470,11 @@ func TestHowAdminConfigChangesCausesRotations(t *testing.T) {
 			name:           "change container image",
 			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: true, rotationCompute: false},
 			change:         func(cs *api.OpenShiftManagedCluster) { cs.Config.Images.WebConsole = "newImage" },
+		},
+		{
+			name:           "change security patch packages",
+			expectRotation: map[rotationType]bool{rotationMaster: true, rotationInfra: true, rotationSync: false, rotationCompute: true},
+			change:         func(cs *api.OpenShiftManagedCluster) { cs.Config.SecurityPatchPackages = []string{"patch-rpm"} },
 		},
 	}
 

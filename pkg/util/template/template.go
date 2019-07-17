@@ -27,6 +27,7 @@ func Template(name, tmpl string, f template.FuncMap, data interface{}) ([]byte, 
 			replacer := strings.NewReplacer("$", "\\$")
 			return replacer.Replace(b)
 		},
+		"StringsJoin": strings.Join,
 	}).Funcs(f).Parse(tmpl)
 	if err != nil {
 		return nil, err

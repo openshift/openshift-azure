@@ -174,7 +174,7 @@ EOF
 # not commited with a : so that Windows users can check out the repo
 mv /etc/docker/certs.d/docker-registry.default.svc-5000 /etc/docker/certs.d/docker-registry.default.svc:5000
 
-rm /etc/yum.repos.d/kickstart.repo /var/lib/yum/client-cert.pem /var/lib/yum/client-key.pem
+rm /var/lib/yum/client-cert.pem /var/lib/yum/client-key.pem
 
 mkdir /var/lib/etcd
 
