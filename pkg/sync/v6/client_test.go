@@ -5,6 +5,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+
+	"github.com/openshift/openshift-azure/pkg/api"
 )
 
 var clientTests = []struct {
@@ -44,8 +46,10 @@ func init() {
 }
 
 func TestNeedsUpdate(t *testing.T) {
+	cs := api.OpenShiftManagedCluster{}
+	s := &sync{cs: &cs, log: log}
 	for _, test := range clientTests {
-		if got := needsUpdate(log, test.existing, test.updated); got != test.exp {
+		if got := s.needsUpdate(test.existing, test.updated); got != test.exp {
 			t.Errorf("%s: expected update %t, got %t", test.name, test.exp, got)
 		}
 	}
