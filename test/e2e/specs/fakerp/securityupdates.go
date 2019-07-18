@@ -21,7 +21,7 @@ import (
 	logger "github.com/openshift/openshift-azure/test/util/log"
 )
 
-var _ = Describe("Apply security updates E2E tests [ApplySecurityUpdates][Fake][LongRunning]", func() {
+var _ = Describe("Apply security updates E2E tests [ApplySecurityUpdates][LongRunning]", func() {
 	var (
 		ctx                    = context.Background()
 		securityUpdatePackages = []string{

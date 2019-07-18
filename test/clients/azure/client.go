@@ -41,7 +41,7 @@ type Client struct {
 }
 
 // NewClientFromEnvironment creates a new azure client from environment variables and stores it in the RPClient variable
-func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry, realRP bool) error {
+func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry) error {
 	authorizer, err := azureclient.NewAuthorizerFromEnvironment("")
 	if err != nil {
 		return err
@@ -57,12 +57,9 @@ func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry, realRP boo
 	subscriptionID := cfg.SubscriptionID
 
 	var storageClient storage.BlobStorageClient
-	//for now fake RP tests use the Blob Storage, real RP do not
-	if !realRP {
-		storageClient, err = configblob.GetService(ctx, log, cfg)
-		if err != nil {
-			return err
-		}
+	storageClient, err = configblob.GetService(ctx, log, cfg)
+	if err != nil {
+		return err
 	}
 
 	var rpURL string

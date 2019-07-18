@@ -14,7 +14,7 @@ import (
 	"github.com/openshift/openshift-azure/test/clients/azure"
 )
 
-var _ = Describe("Control Plane Pods Status E2E tests [Fake][EveryPR]", func() {
+var _ = Describe("Control Plane Pods Status E2E tests [EveryPR]", func() {
 	It("should allow an SRE to fetch the status of control plane pods", func() {
 		By("Using the OSA admin client to fetch the raw cluster status")
 		b, err := azure.RPClient.OpenShiftManagedClustersAdmin.GetControlPlanePods(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))

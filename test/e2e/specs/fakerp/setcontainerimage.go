@@ -18,7 +18,7 @@ import (
 	"github.com/openshift/openshift-azure/test/sanity"
 )
 
-var _ = Describe("Change a single image to latest E2E tests [ChangeImage][Fake][LongRunning]", func() {
+var _ = Describe("Change a single image to latest E2E tests [ChangeImage][LongRunning]", func() {
 	var (
 		ctx = context.Background()
 	)

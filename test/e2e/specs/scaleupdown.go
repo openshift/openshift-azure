@@ -24,7 +24,7 @@ import (
 	"github.com/openshift/openshift-azure/test/sanity"
 )
 
-var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][EveryPR][LongRunning]", func() {
+var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][EveryPR][LongRunning]", func() {
 	const (
 		sampleDeployment = "hello-openshift"
 	)
