@@ -22,7 +22,7 @@ func (u *Kubeclientset) BackupCluster(ctx context.Context, backupName string) er
 
 	job := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      backupName,
+			Name:      "etcd-backup",
 			Namespace: cronjob.Namespace,
 		},
 		Spec: cronjob.Spec.JobTemplate.Spec,
