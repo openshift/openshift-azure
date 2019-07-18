@@ -8,7 +8,7 @@ The following are ginkgo test focuses supported by openshift on azure e2e tests
 #### Customizing e2e test scope with focuses
 
 You can specify a test focus by setting the `FOCUS` environment variable. For example
-to run all tests tagged with [EveryPR] against the Real RP you would specify a focus as
+to run all tests tagged with [EveryPR] you would specify the focus as
 
 ```
 export FOCUS=\[EveryPR\]
