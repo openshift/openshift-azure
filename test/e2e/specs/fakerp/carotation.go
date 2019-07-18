@@ -11,7 +11,7 @@ import (
 	"github.com/openshift/openshift-azure/test/sanity"
 )
 
-var _ = Describe("Ca Rotation E2E tests [CaRotation][Fake][LongRunning]", func() {
+var _ = Describe("Ca Rotation E2E tests [CaRotation][LongRunning]", func() {
 	It("should be possible to maintain a healthy cluster after rotating all certificates", func() {
 		By("Reading the cluster state")
 		before, err := azure.RPClient.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))

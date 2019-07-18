@@ -18,7 +18,7 @@ import (
 	"github.com/openshift/openshift-azure/test/sanity"
 )
 
-var _ = Describe("Reimage VM E2E tests [ReimageVM][Fake][LongRunning]", func() {
+var _ = Describe("Reimage VM E2E tests [ReimageVM][LongRunning]", func() {
 	It("should be possible for an SRE to reimage a VM in a scale set", func() {
 		By("Reading the cluster state")
 		before, err := azure.RPClient.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))

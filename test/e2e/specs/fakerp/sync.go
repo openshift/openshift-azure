@@ -12,7 +12,7 @@ import (
 	"github.com/openshift/openshift-azure/test/sanity"
 )
 
-var _ = Describe("sync pod tests [Fake][EveryPR]", func() {
+var _ = Describe("sync pod tests [EveryPR]", func() {
 	It("should not continuously update objects", func() {
 		pods, err := sanity.Checker.Client.Admin.CoreV1.Pods("kube-system").List(metav1.ListOptions{LabelSelector: "app=sync"})
 		Expect(err).ToNot(HaveOccurred())

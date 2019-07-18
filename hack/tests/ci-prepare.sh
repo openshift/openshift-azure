@@ -56,18 +56,10 @@ generate_artifacts() {
 }
 
 delete() {
-  realrp="$1"
-
   if [[ -n "$NO_DELETE" ]]; then
       return
   fi
-
-  # only delete for fakerp
-  if [[ -z "$realrp" ]]; then
-    make delete
-  fi
-
-  az group delete -g "$RESOURCEGROUP" --yes --no-wait
+  make delete
 }
 
 if [[ ! -e /var/run/secrets/kubernetes.io ]]; then

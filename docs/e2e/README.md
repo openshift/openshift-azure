@@ -5,7 +5,7 @@ If you are developing tests locally, you can use the native `go test` to invoke 
 Example: Run the end user e2e tests
 ```
 source ./env
-export FOCUS="\[CustomerAdmin\]|\[EndUser\]\[Fake\]"
+export FOCUS="\[CustomerAdmin\]|\[EndUser\]"
 ./hack/e2e.sh
 ```
 
@@ -14,7 +14,7 @@ As a shorthand to the above, you could simply run `make e2e`
 Example: Run the scale up/down e2e tests against the fake rp
 ```
 source ./env
-export FOCUS="\[ScaleUpDown\]\[Fake\]"
+export FOCUS="\[ScaleUpDown\]"
 export TIMEOUT=30m
 export EXTRA_FLAGS="-scaleUpManifest=test/manifests/normal/scaleup.yaml -scaleDownManifest=test/manifests/normal/scaledown.yaml"
 ./hack/e2e.sh
@@ -31,7 +31,7 @@ docker pull quay.io/openshift-on-azure/e2e-tests:latest
 
 Example: Run the end user e2e tests in a container
 ```
-export FOCUS="\[CustomerAdmin\]|\[EndUser\]\[Fake\]"
+export FOCUS="\[CustomerAdmin\]|\[EndUser\]"
 export TIMEOUT=20m
 source ./env
 
@@ -53,7 +53,7 @@ quay.io/openshift-on-azure/e2e-tests \
 
 Example: Run the scale up/down e2e tests against the fake rp in a container
 ```
-export FOCUS="\[ScaleUpDown\]\[Fake\]"
+export FOCUS="\[ScaleUpDown\]"
 export TIMEOUT=30m
 source ./env
 

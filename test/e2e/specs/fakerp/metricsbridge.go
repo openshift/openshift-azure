@@ -67,7 +67,7 @@ func parseMetrics(query string) ([]string, error) {
 //  - query being on a list of manually verified correct queries (that normally don't return any data)
 //  - query having ' != 0' at the end, that returns data after this condition is removed
 //  - query calculating rate( x [1m]) of a metric x, when querying for metric x returns data
-var _ = Describe("Metricsbridge E2E check configured queries [Fake]", func() {
+var _ = Describe("Metricsbridge E2E check configured queries ", func() {
 	// queries which usually return no datapoints, but have been verified as valid manually
 	manuallyVerifiedQueries := map[string]bool{
 		"kubelet_runtime_operations_errors != 0": true,

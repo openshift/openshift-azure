@@ -12,7 +12,7 @@ import (
 	"github.com/openshift/openshift-azure/test/sanity"
 )
 
-var _ = Describe("Force Update E2E tests [ForceUpdate][Fake][LongRunning]", func() {
+var _ = Describe("Force Update E2E tests [ForceUpdate][LongRunning]", func() {
 	It("should be possible for an SRE to force update a cluster", func() {
 		By("Reading the update blob before the force update")
 		ubs := updateblob.NewBlobService(azure.RPClient.BlobStorage)

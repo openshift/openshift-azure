@@ -9,8 +9,8 @@ import (
 	"github.com/openshift/openshift-azure/test/sanity"
 )
 
-var _ = Describe("Openshift on Azure end user e2e tests [EndUser][Fake][EveryPR]", func() {
-	It("should create and validate test apps [EndUser][Fake][Apps]", func() {
+var _ = Describe("Openshift on Azure end user e2e tests [EndUser][EveryPR]", func() {
+	It("should create and validate test apps [EndUser][Apps]", func() {
 		ctx := context.Background()
 		By("creating test app")
 		namespace, errs := sanity.Checker.CreateTestApp(ctx)
@@ -25,7 +25,7 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser][Fake][EveryPR]
 		Expect(errs).To(BeEmpty())
 	})
 
-	It("should validate the cluster [EndUser][Fake][Cluster]", func() {
+	It("should validate the cluster [EndUser][Cluster]", func() {
 		errs := sanity.Checker.ValidateCluster(context.Background())
 		Expect(errs).To(BeEmpty())
 	})
