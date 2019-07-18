@@ -1,8 +1,7 @@
 package validate
 
 import (
-	"errors"
-	"reflect"
+	"regexp"
 	"testing"
 
 	"github.com/Azure/go-autorest/autorest/to"
@@ -23,7 +22,7 @@ func TestAdminAPIValidateUpdate(t *testing.T) {
 	tests := map[string]struct {
 		oldf         func(*api.OpenShiftManagedCluster)
 		f            func(*api.OpenShiftManagedCluster)
-		expectedErrs []error
+		expectedErrs []*regexp.Regexp
 	}{
 		"no-op": {},
 		"change log level": {
@@ -43,8 +42,8 @@ func TestAdminAPIValidateUpdate(t *testing.T) {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Config.PluginVersion = "latest" // the RP does this, but after validation: the user can't do this
 			},
-			expectedErrs: []error{
-				errors.New(`invalid change [Config.PluginVersion: latest != ]`),
+			expectedErrs: []*regexp.Regexp{
+				regexp.MustCompile(`PluginVersion:\s+?"latest"(?s).+?PluginVersion:\s+?""`),
 			},
 		},
 		"permitted infra scale up": {
@@ -64,8 +63,8 @@ func TestAdminAPIValidateUpdate(t *testing.T) {
 					}
 				}
 			},
-			expectedErrs: []error{
-				errors.New(`invalid change [Properties.AgentPoolProfiles.slice[1].Count: 2 != 3]`),
+			expectedErrs: []*regexp.Regexp{
+				regexp.MustCompile(`Count:\s+?2(?s).+?Count:\s+?3`),
 			},
 		},
 		"invalid compute scale": {
@@ -76,16 +75,16 @@ func TestAdminAPIValidateUpdate(t *testing.T) {
 					}
 				}
 			},
-			expectedErrs: []error{
-				errors.New(`invalid change [Properties.AgentPoolProfiles.slice[2].Count: 4 != 1]`),
+			expectedErrs: []*regexp.Regexp{
+				regexp.MustCompile(`Count:\s+?4(?s).+?Count:\s+?1`),
 			},
 		},
 		"invalid change": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Name = "new"
 			},
-			expectedErrs: []error{
-				errors.New(`invalid change [Name: new != openshift]`),
+			expectedErrs: []*regexp.Regexp{
+				regexp.MustCompile(`Name:\s+?"new"(?s).+?Name:\s+?"openshift"`),
 			},
 		},
 	}
@@ -106,15 +105,13 @@ func TestAdminAPIValidateUpdate(t *testing.T) {
 		}
 		var v AdminAPIValidator
 		errs := v.Validate(cs, oldCs)
-		if !reflect.DeepEqual(errs, test.expectedErrs) {
-			t.Logf("test case %q", name)
-			t.Errorf("expected errors:")
-			for _, err := range test.expectedErrs {
-				t.Errorf("\t%v", err)
-			}
-			t.Error("received errors:")
-			for _, err := range errs {
-				t.Errorf("\t%v", err)
+		if len(test.expectedErrs) != len(errs) {
+			t.Errorf("%s: expected %d errors, got %d", name, len(test.expectedErrs), len(errs))
+		}
+
+		for i, exp := range test.expectedErrs {
+			if !exp.MatchString(errs[i].Error()) {
+				t.Errorf("%s: error at index %d doesn't match \"%v\". Error: %v", name, i, exp, errs[i])
 			}
 		}
 	}

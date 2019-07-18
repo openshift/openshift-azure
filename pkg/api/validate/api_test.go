@@ -1,8 +1,7 @@
 package validate
 
 import (
-	"errors"
-	"reflect"
+	"regexp"
 	"testing"
 
 	"github.com/ghodss/yaml"
@@ -13,7 +12,7 @@ import (
 func TestAPIValidateUpdate(t *testing.T) {
 	tests := map[string]struct {
 		f            func(*api.OpenShiftManagedCluster)
-		expectedErrs []error
+		expectedErrs []*regexp.Regexp
 		externalOnly bool
 	}{
 		"no-op": {},
@@ -31,8 +30,8 @@ func TestAPIValidateUpdate(t *testing.T) {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Name = "new"
 			},
-			expectedErrs: []error{
-				errors.New(`invalid change [Name: new != openshift]`),
+			expectedErrs: []*regexp.Regexp{
+				regexp.MustCompile(`Name:\s+?"new"(?s).+?Name:\s+?"openshift"`),
 			},
 		},
 		"change AADIdentityProvider": {
@@ -60,15 +59,13 @@ func TestAPIValidateUpdate(t *testing.T) {
 		}
 		var v APIValidator
 		errs := v.Validate(cs, oldCs, false)
-		if !reflect.DeepEqual(errs, test.expectedErrs) {
-			t.Logf("test case %q", name)
-			t.Errorf("expected errors:")
-			for _, err := range test.expectedErrs {
-				t.Errorf("\t%v", err)
-			}
-			t.Error("received errors:")
-			for _, err := range errs {
-				t.Errorf("\t%v", err)
+		if len(test.expectedErrs) != len(errs) {
+			t.Errorf("%s: expected %d errors, got %d", name, len(test.expectedErrs), len(errs))
+		}
+
+		for i, exp := range test.expectedErrs {
+			if !exp.MatchString(errs[i].Error()) {
+				t.Errorf("%s: error at index %d doesn't match \"%v\". Error: %v", name, i, exp, errs[i])
 			}
 		}
 	}

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/go-test/deep"
+	"github.com/openshift/openshift-azure/pkg/util/cmp"
 )
 
 func TestClean(t *testing.T) {
@@ -37,7 +37,7 @@ func TestClean(t *testing.T) {
 
 		clean(i)
 		if !reflect.DeepEqual(i, o) {
-			t.Errorf("%s:\n%s", match, strings.Join(deep.Equal(i, o), "\n"))
+			t.Errorf("%s:\n%s", match, cmp.Diff(i, o))
 		}
 	}
 }

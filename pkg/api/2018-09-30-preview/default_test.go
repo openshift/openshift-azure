@@ -5,7 +5,8 @@ import (
 	"testing"
 
 	"github.com/Azure/go-autorest/autorest/to"
-	"github.com/go-test/deep"
+
+	"github.com/openshift/openshift-azure/pkg/util/cmp"
 )
 
 func sampleManagedCluster() *OpenShiftManagedCluster {
@@ -124,7 +125,7 @@ func TestDefaults(t *testing.T) {
 		setDefaults(config)
 
 		if !reflect.DeepEqual(config, expected) {
-			t.Errorf("%s: unexpected diff %s", test.name, deep.Equal(config, expected))
+			t.Errorf("%s: unexpected diff %s", test.name, cmp.Diff(config, expected))
 		}
 	}
 }

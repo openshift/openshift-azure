@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/go-test/deep"
-
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/util/cmp"
 )
 
 // AdminAPIValidator validator for external Admin API
@@ -81,7 +80,7 @@ func (v *AdminAPIValidator) validateUpdateContainerService(cs, oldCs *api.OpenSh
 	old.Config.SecurityPatchPackages = cs.Config.SecurityPatchPackages
 
 	if !reflect.DeepEqual(cs, old) {
-		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(cs, old)))
+		errs = append(errs, fmt.Errorf("invalid change %s", cmp.Diff(cs, old)))
 	}
 
 	return
