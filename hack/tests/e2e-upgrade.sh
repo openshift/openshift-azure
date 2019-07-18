@@ -40,7 +40,7 @@ cp -a "$T/src/github.com/openshift/openshift-azure/_data" .
 set_build_images
 
 # try upgrading just a single image to latest
-FOCUS="\[ChangeImage\]\[Fake\]" TIMEOUT=50m ./hack/e2e.sh
+FOCUS="\[ChangeImage\]" TIMEOUT=50m ./hack/e2e.sh
 
 # now upgrade the whole lot
 ADMIN_MANIFEST=test/manifests/fakerp/admin-update.yaml make upgrade e2e
