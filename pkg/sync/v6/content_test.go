@@ -235,6 +235,10 @@ func handleTemplates(index index) error {
 
 	for _, file := range files {
 		if _, found := touched[file]; !found {
+			// project-request is not part of content-update flow
+			if file == "project-request.yaml" {
+				continue
+			}
 			err = os.Remove("data/Template.template.openshift.io/openshift/" + file)
 			if err != nil {
 				return err
