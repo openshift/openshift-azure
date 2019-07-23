@@ -1,12 +1,12 @@
 hash: 0e94f8fae85c523e148deebd141a4e3de1f6e6267636254c4bdb00a410135b39
-updated: 2019-07-12T12:34:47.05752+01:00
+updated: 2019-07-23T12:03:39.824691057+02:00
 imports:
 - name: code.cloudfoundry.org/clock
   version: 02e53af36e6c978af692887ed449b74026d76fec
 - name: contrib.go.opencensus.io/exporter/ocagent
-  version: 88230df77e734507cd633004f098a4febd80ba0b
+  version: 8110e6c0236bb231b19119275a6be6ec666d05c8
 - name: github.com/alecthomas/units
-  version: 2efee857e7cfd4f3d0138cc3cbb1b4966962b93a
+  version: c3de453c63f4bdb4dadffab9805ec00426c505f7
 - name: github.com/Azure/azure-sdk-for-go
   version: 1951233eb944a49aa5f7278cba8e3e32a8c958af
   subpackages:
@@ -46,7 +46,7 @@ imports:
   subpackages:
   - quantile
 - name: github.com/census-instrumentation/opencensus-proto
-  version: e2601ef16f8a085a69d94ace5133f97438f8945f
+  version: 97194d1225539f817404bac07e965fd6d8f2a289
   subpackages:
   - gen-go/agent/common/v1
   - gen-go/agent/metrics/v1
@@ -76,7 +76,7 @@ imports:
 - name: github.com/dgrijalva/jwt-go
   version: 01aeca54ebda6e0fbfafd0a524d234159c05ec20
 - name: github.com/dimchansky/utfbom
-  version: d2133a1ce379ef6fa992b0514a77146c60db9d1c
+  version: 6c6132ff69f0f6c088739067407b5d32c52e1d0f
 - name: github.com/ghodss/yaml
   version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
 - name: github.com/go-chi/chi
@@ -84,7 +84,7 @@ imports:
   subpackages:
   - middleware
 - name: github.com/go-kit/kit
-  version: 7d4de0a2703de8e46bbff16759dea16481f39b2f
+  version: 150a65a7ec6156b4b640c1fd55f26fd3d475d656
   subpackages:
   - log
   - log/level
@@ -93,7 +93,7 @@ imports:
 - name: github.com/go-logr/logr
   version: 9fb12b3b21c5415d16ac18dc5cd42c1cfdd40c4e
 - name: github.com/go-logr/zapr
-  version: 03f06a783fbb7dfaf3f629c7825480e43a7105e6
+  version: 7536572e8d55209135cd5e7ccf7fce43dca217ab
 - name: github.com/gogo/protobuf
   version: c0656edd0d9eab7c66d1eb0c568f9039345796f7
   subpackages:
@@ -133,7 +133,7 @@ imports:
   - cmp/internal/function
   - cmp/internal/value
 - name: github.com/google/go-github
-  version: 7a8ff7a9b90963cdf49e959a5e8009ea03138ff1
+  version: c756c329c19dbbadba0675b42af693093c3f2c45
   subpackages:
   - github
 - name: github.com/google/go-querystring
@@ -143,7 +143,7 @@ imports:
 - name: github.com/google/gofuzz
   version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
 - name: github.com/google/uuid
-  version: c2e93f3ae59f2904160ceaab466009f965df46d6
+  version: 9b3b1e0f5f99ae461456d768e7d301a7acdaa2d8
 - name: github.com/googleapis/gnostic
   version: 0c5108395e2debce0d731cf0287ddf7242066aba
   subpackages:
@@ -151,7 +151,7 @@ imports:
   - compiler
   - extensions
 - name: github.com/grpc-ecosystem/grpc-gateway
-  version: bebc7374a79e1105d786ef3468b474e47d652511
+  version: ad529a448ba494a88058f9e5be0988713174ac86
   subpackages:
   - internal
   - runtime
@@ -288,13 +288,13 @@ imports:
   - user/clientset/versioned/typed/user/v1
   - user/clientset/versioned/typed/user/v1/fake
 - name: github.com/opentracing/opentracing-go
-  version: 659c90643e714681897ec2521c60567dd21da733
+  version: 135aa78c6f95b4a199daf2f0470d231136cbbd0c
   subpackages:
   - log
 - name: github.com/pborman/uuid
   version: adf5a7427709b9deb95d29d3fa8a2bf9cfd388f1
 - name: github.com/pkg/errors
-  version: 27936f6d90f9c8e1145f11ed52ffffbfdb9e0af7
+  version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/prometheus/client_golang
   version: 505eaef017263e299324067d40ca2c48f6a2cf50
   subpackages:
@@ -305,7 +305,7 @@ imports:
   - prometheus/promauto
   - prometheus/promhttp
 - name: github.com/prometheus/client_model
-  version: fd36f4220a901265f90734c3183c5f0c91daa0b8
+  version: 5c3871d89910bfb32f5fcab2aa4b9ec68e65a99f
   subpackages:
   - go
 - name: github.com/prometheus/common
@@ -349,9 +349,9 @@ imports:
 - name: github.com/spf13/cobra
   version: ef82de70bb3f60c65fb8eebacbb2d122ef517385
 - name: github.com/spf13/pflag
-  version: 24fa6976df40757dce6aea913e7b81ade90530e1
+  version: 583c0c0531f06d5278b7d917446061adc344b5cd
 - name: go.opencensus.io
-  version: df42942ad08fc1d7526b5a0361f909c351fabfa3
+  version: b4a14686f0a98096416fe1b4cb848e384fb2b22b
   subpackages:
   - internal
   - internal/tagencoding
@@ -446,7 +446,7 @@ imports:
   subpackages:
   - rate
 - name: google.golang.org/api
-  version: 890e5eb51fe205e56dc55eb68d63e82039730816
+  version: 069bea57b1be6ad0671a49ea7a1128025a22b73f
   subpackages:
   - support/bundler
 - name: google.golang.org/appengine
@@ -499,12 +499,10 @@ imports:
   version: c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
-- name: gopkg.in/libgit2/git2go.v27
-  version: ecaeb7a21d479b7966311760a2e8bd734f8f0eef
 - name: gopkg.in/tomb.v1
   version: c131134a1947e9afd9cecfe11f4c6dff0732ae58
 - name: gopkg.in/yaml.v2
-  version: 51d6538a90f86fe93ac480b35f37b2be17fef232
+  version: 670d4cfef0544295bc27a114dbac37980d83185a
 - name: k8s.io/api
   version: 0f11257a8a25954878633ebdc9841c67d8f83bdb
   subpackages:

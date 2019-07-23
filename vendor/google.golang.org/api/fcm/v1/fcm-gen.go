@@ -261,8 +261,7 @@ func (s *AndroidConfig) MarshalJSON() ([]byte, error) {
 // AndroidFcmOptions: Options for features provided by the FCM SDK for
 // Android.
 type AndroidFcmOptions struct {
-	// AnalyticsLabel: Label that the message's analytics data will be
-	// associated with.
+	// AnalyticsLabel: Label associated with the message's analytics data.
 	AnalyticsLabel string `json:"analyticsLabel,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "AnalyticsLabel") to
@@ -342,6 +341,13 @@ type AndroidNotification struct {
 	// icon
 	// specified in your app manifest.
 	Icon string `json:"icon,omitempty"`
+
+	// Image: Contains the URL of an image that is going to be displayed in
+	// a
+	// notification. If present, it will
+	// override
+	// google.firebase.fcm.v1.Notification.image.
+	Image string `json:"image,omitempty"`
 
 	// Sound: The sound to play when the device receives the
 	// notification.
@@ -448,9 +454,15 @@ func (s *ApnsConfig) MarshalJSON() ([]byte, error) {
 
 // ApnsFcmOptions: Options for features provided by the FCM SDK for iOS.
 type ApnsFcmOptions struct {
-	// AnalyticsLabel: Label that the message's analytics data will be
-	// associated with.
+	// AnalyticsLabel: Label associated with the message's analytics data.
 	AnalyticsLabel string `json:"analyticsLabel,omitempty"`
+
+	// Image: Contains the URL of an image that is going to be displayed in
+	// a
+	// notification. If present, it will
+	// override
+	// google.firebase.fcm.v1.Notification.image.
+	Image string `json:"image,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "AnalyticsLabel") to
 	// unconditionally include in API requests. By default, fields with
@@ -479,8 +491,7 @@ func (s *ApnsFcmOptions) MarshalJSON() ([]byte, error) {
 // FcmOptions: Platform independent options for features provided by the
 // FCM SDKs.
 type FcmOptions struct {
-	// AnalyticsLabel: Label that the message's analytics data will be
-	// associated with.
+	// AnalyticsLabel: Label associated with the message's analytics data.
 	AnalyticsLabel string `json:"analyticsLabel,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "AnalyticsLabel") to
@@ -584,6 +595,20 @@ func (s *Message) MarshalJSON() ([]byte, error) {
 type Notification struct {
 	// Body: The notification's body text.
 	Body string `json:"body,omitempty"`
+
+	// Image: Contains the URL of an image that is going to be downloaded on
+	// the device
+	// and displayed in a notification.
+	// JPEG, PNG, BMP have full support across platforms. Animated GIF and
+	// video
+	// only work on iOS. WebP and HEIF have varying levels of support
+	// across
+	// platforms and platform versions.
+	// Android has 1MB image size limit.
+	// Quota usage and implications/costs for hosting image on Firebase
+	// Storage:
+	// https://firebase.google.com/pricing
+	Image string `json:"image,omitempty"`
 
 	// Title: The notification's title.
 	Title string `json:"title,omitempty"`

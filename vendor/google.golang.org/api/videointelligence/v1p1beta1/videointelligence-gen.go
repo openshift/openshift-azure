@@ -731,16 +731,14 @@ func (s *GoogleCloudVideointelligenceV1ObjectTrackingFrame) MarshalJSON() ([]byt
 // GoogleCloudVideointelligenceV1SpeechRecognitionAlternative:
 // Alternative hypotheses (a.k.a. n-best list).
 type GoogleCloudVideointelligenceV1SpeechRecognitionAlternative struct {
-	// Confidence: The confidence estimate between 0.0 and 1.0. A higher
-	// number
+	// Confidence: Output only. The confidence estimate between 0.0 and 1.0.
+	// A higher number
 	// indicates an estimated greater likelihood that the recognized words
 	// are
-	// correct. This field is typically provided only for the top
-	// hypothesis, and
-	// only for `is_final=true` results. Clients should not rely on
-	// the
-	// `confidence` field as it is not guaranteed to be accurate or
-	// consistent.
+	// correct. This field is set only for the top alternative.
+	// This field is not guaranteed to be accurate and users should not rely
+	// on it
+	// to be always provided.
 	// The default of 0.0 is a sentinel value indicating `confidence` was
 	// not set.
 	Confidence float64 `json:"confidence,omitempty"`
@@ -749,7 +747,11 @@ type GoogleCloudVideointelligenceV1SpeechRecognitionAlternative struct {
 	// spoke.
 	Transcript string `json:"transcript,omitempty"`
 
-	// Words: A list of word-specific information for each recognized word.
+	// Words: Output only. A list of word-specific information for each
+	// recognized word.
+	// Note: When `enable_speaker_diarization` is true, you will see all the
+	// words
+	// from the beginning of the audio.
 	Words []*GoogleCloudVideointelligenceV1WordInfo `json:"words,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Confidence") to
@@ -1041,8 +1043,11 @@ type GoogleCloudVideointelligenceV1VideoAnnotationResults struct {
 	// tracked in video.
 	ObjectAnnotations []*GoogleCloudVideointelligenceV1ObjectTrackingAnnotation `json:"objectAnnotations,omitempty"`
 
-	// SegmentLabelAnnotations: Label annotations on video level or user
-	// specified segment level.
+	// Segment: Video segment on which the annotation is run.
+	Segment *GoogleCloudVideointelligenceV1VideoSegment `json:"segment,omitempty"`
+
+	// SegmentLabelAnnotations: Topical label annotations on video level or
+	// user specified segment level.
 	// There is exactly one element for each unique label.
 	SegmentLabelAnnotations []*GoogleCloudVideointelligenceV1LabelAnnotation `json:"segmentLabelAnnotations,omitempty"`
 
@@ -1050,7 +1055,7 @@ type GoogleCloudVideointelligenceV1VideoAnnotationResults struct {
 	// video segment.
 	ShotAnnotations []*GoogleCloudVideointelligenceV1VideoSegment `json:"shotAnnotations,omitempty"`
 
-	// ShotLabelAnnotations: Label annotations on shot level.
+	// ShotLabelAnnotations: Topical label annotations on shot level.
 	// There is exactly one element for each unique label.
 	ShotLabelAnnotations []*GoogleCloudVideointelligenceV1LabelAnnotation `json:"shotLabelAnnotations,omitempty"`
 
@@ -1798,16 +1803,14 @@ func (s *GoogleCloudVideointelligenceV1beta2ObjectTrackingFrame) MarshalJSON() (
 // GoogleCloudVideointelligenceV1beta2SpeechRecognitionAlternative:
 // Alternative hypotheses (a.k.a. n-best list).
 type GoogleCloudVideointelligenceV1beta2SpeechRecognitionAlternative struct {
-	// Confidence: The confidence estimate between 0.0 and 1.0. A higher
-	// number
+	// Confidence: Output only. The confidence estimate between 0.0 and 1.0.
+	// A higher number
 	// indicates an estimated greater likelihood that the recognized words
 	// are
-	// correct. This field is typically provided only for the top
-	// hypothesis, and
-	// only for `is_final=true` results. Clients should not rely on
-	// the
-	// `confidence` field as it is not guaranteed to be accurate or
-	// consistent.
+	// correct. This field is set only for the top alternative.
+	// This field is not guaranteed to be accurate and users should not rely
+	// on it
+	// to be always provided.
 	// The default of 0.0 is a sentinel value indicating `confidence` was
 	// not set.
 	Confidence float64 `json:"confidence,omitempty"`
@@ -1816,7 +1819,11 @@ type GoogleCloudVideointelligenceV1beta2SpeechRecognitionAlternative struct {
 	// spoke.
 	Transcript string `json:"transcript,omitempty"`
 
-	// Words: A list of word-specific information for each recognized word.
+	// Words: Output only. A list of word-specific information for each
+	// recognized word.
+	// Note: When `enable_speaker_diarization` is true, you will see all the
+	// words
+	// from the beginning of the audio.
 	Words []*GoogleCloudVideointelligenceV1beta2WordInfo `json:"words,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Confidence") to
@@ -2109,8 +2116,11 @@ type GoogleCloudVideointelligenceV1beta2VideoAnnotationResults struct {
 	// tracked in video.
 	ObjectAnnotations []*GoogleCloudVideointelligenceV1beta2ObjectTrackingAnnotation `json:"objectAnnotations,omitempty"`
 
-	// SegmentLabelAnnotations: Label annotations on video level or user
-	// specified segment level.
+	// Segment: Video segment on which the annotation is run.
+	Segment *GoogleCloudVideointelligenceV1beta2VideoSegment `json:"segment,omitempty"`
+
+	// SegmentLabelAnnotations: Topical label annotations on video level or
+	// user specified segment level.
 	// There is exactly one element for each unique label.
 	SegmentLabelAnnotations []*GoogleCloudVideointelligenceV1beta2LabelAnnotation `json:"segmentLabelAnnotations,omitempty"`
 
@@ -2118,7 +2128,7 @@ type GoogleCloudVideointelligenceV1beta2VideoAnnotationResults struct {
 	// video segment.
 	ShotAnnotations []*GoogleCloudVideointelligenceV1beta2VideoSegment `json:"shotAnnotations,omitempty"`
 
-	// ShotLabelAnnotations: Label annotations on shot level.
+	// ShotLabelAnnotations: Topical label annotations on shot level.
 	// There is exactly one element for each unique label.
 	ShotLabelAnnotations []*GoogleCloudVideointelligenceV1beta2LabelAnnotation `json:"shotLabelAnnotations,omitempty"`
 
@@ -3184,16 +3194,14 @@ func (s *GoogleCloudVideointelligenceV1p1beta1SpeechContext) MarshalJSON() ([]by
 // GoogleCloudVideointelligenceV1p1beta1SpeechRecognitionAlternative:
 // Alternative hypotheses (a.k.a. n-best list).
 type GoogleCloudVideointelligenceV1p1beta1SpeechRecognitionAlternative struct {
-	// Confidence: The confidence estimate between 0.0 and 1.0. A higher
-	// number
+	// Confidence: Output only. The confidence estimate between 0.0 and 1.0.
+	// A higher number
 	// indicates an estimated greater likelihood that the recognized words
 	// are
-	// correct. This field is typically provided only for the top
-	// hypothesis, and
-	// only for `is_final=true` results. Clients should not rely on
-	// the
-	// `confidence` field as it is not guaranteed to be accurate or
-	// consistent.
+	// correct. This field is set only for the top alternative.
+	// This field is not guaranteed to be accurate and users should not rely
+	// on it
+	// to be always provided.
 	// The default of 0.0 is a sentinel value indicating `confidence` was
 	// not set.
 	Confidence float64 `json:"confidence,omitempty"`
@@ -3202,7 +3210,11 @@ type GoogleCloudVideointelligenceV1p1beta1SpeechRecognitionAlternative struct {
 	// spoke.
 	Transcript string `json:"transcript,omitempty"`
 
-	// Words: A list of word-specific information for each recognized word.
+	// Words: Output only. A list of word-specific information for each
+	// recognized word.
+	// Note: When `enable_speaker_diarization` is true, you will see all the
+	// words
+	// from the beginning of the audio.
 	Words []*GoogleCloudVideointelligenceV1p1beta1WordInfo `json:"words,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Confidence") to
@@ -3641,8 +3653,11 @@ type GoogleCloudVideointelligenceV1p1beta1VideoAnnotationResults struct {
 	// tracked in video.
 	ObjectAnnotations []*GoogleCloudVideointelligenceV1p1beta1ObjectTrackingAnnotation `json:"objectAnnotations,omitempty"`
 
-	// SegmentLabelAnnotations: Label annotations on video level or user
-	// specified segment level.
+	// Segment: Video segment on which the annotation is run.
+	Segment *GoogleCloudVideointelligenceV1p1beta1VideoSegment `json:"segment,omitempty"`
+
+	// SegmentLabelAnnotations: Topical label annotations on video level or
+	// user specified segment level.
 	// There is exactly one element for each unique label.
 	SegmentLabelAnnotations []*GoogleCloudVideointelligenceV1p1beta1LabelAnnotation `json:"segmentLabelAnnotations,omitempty"`
 
@@ -3650,7 +3665,7 @@ type GoogleCloudVideointelligenceV1p1beta1VideoAnnotationResults struct {
 	// video segment.
 	ShotAnnotations []*GoogleCloudVideointelligenceV1p1beta1VideoSegment `json:"shotAnnotations,omitempty"`
 
-	// ShotLabelAnnotations: Label annotations on shot level.
+	// ShotLabelAnnotations: Topical label annotations on shot level.
 	// There is exactly one element for each unique label.
 	ShotLabelAnnotations []*GoogleCloudVideointelligenceV1p1beta1LabelAnnotation `json:"shotLabelAnnotations,omitempty"`
 
@@ -4453,16 +4468,14 @@ func (s *GoogleCloudVideointelligenceV1p2beta1ObjectTrackingFrame) MarshalJSON()
 // GoogleCloudVideointelligenceV1p2beta1SpeechRecognitionAlternative:
 // Alternative hypotheses (a.k.a. n-best list).
 type GoogleCloudVideointelligenceV1p2beta1SpeechRecognitionAlternative struct {
-	// Confidence: The confidence estimate between 0.0 and 1.0. A higher
-	// number
+	// Confidence: Output only. The confidence estimate between 0.0 and 1.0.
+	// A higher number
 	// indicates an estimated greater likelihood that the recognized words
 	// are
-	// correct. This field is typically provided only for the top
-	// hypothesis, and
-	// only for `is_final=true` results. Clients should not rely on
-	// the
-	// `confidence` field as it is not guaranteed to be accurate or
-	// consistent.
+	// correct. This field is set only for the top alternative.
+	// This field is not guaranteed to be accurate and users should not rely
+	// on it
+	// to be always provided.
 	// The default of 0.0 is a sentinel value indicating `confidence` was
 	// not set.
 	Confidence float64 `json:"confidence,omitempty"`
@@ -4471,7 +4484,11 @@ type GoogleCloudVideointelligenceV1p2beta1SpeechRecognitionAlternative struct {
 	// spoke.
 	Transcript string `json:"transcript,omitempty"`
 
-	// Words: A list of word-specific information for each recognized word.
+	// Words: Output only. A list of word-specific information for each
+	// recognized word.
+	// Note: When `enable_speaker_diarization` is true, you will see all the
+	// words
+	// from the beginning of the audio.
 	Words []*GoogleCloudVideointelligenceV1p2beta1WordInfo `json:"words,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Confidence") to
@@ -4764,8 +4781,11 @@ type GoogleCloudVideointelligenceV1p2beta1VideoAnnotationResults struct {
 	// tracked in video.
 	ObjectAnnotations []*GoogleCloudVideointelligenceV1p2beta1ObjectTrackingAnnotation `json:"objectAnnotations,omitempty"`
 
-	// SegmentLabelAnnotations: Label annotations on video level or user
-	// specified segment level.
+	// Segment: Video segment on which the annotation is run.
+	Segment *GoogleCloudVideointelligenceV1p2beta1VideoSegment `json:"segment,omitempty"`
+
+	// SegmentLabelAnnotations: Topical label annotations on video level or
+	// user specified segment level.
 	// There is exactly one element for each unique label.
 	SegmentLabelAnnotations []*GoogleCloudVideointelligenceV1p2beta1LabelAnnotation `json:"segmentLabelAnnotations,omitempty"`
 
@@ -4773,7 +4793,7 @@ type GoogleCloudVideointelligenceV1p2beta1VideoAnnotationResults struct {
 	// video segment.
 	ShotAnnotations []*GoogleCloudVideointelligenceV1p2beta1VideoSegment `json:"shotAnnotations,omitempty"`
 
-	// ShotLabelAnnotations: Label annotations on shot level.
+	// ShotLabelAnnotations: Topical label annotations on shot level.
 	// There is exactly one element for each unique label.
 	ShotLabelAnnotations []*GoogleCloudVideointelligenceV1p2beta1LabelAnnotation `json:"shotLabelAnnotations,omitempty"`
 
@@ -5618,16 +5638,14 @@ func (s *GoogleCloudVideointelligenceV1p3beta1ObjectTrackingFrame) MarshalJSON()
 // GoogleCloudVideointelligenceV1p3beta1SpeechRecognitionAlternative:
 // Alternative hypotheses (a.k.a. n-best list).
 type GoogleCloudVideointelligenceV1p3beta1SpeechRecognitionAlternative struct {
-	// Confidence: The confidence estimate between 0.0 and 1.0. A higher
-	// number
+	// Confidence: Output only. The confidence estimate between 0.0 and 1.0.
+	// A higher number
 	// indicates an estimated greater likelihood that the recognized words
 	// are
-	// correct. This field is typically provided only for the top
-	// hypothesis, and
-	// only for `is_final=true` results. Clients should not rely on
-	// the
-	// `confidence` field as it is not guaranteed to be accurate or
-	// consistent.
+	// correct. This field is set only for the top alternative.
+	// This field is not guaranteed to be accurate and users should not rely
+	// on it
+	// to be always provided.
 	// The default of 0.0 is a sentinel value indicating `confidence` was
 	// not set.
 	Confidence float64 `json:"confidence,omitempty"`
@@ -5636,7 +5654,11 @@ type GoogleCloudVideointelligenceV1p3beta1SpeechRecognitionAlternative struct {
 	// spoke.
 	Transcript string `json:"transcript,omitempty"`
 
-	// Words: A list of word-specific information for each recognized word.
+	// Words: Output only. A list of word-specific information for each
+	// recognized word.
+	// Note: When `enable_speaker_diarization` is true, you will see all the
+	// words
+	// from the beginning of the audio.
 	Words []*GoogleCloudVideointelligenceV1p3beta1WordInfo `json:"words,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Confidence") to
@@ -6121,8 +6143,11 @@ type GoogleCloudVideointelligenceV1p3beta1VideoAnnotationResults struct {
 	// tracked in video.
 	ObjectAnnotations []*GoogleCloudVideointelligenceV1p3beta1ObjectTrackingAnnotation `json:"objectAnnotations,omitempty"`
 
-	// SegmentLabelAnnotations: Label annotations on video level or user
-	// specified segment level.
+	// Segment: Video segment on which the annotation is run.
+	Segment *GoogleCloudVideointelligenceV1p3beta1VideoSegment `json:"segment,omitempty"`
+
+	// SegmentLabelAnnotations: Topical label annotations on video level or
+	// user specified segment level.
 	// There is exactly one element for each unique label.
 	SegmentLabelAnnotations []*GoogleCloudVideointelligenceV1p3beta1LabelAnnotation `json:"segmentLabelAnnotations,omitempty"`
 
@@ -6130,7 +6155,7 @@ type GoogleCloudVideointelligenceV1p3beta1VideoAnnotationResults struct {
 	// video segment.
 	ShotAnnotations []*GoogleCloudVideointelligenceV1p3beta1VideoSegment `json:"shotAnnotations,omitempty"`
 
-	// ShotLabelAnnotations: Label annotations on shot level.
+	// ShotLabelAnnotations: Topical label annotations on shot level.
 	// There is exactly one element for each unique label.
 	ShotLabelAnnotations []*GoogleCloudVideointelligenceV1p3beta1LabelAnnotation `json:"shotLabelAnnotations,omitempty"`
 
