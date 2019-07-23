@@ -55,4 +55,6 @@ fetch_origin "release-3.11"
 
 build_extended_test
 
+export KUBECONFIG=$PWD/_data/_out/admin.kubeconfig
+
 run_tests
