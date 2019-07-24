@@ -85,6 +85,7 @@ func TestReadDB(t *testing.T) {
 	cs.Config.Images.NodeExporter = ":"
 	cs.Config.Images.KubeStateMetrics = ":"
 	cs.Config.Images.KubeRbacProxy = ":"
+	cs.Config.Images.MonitorAgent = ":"
 
 	s := &sync{cs: &cs}
 	err := s.readDB()

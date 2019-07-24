@@ -11,15 +11,16 @@ import (
 )
 
 type Config struct {
-	SubscriptionID   string `envconfig:"AZURE_SUBSCRIPTION_ID" required:"true"`
-	TenantID         string `envconfig:"AZURE_TENANT_ID" required:"true"`
-	ClientID         string `envconfig:"AZURE_CLIENT_ID" required:"true"`
-	ClientSecret     string `envconfig:"AZURE_CLIENT_SECRET" required:"true"`
-	AADClientID      string `envconfig:"AZURE_AAD_CLIENT_ID"`
-	AADClientSecret  string `envconfig:"AZURE_AAD_CLIENT_SECRET"`
-	AADGroupAdminsID string `envconfig:"AZURE_AAD_GROUP_ADMINS_ID"`
-	DeployVersion    string `envconfig:"DEPLOY_VERSION" required:"true"`
-	RunningUnderTest string `envconfig:"RUNNING_UNDER_TEST"`
+	SubscriptionID      string `envconfig:"AZURE_SUBSCRIPTION_ID" required:"true"`
+	TenantID            string `envconfig:"AZURE_TENANT_ID" required:"true"`
+	ClientID            string `envconfig:"AZURE_CLIENT_ID" required:"true"`
+	ClientSecret        string `envconfig:"AZURE_CLIENT_SECRET" required:"true"`
+	AADClientID         string `envconfig:"AZURE_AAD_CLIENT_ID"`
+	AADClientSecret     string `envconfig:"AZURE_AAD_CLIENT_SECRET"`
+	AADGroupAdminsID    string `envconfig:"AZURE_AAD_GROUP_ADMINS_ID"`
+	DeployVersion       string `envconfig:"DEPLOY_VERSION" required:"true"`
+	RunningUnderTest    string `envconfig:"RUNNING_UNDER_TEST"`
+	WorkspaceResourceID string `envconfig:"AZURE_WORKSPACE_ID"`
 
 	Region        string
 	Regions       string `envconfig:"AZURE_REGIONS" required:"true"`

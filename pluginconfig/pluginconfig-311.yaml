@@ -56,6 +56,7 @@ versions:
       startup: quay.io/openshift-on-azure/azure:v5.1
       sync: quay.io/openshift-on-azure/azure:v5.1
       tlsProxy: quay.io/openshift-on-azure/azure:v5.1
+      monitorAgent: mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod07092019
   v5.2:
     imageOffer: osa
     imagePublisher: redhat
@@ -96,6 +97,7 @@ versions:
       startup: quay.io/openshift-on-azure/azure:v5.2
       sync: quay.io/openshift-on-azure/azure:v5.2
       tlsProxy: quay.io/openshift-on-azure/azure:v5.2
+      monitorAgent: mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod07092019
   v6.0:
     ## Node image and version configurables
     imageOffer: osa
@@ -137,6 +139,7 @@ versions:
       startup: quay.io/openshift-on-azure/azure:v6.0
       sync: quay.io/openshift-on-azure/azure:v6.0
       tlsProxy: quay.io/openshift-on-azure/azure:v6.0
+      monitorAgent: mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod07092019
   v7.0:
     imageOffer: osa
     imagePublisher: redhat
@@ -217,6 +220,7 @@ versions:
       startup: quay.io/openshift-on-azure/azure:latest
       sync: quay.io/openshift-on-azure/azure:latest
       tlsProxy: quay.io/openshift-on-azure/azure:latest
+      monitorAgent: mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod07092019
 ## certificates, used to authenticate to external systems
 ## Red Hat CDN client certificates
   #packageRepository:
