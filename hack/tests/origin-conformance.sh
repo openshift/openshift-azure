@@ -21,7 +21,9 @@ fetch_origin() {
 build_extended_test() {
   # build extended.tests (regular user can't write to /usr/local)
   # TODO: This will need updating once we move to 4.x
-  make -C /tmp/origin build-extended-test && mv -v /tmp/origin/_output/local/bin/linux/$(go env GOARCH)/* $(go env GOPATH)/bin/
+  mkdir -pv $(go env GOPATH)/bin
+  make -C /tmp/origin build-extended-test
+  mv -v /tmp/origin/_output/local/bin/linux/$(go env GOARCH)/* $(go env GOPATH)/bin/
 }
 
 function run_tests() {
@@ -48,8 +50,11 @@ set_build_images
 
 make create
 
+# TODO: This will need updating once we move to 4.x
 fetch_origin "release-3.11"
 
 build_extended_test
+
+export KUBECONFIG=$PWD/_data/_out/admin.kubeconfig
 
 run_tests
