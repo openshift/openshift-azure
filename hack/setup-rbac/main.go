@@ -13,6 +13,10 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/authorization"
 )
 
+const (
+	OSAContributorAddon = "9bef4004-f578-4ae8-8364-698f59f1bedc"
+)
+
 // ensureRoleDefinitions ensures that the OSA Master and OSA Worker roles are
 // correctly defined in a subscription
 func ensureRoleDefinitions(ctx context.Context, log *logrus.Entry) error {
@@ -76,6 +80,26 @@ func ensureRoleDefinitions(ctx context.Context, log *logrus.Entry) error {
 						"Microsoft.Compute/virtualMachineScaleSets/virtualMachines/read",
 						"Microsoft.Compute/virtualMachineScaleSets/virtualMachines/networkInterfaces/read",
 						"Microsoft.Storage/storageAccounts/read", // legacy: BlobDiskController?
+					},
+				},
+			},
+			AssignableScopes: &[]string{
+				"/subscriptions/" + os.Getenv("AZURE_SUBSCRIPTION_ID"),
+			},
+		},
+	})
+
+	// TODO: This needs right model to enable delete/update AAD apps for CI
+	_, err = cli.CreateOrUpdate(ctx, "/subscriptions/"+os.Getenv("AZURE_SUBSCRIPTION_ID"), OSAContributorAddon, azauthorization.RoleDefinition{
+		Name: to.StringPtr(OSAContributorAddon),
+		Properties: &azauthorization.RoleDefinitionProperties{
+			RoleName: to.StringPtr("OSA-Contributor-addon"),
+			Permissions: &[]azauthorization.Permission{
+				{
+					Actions: &[]string{
+						// Think twice before adding anything to this list:
+						// could this become a security risk?
+						"Microsoft.Authorization/locks/*",
 					},
 				},
 			},
