@@ -80,8 +80,8 @@ func createOSBAApp(ctx context.Context) (err error) {
 	return
 }
 
-var _ = Describe("Openshift on Azure end user e2e tests [CustomerAdmin][Fake][EveryPR]", func() {
-	It("should create and validate an OpenShift Broker App [CustomerAdmin][Fake][OSBA]", func() {
+var _ = Describe("Openshift on Azure end user e2e tests [CustomerAdmin][EveryPR]", func() {
+	It("should create and validate an OpenShift Broker App [CustomerAdmin][OSBA]", func() {
 		var errs []error
 		ctx := context.Background()
 		By("creating openshift broker app")

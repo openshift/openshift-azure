@@ -17,7 +17,7 @@ import (
 	"github.com/openshift/openshift-azure/test/sanity"
 )
 
-var _ = Describe("Command tests [Command][Fake][LongRunning]", func() {
+var _ = Describe("Command tests [Command][LongRunning]", func() {
 	It("should be possible for an SRE to restart system services on vms", func() {
 		vm := "master-000000"
 

@@ -76,7 +76,7 @@ unit: generate testinsights
 	go test ./... -coverprofile=coverage.out -covermode=atomic -json | ./testinsights
 
 e2e:
-	FOCUS="\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh
+	FOCUS="\[CustomerAdmin\]|\[EndUser\]" TIMEOUT=60m ./hack/e2e.sh
 
 vmimage:
 	./hack/vmimage.sh

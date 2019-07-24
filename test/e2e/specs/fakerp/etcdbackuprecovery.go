@@ -18,7 +18,7 @@ import (
 	"github.com/openshift/openshift-azure/test/sanity"
 )
 
-var _ = Describe("Etcd Recovery E2E tests [EtcdBackupRecovery][Fake][LongRunning]", func() {
+var _ = Describe("Etcd Recovery E2E tests [EtcdBackupRecovery][LongRunning]", func() {
 	const (
 		configMapName = "recovery-test-data"
 	)

@@ -23,7 +23,7 @@ import (
 	"github.com/openshift/openshift-azure/test/sanity"
 )
 
-var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fake][EveryPR]", func() {
+var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][EveryPR]", func() {
 	It("should read nodes", func() {
 		_, err := sanity.Checker.Client.CustomerAdmin.CoreV1.Nodes().Get("master-000000", metav1.GetOptions{})
 		Expect(err).ToNot(HaveOccurred())

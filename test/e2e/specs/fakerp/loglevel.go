@@ -13,7 +13,7 @@ import (
 	"github.com/openshift/openshift-azure/test/sanity"
 )
 
-var _ = Describe("Change OpenShift Component Log Level E2E tests [ChangeLogLevel][Fake][LongRunning]", func() {
+var _ = Describe("Change OpenShift Component Log Level E2E tests [ChangeLogLevel][LongRunning]", func() {
 	var (
 		ctx = context.Background()
 	)
