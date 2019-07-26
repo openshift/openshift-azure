@@ -175,12 +175,6 @@ var translations = map[string][]struct {
 			Template:   "{{ .Derived.OpenShiftVersionTag .ContainerService }}",
 		},
 	},
-	"ConfigMap/openshift-azure-logging/mdsd-config": {
-		{
-			Path:     jsonpath.MustCompile("$.data.'mdsd.xml'"),
-			Template: "{{ .Derived.MDSDConfig .ContainerService }}",
-		},
-	},
 	"ConfigMap/openshift-monitoring/cluster-monitoring-config": {
 		{
 			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
@@ -308,48 +302,6 @@ var translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
 			Template: "{{ .Config.Images.ServiceCatalog }}",
-		},
-	},
-	"DaemonSet.apps/openshift-azure-logging/mdsd": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.Images.GenevaTDAgent }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[1].image"),
-			Template: "{{ .Config.Images.GenevaLogging }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[1].env[?(@.name='SUBSCRIPTION_ID')].value"),
-			Template: "{{ .ContainerService.Properties.AzProfile.SubscriptionID }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[1].env[?(@.name='RESOURCE_GROUP_NAME')].value"),
-			Template: "{{ .ContainerService.Properties.AzProfile.ResourceGroup }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[1].env[?(@.name='RESOURCE_NAME')].value"),
-			Template: "{{ .ContainerService.Name }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[1].env[?(@.name='ACCOUNT')].value"),
-			Template: "{{ .Config.GenevaLoggingAccount }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[1].env[?(@.name='NAMESPACE')].value"),
-			Template: "{{ .Config.GenevaLoggingNamespace }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[1].env[?(@.name='MONITORING_GCS_ACCOUNT')].value"),
-			Template: "{{ .Config.GenevaLoggingControlPlaneAccount }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[1].env[?(@.name='MONITORING_GCS_ENVIRONMENT')].value"),
-			Template: "{{ .Config.GenevaLoggingControlPlaneEnvironment }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[1].env[?(@.name='MONITORING_GCS_REGION')].value"),
-			Template: "{{ .Config.GenevaLoggingControlPlaneRegion }}",
 		},
 	},
 	"DaemonSet.apps/openshift-template-service-broker/apiserver": {
@@ -575,22 +527,6 @@ var translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'.dockerconfigjson'"),
 			Template: "{{ String .Config.Images.ImagePullSecret }}",
-		},
-	},
-	"Secret/openshift-azure-logging/gcs-cert": {
-		{
-			Path:     jsonpath.MustCompile("$.stringData.'gcscert.pem'"),
-			Template: "{{ String (CertAsBytes .Config.Certificates.GenevaLogging.Cert) }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.stringData.'gcskey.pem'"),
-			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.GenevaLogging.Key) }}",
-		},
-	},
-	"Secret/openshift-azure-logging/azure-registry": {
-		{
-			Path:     jsonpath.MustCompile("$.stringData.'.dockerconfigjson'"),
-			Template: "{{ String .Config.Images.GenevaImagePullSecret }}",
 		},
 	},
 	"Secret/openshift-azure-monitoring/azure-registry": {

@@ -34,6 +34,7 @@ type startup struct {
 	testConfig api.TestConfig
 }
 
+// New returns a new startup entrypoint
 func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) *startup {
 	return &startup{log: log, cs: cs, testConfig: testConfig}
 }
@@ -101,48 +102,73 @@ func (s *startup) Hash(role api.AgentPoolProfileRole) ([]byte, error) {
 func (s *startup) writeFiles(role api.AgentPoolProfileRole, w writers.Writer, hostname, domainname string) error {
 	assetNames := AssetNames()
 	sort.Strings(assetNames)
+	var filesToWrite = map[string]string{}
+	var fileKeys = []string{}
 
+	// load all files into a map, common/ will be first (as it is sorted) and later
+	// role-specific files will overwrite the common ones
 	for _, filepath := range assetNames {
 		var tmpl string
 
-		switch role {
-		case api.AgentPoolProfileRoleMaster:
-			if !strings.HasPrefix(filepath, "master/") {
-				continue
-			}
-
+		if strings.HasPrefix(filepath, "common/") {
 			b, err := Asset(filepath)
 			if err != nil {
 				return err
 			}
-			tmpl = string(b)
 
-			filepath = strings.TrimPrefix(filepath, "master")
+			filepath = strings.TrimPrefix(filepath, "common")
 
-		default:
-			if !strings.HasPrefix(filepath, "worker/") {
-				continue
+			filesToWrite[filepath] = string(b)
+
+		} else {
+
+			switch role {
+			case api.AgentPoolProfileRoleMaster:
+				if !strings.HasPrefix(filepath, "master/") {
+					continue
+				}
+
+				b, err := Asset(filepath)
+				if err != nil {
+					return err
+				}
+				tmpl = string(b)
+
+				filepath = strings.TrimPrefix(filepath, "master")
+
+			default:
+				if !strings.HasPrefix(filepath, "worker/") {
+					continue
+				}
+
+				b, err := Asset(filepath)
+				if err != nil {
+					return err
+				}
+				tmpl = string(b)
+
+				filepath = strings.TrimPrefix(filepath, "worker")
 			}
 
-			b, err := Asset(filepath)
-			if err != nil {
-				return err
-			}
-			tmpl = string(b)
-
-			filepath = strings.TrimPrefix(filepath, "worker")
+			filesToWrite[filepath] = tmpl
+			fileKeys = append(fileKeys, filepath)
 		}
+	}
 
-		b, err := template.Template(filepath, tmpl, map[string]interface{}{
-			"Deref": func(pi *int) int { return *pi },
-		}, map[string]interface{}{
-			"ContainerService": s.cs,
-			"Config":           &s.cs.Config,
-			"Derived":          derived,
-			"Role":             role,
-			"Hostname":         hostname,
-			"DomainName":       domainname,
-		})
+	// write the final map file to disk using fileKeys slice to guarantee order
+	for _, filepath := range fileKeys {
+		var tmpl = filesToWrite[filepath]
+		b, err := template.Template(filepath, tmpl,
+			map[string]interface{}{
+				"Deref": func(pi *int) int { return *pi },
+			}, map[string]interface{}{
+				"ContainerService": s.cs,
+				"Config":           &s.cs.Config,
+				"Derived":          derived,
+				"Role":             role,
+				"Hostname":         hostname,
+				"DomainName":       domainname,
+			})
 		if err != nil {
 			return err
 		}
