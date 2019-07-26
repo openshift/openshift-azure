@@ -3,6 +3,7 @@ package template
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/xml"
 	"strconv"
 	"strings"
 	"text/template"
@@ -28,6 +29,11 @@ func Template(name, tmpl string, f template.FuncMap, data interface{}) ([]byte, 
 			return replacer.Replace(b)
 		},
 		"StringsJoin": strings.Join,
+		"XMLEscape": func(s string) (string, error) {
+			var b bytes.Buffer
+			err := xml.EscapeText(&b, []byte(s))
+			return b.String(), err
+		},
 	}).Funcs(f).Parse(tmpl)
 	if err != nil {
 		return nil, err

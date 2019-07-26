@@ -43,6 +43,12 @@ sslcacert=/etc/rhsm/ca/redhat-uep.pem
 sslclientcert=/var/lib/yum/client-cert.pem
 sslclientkey=/var/lib/yum/client-key.pem
 enabled=yes
+
+[azurecore]
+name=azurecore
+baseurl=https://packages.microsoft.com/yumrepos/azurecore
+enabled=yes
+gpgcheck=no
 EOF
 
 logger -t master-startup.sh "installing ARO security updates [{{ StringsJoin .Config.SecurityPatchPackages ", " }}] on $(hostname)"
@@ -166,6 +172,11 @@ mkdir -m 0750 -p /var/lib/origin/openshift.local.volumes
 # disabling rsyslog since we manage everything through journald
 systemctl disable rsyslog.service
 systemctl stop rsyslog.service
+
+# setting up geneva logging stack
+systemctl unmask mdsd.service azsecd.service azsecmond.service
+systemctl enable mdsd.service azsecd.service azsecmond.service
+systemctl start mdsd.service azsecd.service azsecmond.service
 
 # note: atomic-openshift-node crash loops until master is up
 systemctl enable atomic-openshift-node.service

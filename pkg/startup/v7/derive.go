@@ -27,17 +27,16 @@ func (derivedType) SystemReserved(cs *api.OpenShiftManagedCluster, role api.Agen
 		if isSmallVM(app.VMSize) {
 			if role == api.AgentPoolProfileRoleMaster {
 				return "cpu=500m,memory=1Gi", nil
-			} else {
-				return "cpu=200m,memory=512Mi", nil
 			}
 
-		} else {
-			if role == api.AgentPoolProfileRoleMaster {
-				return "cpu=1000m,memory=1Gi", nil
-			} else {
-				return "cpu=500m,memory=512Mi", nil
-			}
+			return "cpu=200m,memory=512Mi", nil
 		}
+
+		if role == api.AgentPoolProfileRoleMaster {
+			return "cpu=1000m,memory=1Gi", nil
+		}
+
+		return "cpu=500m,memory=512Mi", nil
 	}
 
 	return "", fmt.Errorf("role %s not found", role)
