@@ -1,8 +1,8 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhdm: "1.1"
-  template: rhdm73-authoring
+  rhdm: "1.0"
+  template: rhdm74-authoring
 message: |-
   A new persistent Decision Manager application has been created in your project.
   The username/password for accessing the Decision Central interface is
@@ -20,21 +20,21 @@ message: |-
 metadata:
   annotations:
     description: Application template for a non-HA persistent authoring environment,
-      for Red Hat Decision Manager 7.3
+      for Red Hat Decision Manager 7.4
     iconClass: icon-jboss
-    openshift.io/display-name: Red Hat Decision Manager 7.3 authoring environment
+    openshift.io/display-name: Red Hat Decision Manager 7.4 authoring environment
       (non-HA, persistent, with https)
     openshift.io/provider-display-name: Red Hat, Inc.
     tags: rhdm,decisionserver,jboss,authoring
     template.openshift.io/bindable: "false"
-    template.openshift.io/documentation-url: https://access.redhat.com/documentation/en-us/red_hat_decision_manager/7.3/html/deploying_a_red_hat_decision_manager_7.3_authoring_environment_on_red_hat_openshift_container_platform/
+    template.openshift.io/documentation-url: https://access.redhat.com/documentation/en-us/red_hat_decision_manager/7.4/html/deploying_a_red_hat_decision_manager_7.4_authoring_environment_on_red_hat_openshift_container_platform/
     template.openshift.io/long-description: This template defines resources needed
-      to develop and execute Rules on Red Hat Decision Manager 7.3, including application
+      to develop and execute Rules on Red Hat Decision Manager 7.4, including application
       deployment configuration, secure and insecure http communication and a persistent
       volume to store data that needs to survive to a restart.
     template.openshift.io/support-url: https://access.redhat.com
-    version: "1.1"
-  name: rhdm73-authoring
+    version: "1.0"
+  name: rhdm74-authoring
   namespace: openshift
 objects:
 - apiVersion: v1
@@ -48,9 +48,9 @@ objects:
   metadata:
     labels:
       application: ${APPLICATION_NAME}
-    name: ${APPLICATION_NAME}-rhdmsvc-view
+    name: ${APPLICATION_NAME}-rhdmsvc-edit
   roleRef:
-    name: view
+    name: edit
   subjects:
   - kind: ServiceAccount
     name: ${APPLICATION_NAME}-rhdmsvc
@@ -95,8 +95,12 @@ objects:
       targetPort: 8443
     selector:
       deploymentConfig: ${APPLICATION_NAME}-kieserver
+    sessionAffinity: ClientIP
+    sessionAffinityConfig:
+      clientIP:
+        timeoutSeconds: 3600
 - apiVersion: v1
-  id: ${APPLICATION_NAME}-rhdmcentr-http
+  id: insecure-${APPLICATION_NAME}-rhdmcentr-http
   kind: Route
   metadata:
     annotations:
@@ -105,7 +109,7 @@ objects:
     labels:
       application: ${APPLICATION_NAME}
       service: ${APPLICATION_NAME}-rhdmcentr
-    name: ${APPLICATION_NAME}-rhdmcentr
+    name: insecure-${APPLICATION_NAME}-rhdmcentr
   spec:
     host: ${DECISION_CENTRAL_HOSTNAME_HTTP}
     port:
@@ -122,7 +126,7 @@ objects:
     labels:
       application: ${APPLICATION_NAME}
       service: ${APPLICATION_NAME}-rhdmcentr
-    name: secure-${APPLICATION_NAME}-rhdmcentr
+    name: ${APPLICATION_NAME}-rhdmcentr
   spec:
     host: ${DECISION_CENTRAL_HOSTNAME_HTTPS}
     port:
@@ -132,15 +136,16 @@ objects:
     to:
       name: ${APPLICATION_NAME}-rhdmcentr
 - apiVersion: v1
-  id: ${APPLICATION_NAME}-kieserver-http
+  id: insecure-${APPLICATION_NAME}-kieserver-http
   kind: Route
   metadata:
     annotations:
       description: Route for KIE server's http service.
+      haproxy.router.openshift.io/balance: source
     labels:
       application: ${APPLICATION_NAME}
       service: ${APPLICATION_NAME}-kieserver
-    name: ${APPLICATION_NAME}-kieserver
+    name: insecure-${APPLICATION_NAME}-kieserver
   spec:
     host: ${KIE_SERVER_HOSTNAME_HTTP}
     port:
@@ -156,7 +161,7 @@ objects:
     labels:
       application: ${APPLICATION_NAME}
       service: ${APPLICATION_NAME}-kieserver
-    name: secure-${APPLICATION_NAME}-kieserver
+    name: ${APPLICATION_NAME}-kieserver
   spec:
     host: ${KIE_SERVER_HOSTNAME_HTTPS}
     port:
@@ -196,6 +201,14 @@ objects:
             value: ${KIE_ADMIN_PWD}
           - name: KIE_MBEANS
             value: ${KIE_MBEANS}
+          - name: KIE_SERVER_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED
+            value: ${KIE_SERVER_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED}
+          - name: KIE_SERVER_CONTROLLER_OPENSHIFT_PREFER_KIESERVER_SERVICE
+            value: ${KIE_SERVER_CONTROLLER_OPENSHIFT_PREFER_KIESERVER_SERVICE}
+          - name: KIE_SERVER_CONTROLLER_TEMPLATE_CACHE_TTL
+            value: ${KIE_SERVER_CONTROLLER_TEMPLATE_CACHE_TTL}
+          - name: KIE_WORKBENCH_CONTROLLER_OPENSHIFT_ENABLED
+            value: "true"
           - name: KIE_SERVER_CONTROLLER_USER
             value: ${KIE_SERVER_CONTROLLER_USER}
           - name: KIE_SERVER_CONTROLLER_PWD
@@ -300,14 +313,13 @@ objects:
             value: ${AUTH_ROLE_MAPPER_ROLES_PROPERTIES}
           - name: AUTH_ROLE_MAPPER_REPLACE_ROLE
             value: ${AUTH_ROLE_MAPPER_REPLACE_ROLE}
-          image: rhdm73-decisioncentral-openshift
+          image: rhdm74-decisioncentral-openshift
           imagePullPolicy: Always
           livenessProbe:
-            exec:
-              command:
-              - /bin/bash
-              - -c
-              - curl --fail --silent -u '${KIE_ADMIN_USER}:${KIE_ADMIN_PWD}' http://localhost:8080/kie-wb.jsp
+            httpGet:
+              path: /rest/healthy
+              port: 8080
+              scheme: HTTP
             initialDelaySeconds: 180
             periodSeconds: 15
             timeoutSeconds: 2
@@ -326,12 +338,11 @@ objects:
             name: git-ssh
             protocol: TCP
           readinessProbe:
-            exec:
-              command:
-              - /bin/bash
-              - -c
-              - curl --fail --silent -u '${KIE_ADMIN_USER}:${KIE_ADMIN_PWD}' http://localhost:8080/kie-wb.jsp
             failureThreshold: 6
+            httpGet:
+              path: /rest/ready
+              port: 8080
+              scheme: HTTP
             initialDelaySeconds: 60
             periodSeconds: 30
             timeoutSeconds: 2
@@ -342,7 +353,7 @@ objects:
           - mountPath: /etc/decisioncentral-secret-volume
             name: decisioncentral-keystore-volume
             readOnly: true
-          - mountPath: /opt/eap/standalone/data/kie
+          - mountPath: /opt/kie/data
             name: ${APPLICATION_NAME}-rhdmcentr-pvol
         serviceAccountName: ${APPLICATION_NAME}-rhdmsvc
         terminationGracePeriodSeconds: 60
@@ -360,7 +371,7 @@ objects:
         - ${APPLICATION_NAME}-rhdmcentr
         from:
           kind: ImageStreamTag
-          name: rhdm73-decisioncentral-openshift:${IMAGE_STREAM_TAG}
+          name: rhdm74-decisioncentral-openshift:${IMAGE_STREAM_TAG}
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: ImageChange
     - type: ConfigChange
@@ -372,23 +383,31 @@ objects:
     labels:
       application: ${APPLICATION_NAME}
       service: ${APPLICATION_NAME}-kieserver
+      services.server.kie.org/kie-server-id: ${APPLICATION_NAME}-kieserver
     name: ${APPLICATION_NAME}-kieserver
   spec:
     replicas: 1
+    revisionHistoryLimit: 10
     selector:
       deploymentConfig: ${APPLICATION_NAME}-kieserver
     strategy:
-      type: Recreate
+      rollingParams:
+        maxSurge: 100%
+        maxUnavailable: 0
+      type: Rolling
     template:
       metadata:
         labels:
           application: ${APPLICATION_NAME}
           deploymentConfig: ${APPLICATION_NAME}-kieserver
           service: ${APPLICATION_NAME}-kieserver
+          services.server.kie.org/kie-server-id: ${APPLICATION_NAME}-kieserver
         name: ${APPLICATION_NAME}-kieserver
       spec:
         containers:
         - env:
+          - name: WORKBENCH_SERVICE_NAME
+            value: ${APPLICATION_NAME}-rhdmcentr
           - name: KIE_ADMIN_USER
             value: ${KIE_ADMIN_USER}
           - name: KIE_ADMIN_PWD
@@ -399,24 +418,18 @@ objects:
             value: ${KIE_MBEANS}
           - name: DROOLS_SERVER_FILTER_CLASSES
             value: ${DROOLS_SERVER_FILTER_CLASSES}
+          - name: PROMETHEUS_SERVER_EXT_DISABLED
+            value: ${PROMETHEUS_SERVER_EXT_DISABLED}
           - name: KIE_SERVER_BYPASS_AUTH_USER
             value: ${KIE_SERVER_BYPASS_AUTH_USER}
-          - name: KIE_SERVER_CONTROLLER_USER
-            value: ${KIE_SERVER_CONTROLLER_USER}
-          - name: KIE_SERVER_CONTROLLER_PWD
-            value: ${KIE_SERVER_CONTROLLER_PWD}
-          - name: KIE_SERVER_CONTROLLER_TOKEN
-            value: ${KIE_SERVER_CONTROLLER_TOKEN}
-          - name: KIE_SERVER_CONTROLLER_SERVICE
-            value: ${APPLICATION_NAME}-rhdmcentr
-          - name: KIE_SERVER_CONTROLLER_PROTOCOL
-            value: ws
           - name: KIE_SERVER_ID
-            value: ${APPLICATION_NAME}-kieserver
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['services.server.kie.org/kie-server-id']
           - name: KIE_SERVER_ROUTE_NAME
             value: ${APPLICATION_NAME}-kieserver
-          - name: KIE_SERVER_USE_SECURE_ROUTE_NAME
-            value: ${KIE_SERVER_USE_SECURE_ROUTE_NAME}
+          - name: KIE_SERVER_STARTUP_STRATEGY
+            value: OpenShiftStartupStrategy
           - name: KIE_SERVER_USER
             value: ${KIE_SERVER_USER}
           - name: KIE_SERVER_PWD
@@ -523,13 +536,23 @@ objects:
             value: ${AUTH_ROLE_MAPPER_REPLACE_ROLE}
           image: ${KIE_SERVER_IMAGE_STREAM_NAME}
           imagePullPolicy: Always
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                - /bin/sh
+                - /opt/eap/bin/launch/jboss-kie-kieserver-hooks.sh
+            preStop:
+              exec:
+                command:
+                - /bin/sh
+                - /opt/eap/bin/launch/jboss-kie-kieserver-hooks.sh
           livenessProbe:
-            exec:
-              command:
-              - /bin/bash
-              - -c
-              - curl --fail --silent -u '${KIE_ADMIN_USER}:${KIE_ADMIN_PWD}' http://localhost:8080/services/rest/server/healthcheck
             failureThreshold: 3
+            httpGet:
+              path: /services/rest/server/healthcheck
+              port: 8080
+              scheme: HTTP
             initialDelaySeconds: 180
             periodSeconds: 15
             timeoutSeconds: 2
@@ -545,12 +568,11 @@ objects:
             name: https
             protocol: TCP
           readinessProbe:
-            exec:
-              command:
-              - /bin/bash
-              - -c
-              - curl --fail --silent -u '${KIE_ADMIN_USER}:${KIE_ADMIN_PWD}' http://localhost:8080/services/rest/server/readycheck
             failureThreshold: 6
+            httpGet:
+              path: /services/rest/server/readycheck
+              port: 8080
+              scheme: HTTP
             initialDelaySeconds: 60
             periodSeconds: 30
             timeoutSeconds: 2
@@ -562,7 +584,7 @@ objects:
             name: kieserver-keystore-volume
             readOnly: true
         serviceAccountName: ${APPLICATION_NAME}-rhdmsvc
-        terminationGracePeriodSeconds: 60
+        terminationGracePeriodSeconds: 90
         volumes:
         - name: kieserver-keystore-volume
           secret:
@@ -652,30 +674,26 @@ parameters:
   displayName: Drools Server Filter Classes
   name: DROOLS_SERVER_FILTER_CLASSES
   value: "true"
+- description: If set to false, the prometheus server extension will be enabled. (Sets
+    the org.kie.prometheus.server.ext.disabled system property)
+  displayName: Prometheus Server Extension Disabled
+  name: PROMETHEUS_SERVER_EXT_DISABLED
 - description: 'Custom hostname for http service route for Decision Central. Leave
-    blank for default hostname, e.g.: <application-name>-rhdmcentr-<project>.<default-domain-suffix>'
+    blank for default hostname, e.g.: insecure-<application-name>-rhdmcentr-<project>.<default-domain-suffix>'
   displayName: Decision Central Custom http Route Hostname
   name: DECISION_CENTRAL_HOSTNAME_HTTP
 - description: 'Custom hostname for https service route for Decision Central.  Leave
-    blank for default hostname, e.g.: secure-<application-name>-rhdmcentr-<project>.<default-domain-suffix>'
+    blank for default hostname, e.g.: <application-name>-rhdmcentr-<project>.<default-domain-suffix>'
   displayName: Decision Central Custom https Route Hostname
   name: DECISION_CENTRAL_HOSTNAME_HTTPS
 - description: 'Custom hostname for http service route for KIE Server. Leave blank
-    for default hostname, e.g.: <application-name>-kieserver-<project>.<default-domain-suffix>'
+    for default hostname, e.g.: insecure-<application-name>-kieserver-<project>.<default-domain-suffix>'
   displayName: KIE Server Custom http Route Hostname
   name: KIE_SERVER_HOSTNAME_HTTP
 - description: 'Custom hostname for https service route for KIE Server.  Leave blank
-    for default hostname, e.g.: secure-<application-name>-kieserver-<project>.<default-domain-suffix>'
+    for default hostname, e.g.: <application-name>-kieserver-<project>.<default-domain-suffix>'
   displayName: KIE Server Custom https Route Hostname
   name: KIE_SERVER_HOSTNAME_HTTPS
-- description: If true, the KIE server will use secure-<application-name>-kieserver
-    vs. <application-name>-kieserver as the KIE server route endpoint for Decision
-    Central to report. Therefore, Decision Central displays the secure link to the
-    user.
-  displayName: Use the secure route name to link application requests to KIE_SERVER_HOSTNAME_HTTPS
-    vs KIE_SERVER_HOSTNAME_HTTP.
-  name: KIE_SERVER_USE_SECURE_ROUTE_NAME
-  value: "false"
 - description: The name of the secret containing the keystore file for Decision Central.
   displayName: Decision Central Server Keystore Secret Name
   name: DECISION_CENTRAL_HTTPS_SECRET
@@ -708,6 +726,23 @@ parameters:
   displayName: KIE Server Keystore Password
   name: KIE_SERVER_HTTPS_PASSWORD
   value: mykeystorepass
+- description: If set to true, turns on KIE server global discovery feature (Sets
+    the org.kie.server.controller.openshift.global.discovery.enabled system property)
+  displayName: Enable KIE server global discovery
+  name: KIE_SERVER_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED
+  value: "false"
+- description: If OpenShift integration of Business Central is turned on, setting
+    this parameter to true enables connection to KIE Server via an OpenShift internal
+    Service endpoint. (Sets the org.kie.server.controller.openshift.prefer.kieserver.service
+    system property)
+  displayName: Prefer KIE Server OpenShift Service
+  name: KIE_SERVER_CONTROLLER_OPENSHIFT_PREFER_KIESERVER_SERVICE
+  value: "true"
+- description: KIE ServerTemplate Cache TTL in milliseconds. (Sets the org.kie.server.controller.template.cache.ttl
+    system property)
+  displayName: KIE ServerTemplate Cache TTL
+  name: KIE_SERVER_CONTROLLER_TEMPLATE_CACHE_TTL
+  value: "60000"
 - description: Namespace in which the ImageStreams for Red Hat Middleware images are
     installed. These ImageStreams are normally installed in the openshift namespace.
     You should only need to modify this if you installed the ImageStreams in a different
@@ -716,16 +751,16 @@ parameters:
   name: IMAGE_STREAM_NAMESPACE
   required: true
   value: openshift
-- description: The name of the image stream to use for KIE server. Default is "rhdm73-kieserver-openshift".
+- description: The name of the image stream to use for KIE server. Default is "rhdm74-kieserver-openshift".
   displayName: KIE Server ImageStream Name
   name: KIE_SERVER_IMAGE_STREAM_NAME
   required: true
-  value: rhdm73-kieserver-openshift
-- description: A named pointer to an image in an image stream. Default is "1.1".
+  value: rhdm74-kieserver-openshift
+- description: A named pointer to an image in an image stream. Default is "1.0".
   displayName: ImageStream Tag
   name: IMAGE_STREAM_TAG
   required: true
-  value: "1.1"
+  value: "1.0"
 - description: Maven mirror that Decision Central and KIE server must use. If you
     configure a mirror, this mirror must contain all artifacts that are required for
     building and deploying your services.
