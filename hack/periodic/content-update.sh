@@ -16,7 +16,7 @@ git reset HEAD^
 curl -u openshift-azure-robot:$GITHUB_TOKEN -H "Content-Type:application/json" -d @- -so /dev/null https://api.github.com/repos/openshift/openshift-azure/pulls <<'EOF'
 {
     "title": "Content update",
-    "body": "```release-note\r\nNONE\r\n```",
+    "body": "```release-notes\r\nNONE\r\n```",
     "head": "openshift-azure-robot:content-update",
     "base": "master"
 }
