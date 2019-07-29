@@ -1,8 +1,10 @@
 package validate
 
 import (
+	"fmt"
 	"net"
 	"testing"
+	"time"
 )
 
 func TestValidateImageVersion(t *testing.T) {
@@ -287,14 +289,11 @@ func TestIsValidAgentPoolHostname(t *testing.T) {
 	}
 }
 
-func TestIsValidBlobContainerName(t *testing.T) {
+func TestIsValidBlobName(t *testing.T) {
 	for _, tt := range []struct {
 		name  string
 		valid bool
 	}{
-		{
-			name: "12",
-		},
 		{
 			name:  "123",
 			valid: true,
@@ -308,29 +307,45 @@ func TestIsValidBlobContainerName(t *testing.T) {
 			valid: true,
 		},
 		{
-			name:  "123456789012345678901234567890123456789012345678901234567890123",
+			name:  "Good",
 			valid: true,
 		},
 		{
-			name: "1234567890123456789012345678901234567890123456789012345678901234",
+			name: "bad.",
 		},
 		{
-			name: "bad!",
+			name: "bad/",
 		},
 		{
-			name: "Bad",
+			name: "",
 		},
 		{
-			name: "-bad",
+			name: "ba./d",
 		},
 		{
-			name: "bad-",
+			name: "b/.ad",
 		},
 		{
-			name: "bad--bad",
+			name: "\\bad\\",
+		},
+		{
+			name: "1%",
+		},
+		{
+			name: "\bad",
+		},
+		{
+			name: "foo/c{/}.jpg",
+		},
+		{
+			name: "ba da",
+		},
+		{
+			name:  fmt.Sprintf("backup%s", time.Now().UTC().Format("2006-01-02T15-04-05")),
+			valid: true,
 		},
 	} {
-		valid := IsValidBlobContainerName(tt.name)
+		valid := IsValidBlobName(tt.name)
 		if valid != tt.valid {
 			t.Errorf("%s: wanted valid %v, got %v", tt.name, tt.valid, valid)
 		}

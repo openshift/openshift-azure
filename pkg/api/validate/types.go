@@ -1,7 +1,9 @@
 package validate
 
 import (
+	"fmt"
 	"net"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -34,8 +36,6 @@ var (
 
 	// This regexp is to guard against InvalidDomainNameLabel for hostname validation
 	rxCloudDomainLabel = regexp.MustCompile(`^[a-z][a-z0-9-]{1,61}[a-z0-9]\.`)
-
-	rxBlobContainerName = regexp.MustCompile(`^[a-z0-9-]{3,63}$`)
 
 	// This regexp is to check image version format
 	rxImageVersion = regexp.MustCompile(`^[0-9]{3}.[0-9]{1,4}.[0-9]{8}$`)
@@ -150,16 +150,24 @@ func isValidIPV4CIDR(cidr string) bool {
 	return true
 }
 
-func IsValidBlobContainerName(c string) bool {
+func IsValidBlobName(c string) bool {
 	// https://docs.microsoft.com/en-us/rest/api/storageservices/naming-and-referencing-containers--blobs--and-metadata
-	if !rxBlobContainerName.MatchString(c) {
+	if len(c) < 1 || len(c) > 1024 {
 		return false
 	}
-
-	if strings.Trim(c, "-") != c || strings.Contains(c, "--") {
+	if strings.HasSuffix(c, ".") || strings.HasSuffix(c, "/") {
 		return false
 	}
-
+	if strings.Contains(c, "./") || strings.Contains(c, "/.") {
+		return false
+	}
+	u, err := url.Parse(fmt.Sprintf("http://example.com/%s", c))
+	if err != nil {
+		return false
+	}
+	if u.EscapedPath() != "/"+c {
+		return false
+	}
 	return true
 }
 

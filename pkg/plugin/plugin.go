@@ -184,7 +184,8 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 	}
 
 	p.log.Info("running CreateOrUpdate")
-	if err := p.CreateOrUpdate(ctx, cs, true, deployFn); err != nil {
+	// note: do not backupEtcd as we are recovering from a backup - doesn't make sense
+	if err := p.createOrUpdateExt(ctx, cs, updateTypeNormal, deployFn, false); err != nil {
 		return err
 	}
 	return nil
@@ -198,17 +199,25 @@ const (
 
 func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, deployFn api.DeployFn) *api.PluginError {
 	if isUpdate {
-		return p.createOrUpdateExt(ctx, cs, updateTypeNormal, deployFn)
+		return p.createOrUpdateExt(ctx, cs, updateTypeNormal, deployFn, true)
 	}
-	return p.createOrUpdateExt(ctx, cs, updateTypeCreate, deployFn)
+	return p.createOrUpdateExt(ctx, cs, updateTypeCreate, deployFn, false)
 }
 
-func (p *plugin) createOrUpdateExt(ctx context.Context, cs *api.OpenShiftManagedCluster, updateType int, deployFn api.DeployFn) *api.PluginError {
+func (p *plugin) createOrUpdateExt(ctx context.Context, cs *api.OpenShiftManagedCluster, updateType int, deployFn api.DeployFn, backupEtcd bool) *api.PluginError {
 	suffix := fmt.Sprintf("%d", p.now().Unix())
 
 	isUpdate := true
 	if updateType == updateTypeCreate {
 		isUpdate = false
+	}
+
+	if backupEtcd && isUpdate {
+		path := fmt.Sprintf("pre-update-%s", time.Now().UTC().Format("2006-01-02T15-04-05"))
+		err := p.BackupEtcdCluster(ctx, cs, path)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepEtcdBackup}
+		}
 	}
 
 	p.log.Info("creating clients")
@@ -351,7 +360,7 @@ func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftMana
 	}
 
 	p.log.Info("running CreateOrUpdate")
-	if err := p.createOrUpdateExt(ctx, cs, updateTypeNormal, deployFn); err != nil {
+	if err := p.createOrUpdateExt(ctx, cs, updateTypeNormal, deployFn, false); err != nil {
 		return err
 	}
 	return nil
@@ -375,7 +384,7 @@ func (p *plugin) RotateClusterCertificates(ctx context.Context, cs *api.OpenShif
 	}
 
 	p.log.Info("running CreateOrUpdate")
-	if err := p.createOrUpdateExt(ctx, cs, updateTypeMasterFast, deployFn); err != nil {
+	if err := p.createOrUpdateExt(ctx, cs, updateTypeMasterFast, deployFn, false); err != nil {
 		return err
 	}
 	return nil
@@ -403,7 +412,7 @@ func (p *plugin) RotateClusterCertificatesAndSecrets(ctx context.Context, cs *ap
 	}
 
 	p.log.Info("running CreateOrUpdate")
-	if err := p.createOrUpdateExt(ctx, cs, updateTypeMasterFast, deployFn); err != nil {
+	if err := p.createOrUpdateExt(ctx, cs, updateTypeMasterFast, deployFn, false); err != nil {
 		return err
 	}
 	return nil
@@ -494,7 +503,7 @@ func (p *plugin) Reimage(ctx context.Context, cs *api.OpenShiftManagedCluster, h
 }
 
 func (p *plugin) BackupEtcdCluster(ctx context.Context, cs *api.OpenShiftManagedCluster, backupName string) error {
-	if !validate.IsValidBlobContainerName(backupName) { // no valid blob name is an invalid kubernetes name
+	if !validate.IsValidBlobName(backupName) {
 		return fmt.Errorf("invalid backup name %q", backupName)
 	}
 

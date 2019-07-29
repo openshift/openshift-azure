@@ -77,6 +77,7 @@ func TestCreateOrUpdate(t *testing.T) {
 			clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
 			if tt.isUpdate {
 				var c *gomock.Call
+				clusterUpgrader.EXPECT().BackupCluster(nil, gomock.Any())
 				expectUpdate(cs, clusterUpgrader, &c)
 			} else {
 				c := clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil).Return(nil)
@@ -238,6 +239,7 @@ func TestForceUpdate(t *testing.T) {
 	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
 
 	c := clusterUpgrader.EXPECT().ResetUpdateBlob().Return(nil)
+	c = clusterUpgrader.EXPECT().BackupCluster(nil, gomock.Any()).After(c)
 	expectUpdate(cs, clusterUpgrader, &c)
 
 	p := &plugin{

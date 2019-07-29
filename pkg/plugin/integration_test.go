@@ -20,6 +20,8 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
 	appsv1 "k8s.io/api/apps/v1"
+	batchv1 "k8s.io/api/batch/v1"
+	batchv1b1 "k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -272,7 +274,48 @@ func setupNewCluster(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftMa
 				},
 			},
 		}
+
 		return true, node, nil
+	})
+	cli.PrependReactor("get", "cronjobs", func(action k8stesting.Action) (bool, runtime.Object, error) {
+		get := action.(k8stesting.GetAction)
+		cronjob := &batchv1b1.CronJob{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      get.GetName(),
+				Namespace: get.GetNamespace(),
+			},
+			Spec: batchv1b1.CronJobSpec{
+				JobTemplate: batchv1b1.JobTemplateSpec{
+					Spec: batchv1.JobSpec{
+						BackoffLimit: to.Int32Ptr(4),
+						Template: corev1.PodTemplateSpec{
+							Spec: corev1.PodSpec{
+								Containers: []corev1.Container{{}},
+							},
+						},
+					},
+				},
+			},
+		}
+		return true, cronjob, nil
+	})
+	cli.PrependReactor("get", "jobs", func(action k8stesting.Action) (bool, runtime.Object, error) {
+		get := action.(k8stesting.GetAction)
+		job := &batchv1.Job{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      get.GetName(),
+				Namespace: get.GetNamespace(),
+			},
+			Status: batchv1.JobStatus{
+				Conditions: []batchv1.JobCondition{
+					{
+						Type:   batchv1.JobComplete,
+						Status: corev1.ConditionTrue,
+					},
+				},
+			},
+		}
+		return true, job, nil
 	})
 
 	cli.AddProxyReactor("services", func(action k8stesting.Action) (handled bool, ret restclient.ResponseWrapper, err error) {

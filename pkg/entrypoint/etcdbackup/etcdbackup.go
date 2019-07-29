@@ -10,6 +10,7 @@ import (
 	"github.com/coreos/etcd/pkg/transport"
 	"github.com/sirupsen/logrus"
 
+	"github.com/openshift/openshift-azure/pkg/api/validate"
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/etcdbackup"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
@@ -69,6 +70,10 @@ func start(cfg *cmdConfig) error {
 		if len(cfg.blobName) > 0 {
 			path = cfg.blobName
 		}
+		if !validate.IsValidBlobName(path) {
+			return fmt.Errorf("bad backup blob name %s", path)
+		}
+
 		log.Infof("backing up etcd to %s", path)
 		err = b.SaveSnapshot(ctx, path)
 		if err != nil {

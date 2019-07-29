@@ -20,6 +20,7 @@ const (
 	PluginStepInitializeUpdateBlob                PluginStep = "InitializeUpdateBlob"
 	PluginStepResetUpdateBlob                     PluginStep = "ResetUpdateBlob"
 	PluginStepEtcdListBackups                     PluginStep = "EtcdListBackups"
+	PluginStepEtcdBackup                          PluginStep = "EtcdBackup"
 	PluginStepClientCreation                      PluginStep = "ClientCreation"
 	PluginStepEnrichCertificatesFromVault         PluginStep = "EnrichCertificatesFromVault"
 	PluginStepEnrichStorageAccountKeys            PluginStep = "EnrichStorageAccountKeys"
