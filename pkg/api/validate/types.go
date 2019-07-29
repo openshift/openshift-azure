@@ -152,6 +152,15 @@ func isValidIPV4CIDR(cidr string) bool {
 
 func IsValidBlobName(c string) bool {
 	// https://docs.microsoft.com/en-us/rest/api/storageservices/naming-and-referencing-containers--blobs--and-metadata
+	if len(c) < 1 || len(c) > 1024 {
+		return false
+	}
+	if strings.HasSuffix(c, ".") || strings.HasSuffix(c, "/") {
+		return false
+	}
+	if strings.Contains(c, "./") || strings.Contains(c, "/.") {
+		return false
+	}
 	u, err := url.Parse(fmt.Sprintf("http://example.com/%s", c))
 	if err != nil {
 		return false

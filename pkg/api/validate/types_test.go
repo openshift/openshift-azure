@@ -311,6 +311,21 @@ func TestIsValidBlobName(t *testing.T) {
 			valid: true,
 		},
 		{
+			name: "bad.",
+		},
+		{
+			name: "bad/",
+		},
+		{
+			name: "",
+		},
+		{
+			name: "ba./d",
+		},
+		{
+			name: "b/.ad",
+		},
+		{
 			name: "\\bad\\",
 		},
 		{
