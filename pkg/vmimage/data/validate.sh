@@ -25,7 +25,7 @@ yum updateinfo > /tmp/yum_update_info || true
 
 
 # install openscap and run
-yum install -y openscap-scanner openscap-utils scap-security-guide
+yum install -y openscap-scanner openscap-utils scap-security-guide python-lxml
 
 oscap xccdf eval \
   --profile xccdf_cloud.osadev_profile_stig_customized_aro \
@@ -36,3 +36,4 @@ oscap xccdf eval \
   --cpe /usr/share/xml/scap/ssg/content/ssg-rhel7-cpe-dictionary.xml \
   /usr/share/xml/scap/ssg/content/ssg-rhel7-ds.xml > /tmp/oscap.log || true
   
+python -c 'import sys; from lxml import html; h = html.fromstring(open("/tmp/scap-report.html").read()); sys.exit(1) if len(h.find_class("rule-result rule-result-fail")) > 0 else sys.exit(0)'
