@@ -141,7 +141,7 @@
       }
     }
   },
-  "revision": "20190606",
+  "revision": "20190711",
   "rootUrl": "https://fcm.googleapis.com/",
   "schemas": {
     "AndroidConfig": {
@@ -196,7 +196,7 @@
       "id": "AndroidFcmOptions",
       "properties": {
         "analyticsLabel": {
-          "description": "Label that the message's analytics data will be associated with.",
+          "description": "Label associated with the message's analytics data.",
           "type": "string"
         }
       },
@@ -235,6 +235,10 @@
         },
         "icon": {
           "description": "The notification's icon.\nSets the notification icon to myicon for drawable resource myicon.\nIf you don't send this key in the request, FCM displays the launcher icon\nspecified in your app manifest.",
+          "type": "string"
+        },
+        "image": {
+          "description": "Contains the URL of an image that is going to be displayed in a\nnotification. If present, it will override\ngoogle.firebase.fcm.v1.Notification.image.",
           "type": "string"
         },
         "sound": {
@@ -294,7 +298,11 @@
       "id": "ApnsFcmOptions",
       "properties": {
         "analyticsLabel": {
-          "description": "Label that the message's analytics data will be associated with.",
+          "description": "Label associated with the message's analytics data.",
+          "type": "string"
+        },
+        "image": {
+          "description": "Contains the URL of an image that is going to be displayed in a\nnotification. If present, it will override\ngoogle.firebase.fcm.v1.Notification.image.",
           "type": "string"
         }
       },
@@ -305,7 +313,7 @@
       "id": "FcmOptions",
       "properties": {
         "analyticsLabel": {
-          "description": "Label that the message's analytics data will be associated with.",
+          "description": "Label associated with the message's analytics data.",
           "type": "string"
         }
       },
@@ -367,6 +375,10 @@
       "properties": {
         "body": {
           "description": "The notification's body text.",
+          "type": "string"
+        },
+        "image": {
+          "description": "Contains the URL of an image that is going to be downloaded on the device\nand displayed in a notification.\nJPEG, PNG, BMP have full support across platforms. Animated GIF and video\nonly work on iOS. WebP and HEIF have varying levels of support across\nplatforms and platform versions.\nAndroid has 1MB image size limit.\nQuota usage and implications/costs for hosting image on Firebase Storage:\nhttps://firebase.google.com/pricing",
           "type": "string"
         },
         "title": {

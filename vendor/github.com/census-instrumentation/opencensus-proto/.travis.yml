@@ -1,4 +1,3 @@
-sudo: required
 dist: trusty
 
 matrix:
@@ -11,21 +10,15 @@ matrix:
     jdk: oraclejdk8
     env: BUILD=GRADLE
 
-before_install:
-  - case "$BUILD" in
-      "BAZEL")
-        echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list ;
-        curl https://storage.googleapis.com/bazel-apt/doc/apt-key.pub.gpg | sudo apt-key add - ;
-        sudo apt-get update ;;
-    esac
-
 install:
   - case "$BUILD" in
       "BAZEL")
-        sudo apt-get install bazel ;
-        echo "build --disk_cache=$HOME/bazel-cache" > ~/.bazelrc ;
-        echo "build --experimental_strict_action_env" >> ~/.bazelrc ;
-        bazel version;;
+        export BAZEL_OS="linux" ;
+        export BAZEL_VERSION="0.26.0" ;
+        wget "https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-${BAZEL_OS}-x86_64.sh" ;
+        chmod +x bazel-${BAZEL_VERSION}-installer-${BAZEL_OS}-x86_64.sh ;
+        ./bazel-${BAZEL_VERSION}-installer-${BAZEL_OS}-x86_64.sh --user ;
+        bazel version ;;
     esac
 
 script:

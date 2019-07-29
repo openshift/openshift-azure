@@ -881,7 +881,7 @@
       }
     }
   },
-  "revision": "20190614",
+  "revision": "20190704",
   "rootUrl": "https://servicemanagement.googleapis.com/",
   "schemas": {
     "Advice": {
@@ -975,6 +975,10 @@
             "type": "string"
           },
           "type": "array"
+        },
+        "ignoreChildExemptions": {
+          "description": "Specifies whether principals can be exempted for the same LogType in\nlower-level resource policies. If true, any lower-level exemptions will\nbe ignored.",
+          "type": "boolean"
         },
         "logType": {
           "description": "The log type that this config enables.",
@@ -1505,6 +1509,10 @@
           },
           "type": "array"
         },
+        "serviceRootUrl": {
+          "description": "Specifies the service root url if the default one (the service name\nfrom the yaml file) is not suitable. This can be seen in any fully\nspecified service urls as well as sections that show a base that other\nurls are relative to.",
+          "type": "string"
+        },
         "summary": {
           "description": "A short summary of what the service does. Can only be provided by\nplain text.",
           "type": "string"
@@ -1838,7 +1846,24 @@
     "GetIamPolicyRequest": {
       "description": "Request message for `GetIamPolicy` method.",
       "id": "GetIamPolicyRequest",
-      "properties": {},
+      "properties": {
+        "options": {
+          "$ref": "GetPolicyOptions",
+          "description": "OPTIONAL: A `GetPolicyOptions` object for specifying options to\n`GetIamPolicy`. This field is only used by Cloud IAM."
+        }
+      },
+      "type": "object"
+    },
+    "GetPolicyOptions": {
+      "description": "Encapsulates settings provided to GetIamPolicy.",
+      "id": "GetPolicyOptions",
+      "properties": {
+        "requestedPolicyVersion": {
+          "description": "Optional. The policy format version to be returned.\nAcceptable values are 0 and 1.\nIf the value is 0, or the field is omitted, policy format version 1 will be\nreturned.",
+          "format": "int32",
+          "type": "integer"
+        }
+      },
       "type": "object"
     },
     "Http": {

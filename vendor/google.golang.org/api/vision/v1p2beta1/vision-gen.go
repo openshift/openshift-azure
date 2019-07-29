@@ -169,7 +169,9 @@ type AnnotateFileResponse struct {
 	// generated.
 	InputConfig *InputConfig `json:"inputConfig,omitempty"`
 
-	// Responses: Individual responses to images found within the file.
+	// Responses: Individual responses to images found within the file. This
+	// field will be
+	// empty if the `error` field is set.
 	Responses []*AnnotateImageResponse `json:"responses,omitempty"`
 
 	// TotalPages: This field gives the total number of pages in the file.
@@ -1460,7 +1462,9 @@ type GoogleCloudVisionV1p1beta1AnnotateFileResponse struct {
 	// generated.
 	InputConfig *GoogleCloudVisionV1p1beta1InputConfig `json:"inputConfig,omitempty"`
 
-	// Responses: Individual responses to images found within the file.
+	// Responses: Individual responses to images found within the file. This
+	// field will be
+	// empty if the `error` field is set.
 	Responses []*GoogleCloudVisionV1p1beta1AnnotateImageResponse `json:"responses,omitempty"`
 
 	// TotalPages: This field gives the total number of pages in the file.
@@ -2832,7 +2836,7 @@ type GoogleCloudVisionV1p1beta1Paragraph struct {
 	// Property: Additional information detected for the paragraph.
 	Property *GoogleCloudVisionV1p1beta1TextAnnotationTextProperty `json:"property,omitempty"`
 
-	// Words: List of words in this paragraph.
+	// Words: List of all words in this paragraph.
 	Words []*GoogleCloudVisionV1p1beta1Word `json:"words,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "BoundingBox") to
@@ -2972,7 +2976,13 @@ type GoogleCloudVisionV1p1beta1Product struct {
 	//
 	// Multiple values can be assigned to the same key. One product may have
 	// up to
-	// 100 product_labels.
+	// 500 product_labels.
+	//
+	// Notice that the total number of distinct product_labels over all
+	// products
+	// in one ProductSet cannot exceed 1M, otherwise the product search
+	// pipeline
+	// will refuse to work for that ProductSet.
 	ProductLabels []*GoogleCloudVisionV1p1beta1ProductKeyValue `json:"productLabels,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Description") to
@@ -3343,7 +3353,7 @@ type GoogleCloudVisionV1p1beta1Symbol struct {
 	//      2----3
 	//      |    |
 	//      1----0
-	//   and the vertice order will still be (0, 1, 2, 3).
+	//   and the vertex order will still be (0, 1, 2, 3).
 	BoundingBox *GoogleCloudVisionV1p1beta1BoundingPoly `json:"boundingBox,omitempty"`
 
 	// Confidence: Confidence of the OCR results for the symbol. Range [0,
@@ -3976,7 +3986,9 @@ type GoogleCloudVisionV1p2beta1AnnotateFileResponse struct {
 	// generated.
 	InputConfig *GoogleCloudVisionV1p2beta1InputConfig `json:"inputConfig,omitempty"`
 
-	// Responses: Individual responses to images found within the file.
+	// Responses: Individual responses to images found within the file. This
+	// field will be
+	// empty if the `error` field is set.
 	Responses []*GoogleCloudVisionV1p2beta1AnnotateImageResponse `json:"responses,omitempty"`
 
 	// TotalPages: This field gives the total number of pages in the file.
@@ -5915,7 +5927,7 @@ type GoogleCloudVisionV1p2beta1Paragraph struct {
 	// Property: Additional information detected for the paragraph.
 	Property *GoogleCloudVisionV1p2beta1TextAnnotationTextProperty `json:"property,omitempty"`
 
-	// Words: List of words in this paragraph.
+	// Words: List of all words in this paragraph.
 	Words []*GoogleCloudVisionV1p2beta1Word `json:"words,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "BoundingBox") to
@@ -6055,7 +6067,13 @@ type GoogleCloudVisionV1p2beta1Product struct {
 	//
 	// Multiple values can be assigned to the same key. One product may have
 	// up to
-	// 100 product_labels.
+	// 500 product_labels.
+	//
+	// Notice that the total number of distinct product_labels over all
+	// products
+	// in one ProductSet cannot exceed 1M, otherwise the product search
+	// pipeline
+	// will refuse to work for that ProductSet.
 	ProductLabels []*GoogleCloudVisionV1p2beta1ProductKeyValue `json:"productLabels,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Description") to
@@ -6496,7 +6514,7 @@ type GoogleCloudVisionV1p2beta1Symbol struct {
 	//      2----3
 	//      |    |
 	//      1----0
-	//   and the vertice order will still be (0, 1, 2, 3).
+	//   and the vertex order will still be (0, 1, 2, 3).
 	BoundingBox *GoogleCloudVisionV1p2beta1BoundingPoly `json:"boundingBox,omitempty"`
 
 	// Confidence: Confidence of the OCR results for the symbol. Range [0,
@@ -7104,7 +7122,9 @@ type GoogleCloudVisionV1p3beta1AnnotateFileResponse struct {
 	// generated.
 	InputConfig *GoogleCloudVisionV1p3beta1InputConfig `json:"inputConfig,omitempty"`
 
-	// Responses: Individual responses to images found within the file.
+	// Responses: Individual responses to images found within the file. This
+	// field will be
+	// empty if the `error` field is set.
 	Responses []*GoogleCloudVisionV1p3beta1AnnotateImageResponse `json:"responses,omitempty"`
 
 	// TotalPages: This field gives the total number of pages in the file.
@@ -8580,7 +8600,7 @@ type GoogleCloudVisionV1p3beta1Paragraph struct {
 	// Property: Additional information detected for the paragraph.
 	Property *GoogleCloudVisionV1p3beta1TextAnnotationTextProperty `json:"property,omitempty"`
 
-	// Words: List of words in this paragraph.
+	// Words: List of all words in this paragraph.
 	Words []*GoogleCloudVisionV1p3beta1Word `json:"words,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "BoundingBox") to
@@ -8720,7 +8740,13 @@ type GoogleCloudVisionV1p3beta1Product struct {
 	//
 	// Multiple values can be assigned to the same key. One product may have
 	// up to
-	// 100 product_labels.
+	// 500 product_labels.
+	//
+	// Notice that the total number of distinct product_labels over all
+	// products
+	// in one ProductSet cannot exceed 1M, otherwise the product search
+	// pipeline
+	// will refuse to work for that ProductSet.
 	ProductLabels []*GoogleCloudVisionV1p3beta1ProductKeyValue `json:"productLabels,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Description") to
@@ -9151,7 +9177,7 @@ type GoogleCloudVisionV1p3beta1Symbol struct {
 	//      2----3
 	//      |    |
 	//      1----0
-	//   and the vertice order will still be (0, 1, 2, 3).
+	//   and the vertex order will still be (0, 1, 2, 3).
 	BoundingBox *GoogleCloudVisionV1p3beta1BoundingPoly `json:"boundingBox,omitempty"`
 
 	// Confidence: Confidence of the OCR results for the symbol. Range [0,
@@ -9728,7 +9754,9 @@ type GoogleCloudVisionV1p4beta1AnnotateFileResponse struct {
 	// generated.
 	InputConfig *GoogleCloudVisionV1p4beta1InputConfig `json:"inputConfig,omitempty"`
 
-	// Responses: Individual responses to images found within the file.
+	// Responses: Individual responses to images found within the file. This
+	// field will be
+	// empty if the `error` field is set.
 	Responses []*GoogleCloudVisionV1p4beta1AnnotateImageResponse `json:"responses,omitempty"`
 
 	// TotalPages: This field gives the total number of pages in the file.
@@ -9790,6 +9818,10 @@ type GoogleCloudVisionV1p4beta1AnnotateImageResponse struct {
 	// extracted successfully.
 	ImagePropertiesAnnotation *GoogleCloudVisionV1p4beta1ImageProperties `json:"imagePropertiesAnnotation,omitempty"`
 
+	// ImageQualityAnnotation: If present, image quality calculation has
+	// completed successfully.
+	ImageQualityAnnotation *GoogleCloudVisionV1p4beta1ImageQuality `json:"imageQualityAnnotation,omitempty"`
+
 	// LabelAnnotations: If present, label detection has completed
 	// successfully.
 	LabelAnnotations []*GoogleCloudVisionV1p4beta1EntityAnnotation `json:"labelAnnotations,omitempty"`
@@ -9810,6 +9842,10 @@ type GoogleCloudVisionV1p4beta1AnnotateImageResponse struct {
 	// ProductSearchResults: If present, product search has completed
 	// successfully.
 	ProductSearchResults *GoogleCloudVisionV1p4beta1ProductSearchResults `json:"productSearchResults,omitempty"`
+
+	// QualityOptimizationResult: If present, image quality optimization has
+	// completed successfully.
+	QualityOptimizationResult *GoogleCloudVisionV1p4beta1QualityOptimizationResult `json:"qualityOptimizationResult,omitempty"`
 
 	// SafeSearchAnnotation: If present, safe-search annotation has
 	// completed successfully.
@@ -10854,6 +10890,11 @@ func (s *GoogleCloudVisionV1p4beta1ImageProperties) MarshalJSON() ([]byte, error
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// GoogleCloudVisionV1p4beta1ImageQuality: Stores image quality scores,
+// could be aesthetic quality or technical quality.
+type GoogleCloudVisionV1p4beta1ImageQuality struct {
+}
+
 // GoogleCloudVisionV1p4beta1ImportProductSetsResponse: Response message
 // for the `ImportProductSets` method.
 //
@@ -11265,7 +11306,7 @@ type GoogleCloudVisionV1p4beta1Paragraph struct {
 	// Property: Additional information detected for the paragraph.
 	Property *GoogleCloudVisionV1p4beta1TextAnnotationTextProperty `json:"property,omitempty"`
 
-	// Words: List of words in this paragraph.
+	// Words: List of all words in this paragraph.
 	Words []*GoogleCloudVisionV1p4beta1Word `json:"words,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "BoundingBox") to
@@ -11405,7 +11446,13 @@ type GoogleCloudVisionV1p4beta1Product struct {
 	//
 	// Multiple values can be assigned to the same key. One product may have
 	// up to
-	// 100 product_labels.
+	// 500 product_labels.
+	//
+	// Notice that the total number of distinct product_labels over all
+	// products
+	// in one ProductSet cannot exceed 1M, otherwise the product search
+	// pipeline
+	// will refuse to work for that ProductSet.
 	ProductLabels []*GoogleCloudVisionV1p4beta1ProductKeyValue `json:"productLabels,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Description") to
@@ -11635,6 +11682,66 @@ func (s *GoogleCloudVisionV1p4beta1Property) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// GoogleCloudVisionV1p4beta1QualityOptimizationResult: Stores enhanced
+// image bytes.
+type GoogleCloudVisionV1p4beta1QualityOptimizationResult struct {
+	// Image: Optimized image bytes.
+	Image string `json:"image,omitempty"`
+
+	// MimeType: Mime type of the output image.
+	MimeType string `json:"mimeType,omitempty"`
+
+	// QualityOptimizationType: Required optimization type.
+	//
+	// Possible values:
+	//   "TYPE_UNSPECIFIED" - Invalid. Customer must select one Type.
+	//   "COMPRESSION" - Reduce image file size. Detailed params specified
+	// in CompressionConfig.
+	// If customer do not specify CompressionConfig, it will reduce image
+	// file
+	// size while not reducing image quality. If customer
+	// specify
+	// CompressionConfig, we will reduce file size while
+	// keeping
+	// CompressionParams.target_quality.
+	//   "ENHANCEMENT" - Denoise, sharpening, HDR and upscaling. Detailed
+	// params specified in
+	// EnhancementConfig. If customer do not specify EnhancmentConfig, it
+	// will
+	// do image enhancement using default values. If upscale_ratio
+	// not
+	// specified, the output image will have the same resolution as input
+	// image.
+	//   "QUALITY_SCORE" - Query quality score for an image. Detailed params
+	// specified in
+	// QualityScoreConfig. If customer does not specify
+	// QualityScoreConfig,
+	// aesthetic score of image will be returned.
+	QualityOptimizationType string `json:"qualityOptimizationType,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Image") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Image") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GoogleCloudVisionV1p4beta1QualityOptimizationResult) MarshalJSON() ([]byte, error) {
+	type NoMethod GoogleCloudVisionV1p4beta1QualityOptimizationResult
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // GoogleCloudVisionV1p4beta1ReferenceImage: A `ReferenceImage`
 // represents a product image and its associated metadata,
 // such as bounding boxes.
@@ -11836,7 +11943,7 @@ type GoogleCloudVisionV1p4beta1Symbol struct {
 	//      2----3
 	//      |    |
 	//      1----0
-	//   and the vertice order will still be (0, 1, 2, 3).
+	//   and the vertex order will still be (0, 1, 2, 3).
 	BoundingBox *GoogleCloudVisionV1p4beta1BoundingPoly `json:"boundingBox,omitempty"`
 
 	// Confidence: Confidence of the OCR results for the symbol. Range [0,
@@ -12413,7 +12520,9 @@ type GoogleCloudVisionV1p5beta1AnnotateFileResponse struct {
 	// generated.
 	InputConfig *GoogleCloudVisionV1p5beta1InputConfig `json:"inputConfig,omitempty"`
 
-	// Responses: Individual responses to images found within the file.
+	// Responses: Individual responses to images found within the file. This
+	// field will be
+	// empty if the `error` field is set.
 	Responses []*GoogleCloudVisionV1p5beta1AnnotateImageResponse `json:"responses,omitempty"`
 
 	// TotalPages: This field gives the total number of pages in the file.
@@ -14030,14 +14139,13 @@ type GoogleCloudVisionV1p5beta1Paragraph struct {
 
 	// MergedText: All UTF-8 text detected in this paragraph. This field is
 	// by default not
-	// returned unless specified in
-	// TextDetectionParams.paragraph_filter.
+	// returned unless specified in TextDetectionParams.paragraph_filter.
 	MergedText string `json:"mergedText,omitempty"`
 
 	// Property: Additional information detected for the paragraph.
 	Property *GoogleCloudVisionV1p5beta1TextAnnotationTextProperty `json:"property,omitempty"`
 
-	// Words: List of words in this paragraph.
+	// Words: List of all words in this paragraph.
 	Words []*GoogleCloudVisionV1p5beta1Word `json:"words,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "BoundingBox") to
@@ -14177,7 +14285,13 @@ type GoogleCloudVisionV1p5beta1Product struct {
 	//
 	// Multiple values can be assigned to the same key. One product may have
 	// up to
-	// 100 product_labels.
+	// 500 product_labels.
+	//
+	// Notice that the total number of distinct product_labels over all
+	// products
+	// in one ProductSet cannot exceed 1M, otherwise the product search
+	// pipeline
+	// will refuse to work for that ProductSet.
 	ProductLabels []*GoogleCloudVisionV1p5beta1ProductKeyValue `json:"productLabels,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Description") to
@@ -14608,7 +14722,7 @@ type GoogleCloudVisionV1p5beta1Symbol struct {
 	//      2----3
 	//      |    |
 	//      1----0
-	//   and the vertice order will still be (0, 1, 2, 3).
+	//   and the vertex order will still be (0, 1, 2, 3).
 	BoundingBox *GoogleCloudVisionV1p5beta1BoundingPoly `json:"boundingBox,omitempty"`
 
 	// Confidence: Confidence of the OCR results for the symbol. Range [0,
@@ -16026,7 +16140,7 @@ type Paragraph struct {
 	// Property: Additional information detected for the paragraph.
 	Property *TextProperty `json:"property,omitempty"`
 
-	// Words: List of words in this paragraph.
+	// Words: List of all words in this paragraph.
 	Words []*Word `json:"words,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "BoundingBox") to
@@ -16165,7 +16279,13 @@ type Product struct {
 	//
 	// Multiple values can be assigned to the same key. One product may have
 	// up to
-	// 100 product_labels.
+	// 500 product_labels.
+	//
+	// Notice that the total number of distinct product_labels over all
+	// products
+	// in one ProductSet cannot exceed 1M, otherwise the product search
+	// pipeline
+	// will refuse to work for that ProductSet.
 	ProductLabels []*KeyValue `json:"productLabels,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Description") to
@@ -16574,7 +16694,7 @@ type Symbol struct {
 	//      2----3
 	//      |    |
 	//      1----0
-	//   and the vertice order will still be (0, 1, 2, 3).
+	//   and the vertex order will still be (0, 1, 2, 3).
 	BoundingBox *BoundingPoly `json:"boundingBox,omitempty"`
 
 	// Confidence: Confidence of the OCR results for the symbol. Range [0,

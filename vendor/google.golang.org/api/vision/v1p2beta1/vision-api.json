@@ -192,7 +192,7 @@
       }
     }
   },
-  "revision": "20190531",
+  "revision": "20190718",
   "rootUrl": "https://vision.googleapis.com/",
   "schemas": {
     "AnnotateFileResponse": {
@@ -204,7 +204,7 @@
           "description": "Information about the file for which this response is generated."
         },
         "responses": {
-          "description": "Individual responses to images found within the file.",
+          "description": "Individual responses to images found within the file. This field will be\nempty if the `error` field is set.",
           "items": {
             "$ref": "AnnotateImageResponse"
           },
@@ -866,7 +866,7 @@
           "description": "Information about the file for which this response is generated."
         },
         "responses": {
-          "description": "Individual responses to images found within the file.",
+          "description": "Individual responses to images found within the file. This field will be\nempty if the `error` field is set.",
           "items": {
             "$ref": "GoogleCloudVisionV1p1beta1AnnotateImageResponse"
           },
@@ -1679,7 +1679,7 @@
           "description": "Additional information detected for the paragraph."
         },
         "words": {
-          "description": "List of words in this paragraph.",
+          "description": "List of all words in this paragraph.",
           "items": {
             "$ref": "GoogleCloudVisionV1p1beta1Word"
           },
@@ -1731,7 +1731,7 @@
           "type": "string"
         },
         "productLabels": {
-          "description": "Key-value pairs that can be attached to a product. At query time,\nconstraints can be specified based on the product_labels.\n\nNote that integer values can be provided as strings, e.g. \"1199\". Only\nstrings with integer values can match a range-based restriction which is\nto be supported soon.\n\nMultiple values can be assigned to the same key. One product may have up to\n100 product_labels.",
+          "description": "Key-value pairs that can be attached to a product. At query time,\nconstraints can be specified based on the product_labels.\n\nNote that integer values can be provided as strings, e.g. \"1199\". Only\nstrings with integer values can match a range-based restriction which is\nto be supported soon.\n\nMultiple values can be assigned to the same key. One product may have up to\n500 product_labels.\n\nNotice that the total number of distinct product_labels over all products\nin one ProductSet cannot exceed 1M, otherwise the product search pipeline\nwill refuse to work for that ProductSet.",
           "items": {
             "$ref": "GoogleCloudVisionV1p1beta1ProductKeyValue"
           },
@@ -1952,7 +1952,7 @@
       "properties": {
         "boundingBox": {
           "$ref": "GoogleCloudVisionV1p1beta1BoundingPoly",
-          "description": "The bounding box for the symbol.\nThe vertices are in the order of top-left, top-right, bottom-right,\nbottom-left. When a rotation of the bounding box is detected the rotation\nis represented as around the top-left corner as defined when the text is\nread in the 'natural' orientation.\nFor example:\n  * when the text is horizontal it might look like:\n     0----1\n     |    |\n     3----2\n  * when it's rotated 180 degrees around the top-left corner it becomes:\n     2----3\n     |    |\n     1----0\n  and the vertice order will still be (0, 1, 2, 3)."
+          "description": "The bounding box for the symbol.\nThe vertices are in the order of top-left, top-right, bottom-right,\nbottom-left. When a rotation of the bounding box is detected the rotation\nis represented as around the top-left corner as defined when the text is\nread in the 'natural' orientation.\nFor example:\n  * when the text is horizontal it might look like:\n     0----1\n     |    |\n     3----2\n  * when it's rotated 180 degrees around the top-left corner it becomes:\n     2----3\n     |    |\n     1----0\n  and the vertex order will still be (0, 1, 2, 3)."
         },
         "confidence": {
           "description": "Confidence of the OCR results for the symbol. Range [0, 1].",
@@ -2270,7 +2270,7 @@
           "description": "Information about the file for which this response is generated."
         },
         "responses": {
-          "description": "Individual responses to images found within the file.",
+          "description": "Individual responses to images found within the file. This field will be\nempty if the `error` field is set.",
           "items": {
             "$ref": "GoogleCloudVisionV1p2beta1AnnotateImageResponse"
           },
@@ -3360,7 +3360,7 @@
           "description": "Additional information detected for the paragraph."
         },
         "words": {
-          "description": "List of words in this paragraph.",
+          "description": "List of all words in this paragraph.",
           "items": {
             "$ref": "GoogleCloudVisionV1p2beta1Word"
           },
@@ -3412,7 +3412,7 @@
           "type": "string"
         },
         "productLabels": {
-          "description": "Key-value pairs that can be attached to a product. At query time,\nconstraints can be specified based on the product_labels.\n\nNote that integer values can be provided as strings, e.g. \"1199\". Only\nstrings with integer values can match a range-based restriction which is\nto be supported soon.\n\nMultiple values can be assigned to the same key. One product may have up to\n100 product_labels.",
+          "description": "Key-value pairs that can be attached to a product. At query time,\nconstraints can be specified based on the product_labels.\n\nNote that integer values can be provided as strings, e.g. \"1199\". Only\nstrings with integer values can match a range-based restriction which is\nto be supported soon.\n\nMultiple values can be assigned to the same key. One product may have up to\n500 product_labels.\n\nNotice that the total number of distinct product_labels over all products\nin one ProductSet cannot exceed 1M, otherwise the product search pipeline\nwill refuse to work for that ProductSet.",
           "items": {
             "$ref": "GoogleCloudVisionV1p2beta1ProductKeyValue"
           },
@@ -3659,7 +3659,7 @@
       "properties": {
         "boundingBox": {
           "$ref": "GoogleCloudVisionV1p2beta1BoundingPoly",
-          "description": "The bounding box for the symbol.\nThe vertices are in the order of top-left, top-right, bottom-right,\nbottom-left. When a rotation of the bounding box is detected the rotation\nis represented as around the top-left corner as defined when the text is\nread in the 'natural' orientation.\nFor example:\n  * when the text is horizontal it might look like:\n     0----1\n     |    |\n     3----2\n  * when it's rotated 180 degrees around the top-left corner it becomes:\n     2----3\n     |    |\n     1----0\n  and the vertice order will still be (0, 1, 2, 3)."
+          "description": "The bounding box for the symbol.\nThe vertices are in the order of top-left, top-right, bottom-right,\nbottom-left. When a rotation of the bounding box is detected the rotation\nis represented as around the top-left corner as defined when the text is\nread in the 'natural' orientation.\nFor example:\n  * when the text is horizontal it might look like:\n     0----1\n     |    |\n     3----2\n  * when it's rotated 180 degrees around the top-left corner it becomes:\n     2----3\n     |    |\n     1----0\n  and the vertex order will still be (0, 1, 2, 3)."
         },
         "confidence": {
           "description": "Confidence of the OCR results for the symbol. Range [0, 1].",
@@ -3958,7 +3958,7 @@
           "description": "Information about the file for which this response is generated."
         },
         "responses": {
-          "description": "Individual responses to images found within the file.",
+          "description": "Individual responses to images found within the file. This field will be\nempty if the `error` field is set.",
           "items": {
             "$ref": "GoogleCloudVisionV1p3beta1AnnotateImageResponse"
           },
@@ -4827,7 +4827,7 @@
           "description": "Additional information detected for the paragraph."
         },
         "words": {
-          "description": "List of words in this paragraph.",
+          "description": "List of all words in this paragraph.",
           "items": {
             "$ref": "GoogleCloudVisionV1p3beta1Word"
           },
@@ -4879,7 +4879,7 @@
           "type": "string"
         },
         "productLabels": {
-          "description": "Key-value pairs that can be attached to a product. At query time,\nconstraints can be specified based on the product_labels.\n\nNote that integer values can be provided as strings, e.g. \"1199\". Only\nstrings with integer values can match a range-based restriction which is\nto be supported soon.\n\nMultiple values can be assigned to the same key. One product may have up to\n100 product_labels.",
+          "description": "Key-value pairs that can be attached to a product. At query time,\nconstraints can be specified based on the product_labels.\n\nNote that integer values can be provided as strings, e.g. \"1199\". Only\nstrings with integer values can match a range-based restriction which is\nto be supported soon.\n\nMultiple values can be assigned to the same key. One product may have up to\n500 product_labels.\n\nNotice that the total number of distinct product_labels over all products\nin one ProductSet cannot exceed 1M, otherwise the product search pipeline\nwill refuse to work for that ProductSet.",
           "items": {
             "$ref": "GoogleCloudVisionV1p3beta1ProductKeyValue"
           },
@@ -5122,7 +5122,7 @@
       "properties": {
         "boundingBox": {
           "$ref": "GoogleCloudVisionV1p3beta1BoundingPoly",
-          "description": "The bounding box for the symbol.\nThe vertices are in the order of top-left, top-right, bottom-right,\nbottom-left. When a rotation of the bounding box is detected the rotation\nis represented as around the top-left corner as defined when the text is\nread in the 'natural' orientation.\nFor example:\n  * when the text is horizontal it might look like:\n     0----1\n     |    |\n     3----2\n  * when it's rotated 180 degrees around the top-left corner it becomes:\n     2----3\n     |    |\n     1----0\n  and the vertice order will still be (0, 1, 2, 3)."
+          "description": "The bounding box for the symbol.\nThe vertices are in the order of top-left, top-right, bottom-right,\nbottom-left. When a rotation of the bounding box is detected the rotation\nis represented as around the top-left corner as defined when the text is\nread in the 'natural' orientation.\nFor example:\n  * when the text is horizontal it might look like:\n     0----1\n     |    |\n     3----2\n  * when it's rotated 180 degrees around the top-left corner it becomes:\n     2----3\n     |    |\n     1----0\n  and the vertex order will still be (0, 1, 2, 3)."
         },
         "confidence": {
           "description": "Confidence of the OCR results for the symbol. Range [0, 1].",
@@ -5410,7 +5410,7 @@
           "description": "Information about the file for which this response is generated."
         },
         "responses": {
-          "description": "Individual responses to images found within the file.",
+          "description": "Individual responses to images found within the file. This field will be\nempty if the `error` field is set.",
           "items": {
             "$ref": "GoogleCloudVisionV1p4beta1AnnotateImageResponse"
           },
@@ -5455,6 +5455,10 @@
           "$ref": "GoogleCloudVisionV1p4beta1ImageProperties",
           "description": "If present, image properties were extracted successfully."
         },
+        "imageQualityAnnotation": {
+          "$ref": "GoogleCloudVisionV1p4beta1ImageQuality",
+          "description": "If present, image quality calculation has completed successfully."
+        },
         "labelAnnotations": {
           "description": "If present, label detection has completed successfully.",
           "items": {
@@ -5486,6 +5490,10 @@
         "productSearchResults": {
           "$ref": "GoogleCloudVisionV1p4beta1ProductSearchResults",
           "description": "If present, product search has completed successfully."
+        },
+        "qualityOptimizationResult": {
+          "$ref": "GoogleCloudVisionV1p4beta1QualityOptimizationResult",
+          "description": "If present, image quality optimization has completed successfully."
         },
         "safeSearchAnnotation": {
           "$ref": "GoogleCloudVisionV1p4beta1SafeSearchAnnotation",
@@ -6105,6 +6113,12 @@
       },
       "type": "object"
     },
+    "GoogleCloudVisionV1p4beta1ImageQuality": {
+      "description": "Stores image quality scores, could be aesthetic quality or technical quality.",
+      "id": "GoogleCloudVisionV1p4beta1ImageQuality",
+      "properties": {},
+      "type": "object"
+    },
     "GoogleCloudVisionV1p4beta1ImportProductSetsResponse": {
       "description": "Response message for the `ImportProductSets` method.\n\nThis message is returned by the\ngoogle.longrunning.Operations.GetOperation method in the returned\ngoogle.longrunning.Operation.response field.",
       "id": "GoogleCloudVisionV1p4beta1ImportProductSetsResponse",
@@ -6304,7 +6318,7 @@
           "description": "Additional information detected for the paragraph."
         },
         "words": {
-          "description": "List of words in this paragraph.",
+          "description": "List of all words in this paragraph.",
           "items": {
             "$ref": "GoogleCloudVisionV1p4beta1Word"
           },
@@ -6356,7 +6370,7 @@
           "type": "string"
         },
         "productLabels": {
-          "description": "Key-value pairs that can be attached to a product. At query time,\nconstraints can be specified based on the product_labels.\n\nNote that integer values can be provided as strings, e.g. \"1199\". Only\nstrings with integer values can match a range-based restriction which is\nto be supported soon.\n\nMultiple values can be assigned to the same key. One product may have up to\n100 product_labels.",
+          "description": "Key-value pairs that can be attached to a product. At query time,\nconstraints can be specified based on the product_labels.\n\nNote that integer values can be provided as strings, e.g. \"1199\". Only\nstrings with integer values can match a range-based restriction which is\nto be supported soon.\n\nMultiple values can be assigned to the same key. One product may have up to\n500 product_labels.\n\nNotice that the total number of distinct product_labels over all products\nin one ProductSet cannot exceed 1M, otherwise the product search pipeline\nwill refuse to work for that ProductSet.",
           "items": {
             "$ref": "GoogleCloudVisionV1p4beta1ProductKeyValue"
           },
@@ -6459,6 +6473,38 @@
         },
         "value": {
           "description": "Value of the property.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVisionV1p4beta1QualityOptimizationResult": {
+      "description": "Stores enhanced image bytes.",
+      "id": "GoogleCloudVisionV1p4beta1QualityOptimizationResult",
+      "properties": {
+        "image": {
+          "description": "Optimized image bytes.",
+          "format": "byte",
+          "type": "string"
+        },
+        "mimeType": {
+          "description": "Mime type of the output image.",
+          "type": "string"
+        },
+        "qualityOptimizationType": {
+          "description": "Required optimization type.",
+          "enum": [
+            "TYPE_UNSPECIFIED",
+            "COMPRESSION",
+            "ENHANCEMENT",
+            "QUALITY_SCORE"
+          ],
+          "enumDescriptions": [
+            "Invalid. Customer must select one Type.",
+            "Reduce image file size. Detailed params specified in CompressionConfig.\nIf customer do not specify CompressionConfig, it will reduce image file\nsize while not reducing image quality. If customer specify\nCompressionConfig, we will reduce file size while keeping\nCompressionParams.target_quality.",
+            "Denoise, sharpening, HDR and upscaling. Detailed params specified in\nEnhancementConfig. If customer do not specify EnhancmentConfig, it will\ndo image enhancement using default values. If upscale_ratio not\nspecified, the output image will have the same resolution as input image.",
+            "Query quality score for an image. Detailed params specified in\nQualityScoreConfig. If customer does not specify QualityScoreConfig,\naesthetic score of image will be returned."
+          ],
           "type": "string"
         }
       },
@@ -6599,7 +6645,7 @@
       "properties": {
         "boundingBox": {
           "$ref": "GoogleCloudVisionV1p4beta1BoundingPoly",
-          "description": "The bounding box for the symbol.\nThe vertices are in the order of top-left, top-right, bottom-right,\nbottom-left. When a rotation of the bounding box is detected the rotation\nis represented as around the top-left corner as defined when the text is\nread in the 'natural' orientation.\nFor example:\n  * when the text is horizontal it might look like:\n     0----1\n     |    |\n     3----2\n  * when it's rotated 180 degrees around the top-left corner it becomes:\n     2----3\n     |    |\n     1----0\n  and the vertice order will still be (0, 1, 2, 3)."
+          "description": "The bounding box for the symbol.\nThe vertices are in the order of top-left, top-right, bottom-right,\nbottom-left. When a rotation of the bounding box is detected the rotation\nis represented as around the top-left corner as defined when the text is\nread in the 'natural' orientation.\nFor example:\n  * when the text is horizontal it might look like:\n     0----1\n     |    |\n     3----2\n  * when it's rotated 180 degrees around the top-left corner it becomes:\n     2----3\n     |    |\n     1----0\n  and the vertex order will still be (0, 1, 2, 3)."
         },
         "confidence": {
           "description": "Confidence of the OCR results for the symbol. Range [0, 1].",
@@ -6887,7 +6933,7 @@
           "description": "Information about the file for which this response is generated."
         },
         "responses": {
-          "description": "Individual responses to images found within the file.",
+          "description": "Individual responses to images found within the file. This field will be\nempty if the `error` field is set.",
           "items": {
             "$ref": "GoogleCloudVisionV1p5beta1AnnotateImageResponse"
           },
@@ -7822,7 +7868,7 @@
           "type": "number"
         },
         "mergedText": {
-          "description": "All UTF-8 text detected in this paragraph. This field is by default not\nreturned unless specified in\nTextDetectionParams.paragraph_filter.",
+          "description": "All UTF-8 text detected in this paragraph. This field is by default not\nreturned unless specified in TextDetectionParams.paragraph_filter.",
           "type": "string"
         },
         "property": {
@@ -7830,7 +7876,7 @@
           "description": "Additional information detected for the paragraph."
         },
         "words": {
-          "description": "List of words in this paragraph.",
+          "description": "List of all words in this paragraph.",
           "items": {
             "$ref": "GoogleCloudVisionV1p5beta1Word"
           },
@@ -7882,7 +7928,7 @@
           "type": "string"
         },
         "productLabels": {
-          "description": "Key-value pairs that can be attached to a product. At query time,\nconstraints can be specified based on the product_labels.\n\nNote that integer values can be provided as strings, e.g. \"1199\". Only\nstrings with integer values can match a range-based restriction which is\nto be supported soon.\n\nMultiple values can be assigned to the same key. One product may have up to\n100 product_labels.",
+          "description": "Key-value pairs that can be attached to a product. At query time,\nconstraints can be specified based on the product_labels.\n\nNote that integer values can be provided as strings, e.g. \"1199\". Only\nstrings with integer values can match a range-based restriction which is\nto be supported soon.\n\nMultiple values can be assigned to the same key. One product may have up to\n500 product_labels.\n\nNotice that the total number of distinct product_labels over all products\nin one ProductSet cannot exceed 1M, otherwise the product search pipeline\nwill refuse to work for that ProductSet.",
           "items": {
             "$ref": "GoogleCloudVisionV1p5beta1ProductKeyValue"
           },
@@ -8125,7 +8171,7 @@
       "properties": {
         "boundingBox": {
           "$ref": "GoogleCloudVisionV1p5beta1BoundingPoly",
-          "description": "The bounding box for the symbol.\nThe vertices are in the order of top-left, top-right, bottom-right,\nbottom-left. When a rotation of the bounding box is detected the rotation\nis represented as around the top-left corner as defined when the text is\nread in the 'natural' orientation.\nFor example:\n  * when the text is horizontal it might look like:\n     0----1\n     |    |\n     3----2\n  * when it's rotated 180 degrees around the top-left corner it becomes:\n     2----3\n     |    |\n     1----0\n  and the vertice order will still be (0, 1, 2, 3)."
+          "description": "The bounding box for the symbol.\nThe vertices are in the order of top-left, top-right, bottom-right,\nbottom-left. When a rotation of the bounding box is detected the rotation\nis represented as around the top-left corner as defined when the text is\nread in the 'natural' orientation.\nFor example:\n  * when the text is horizontal it might look like:\n     0----1\n     |    |\n     3----2\n  * when it's rotated 180 degrees around the top-left corner it becomes:\n     2----3\n     |    |\n     1----0\n  and the vertex order will still be (0, 1, 2, 3)."
         },
         "confidence": {
           "description": "Confidence of the OCR results for the symbol. Range [0, 1].",
@@ -8868,7 +8914,7 @@
           "description": "Additional information detected for the paragraph."
         },
         "words": {
-          "description": "List of words in this paragraph.",
+          "description": "List of all words in this paragraph.",
           "items": {
             "$ref": "Word"
           },
@@ -8920,7 +8966,7 @@
           "type": "string"
         },
         "productLabels": {
-          "description": "Key-value pairs that can be attached to a product. At query time,\nconstraints can be specified based on the product_labels.\n\nNote that integer values can be provided as strings, e.g. \"1199\". Only\nstrings with integer values can match a range-based restriction which is\nto be supported soon.\n\nMultiple values can be assigned to the same key. One product may have up to\n100 product_labels.",
+          "description": "Key-value pairs that can be attached to a product. At query time,\nconstraints can be specified based on the product_labels.\n\nNote that integer values can be provided as strings, e.g. \"1199\". Only\nstrings with integer values can match a range-based restriction which is\nto be supported soon.\n\nMultiple values can be assigned to the same key. One product may have up to\n500 product_labels.\n\nNotice that the total number of distinct product_labels over all products\nin one ProductSet cannot exceed 1M, otherwise the product search pipeline\nwill refuse to work for that ProductSet.",
           "items": {
             "$ref": "KeyValue"
           },
@@ -9157,7 +9203,7 @@
       "properties": {
         "boundingBox": {
           "$ref": "BoundingPoly",
-          "description": "The bounding box for the symbol.\nThe vertices are in the order of top-left, top-right, bottom-right,\nbottom-left. When a rotation of the bounding box is detected the rotation\nis represented as around the top-left corner as defined when the text is\nread in the 'natural' orientation.\nFor example:\n  * when the text is horizontal it might look like:\n     0----1\n     |    |\n     3----2\n  * when it's rotated 180 degrees around the top-left corner it becomes:\n     2----3\n     |    |\n     1----0\n  and the vertice order will still be (0, 1, 2, 3)."
+          "description": "The bounding box for the symbol.\nThe vertices are in the order of top-left, top-right, bottom-right,\nbottom-left. When a rotation of the bounding box is detected the rotation\nis represented as around the top-left corner as defined when the text is\nread in the 'natural' orientation.\nFor example:\n  * when the text is horizontal it might look like:\n     0----1\n     |    |\n     3----2\n  * when it's rotated 180 degrees around the top-left corner it becomes:\n     2----3\n     |    |\n     1----0\n  and the vertex order will still be (0, 1, 2, 3)."
         },
         "confidence": {
           "description": "Confidence of the OCR results for the symbol. Range [0, 1].",

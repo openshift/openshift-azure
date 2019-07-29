@@ -1873,6 +1873,9 @@ type VirtualMachine struct {
 	// labels
 	// imposed by Compute Engine.
 	//
+	// Labels keys with the prefix 'google-' are reserved for use by
+	// Google.
+	//
 	// Labels applied at creation time to the VM. Applied on a best-effort
 	// basis
 	// to attached disk resources shortly after VM creation.
@@ -1942,6 +1945,9 @@ func (s *VirtualMachine) MarshalJSON() ([]byte, error) {
 type WorkerAssignedEvent struct {
 	// Instance: The worker's instance name.
 	Instance string `json:"instance,omitempty"`
+
+	// MachineType: The machine type that was assigned for the worker.
+	MachineType string `json:"machineType,omitempty"`
 
 	// Zone: The zone the worker is running in.
 	Zone string `json:"zone,omitempty"`

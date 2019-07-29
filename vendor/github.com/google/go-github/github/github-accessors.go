@@ -3324,6 +3324,30 @@ func (h *HookStats) GetTotalHooks() int {
 	return *h.TotalHooks
 }
 
+// GetGroupDescription returns the GroupDescription field if it's non-nil, zero value otherwise.
+func (i *IDPGroup) GetGroupDescription() string {
+	if i == nil || i.GroupDescription == nil {
+		return ""
+	}
+	return *i.GroupDescription
+}
+
+// GetGroupID returns the GroupID field if it's non-nil, zero value otherwise.
+func (i *IDPGroup) GetGroupID() string {
+	if i == nil || i.GroupID == nil {
+		return ""
+	}
+	return *i.GroupID
+}
+
+// GetGroupName returns the GroupName field if it's non-nil, zero value otherwise.
+func (i *IDPGroup) GetGroupName() string {
+	if i == nil || i.GroupName == nil {
+		return ""
+	}
+	return *i.GroupName
+}
+
 // GetAuthorsCount returns the AuthorsCount field if it's non-nil, zero value otherwise.
 func (i *Import) GetAuthorsCount() int {
 	if i == nil || i.AuthorsCount == nil {
@@ -6130,6 +6154,14 @@ func (o *Organization) GetLogin() string {
 		return ""
 	}
 	return *o.Login
+}
+
+// GetMembersAllowedRepositoryCreationType returns the MembersAllowedRepositoryCreationType field if it's non-nil, zero value otherwise.
+func (o *Organization) GetMembersAllowedRepositoryCreationType() string {
+	if o == nil || o.MembersAllowedRepositoryCreationType == nil {
+		return ""
+	}
+	return *o.MembersAllowedRepositoryCreationType
 }
 
 // GetMembersCanCreateRepos returns the MembersCanCreateRepos field if it's non-nil, zero value otherwise.
@@ -9940,6 +9972,14 @@ func (r *RepositoryComment) GetID() int64 {
 	return *r.ID
 }
 
+// GetNodeID returns the NodeID field if it's non-nil, zero value otherwise.
+func (r *RepositoryComment) GetNodeID() string {
+	if r == nil || r.NodeID == nil {
+		return ""
+	}
+	return *r.NodeID
+}
+
 // GetPath returns the Path field if it's non-nil, zero value otherwise.
 func (r *RepositoryComment) GetPath() string {
 	if r == nil || r.Path == nil {
@@ -12156,6 +12196,14 @@ func (u *User) GetID() int64 {
 	return *u.ID
 }
 
+// GetLdapDn returns the LdapDn field if it's non-nil, zero value otherwise.
+func (u *User) GetLdapDn() string {
+	if u == nil || u.LdapDn == nil {
+		return ""
+	}
+	return *u.LdapDn
+}
+
 // GetLocation returns the Location field if it's non-nil, zero value otherwise.
 func (u *User) GetLocation() string {
 	if u == nil || u.Location == nil {
@@ -12370,6 +12418,14 @@ func (u *UserEmail) GetVerified() bool {
 		return false
 	}
 	return *u.Verified
+}
+
+// GetVisibility returns the Visibility field if it's non-nil, zero value otherwise.
+func (u *UserEmail) GetVisibility() string {
+	if u == nil || u.Visibility == nil {
+		return ""
+	}
+	return *u.Visibility
 }
 
 // GetAvatarURL returns the AvatarURL field if it's non-nil, zero value otherwise.

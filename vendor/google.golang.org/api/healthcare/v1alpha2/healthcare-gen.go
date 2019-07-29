@@ -350,7 +350,7 @@ type Annotation struct {
 	// tags.
 	ResourceAnnotation *ResourceAnnotation `json:"resourceAnnotation,omitempty"`
 
-	// TextAnnotation: Annotations for sentitive texts, e.g., range of such
+	// TextAnnotation: Annotations for sensitive texts, e.g., range of such
 	// texts.
 	TextAnnotation *SensitiveTextAnnotation `json:"textAnnotation,omitempty"`
 
@@ -492,7 +492,7 @@ func (s *AnnotationStore) MarshalJSON() ([]byte, error) {
 //             {
 //               "log_type": "DATA_READ",
 //               "exempted_members": [
-//                 "user:foo@gmail.com"
+//                 "user:jose@example.com"
 //               ]
 //             },
 //             {
@@ -504,7 +504,7 @@ func (s *AnnotationStore) MarshalJSON() ([]byte, error) {
 //           ]
 //         },
 //         {
-//           "service": "fooservice.googleapis.com"
+//           "service": "sampleservice.googleapis.com"
 //           "audit_log_configs": [
 //             {
 //               "log_type": "DATA_READ",
@@ -512,7 +512,7 @@ func (s *AnnotationStore) MarshalJSON() ([]byte, error) {
 //             {
 //               "log_type": "DATA_WRITE",
 //               "exempted_members": [
-//                 "user:bar@gmail.com"
+//                 "user:aliya@example.com"
 //               ]
 //             }
 //           ]
@@ -520,11 +520,11 @@ func (s *AnnotationStore) MarshalJSON() ([]byte, error) {
 //       ]
 //     }
 //
-// For fooservice, this policy enables DATA_READ, DATA_WRITE and
+// For sampleservice, this policy enables DATA_READ, DATA_WRITE and
 // ADMIN_READ
-// logging. It also exempts foo@gmail.com from DATA_READ logging,
+// logging. It also exempts jose@example.com from DATA_READ logging,
 // and
-// bar@gmail.com from DATA_WRITE logging.
+// aliya@example.com from DATA_WRITE logging.
 type AuditConfig struct {
 	// AuditLogConfigs: The configuration for logging of each type of
 	// permission.
@@ -570,7 +570,7 @@ func (s *AuditConfig) MarshalJSON() ([]byte, error) {
 //         {
 //           "log_type": "DATA_READ",
 //           "exempted_members": [
-//             "user:foo@gmail.com"
+//             "user:jose@example.com"
 //           ]
 //         },
 //         {
@@ -581,13 +581,20 @@ func (s *AuditConfig) MarshalJSON() ([]byte, error) {
 //
 // This enables 'DATA_READ' and 'DATA_WRITE' logging, while
 // exempting
-// foo@gmail.com from DATA_READ logging.
+// jose@example.com from DATA_READ logging.
 type AuditLogConfig struct {
 	// ExemptedMembers: Specifies the identities that do not cause logging
 	// for this type of
 	// permission.
 	// Follows the same format of Binding.members.
 	ExemptedMembers []string `json:"exemptedMembers,omitempty"`
+
+	// IgnoreChildExemptions: Specifies whether principals can be exempted
+	// for the same LogType in
+	// lower-level resource policies. If true, any lower-level exemptions
+	// will
+	// be ignored.
+	IgnoreChildExemptions bool `json:"ignoreChildExemptions,omitempty"`
 
 	// LogType: The log type that this config enables.
 	//
@@ -646,7 +653,7 @@ type Binding struct {
 	//
 	// * `user:{emailid}`: An email address that represents a specific
 	// Google
-	//    account. For example, `alice@gmail.com` .
+	//    account. For example, `alice@example.com` .
 	//
 	//
 	// * `serviceAccount:{emailid}`: An email address that represents a
@@ -1598,6 +1605,16 @@ type FhirStore struct {
 	// the results show up in the streaming destination.
 	StreamConfigs []*StreamConfig `json:"streamConfigs,omitempty"`
 
+	// SubscriptionConfig: Configuration of FHIR
+	// Subscription:
+	// https://www.hl7.org/fhir/subscription.html.
+	SubscriptionConfig *SubscriptionConfig `json:"subscriptionConfig,omitempty"`
+
+	// ValidationConfig: Configuration for how incoming FHIR resources will
+	// be validated against
+	// configured profiles.
+	ValidationConfig *ValidationConfig `json:"validationConfig,omitempty"`
+
 	// ServerResponse contains the HTTP response code and headers from the
 	// server.
 	googleapi.ServerResponse `json:"-"`
@@ -1720,6 +1737,67 @@ func (s *Finding) MarshalJSON() ([]byte, error) {
 
 // GetIamPolicyRequest: Request message for `GetIamPolicy` method.
 type GetIamPolicyRequest struct {
+	// Options: OPTIONAL: A `GetPolicyOptions` object for specifying options
+	// to
+	// `GetIamPolicy`. This field is only used by Cloud IAM.
+	Options *GetPolicyOptions `json:"options,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Options") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Options") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GetIamPolicyRequest) MarshalJSON() ([]byte, error) {
+	type NoMethod GetIamPolicyRequest
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// GetPolicyOptions: Encapsulates settings provided to GetIamPolicy.
+type GetPolicyOptions struct {
+	// RequestedPolicyVersion: Optional. The policy format version to be
+	// returned.
+	// Acceptable values are 0 and 1.
+	// If the value is 0, or the field is omitted, policy format version 1
+	// will be
+	// returned.
+	RequestedPolicyVersion int64 `json:"requestedPolicyVersion,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g.
+	// "RequestedPolicyVersion") to unconditionally include in API requests.
+	// By default, fields with empty values are omitted from API requests.
+	// However, any non-pointer, non-interface field appearing in
+	// ForceSendFields will be sent to the server regardless of whether the
+	// field is empty or not. This may be used to include empty fields in
+	// Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "RequestedPolicyVersion")
+	// to include in API requests with the JSON null value. By default,
+	// fields with empty values are omitted from API requests. However, any
+	// field with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GetPolicyOptions) MarshalJSON() ([]byte, error) {
+	type NoMethod GetPolicyOptions
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
 // GoogleCloudHealthcareV1alpha2DicomBigQueryDestination: The BigQuery
@@ -3467,7 +3545,7 @@ type Policy struct {
 	//
 	// If no `etag` is provided in the call to `setIamPolicy`, then the
 	// existing
-	// policy is overwritten blindly.
+	// policy is overwritten.
 	Etag string `json:"etag,omitempty"`
 
 	// Version: Deprecated.
@@ -3892,6 +3970,95 @@ func (s *StreamConfig) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// SubscriptionConfig: Configuration of FHIR
+// Subscription:
+// https://www.hl7.org/fhir/subscription.html.
+type SubscriptionConfig struct {
+	// AllowedRestHookEndpoints: REST hook endpoints that are allowed to
+	// receive subscription notifications.
+	// The create or update operation on a FHIR Subscription resource will
+	// fail if
+	// the FHIR Subscription resource contains a REST hook endpoint that is
+	// not in
+	// this list.
+	// A subscription notification push will fail if the FHIR
+	// Subscription
+	// resource contains a REST hook endpoint that is not in this list.
+	// The REST hook endpoint in a subscription resource will be compared
+	// with the
+	// endpoints in this list by exact matching.
+	// Users must verify their ownership of the domain of an endpoint
+	// before
+	// adding it to this list. To verify domain ownership, go
+	// to
+	// https://search.google.com/search-console/welcome.
+	AllowedRestHookEndpoints []*SubscriptionRestHookEndpoint `json:"allowedRestHookEndpoints,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g.
+	// "AllowedRestHookEndpoints") to unconditionally include in API
+	// requests. By default, fields with empty values are omitted from API
+	// requests. However, any non-pointer, non-interface field appearing in
+	// ForceSendFields will be sent to the server regardless of whether the
+	// field is empty or not. This may be used to include empty fields in
+	// Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "AllowedRestHookEndpoints")
+	// to include in API requests with the JSON null value. By default,
+	// fields with empty values are omitted from API requests. However, any
+	// field with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *SubscriptionConfig) MarshalJSON() ([]byte, error) {
+	type NoMethod SubscriptionConfig
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// SubscriptionRestHookEndpoint: REST hook endpoint of FHIR
+// Subscription.
+type SubscriptionRestHookEndpoint struct {
+	// AllowResourcePayload: Whether this endpoint is allowed to receive
+	// full resource payloads. If set
+	// to false, the subscription notificiation sending to this endpoint
+	// with full
+	// resource payload will be blocked.
+	AllowResourcePayload bool `json:"allowResourcePayload,omitempty"`
+
+	// Endpoint: Address of the REST hook endpoint. It must be a valid HTTPS
+	// URL with TLS
+	// certificate.
+	Endpoint string `json:"endpoint,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g.
+	// "AllowResourcePayload") to unconditionally include in API requests.
+	// By default, fields with empty values are omitted from API requests.
+	// However, any non-pointer, non-interface field appearing in
+	// ForceSendFields will be sent to the server regardless of whether the
+	// field is empty or not. This may be used to include empty fields in
+	// Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "AllowResourcePayload") to
+	// include in API requests with the JSON null value. By default, fields
+	// with empty values are omitted from API requests. However, any field
+	// with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *SubscriptionRestHookEndpoint) MarshalJSON() ([]byte, error) {
+	type NoMethod SubscriptionRestHookEndpoint
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // TagFilterList: List of tags to be filtered.
 type TagFilterList struct {
 	// Tags: Tags to be filtered. Tags must be DICOM Data Elements, File
@@ -4027,6 +4194,58 @@ type TextConfig struct {
 
 func (s *TextConfig) MarshalJSON() ([]byte, error) {
 	type NoMethod TextConfig
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// ValidationConfig: This structure contains the configuration for FHIR
+// profiles and validation.
+type ValidationConfig struct {
+	// DisableProfileValidation: Whether profile validation should be
+	// disabled for this FHIR store. Set
+	// this to true to disable checking incoming resources for
+	// conformance
+	// against StructureDefinitions in this FHIR store.
+	DisableProfileValidation bool `json:"disableProfileValidation,omitempty"`
+
+	// EnabledImplementationGuides: A list of ImplementationGuide IDs in
+	// this FHIR store that will be used to
+	// configure which profiles are used for validation. For example, to
+	// enable
+	// an implementation guide with ID 1 set `enabled_implementation_guides`
+	// to
+	// `["1"]`. If `enabled_implementation_guides` is empty or omitted
+	// then
+	// incoming resources will only be required to conform to the base
+	// FHIR
+	// profiles. Otherwise, a resource must conform to at least one
+	// profile
+	// listed in the `global` property of one of the
+	// enabled
+	// ImplementationGuides.
+	EnabledImplementationGuides []string `json:"enabledImplementationGuides,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g.
+	// "DisableProfileValidation") to unconditionally include in API
+	// requests. By default, fields with empty values are omitted from API
+	// requests. However, any non-pointer, non-interface field appearing in
+	// ForceSendFields will be sent to the server regardless of whether the
+	// field is empty or not. This may be used to include empty fields in
+	// Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "DisableProfileValidation")
+	// to include in API requests with the JSON null value. By default,
+	// fields with empty values are omitted from API requests. However, any
+	// field with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *ValidationConfig) MarshalJSON() ([]byte, error) {
+	type NoMethod ValidationConfig
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -5029,6 +5248,18 @@ func (r *ProjectsLocationsDatasetsService) GetIamPolicy(resource string) *Projec
 	return c
 }
 
+// OptionsRequestedPolicyVersion sets the optional parameter
+// "options.requestedPolicyVersion": The policy format version to be
+// returned.
+// Acceptable values are 0 and 1.
+// If the value is 0, or the field is omitted, policy format version 1
+// will be
+// returned.
+func (c *ProjectsLocationsDatasetsGetIamPolicyCall) OptionsRequestedPolicyVersion(optionsRequestedPolicyVersion int64) *ProjectsLocationsDatasetsGetIamPolicyCall {
+	c.urlParams_.Set("options.requestedPolicyVersion", fmt.Sprint(optionsRequestedPolicyVersion))
+	return c
+}
+
 // Fields allows partial responses to be retrieved. See
 // https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
 // for more information.
@@ -5135,6 +5366,12 @@ func (c *ProjectsLocationsDatasetsGetIamPolicyCall) Do(opts ...googleapi.CallOpt
 	//     "resource"
 	//   ],
 	//   "parameters": {
+	//     "options.requestedPolicyVersion": {
+	//       "description": "Optional. The policy format version to be returned.\nAcceptable values are 0 and 1.\nIf the value is 0, or the field is omitted, policy format version 1 will be\nreturned.",
+	//       "format": "int32",
+	//       "location": "query",
+	//       "type": "integer"
+	//     },
 	//     "resource": {
 	//       "description": "REQUIRED: The resource for which the policy is being requested.\nSee the operation documentation for the appropriate value for this field.",
 	//       "location": "path",
@@ -6238,7 +6475,8 @@ type ProjectsLocationsDatasetsAnnotationStoresGetIamPolicyCall struct {
 //
 // Authorization requires the Google IAM
 // permission
-// `healthcare.AnnotationStores.getIamPolicy` on the specified resource
+// `healthcare.AnnotationStores.getIamPolicy` on the specified
+// resource
 func (r *ProjectsLocationsDatasetsAnnotationStoresService) GetIamPolicy(resource string, getiampolicyrequest *GetIamPolicyRequest) *ProjectsLocationsDatasetsAnnotationStoresGetIamPolicyCall {
 	c := &ProjectsLocationsDatasetsAnnotationStoresGetIamPolicyCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.resource = resource
@@ -6336,7 +6574,7 @@ func (c *ProjectsLocationsDatasetsAnnotationStoresGetIamPolicyCall) Do(opts ...g
 	}
 	return ret, nil
 	// {
-	//   "description": "Gets the access control policy for a resource. Returns NOT_FOUND error if\nthe resource does not exist. Returns an empty policy if the resource exists\nbut does not have a policy set.\n\nAuthorization requires the Google IAM permission\n`healthcare.AnnotationStores.getIamPolicy` on the specified resource",
+	//   "description": "Gets the access control policy for a resource. Returns NOT_FOUND error if\nthe resource does not exist. Returns an empty policy if the resource exists\nbut does not have a policy set.\n\nAuthorization requires the Google IAM permission\n`healthcare.AnnotationStores.getIamPolicy` on the specified\nresource",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/annotationStores/{annotationStoresId}:getIamPolicy",
 	//   "httpMethod": "POST",
 	//   "id": "healthcare.projects.locations.datasets.annotationStores.getIamPolicy",
@@ -6749,7 +6987,8 @@ type ProjectsLocationsDatasetsAnnotationStoresSetIamPolicyCall struct {
 //
 // Authorization requires the Google IAM
 // permission
-// 'healthcare.annotationStores.setIamPolicy' on the specified resource
+// `healthcare.annotationStores.setIamPolicy` on the specified
+// resource
 func (r *ProjectsLocationsDatasetsAnnotationStoresService) SetIamPolicy(resource string, setiampolicyrequest *SetIamPolicyRequest) *ProjectsLocationsDatasetsAnnotationStoresSetIamPolicyCall {
 	c := &ProjectsLocationsDatasetsAnnotationStoresSetIamPolicyCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.resource = resource
@@ -6847,7 +7086,7 @@ func (c *ProjectsLocationsDatasetsAnnotationStoresSetIamPolicyCall) Do(opts ...g
 	}
 	return ret, nil
 	// {
-	//   "description": "POLICIES\nSets the access control policy for a resource. Replaces any existing\npolicy.\n\nAuthorization requires the Google IAM permission\n'healthcare.annotationStores.setIamPolicy' on the specified resource",
+	//   "description": "POLICIES\nSets the access control policy for a resource. Replaces any existing\npolicy.\n\nAuthorization requires the Google IAM permission\n`healthcare.annotationStores.setIamPolicy` on the specified\nresource",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/annotationStores/{annotationStoresId}:setIamPolicy",
 	//   "httpMethod": "POST",
 	//   "id": "healthcare.projects.locations.datasets.annotationStores.setIamPolicy",
@@ -8393,6 +8632,18 @@ func (r *ProjectsLocationsDatasetsDicomStoresService) GetIamPolicy(resource stri
 	return c
 }
 
+// OptionsRequestedPolicyVersion sets the optional parameter
+// "options.requestedPolicyVersion": The policy format version to be
+// returned.
+// Acceptable values are 0 and 1.
+// If the value is 0, or the field is omitted, policy format version 1
+// will be
+// returned.
+func (c *ProjectsLocationsDatasetsDicomStoresGetIamPolicyCall) OptionsRequestedPolicyVersion(optionsRequestedPolicyVersion int64) *ProjectsLocationsDatasetsDicomStoresGetIamPolicyCall {
+	c.urlParams_.Set("options.requestedPolicyVersion", fmt.Sprint(optionsRequestedPolicyVersion))
+	return c
+}
+
 // Fields allows partial responses to be retrieved. See
 // https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
 // for more information.
@@ -8499,6 +8750,12 @@ func (c *ProjectsLocationsDatasetsDicomStoresGetIamPolicyCall) Do(opts ...google
 	//     "resource"
 	//   ],
 	//   "parameters": {
+	//     "options.requestedPolicyVersion": {
+	//       "description": "Optional. The policy format version to be returned.\nAcceptable values are 0 and 1.\nIf the value is 0, or the field is omitted, policy format version 1 will be\nreturned.",
+	//       "format": "int32",
+	//       "location": "query",
+	//       "type": "integer"
+	//     },
 	//     "resource": {
 	//       "description": "REQUIRED: The resource for which the policy is being requested.\nSee the operation documentation for the appropriate value for this field.",
 	//       "location": "path",
@@ -12590,12 +12847,24 @@ type ProjectsLocationsDatasetsFhirStoresGetIamPolicyCall struct {
 //
 // Authorization requires the Google IAM
 // permission
-// 'healthcare.fhirStores.getIamPolicy' for a FHIR store
+// `healthcare.fhirStores.getIamPolicy` for a FHIR store
 // or
-// 'healthcare.securityLabels.getIamPolicy' for a security label
+// `healthcare.securityLabels.getIamPolicy` for a security label
 func (r *ProjectsLocationsDatasetsFhirStoresService) GetIamPolicy(resource string) *ProjectsLocationsDatasetsFhirStoresGetIamPolicyCall {
 	c := &ProjectsLocationsDatasetsFhirStoresGetIamPolicyCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.resource = resource
+	return c
+}
+
+// OptionsRequestedPolicyVersion sets the optional parameter
+// "options.requestedPolicyVersion": The policy format version to be
+// returned.
+// Acceptable values are 0 and 1.
+// If the value is 0, or the field is omitted, policy format version 1
+// will be
+// returned.
+func (c *ProjectsLocationsDatasetsFhirStoresGetIamPolicyCall) OptionsRequestedPolicyVersion(optionsRequestedPolicyVersion int64) *ProjectsLocationsDatasetsFhirStoresGetIamPolicyCall {
+	c.urlParams_.Set("options.requestedPolicyVersion", fmt.Sprint(optionsRequestedPolicyVersion))
 	return c
 }
 
@@ -12697,7 +12966,7 @@ func (c *ProjectsLocationsDatasetsFhirStoresGetIamPolicyCall) Do(opts ...googlea
 	}
 	return ret, nil
 	// {
-	//   "description": "Gets the access control policy for a FHIR store or security label within a\nFHIR store. Returns NOT_FOUND error if the resource does not exist. Returns\nan empty policy if the resource exists but does not have a policy set.\n\nAuthorization requires the Google IAM permission\n'healthcare.fhirStores.getIamPolicy' for a FHIR store or\n'healthcare.securityLabels.getIamPolicy' for a security label",
+	//   "description": "Gets the access control policy for a FHIR store or security label within a\nFHIR store. Returns NOT_FOUND error if the resource does not exist. Returns\nan empty policy if the resource exists but does not have a policy set.\n\nAuthorization requires the Google IAM permission\n`healthcare.fhirStores.getIamPolicy` for a FHIR store or\n`healthcare.securityLabels.getIamPolicy` for a security label",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}:getIamPolicy",
 	//   "httpMethod": "GET",
 	//   "id": "healthcare.projects.locations.datasets.fhirStores.getIamPolicy",
@@ -12705,6 +12974,12 @@ func (c *ProjectsLocationsDatasetsFhirStoresGetIamPolicyCall) Do(opts ...googlea
 	//     "resource"
 	//   ],
 	//   "parameters": {
+	//     "options.requestedPolicyVersion": {
+	//       "description": "Optional. The policy format version to be returned.\nAcceptable values are 0 and 1.\nIf the value is 0, or the field is omitted, policy format version 1 will be\nreturned.",
+	//       "format": "int32",
+	//       "location": "query",
+	//       "type": "integer"
+	//     },
 	//     "resource": {
 	//       "description": "REQUIRED: The resource for which the policy is being requested.\nSee the operation documentation for the appropriate value for this field.",
 	//       "location": "path",
@@ -13282,9 +13557,9 @@ type ProjectsLocationsDatasetsFhirStoresSetIamPolicyCall struct {
 //
 // Authorization requires the Google IAM
 // permission
-// 'healthcare.fhirStores.setIamPolicy' for a FHIR store
+// `healthcare.fhirStores.setIamPolicy` for a FHIR store
 // or
-// 'healthcare.securityLabels.setIamPolicy' for a security label
+// `healthcare.securityLabels.setIamPolicy` for a security label
 func (r *ProjectsLocationsDatasetsFhirStoresService) SetIamPolicy(resource string, setiampolicyrequest *SetIamPolicyRequest) *ProjectsLocationsDatasetsFhirStoresSetIamPolicyCall {
 	c := &ProjectsLocationsDatasetsFhirStoresSetIamPolicyCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.resource = resource
@@ -13382,7 +13657,7 @@ func (c *ProjectsLocationsDatasetsFhirStoresSetIamPolicyCall) Do(opts ...googlea
 	}
 	return ret, nil
 	// {
-	//   "description": "Sets the access control policy for a FHIR store or security label within a\nFHIR store. Replaces any existing policy.\n\nAuthorization requires the Google IAM permission\n'healthcare.fhirStores.setIamPolicy' for a FHIR store or\n'healthcare.securityLabels.setIamPolicy' for a security label",
+	//   "description": "Sets the access control policy for a FHIR store or security label within a\nFHIR store. Replaces any existing policy.\n\nAuthorization requires the Google IAM permission\n`healthcare.fhirStores.setIamPolicy` for a FHIR store or\n`healthcare.securityLabels.setIamPolicy` for a security label",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}:setIamPolicy",
 	//   "httpMethod": "POST",
 	//   "id": "healthcare.projects.locations.datasets.fhirStores.setIamPolicy",
@@ -15874,12 +16149,24 @@ type ProjectsLocationsDatasetsFhirStoresSecurityLabelsGetIamPolicyCall struct {
 //
 // Authorization requires the Google IAM
 // permission
-// 'healthcare.fhirStores.getIamPolicy' for a FHIR store
+// `healthcare.fhirStores.getIamPolicy` for a FHIR store
 // or
-// 'healthcare.securityLabels.getIamPolicy' for a security label
+// `healthcare.securityLabels.getIamPolicy` for a security label
 func (r *ProjectsLocationsDatasetsFhirStoresSecurityLabelsService) GetIamPolicy(resource string) *ProjectsLocationsDatasetsFhirStoresSecurityLabelsGetIamPolicyCall {
 	c := &ProjectsLocationsDatasetsFhirStoresSecurityLabelsGetIamPolicyCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.resource = resource
+	return c
+}
+
+// OptionsRequestedPolicyVersion sets the optional parameter
+// "options.requestedPolicyVersion": The policy format version to be
+// returned.
+// Acceptable values are 0 and 1.
+// If the value is 0, or the field is omitted, policy format version 1
+// will be
+// returned.
+func (c *ProjectsLocationsDatasetsFhirStoresSecurityLabelsGetIamPolicyCall) OptionsRequestedPolicyVersion(optionsRequestedPolicyVersion int64) *ProjectsLocationsDatasetsFhirStoresSecurityLabelsGetIamPolicyCall {
+	c.urlParams_.Set("options.requestedPolicyVersion", fmt.Sprint(optionsRequestedPolicyVersion))
 	return c
 }
 
@@ -15981,7 +16268,7 @@ func (c *ProjectsLocationsDatasetsFhirStoresSecurityLabelsGetIamPolicyCall) Do(o
 	}
 	return ret, nil
 	// {
-	//   "description": "Gets the access control policy for a FHIR store or security label within a\nFHIR store. Returns NOT_FOUND error if the resource does not exist. Returns\nan empty policy if the resource exists but does not have a policy set.\n\nAuthorization requires the Google IAM permission\n'healthcare.fhirStores.getIamPolicy' for a FHIR store or\n'healthcare.securityLabels.getIamPolicy' for a security label",
+	//   "description": "Gets the access control policy for a FHIR store or security label within a\nFHIR store. Returns NOT_FOUND error if the resource does not exist. Returns\nan empty policy if the resource exists but does not have a policy set.\n\nAuthorization requires the Google IAM permission\n`healthcare.fhirStores.getIamPolicy` for a FHIR store or\n`healthcare.securityLabels.getIamPolicy` for a security label",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}/securityLabels/{securityLabelsId}:getIamPolicy",
 	//   "httpMethod": "GET",
 	//   "id": "healthcare.projects.locations.datasets.fhirStores.securityLabels.getIamPolicy",
@@ -15989,6 +16276,12 @@ func (c *ProjectsLocationsDatasetsFhirStoresSecurityLabelsGetIamPolicyCall) Do(o
 	//     "resource"
 	//   ],
 	//   "parameters": {
+	//     "options.requestedPolicyVersion": {
+	//       "description": "Optional. The policy format version to be returned.\nAcceptable values are 0 and 1.\nIf the value is 0, or the field is omitted, policy format version 1 will be\nreturned.",
+	//       "format": "int32",
+	//       "location": "query",
+	//       "type": "integer"
+	//     },
 	//     "resource": {
 	//       "description": "REQUIRED: The resource for which the policy is being requested.\nSee the operation documentation for the appropriate value for this field.",
 	//       "location": "path",
@@ -16025,9 +16318,9 @@ type ProjectsLocationsDatasetsFhirStoresSecurityLabelsSetIamPolicyCall struct {
 //
 // Authorization requires the Google IAM
 // permission
-// 'healthcare.fhirStores.setIamPolicy' for a FHIR store
+// `healthcare.fhirStores.setIamPolicy` for a FHIR store
 // or
-// 'healthcare.securityLabels.setIamPolicy' for a security label
+// `healthcare.securityLabels.setIamPolicy` for a security label
 func (r *ProjectsLocationsDatasetsFhirStoresSecurityLabelsService) SetIamPolicy(resource string, setiampolicyrequest *SetIamPolicyRequest) *ProjectsLocationsDatasetsFhirStoresSecurityLabelsSetIamPolicyCall {
 	c := &ProjectsLocationsDatasetsFhirStoresSecurityLabelsSetIamPolicyCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.resource = resource
@@ -16125,7 +16418,7 @@ func (c *ProjectsLocationsDatasetsFhirStoresSecurityLabelsSetIamPolicyCall) Do(o
 	}
 	return ret, nil
 	// {
-	//   "description": "Sets the access control policy for a FHIR store or security label within a\nFHIR store. Replaces any existing policy.\n\nAuthorization requires the Google IAM permission\n'healthcare.fhirStores.setIamPolicy' for a FHIR store or\n'healthcare.securityLabels.setIamPolicy' for a security label",
+	//   "description": "Sets the access control policy for a FHIR store or security label within a\nFHIR store. Replaces any existing policy.\n\nAuthorization requires the Google IAM permission\n`healthcare.fhirStores.setIamPolicy` for a FHIR store or\n`healthcare.securityLabels.setIamPolicy` for a security label",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}/securityLabels/{securityLabelsId}:setIamPolicy",
 	//   "httpMethod": "POST",
 	//   "id": "healthcare.projects.locations.datasets.fhirStores.securityLabels.setIamPolicy",
@@ -16603,6 +16896,18 @@ func (r *ProjectsLocationsDatasetsHl7V2StoresService) GetIamPolicy(resource stri
 	return c
 }
 
+// OptionsRequestedPolicyVersion sets the optional parameter
+// "options.requestedPolicyVersion": The policy format version to be
+// returned.
+// Acceptable values are 0 and 1.
+// If the value is 0, or the field is omitted, policy format version 1
+// will be
+// returned.
+func (c *ProjectsLocationsDatasetsHl7V2StoresGetIamPolicyCall) OptionsRequestedPolicyVersion(optionsRequestedPolicyVersion int64) *ProjectsLocationsDatasetsHl7V2StoresGetIamPolicyCall {
+	c.urlParams_.Set("options.requestedPolicyVersion", fmt.Sprint(optionsRequestedPolicyVersion))
+	return c
+}
+
 // Fields allows partial responses to be retrieved. See
 // https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
 // for more information.
@@ -16709,6 +17014,12 @@ func (c *ProjectsLocationsDatasetsHl7V2StoresGetIamPolicyCall) Do(opts ...google
 	//     "resource"
 	//   ],
 	//   "parameters": {
+	//     "options.requestedPolicyVersion": {
+	//       "description": "Optional. The policy format version to be returned.\nAcceptable values are 0 and 1.\nIf the value is 0, or the field is omitted, policy format version 1 will be\nreturned.",
+	//       "format": "int32",
+	//       "location": "query",
+	//       "type": "integer"
+	//     },
 	//     "resource": {
 	//       "description": "REQUIRED: The resource for which the policy is being requested.\nSee the operation documentation for the appropriate value for this field.",
 	//       "location": "path",

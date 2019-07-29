@@ -1358,13 +1358,55 @@
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/dialogflow"
               ]
+            },
+            "list": {
+              "description": "Lists operations that match the specified filter in the request. If the\nserver doesn't support this method, it returns `UNIMPLEMENTED`.\n\nNOTE: the `name` binding allows API services to override the binding\nto use different resource name schemes, such as `users/*/operations`. To\noverride the binding, API services can add a binding such as\n`\"/v1/{name=users/*}/operations\"` to their service configuration.\nFor backwards compatibility, the default name includes the operations\ncollection id, however overriding users must ensure the name binding\nis the parent resource, without the operations collection id.",
+              "flatPath": "v2/projects/{projectsId}/operations",
+              "httpMethod": "GET",
+              "id": "dialogflow.projects.operations.list",
+              "parameterOrder": [
+                "name"
+              ],
+              "parameters": {
+                "filter": {
+                  "description": "The standard list filter.",
+                  "location": "query",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "The name of the operation's parent resource.",
+                  "location": "path",
+                  "pattern": "^projects/[^/]+$",
+                  "required": true,
+                  "type": "string"
+                },
+                "pageSize": {
+                  "description": "The standard list page size.",
+                  "format": "int32",
+                  "location": "query",
+                  "type": "integer"
+                },
+                "pageToken": {
+                  "description": "The standard list page token.",
+                  "location": "query",
+                  "type": "string"
+                }
+              },
+              "path": "v2/{+name}/operations",
+              "response": {
+                "$ref": "GoogleLongrunningListOperationsResponse"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/dialogflow"
+              ]
             }
           }
         }
       }
     }
   },
-  "revision": "20190616",
+  "revision": "20190717",
   "rootUrl": "https://dialogflow.googleapis.com/",
   "schemas": {
     "GoogleCloudDialogflowV2Agent": {
@@ -1916,6 +1958,10 @@
           "description": "Required. Sample rate (in Hertz) of the audio content sent in the query.\nRefer to\n[Cloud Speech API\ndocumentation](https://cloud.google.com/speech-to-text/docs/basics) for\nmore details.",
           "format": "int32",
           "type": "integer"
+        },
+        "singleUtterance": {
+          "description": "Optional. If `false` (default), recognition does not cease until the\nclient closes the stream.\nIf `true`, the recognizer will detect a single spoken utterance in input\naudio. Recognition ceases when it detects the audio's voice has\nstopped or paused. In this case, once a detected intent is received, the\nclient should close the stream and start a new request with a new stream as\nneeded.\nNote: This setting is relevant only for streaming methods.\nNote: When specified, InputAudioConfig.single_utterance takes precedence\nover StreamingDetectIntentRequest.single_utterance.",
+          "type": "boolean"
         }
       },
       "type": "object"
@@ -2812,7 +2858,7 @@
           "description": "The intent that matched the conversational query. Some, not\nall fields are filled in this message, including but not limited to:\n`name`, `display_name` and `webhook_state`."
         },
         "intentDetectionConfidence": {
-          "description": "The intent detection confidence. Values range from 0.0\n(completely uncertain) to 1.0 (completely certain).\nIf there are `multiple knowledge_answers` messages, this value is set to\nthe greatest `knowledgeAnswers.match_confidence` value in the list.",
+          "description": "The intent detection confidence. Values range from 0.0\n(completely uncertain) to 1.0 (completely certain).\nThis value is for informational purpose only and is only used to\nhelp match the best intent within the classification threshold.\nThis value may change for the same end-user expression at any time due to a\nmodel retraining or change in implementation.\nIf there are `multiple knowledge_answers` messages, this value is set to\nthe greatest `knowledgeAnswers.match_confidence` value in the list.",
           "format": "float",
           "type": "number"
         },
@@ -3113,6 +3159,55 @@
       },
       "type": "object"
     },
+    "GoogleCloudDialogflowV2beta1AnnotatedConversationDataset": {
+      "description": "Represents an annotated conversation dataset.\nConversationDataset can have multiple AnnotatedConversationDataset, each of\nthem represents one result from one annotation task.\nAnnotatedConversationDataset can only be generated from annotation task,\nwhich will be triggered by LabelConversation.",
+      "id": "GoogleCloudDialogflowV2beta1AnnotatedConversationDataset",
+      "properties": {
+        "completedExampleCount": {
+          "description": "Output only. Number of examples that have annotations in the annotated\nconversation dataset.",
+          "format": "int64",
+          "type": "string"
+        },
+        "createTime": {
+          "description": "Output only. Creation time of this annotated conversation dataset.",
+          "format": "google-datetime",
+          "type": "string"
+        },
+        "description": {
+          "description": "Optional. The description of the annotated conversation dataset.\nMaximum of 10000 bytes.",
+          "type": "string"
+        },
+        "displayName": {
+          "description": "Required. The display name of the annotated conversation dataset.\nIt's specified when user starts an annotation task. Maximum of 64 bytes.",
+          "type": "string"
+        },
+        "exampleCount": {
+          "description": "Output only. Number of examples in the annotated conversation dataset.",
+          "format": "int64",
+          "type": "string"
+        },
+        "name": {
+          "description": "Output only. AnnotatedConversationDataset resource name. Format:\n`projects/\u003cProject ID\u003e/conversationDatasets/\u003cConversation Dataset\nID\u003e/annotatedConversationDatasets/\u003cAnnotated Conversation Dataset ID\u003e`",
+          "type": "string"
+        },
+        "questionTypeName": {
+          "description": "Output only. Question type name that identifies a labeling task.\nA question is a single task that a worker answers. A question type is set\nof related questions. Each question belongs to a particular question type.\nIt can be used in CrowdCompute UI to filter and manage labeling tasks.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1ArticleSuggestionModelMetadata": {
+      "description": "Metadata for article suggestion models.",
+      "id": "GoogleCloudDialogflowV2beta1ArticleSuggestionModelMetadata",
+      "properties": {
+        "modelType": {
+          "description": "Optional. Type of the article suggestion model. The available values are:\n*   `article-suggestion-gbt-1` - (default) Article Suggestion Gbt model.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "GoogleCloudDialogflowV2beta1BatchUpdateEntityTypesResponse": {
       "description": "The response message for EntityTypes.BatchUpdateEntityTypes.",
       "id": "GoogleCloudDialogflowV2beta1BatchUpdateEntityTypesResponse",
@@ -3161,6 +3256,61 @@
           },
           "description": "Optional. The collection of parameters associated with this context.\nRefer to [this\ndoc](https://cloud.google.com/dialogflow/docs/intents-actions-parameters)\nfor syntax.",
           "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1ConversationModel": {
+      "description": "Represents a conversation model.",
+      "id": "GoogleCloudDialogflowV2beta1ConversationModel",
+      "properties": {
+        "articleSuggestionModelMetadata": {
+          "$ref": "GoogleCloudDialogflowV2beta1ArticleSuggestionModelMetadata",
+          "description": "Metadata for article suggestion models."
+        },
+        "createTime": {
+          "description": "Output only. Creation time of this model.",
+          "format": "google-datetime",
+          "type": "string"
+        },
+        "datasets": {
+          "description": "Required. Datasets used to create model.",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2beta1InputDataset"
+          },
+          "type": "array"
+        },
+        "displayName": {
+          "description": "Required. The display name of the model. At most 64 bytes long.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Output only. ConversationModel resource name. Format:\n`projects/\u003cProject ID\u003e/conversationModels/\u003cConversation Model ID\u003e`",
+          "type": "string"
+        },
+        "state": {
+          "description": "Output only. State of the model. A model can only serve prediction requests\nafter it gets deployed.",
+          "enum": [
+            "STATE_UNSPECIFIED",
+            "CREATING",
+            "UNDEPLOYED",
+            "DEPLOYING",
+            "DEPLOYED",
+            "UNDEPLOYING",
+            "DELETING",
+            "FAILED"
+          ],
+          "enumDescriptions": [
+            "Should not be used, an un-set enum has this value by default.",
+            "Model is creating.",
+            "Model is not deployed but ready to deploy.",
+            "Model is deploying.",
+            "Model is deployed and ready to use.",
+            "Model is undeploying.",
+            "Model is deleting.",
+            "Model is in error state. Not ready to deploy and use."
+          ],
+          "type": "string"
         }
       },
       "type": "object"
@@ -3265,6 +3415,17 @@
         },
         "agentUri": {
           "description": "The URI to a file containing the exported agent. This field is populated\nonly if `agent_uri` is specified in `ExportAgentRequest`.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1InputDataset": {
+      "description": "InputDataset used to create model or do evaluation.",
+      "id": "GoogleCloudDialogflowV2beta1InputDataset",
+      "properties": {
+        "dataset": {
+          "description": "Required. ConversationDataset resource name. Format:\n`projects/\u003cProject ID\u003e/conversationDatasets/\u003cConversation Dataset ID\u003e`\nor\n`projects/\u003cProject ID\u003e/conversationDatasets/\u003cConversation Dataset\nID\u003e/annotatedConversationDatasets/\u003cAnnotated Conversation Dataset ID\u003e`",
           "type": "string"
         }
       },
@@ -3502,6 +3663,18 @@
         "quickReplies": {
           "$ref": "GoogleCloudDialogflowV2beta1IntentMessageQuickReplies",
           "description": "Displays quick replies."
+        },
+        "rbmCarouselRichCard": {
+          "$ref": "GoogleCloudDialogflowV2beta1IntentMessageRbmCarouselCard",
+          "description": "Rich Business Messaging (RBM) carousel rich card response."
+        },
+        "rbmStandaloneRichCard": {
+          "$ref": "GoogleCloudDialogflowV2beta1IntentMessageRbmStandaloneCard",
+          "description": "Standalone Rich Business Messaging (RBM) rich card response."
+        },
+        "rbmText": {
+          "$ref": "GoogleCloudDialogflowV2beta1IntentMessageRbmText",
+          "description": "Rich Business Messaging (RBM) text response.\n\nRBM allows businesses to send enriched and branded versions of SMS. See\nhttps://jibe.google.com/business-messaging."
         },
         "simpleResponses": {
           "$ref": "GoogleCloudDialogflowV2beta1IntentMessageSimpleResponses",
@@ -3748,6 +3921,233 @@
         },
         "title": {
           "description": "Optional. The title of the collection of quick replies.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1IntentMessageRbmCardContent": {
+      "description": "Rich Business Messaging (RBM) Card content",
+      "id": "GoogleCloudDialogflowV2beta1IntentMessageRbmCardContent",
+      "properties": {
+        "description": {
+          "description": "Optional. Description of the card (at most 2000 bytes).\n\nAt least one of the title, description or media must be set.",
+          "type": "string"
+        },
+        "media": {
+          "$ref": "GoogleCloudDialogflowV2beta1IntentMessageRbmCardContentRbmMedia",
+          "description": "Optional. However at least one of the title, description or media must\nbe set. Media (image, GIF or a video) to include in the card."
+        },
+        "suggestions": {
+          "description": "Optional. List of suggestions to include in the card.",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestion"
+          },
+          "type": "array"
+        },
+        "title": {
+          "description": "Optional. Title of the card (at most 200 bytes).\n\nAt least one of the title, description or media must be set.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1IntentMessageRbmCardContentRbmMedia": {
+      "description": "Rich Business Messaging (RBM) Media displayed in Cards\nThe following media-types are currently supported:\n\n## Image Types\n\n image/jpeg\n image/jpg'\n image/gif\n image/png\n\n## Video Types\n\n video/h263\n video/m4v\n video/mp4\n video/mpeg\n video/mpeg4\n video/webm",
+      "id": "GoogleCloudDialogflowV2beta1IntentMessageRbmCardContentRbmMedia",
+      "properties": {
+        "fileUri": {
+          "description": "Required. Publicly reachable URI of the file. The RBM platform\ndetermines the MIME type of the file from the content-type field in\nthe HTTP headers when the platform fetches the file. The content-type\nfield must be present and accurate in the HTTP response from the URL.",
+          "type": "string"
+        },
+        "height": {
+          "description": "Required for cards with vertical orientation. The height of the media\nwithin a rich card with a vertical layout. (https://goo.gl/NeFCjz).\nFor a standalone card with horizontal layout, height is not\ncustomizable, and this field is ignored.",
+          "enum": [
+            "HEIGHT_UNSPECIFIED",
+            "SHORT",
+            "MEDIUM",
+            "TALL"
+          ],
+          "enumDescriptions": [
+            "Not specified.",
+            "112 DP.",
+            "168 DP.",
+            "264 DP. Not available for rich card carousels when the card width\nis set to small."
+          ],
+          "type": "string"
+        },
+        "thumbnailUri": {
+          "description": "Optional. Publicly reachable URI of the thumbnail.If you don't\nprovide a thumbnail URI, the RBM platform displays a blank\nplaceholder thumbnail until the user's device downloads the file.\nDepending on the user's setting, the file may not download\nautomatically and may require the user to tap a download button.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1IntentMessageRbmCarouselCard": {
+      "description": "Carousel Rich Business Messaging (RBM) rich card.\n\nRich cards allow you to respond to users with more vivid content, e.g.\nwith media and suggestions.\n\nFor more details about RBM rich cards, please see:\nhttps://developers.google.com/rcs-business-messaging/rbm/guides/build/send-messages#rich-cards.\nIf you want to show a single card with more control over the layout,\nplease use RbmStandaloneCard instead.",
+      "id": "GoogleCloudDialogflowV2beta1IntentMessageRbmCarouselCard",
+      "properties": {
+        "cardContents": {
+          "description": "Required. The cards in the carousel. A carousel must have at least\n2 cards and at most 10.",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2beta1IntentMessageRbmCardContent"
+          },
+          "type": "array"
+        },
+        "cardWidth": {
+          "description": "Required. The width of the cards in the carousel.",
+          "enum": [
+            "CARD_WIDTH_UNSPECIFIED",
+            "SMALL",
+            "MEDIUM"
+          ],
+          "enumDescriptions": [
+            "Not specified.",
+            "120 DP. Note that tall media cannot be used.",
+            "232 DP."
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1IntentMessageRbmStandaloneCard": {
+      "description": "Standalone Rich Business Messaging (RBM) rich card.\n\nRich cards allow you to respond to users with more vivid content, e.g.\nwith media and suggestions.\n\nFor more details about RBM rich cards, please see:\nhttps://developers.google.com/rcs-business-messaging/rbm/guides/build/send-messages#rich-cards.\nYou can group multiple rich cards into one using RbmCarouselCard but\ncarousel cards will give you less control over the card layout.",
+      "id": "GoogleCloudDialogflowV2beta1IntentMessageRbmStandaloneCard",
+      "properties": {
+        "cardContent": {
+          "$ref": "GoogleCloudDialogflowV2beta1IntentMessageRbmCardContent",
+          "description": "Required. Card content."
+        },
+        "cardOrientation": {
+          "description": "Required. Orientation of the card.",
+          "enum": [
+            "CARD_ORIENTATION_UNSPECIFIED",
+            "HORIZONTAL",
+            "VERTICAL"
+          ],
+          "enumDescriptions": [
+            "Not specified.",
+            "Horizontal layout.",
+            "Vertical layout."
+          ],
+          "type": "string"
+        },
+        "thumbnailImageAlignment": {
+          "description": "Required if orientation is horizontal.\nImage preview alignment for standalone cards with horizontal layout.",
+          "enum": [
+            "THUMBNAIL_IMAGE_ALIGNMENT_UNSPECIFIED",
+            "LEFT",
+            "RIGHT"
+          ],
+          "enumDescriptions": [
+            "Not specified.",
+            "Thumbnail preview is left-aligned.",
+            "Thumbnail preview is right-aligned."
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestedAction": {
+      "description": "Rich Business Messaging (RBM) suggested client-side action that the user\ncan choose from the card.",
+      "id": "GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestedAction",
+      "properties": {
+        "dial": {
+          "$ref": "GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestedActionRbmSuggestedActionDial",
+          "description": "Suggested client side action: Dial a phone number"
+        },
+        "openUrl": {
+          "$ref": "GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestedActionRbmSuggestedActionOpenUri",
+          "description": "Suggested client side action: Open a URI on device"
+        },
+        "postbackData": {
+          "description": "Opaque payload that the Dialogflow receives in a user event\nwhen the user taps the suggested action. This data will be also\nforwarded to webhook to allow performing custom business logic.",
+          "type": "string"
+        },
+        "shareLocation": {
+          "$ref": "GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestedActionRbmSuggestedActionShareLocation",
+          "description": "Suggested client side action: Share user location"
+        },
+        "text": {
+          "description": "Text to display alongside the action.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestedActionRbmSuggestedActionDial": {
+      "description": "Opens the user's default dialer app with the specified phone number\nbut does not dial automatically (https://goo.gl/ergbB2).",
+      "id": "GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestedActionRbmSuggestedActionDial",
+      "properties": {
+        "phoneNumber": {
+          "description": "Required. The phone number to fill in the default dialer app.\nThis field should be in [E.164](https://en.wikipedia.org/wiki/E.164)\nformat. An example of a correctly formatted phone number:\n+15556767888.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestedActionRbmSuggestedActionOpenUri": {
+      "description": "Opens the user's default web browser app to the specified uri\n(https://goo.gl/6GLJD2). If the user has an app installed that is\nregistered as the default handler for the URL, then this app will be\nopened instead, and its icon will be used in the suggested action UI.",
+      "id": "GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestedActionRbmSuggestedActionOpenUri",
+      "properties": {
+        "uri": {
+          "description": "Required. The uri to open on the user device",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestedActionRbmSuggestedActionShareLocation": {
+      "description": "Opens the device's location chooser so the user can pick a location\nto send back to the agent (https://goo.gl/GXotJW).",
+      "id": "GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestedActionRbmSuggestedActionShareLocation",
+      "properties": {},
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestedReply": {
+      "description": "Rich Business Messaging (RBM) suggested reply that the user can click\ninstead of typing in their own response.",
+      "id": "GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestedReply",
+      "properties": {
+        "postbackData": {
+          "description": "Opaque payload that the Dialogflow receives in a user event\nwhen the user taps the suggested reply. This data will be also\nforwarded to webhook to allow performing custom business logic.",
+          "type": "string"
+        },
+        "text": {
+          "description": "Suggested reply text.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestion": {
+      "description": "Rich Business Messaging (RBM) suggestion. Suggestions allow user to\neasily select/click a predefined response or perform an action (like\nopening a web uri).",
+      "id": "GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestion",
+      "properties": {
+        "action": {
+          "$ref": "GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestedAction",
+          "description": "Predefined client side actions that user can choose"
+        },
+        "reply": {
+          "$ref": "GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestedReply",
+          "description": "Predefined replies for user to select instead of typing"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1IntentMessageRbmText": {
+      "description": "Rich Business Messaging (RBM) text response with suggestions.",
+      "id": "GoogleCloudDialogflowV2beta1IntentMessageRbmText",
+      "properties": {
+        "rbmSuggestion": {
+          "description": "Optional. One or more suggestions to show to the user.",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestion"
+          },
+          "type": "array"
+        },
+        "text": {
+          "description": "Required. Text sent and displayed to the user.",
           "type": "string"
         }
       },
@@ -4059,6 +4459,17 @@
       },
       "type": "object"
     },
+    "GoogleCloudDialogflowV2beta1LabelConversationResponse": {
+      "description": "The response for\nConversationDatasets.LabelConversation",
+      "id": "GoogleCloudDialogflowV2beta1LabelConversationResponse",
+      "properties": {
+        "annotatedConversationDataset": {
+          "$ref": "GoogleCloudDialogflowV2beta1AnnotatedConversationDataset",
+          "description": "New annotated conversation dataset created by the labeling task."
+        }
+      },
+      "type": "object"
+    },
     "GoogleCloudDialogflowV2beta1OriginalDetectIntentRequest": {
       "description": "Represents the contents of the original request that was passed to\nthe `[Streaming]DetectIntent` call.",
       "id": "GoogleCloudDialogflowV2beta1OriginalDetectIntentRequest",
@@ -4118,7 +4529,7 @@
           "description": "The intent that matched the conversational query. Some, not\nall fields are filled in this message, including but not limited to:\n`name`, `display_name` and `webhook_state`."
         },
         "intentDetectionConfidence": {
-          "description": "The intent detection confidence. Values range from 0.0\n(completely uncertain) to 1.0 (completely certain).\nIf there are `multiple knowledge_answers` messages, this value is set to\nthe greatest `knowledgeAnswers.match_confidence` value in the list.",
+          "description": "The intent detection confidence. Values range from 0.0\n(completely uncertain) to 1.0 (completely certain).\nThis value is for informational purpose only and is only used to\nhelp match the best intent within the classification threshold.\nThis value may change for the same end-user expression at any time due to a\nmodel retraining or change in implementation.\nIf there are `multiple knowledge_answers` messages, this value is set to\nthe greatest `knowledgeAnswers.match_confidence` value in the list.",
           "format": "float",
           "type": "number"
         },
@@ -4272,6 +4683,24 @@
         "source": {
           "description": "Optional. This value is passed directly to `QueryResult.webhook_source`.",
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleLongrunningListOperationsResponse": {
+      "description": "The response message for Operations.ListOperations.",
+      "id": "GoogleLongrunningListOperationsResponse",
+      "properties": {
+        "nextPageToken": {
+          "description": "The standard List next-page token.",
+          "type": "string"
+        },
+        "operations": {
+          "description": "A list of operations that matches the specified filter in the request.",
+          "items": {
+            "$ref": "GoogleLongrunningOperation"
+          },
+          "type": "array"
         }
       },
       "type": "object"

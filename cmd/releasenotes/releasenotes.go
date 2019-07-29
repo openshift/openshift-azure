@@ -1,5 +1,3 @@
-//+build releasenotes
-
 package main
 
 import (
@@ -7,174 +5,231 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/google/go-github/github"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
-	git "gopkg.in/libgit2/git2go.v27"
 )
 
-var (
-	mergerx       = regexp.MustCompile(`^Merge pull request #(\d+)`)
-	releasenoterx = regexp.MustCompile(`(?s)` + "```" + `release-notes?\r\n(.*?)(\r\n)?` + "```")
+var releasenoterx = regexp.MustCompile(`(?s)` + "```" + `release-notes?\r\n(.*?)(\r\n)?` + "```")
 
-	reponame    = flag.String("reponame", "openshift/openshift-azure", "GitHub repo name, e.g. openshift/openshift-azure")
-	repopath    = flag.String("repopath", ".", "path to local checked out git repo")
-	commitrange = flag.String("commitrange", "", "commit range, e.g. v2.5..master")
-)
-
-type releasenotes struct {
-	gh *github.Client
+func env(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
 }
 
-type model struct {
-	Commit      *git.Commit
-	PR          *github.PullRequest
-	ReleaseNote *string
+type options struct {
+	githubToken    string
+	githubOrg      string
+	githubRepo     string
+	outputFile     string
+	startSHA       string
+	endSHA         string
+	releaseVersion string
 }
 
-func newReleaseNotes(ctx context.Context) (*releasenotes, error) {
-	var cli *http.Client
+func (o *options) bindFlags() *flag.FlagSet {
+	flags := flag.NewFlagSet("release-notes", flag.ContinueOnError)
 
-	if token, found := os.LookupEnv("GITHUB_TOKEN"); found {
-		cli = oauth2.NewClient(
-			ctx,
-			oauth2.StaticTokenSource(
-				&oauth2.Token{AccessToken: token},
-			),
-		)
-	} else {
-		return nil, fmt.Errorf("env GITHUB_TOKEN needs to be set with a valid Github Personal Access Token")
-	}
+	flags.StringVar(&o.githubToken, "github-token", env("GITHUB_TOKEN", ""), "GitHub access token (required).")
+	flags.StringVar(&o.githubOrg, "github-org", env("GITHUB_ORG", "openshift"), "Name of github organization.")
+	flags.StringVar(&o.githubRepo, "github-repo", env("GITHUB_REPO", "openshift-azure"), "Name of github repository.")
+	flags.StringVar(&o.outputFile, "output-file", env("OUTPUT_FILE", "CHANGELOG.md"), "The path to the where the release notes will be printed.")
+	flags.StringVar(&o.startSHA, "start-sha", env("START_SHA", ""), "The tag or commit hash to start at.")
+	flags.StringVar(&o.endSHA, "end-sha", env("END_SHA", "master"), "The tag or commit hash to end at.")
+	flags.StringVar(&o.releaseVersion, "release-version", env("RELEASE_VERSION", ""), "Which release version to tag the entries as.")
 
-	return &releasenotes{
-		gh: github.NewClient(cli),
-	}, nil
+	return flags
 }
 
-func (rn *releasenotes) mergeCommits(repopath, commitrange string) ([]*git.Commit, error) {
-	repo, err := git.OpenRepository(repopath)
-	if err != nil {
-		return nil, err
+func (o *options) validate() error {
+	if o.githubToken == "" {
+		return fmt.Errorf("gitHub token must be set via -github-token or $GITHUB_TOKEN")
 	}
-
-	w, err := repo.Walk()
-	if err != nil {
-		return nil, err
+	if o.startSHA == "" {
+		return fmt.Errorf("starting commit hash must be set via -start-sha or $START_SHA")
 	}
-
-	w.Sorting(git.SortReverse)
-
-	err = w.PushRange(commitrange)
-	if err != nil {
-		return nil, err
+	if o.endSHA == "" {
+		return fmt.Errorf("ending commit hash must be set via -end-sha or $END_SHA")
 	}
-
-	var mergeCommits []*git.Commit
-
-	err = w.Iterate(func(commit *git.Commit) bool {
-		if commit.ParentCount() > 1 {
-			mergeCommits = append(mergeCommits, commit)
-		}
-		return true
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return mergeCommits, nil
-}
-
-func (rn *releasenotes) enrichCommits(ctx context.Context, reponame string, mergeCommits []*git.Commit) []model {
-	var models []model
-	for _, commit := range mergeCommits {
-		m := mergerx.FindStringSubmatch(commit.Message())
-		if m == nil {
-			log.Printf("couldn't find PR number on commit %s", commit.Id().String())
-			continue
-		}
-
-		number, err := strconv.Atoi(m[1])
-		if err != nil {
-			log.Print(err)
-			continue
-		}
-
-		log.Printf("retrieving PR %d", number)
-		pr, _, err := rn.gh.PullRequests.Get(ctx, reponame[:strings.IndexByte(reponame, '/')], reponame[strings.IndexByte(reponame, '/')+1:], number)
-		if err != nil {
-			log.Printf("couldn't retrieve PR https://github.com/%s/pull/%d", reponame, number)
-			continue
-		}
-
-		var releasenote *string
-		m = releasenoterx.FindStringSubmatch(*pr.Body)
-		if m != nil {
-			releasenote = &m[1]
-		} else {
-			log.Printf("couldn't find release note on PR https://github.com/%s/pull/%d", reponame, number)
-		}
-
-		models = append(models, model{Commit: commit, PR: pr, ReleaseNote: releasenote})
-	}
-
-	return models
-}
-
-func (rn *releasenotes) printModels(w io.Writer, reponame string, models []model) error {
-	for _, model := range models {
-		if model.ReleaseNote == nil || strings.EqualFold(*model.ReleaseNote, "none") {
-			continue
-		}
-
-		_, err := fmt.Fprintf(w, "## %s ([#%d](https://github.com/%s/pull/%[2]d), [@%[4]s](https://github.com/%[4]s), %[5]s)\n\n",
-			*model.PR.Title,
-			*model.PR.Number,
-			reponame,
-			*model.PR.User.Login,
-			model.PR.MergedAt.Format("02/01/2006"),
-		)
-		if err != nil {
-			return err
-		}
-
-		_, err = fmt.Fprintf(w, "%s\n\n\n",
-			*model.ReleaseNote,
-		)
-		if err != nil {
-			return err
-		}
+	if o.releaseVersion == "" {
+		return fmt.Errorf("release version must be set via -release-version or $RELEASE_VERSION")
 	}
 
 	return nil
 }
 
-func (rn *releasenotes) run(ctx context.Context) error {
-	mergeCommits, err := rn.mergeCommits(*repopath, *commitrange)
+type note struct {
+	commit      *github.RepositoryCommit
+	pullRequest *github.PullRequest
+	message     *string
+}
+
+func (n *note) String() string {
+	msg := *n.message
+	title := strings.ToUpper(string(msg[0])) + msg[1:]
+	number := n.pullRequest.GetNumber()
+	url := n.pullRequest.GetHTMLURL()
+	author := n.pullRequest.GetUser().GetLogin()
+	authorUrl := n.pullRequest.GetUser().GetHTMLURL()
+	mergedAt := n.pullRequest.GetMergedAt().Format("02/01/2006")
+
+	return fmt.Sprintf("- %s ([#%d](%s), [@%s](%s), %s)\n", title, number, url, author, authorUrl, mergedAt)
+}
+
+type scraper struct {
+	*github.Client
+	log     *logrus.Entry
+	options *options
+}
+
+func NewScraper(ctx context.Context, log *logrus.Entry, config *options) (*scraper, error) {
+	var cli *http.Client
+	cli = oauth2.NewClient(ctx, oauth2.StaticTokenSource(&oauth2.Token{AccessToken: config.githubToken}))
+	s := &scraper{
+		Client:  github.NewClient(cli),
+		log:     log,
+		options: config,
+	}
+
+	return s, nil
+}
+
+func (s *scraper) noteFromCommit(ctx context.Context, commit *github.RepositoryCommit) (*note, error) {
+	var prNumber int
+	if _, err := fmt.Sscanf(commit.Commit.GetMessage(), "Merge pull request #%d", &prNumber); err != nil {
+		return nil, err
+	}
+	pr, _, err := s.Client.PullRequests.Get(ctx, s.options.githubOrg, s.options.githubRepo, prNumber)
+	if err != nil {
+		return nil, err
+	}
+
+	noteBlocks := releasenoterx.FindStringSubmatch(pr.GetBody())
+	if noteBlocks != nil && !(noteBlocks[1] == "" || strings.EqualFold(noteBlocks[1], "none")) {
+		return &note{
+			commit:      commit,
+			pullRequest: pr,
+			message:     &noteBlocks[1],
+		}, nil
+	}
+	return nil, fmt.Errorf("no release-notes tag found for commit %s", commit.GetSHA())
+}
+
+func (s *scraper) FetchReleaseNotes(ctx context.Context) ([]*note, error) {
+	var notes []*note
+
+	startCommit, _, err := s.Repositories.GetCommit(ctx, s.options.githubOrg, s.options.githubRepo, s.options.startSHA)
+	if err != nil {
+		return nil, err
+	}
+	endCommit, _, err := s.Repositories.GetCommit(ctx, s.options.githubOrg, s.options.githubRepo, s.options.endSHA)
+	if err != nil {
+		return nil, err
+	}
+	listOptions := &github.CommitsListOptions{
+		Since: startCommit.Commit.GetCommitter().GetDate(),
+		Until: endCommit.Commit.GetCommitter().GetDate(),
+	}
+	listOptions.PerPage = 100
+
+	for {
+		commits, resp, err := s.Client.Repositories.ListCommits(ctx, s.options.githubOrg, s.options.githubRepo, listOptions)
+		if err != nil {
+			return nil, err
+		}
+		for _, commit := range commits {
+			if len(commit.Parents) > 1 {
+				note, err := s.noteFromCommit(ctx, commit)
+				if err != nil {
+					s.log.Debug(err)
+					continue
+				}
+				notes = append(notes, note)
+			}
+		}
+		if resp.NextPage == 0 {
+			break
+		}
+		listOptions.Page = resp.NextPage
+	}
+
+	return notes, nil
+}
+
+func (s *scraper) WriteToFile(w io.Writer, notes []*note) error {
+	var err error
+	write := func(s string) {
+		if err != nil {
+			return
+		}
+		_, err = w.Write([]byte(s))
+	}
+	write(fmt.Sprintf("## %s\n\n", s.options.releaseVersion))
+	for _, note := range notes {
+		write(note.String())
+	}
+	write("\n\n")
+	return nil
+}
+
+func run(ctx context.Context, log *logrus.Entry) error {
+	config := &options{}
+	flags := config.bindFlags()
+
+	log.Info("parsing flags")
+	if err := flags.Parse(os.Args[1:]); err != nil {
+		return err
+	}
+
+	log.Info("validating config")
+	if err := config.validate(); err != nil {
+		return err
+	}
+
+	log.Info("creating release notes scraper")
+	scraper, err := NewScraper(ctx, log, config)
 	if err != nil {
 		return err
 	}
 
-	models := rn.enrichCommits(ctx, *reponame, mergeCommits)
+	repo := fmt.Sprintf("github.com/%s/%s", scraper.options.githubOrg, scraper.options.githubRepo)
+	log.Infof("fetching release notes %s..%s from %s", scraper.options.startSHA, scraper.options.endSHA, repo)
+	notes, err := scraper.FetchReleaseNotes(ctx)
+	if err != nil {
+		return err
+	}
 
-	return rn.printModels(os.Stdout, *reponame, models)
+	log.Infof("writing release notes to file %s", scraper.options.outputFile)
+	var output io.Writer
+	if config.outputFile == "" {
+		output = os.Stdout
+	} else {
+		output, err = os.OpenFile(config.outputFile, os.O_WRONLY|os.O_CREATE, 0644)
+		if err != nil {
+			return err
+		}
+		defer output.(*os.File).Close()
+	}
+	err = scraper.WriteToFile(output, notes)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func main() {
 	ctx := context.Background()
-
-	flag.Parse()
-
-	rn, err := newReleaseNotes(ctx)
-	if err != nil {
-		panic(err)
-	}
-	if err = rn.run(ctx); err != nil {
-		panic(err)
+	logrus.SetLevel(logrus.InfoLevel)
+	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
+	log := logrus.NewEntry(logrus.StandardLogger())
+	if err := run(ctx, log); err != nil {
+		log.Fatal(err)
 	}
 }
