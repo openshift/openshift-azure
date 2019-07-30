@@ -35,6 +35,7 @@ type aadManager struct {
 	sc         graphrbac.ServicePrincipalsClient
 	rac        authorization.RoleAssignmentsClient
 	cs         *api.OpenShiftManagedCluster
+	log        *logrus.Entry
 }
 
 func newAADManager(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (*aadManager, error) {
@@ -54,30 +55,33 @@ func newAADManager(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftMana
 		sc:         graphrbac.NewServicePrincipalsClient(ctx, log, cs.Properties.AzProfile.TenantID, graphauthorizer),
 		rac:        authorization.NewRoleAssignmentsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
 		cs:         cs,
+		log:        log,
 	}, nil
 }
 
-func (am *aadManager) ensureApp(ctx context.Context, displayName string, p *api.ServicePrincipalProfile, roleDefinitionID string) error {
-	if p.ClientID != "" {
+func (am *aadManager) ensureApp(ctx context.Context, displayName string, clientID *string, secret *string, roleDefinitionID string) error {
+	if *clientID != "" {
 		return nil
 	}
-
-	p.Secret = uuid.NewV4().String()
-	app, err := am.ac.Create(ctx, azgraphrbac.ApplicationCreateParameters{
+	am.log.Debugf("create aad app %s", displayName)
+	*secret = uuid.NewV4().String()
+	appParam := azgraphrbac.ApplicationCreateParameters{
 		AvailableToOtherTenants: to.BoolPtr(false),
 		DisplayName:             &displayName,
 		IdentifierUris:          &[]string{"http://localhost/" + uuid.NewV4().String()},
 		PasswordCredentials: &[]azgraphrbac.PasswordCredential{
 			{
-				Value:   &p.Secret,
+				Value:   secret,
 				EndDate: &date.Time{Time: time.Now().AddDate(1, 0, 0)},
 			},
 		},
-	})
+	}
+
+	app, err := am.ac.Create(ctx, appParam)
 	if err != nil {
 		return err
 	}
-	p.ClientID = *app.AppID
+	*clientID = *app.AppID
 
 	var sp azgraphrbac.ServicePrincipal
 	err = wait.PollInfinite(5*time.Second, func() (bool, error) {
@@ -131,8 +135,8 @@ func (am *aadManager) ensureApp(ctx context.Context, displayName string, p *api.
 	return nil
 }
 
-func (am *aadManager) deleteApp(ctx context.Context, p *api.ServicePrincipalProfile) error {
-	objID, err := aadapp.GetApplicationObjectIDFromAppID(ctx, am.ac, p.ClientID)
+func (am *aadManager) deleteApp(ctx context.Context, clientID *string) error {
+	objID, err := aadapp.GetApplicationObjectIDFromAppID(ctx, am.ac, *clientID)
 	if err != nil {
 		return err
 	}
@@ -147,22 +151,22 @@ func (am *aadManager) ensureApps(ctx context.Context) error {
 	now := time.Now().Unix()
 
 	err := am.ensureApp(ctx, fmt.Sprintf("auto-%d-%s-master", now, am.cs.Properties.AzProfile.ResourceGroup),
-		&am.cs.Properties.MasterServicePrincipalProfile,
+		&am.cs.Properties.MasterServicePrincipalProfile.ClientID, &am.cs.Properties.MasterServicePrincipalProfile.Secret,
 		"/subscriptions/"+am.cs.Properties.AzProfile.SubscriptionID+"/providers/Microsoft.Authorization/roleDefinitions/"+OSAMasterRoleDefinitionID)
 	if err != nil {
 		return err
 	}
 
 	return am.ensureApp(ctx, fmt.Sprintf("auto-%d-%s-worker", now, am.cs.Properties.AzProfile.ResourceGroup),
-		&am.cs.Properties.WorkerServicePrincipalProfile,
+		&am.cs.Properties.WorkerServicePrincipalProfile.ClientID, &am.cs.Properties.WorkerServicePrincipalProfile.Secret,
 		"/subscriptions/"+am.cs.Properties.AzProfile.SubscriptionID+"/providers/Microsoft.Authorization/roleDefinitions/"+OSAWorkerRoleDefinitionID)
 }
 
 func (am *aadManager) deleteApps(ctx context.Context) error {
-	err := am.deleteApp(ctx, &am.cs.Properties.MasterServicePrincipalProfile)
+	err := am.deleteApp(ctx, &am.cs.Properties.MasterServicePrincipalProfile.ClientID)
 	if err != nil {
 		return err
 	}
 
-	return am.deleteApp(ctx, &am.cs.Properties.WorkerServicePrincipalProfile)
+	return am.deleteApp(ctx, &am.cs.Properties.WorkerServicePrincipalProfile.ClientID)
 }

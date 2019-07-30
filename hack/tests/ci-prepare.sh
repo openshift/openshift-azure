@@ -83,7 +83,9 @@ make secrets
 . ./secrets/secret
 export AZURE_CLIENT_ID="$AZURE_CI_CLIENT_ID"
 export AZURE_CLIENT_SECRET="$AZURE_CI_CLIENT_SECRET"
+export AZURE_AAD_CLIENT_ID="$AZURE_AAD_CI_CLIENT_ID"
+export AZURE_AAD_CLIENT_SECRET="$AZURE_AAD_CI_CLIENT_SECRET"
 
-az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${AZURE_TENANT_ID} >/dev/null
+az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${AZURE_TENANT_ID} --allow-no-subscriptions  >/dev/null
 
 reset_xtrace
