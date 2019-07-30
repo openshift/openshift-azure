@@ -21,7 +21,8 @@ EOF
 cp data/etc/yum.repos.d/kickstart.repo /etc/yum.repos.d/kickstart.repo
 
 yum check-update > /tmp/yum_check_update || true
-yum updateinfo > /tmp/yum_update_info || true
+yum updateinfo > /tmp/yum_updateinfo || true
+yum updateinfo list security -q > /tmp/yum_updateinfo_list_security || true
 
 
 # install openscap and run
@@ -29,8 +30,8 @@ yum install -y openscap-scanner openscap-utils scap-security-guide
 
 oscap xccdf eval \
   --profile xccdf_cloud.osadev_profile_stig_customized_aro \
-  --results /tmp/scap-results.xml \
-  --report /tmp/scap-report.html \
+  --results /tmp/scap_results.xml \
+  --report /tmp/scap_report.html \
   --tailoring-file /root/data/ssg-rhel7-ds-aro.xml \
   --oval-results --fetch-remote-resources \
   --cpe /usr/share/xml/scap/ssg/content/ssg-rhel7-cpe-dictionary.xml \
