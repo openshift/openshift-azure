@@ -42,8 +42,9 @@ cat >client-key.pem <<'EOF'
 {{ .Builder.ClientKey | PrivateKeyAsBytes | String }}
 EOF
 
-go get github.com/jim-minter/tlsproxy
-tlsproxy -insecure -key client-key.pem -cert client-cert.pem https://cdn.redhat.com/ &
+go get github.com/openshift/openshift-azure/cmd/azure
+set +x
+/go/bin/azure tlsproxy --insecure --key client-key.pem --cert client-cert.pem --hostname https://cdn.redhat.com/ --listen 0.0.0.0:8080 &
 while [[ "$(fuser -n tcp 8080)" == "" ]]; do
   sleep 1
 done
@@ -53,6 +54,7 @@ firewall-cmd --zone=public --add-port=8080/tcp
 IMAGE="{{ .Builder.Image }}"
 DISKGIB=${DISKGIB:-32}
 IP=$(ifconfig eth0 | awk '/inet / { print $2 }')
+
 
 cat >rhel7.ks <<KICKSTART
 bootloader
@@ -312,8 +314,8 @@ virt-sparsify --in-place /var/lib/libvirt/images/$IMAGE.raw
 
 mv /var/lib/libvirt/images/$IMAGE.raw /var/lib/libvirt/images/$IMAGE.vhd
 
-go get github.com/jim-minter/vhd-footer
-vhd-footer -size $((DISKGIB << 30)) >>/var/lib/libvirt/images/$IMAGE.vhd
+go get -u github.com/openshift/openshift-azure/cmd/vhdfooter
+/go/bin/vhd-footer -size $((DISKGIB << 30)) >>/var/lib/libvirt/images/$IMAGE.vhd
 
 set +x
 az login --service-principal -u '{{ .ClientID }}' -p '{{ .ClientSecret }}' -t '{{ .TenantID }}'
@@ -330,10 +332,10 @@ set -x
 # a large and mainly sparse disk image.  Use `azureblobupload` to speed things
 # up.
 
-go get github.com/jim-minter/azureblobupload
-set +x
 # az storage blob upload --account-name '{{ .Builder.ImageStorageAccount }}' --account-key $KEY --container-name '{{ .Builder.ImageContainer }}' --type page --file /var/lib/libvirt/images/$IMAGE.vhd
-azureblobupload -account-name '{{ .Builder.ImageStorageAccount }}' -account-key $KEY -container-name '{{ .Builder.ImageContainer }}' -file /var/lib/libvirt/images/$IMAGE.vhd -name $IMAGE.vhd
+go get -u github.com/openshift/openshift-azure/cmd/azureblobupload
+set +x
+/go/bin/azureblobupload -account-name '{{ .Builder.ImageStorageAccount }}' -account-key $KEY -container-name '{{ .Builder.ImageContainer }}' -file /var/lib/libvirt/images/$IMAGE.vhd -name $IMAGE.vhd
 set -x
 
 az image create -g '{{ .Builder.ImageResourceGroup }}' -n $IMAGE --source "https://{{ .Builder.ImageStorageAccount }}.blob.core.windows.net/{{ .Builder.ImageContainer }}/$IMAGE.vhd" --os-type Linux --tags "kernel=$KERNEL" "openshift=$OPENSHIFT" 'gitcommit={{ .Builder.GitCommit }}'
