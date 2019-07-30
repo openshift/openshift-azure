@@ -11,9 +11,7 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
 	"github.com/openshift/openshift-azure/pkg/util/log"
 )
@@ -25,6 +23,7 @@ func (c *cmdConfig) validate() (errs []error) {
 	if c.password == "" && c.username != "" ||
 		c.password != "" && c.username == "" {
 		errs = append(errs, fmt.Errorf("if either USERNAME or PASSWORD environment variable is unset, both must be unset"))
+	
 	}
 
 	return
@@ -37,11 +36,6 @@ func (c *cmdConfig) Init() error {
 
 	c.username = os.Getenv("USERNAME")
 	c.password = os.Getenv("PASSWORD")
-
-	// validate flags
-	if errs := c.validate(); len(errs) > 0 {
-		return errors.Wrap(kerrors.NewAggregate(errs), "validation failed")
-	}
 
 	// sanitize inputs
 	var err error
