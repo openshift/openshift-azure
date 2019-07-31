@@ -10,14 +10,14 @@ trap cleanup EXIT
 
 . hack/tests/ci-prepare.sh
 
-if [ -z "$IMAGE_RESOURCENAME" ] ;
-then
-  IMAGE_RESOURCENAME=$(az image list -g images --query '[-1].name' -o tsv)
-fi
-
 BUILD_RESOURCE_GROUP="vmimage-$(date +%Y%m%d%H%M)"
 IMAGE_RESOURCEGROUP="${IMAGE_RESOURCEGROUP:-images}"
 IMAGE_STORAGEACCOUNT="${IMAGE_STORAGEACCOUNT:-openshiftimages}"
+
+if [ -z "$IMAGE_RESOURCENAME" ] ;
+then
+  IMAGE_RESOURCENAME=$(az image list -g $IMAGE_RESOURCEGROUP --query '[-1].name' -o tsv)
+fi
 
 echo "Validating: ${IMAGE_RESOURCENAME}"
 
