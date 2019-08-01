@@ -306,6 +306,15 @@ var translations = map[string][]struct {
 	},
 	"DaemonSet.apps/openshift-azure-logging/omsagent": {
 		{
+			Path: jsonpath.MustCompile("$.metadata.labels['azure.openshift.io/sync-pod-optionally-apply']"),
+			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
+				if cs.Properties.MonitorProfile.WorkspaceID != "" && cs.Properties.MonitorProfile.WorkspaceKey != "" {
+					return "true", nil
+				}
+				return "false", nil
+			},
+		},
+		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
 			Template: "{{ .Config.Images.LogAnalyticsAgent }}",
 		},

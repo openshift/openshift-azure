@@ -43,6 +43,7 @@ import (
 
 const (
 	ownedBySyncPodLabelKey            = "azure.openshift.io/owned-by-sync-pod"
+	optionallyApplySyncPodLabelKey    = "azure.openshift.io/sync-pod-optionally-apply"
 	syncPodWaitForReadinessLabelKey   = "azure.openshift.io/sync-pod-wait-for-readiness"
 	syncPodReadinessPathAnnotationKey = "azure.openshift.io/sync-pod-readiness-path"
 	reconcileProtectAnnotationKey     = "openshift.io/reconcile-protect"

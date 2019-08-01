@@ -39,7 +39,7 @@ func (s *sync) applyResources(filter func(unstructured.Unstructured) bool, keys 
 	for _, k := range keys {
 		o := s.db[k]
 
-		if !filter(o) {
+		if !filter(o) || strings.ToLower(o.GetLabels()[optionallyApplySyncPodLabelKey]) == "false" {
 			continue
 		}
 
@@ -101,8 +101,12 @@ func (s *sync) deleteOrphans() error {
 					// check that the object is marked by the sync pod
 					l := i.GetLabels()
 					if l[ownedBySyncPodLabelKey] == "true" {
-						// if object is marked, but not in current DB, remove it
-						if _, ok := s.db[keyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName())]; !ok {
+						// if object is marked as owned by the sync pod
+						// but not in current DB, OR marked as don't apply
+						// then remove it
+						entry, inDB := s.db[keyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName())]
+						optionallyApply := (entry.GetLabels()[optionallyApplySyncPodLabelKey] != "false")
+						if !inDB || !optionallyApply {
 							s.log.Info("Delete " + keyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName()))
 							err = dc.Resource(&resource, i.GetNamespace()).Delete(i.GetName(), nil)
 							if err != nil {

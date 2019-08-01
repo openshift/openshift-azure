@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   labels:
+    azure.openshift.io/sync-pod-optionally-apply: '*** GENERATED ***'
     azure.openshift.io/sync-pod-wait-for-readiness: "false"
   name: omsagent
   namespace: openshift-azure-logging
