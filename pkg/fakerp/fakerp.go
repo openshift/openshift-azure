@@ -216,7 +216,7 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 
 	// write out development files
 	log.Info("write helpers")
-	err = os.MkdirAll("_data/_out", 0777)
+	err = os.MkdirAll("_data/_out", 0750)
 	if err != nil {
 		return nil, err
 	}
