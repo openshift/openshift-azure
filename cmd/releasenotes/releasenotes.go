@@ -211,7 +211,7 @@ func run(ctx context.Context, log *logrus.Entry) error {
 	if config.outputFile == "" {
 		output = os.Stdout
 	} else {
-		output, err = os.OpenFile(config.outputFile, os.O_WRONLY|os.O_CREATE, 0644)
+		output, err = os.OpenFile(config.outputFile, os.O_WRONLY|os.O_CREATE, 0600)
 		if err != nil {
 			return err
 		}
