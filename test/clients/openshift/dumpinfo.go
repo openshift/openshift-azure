@@ -30,7 +30,7 @@ func (cli *Client) DumpInfo(namespace, subDir string) error {
 	} else {
 		dir = filepath.Join(*artifactDir, subDir)
 	}
-	err := os.MkdirAll(dir, 0755)
+	err := os.MkdirAll(dir, 0750)
 	if err != nil {
 		return err
 	}
