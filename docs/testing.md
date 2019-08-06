@@ -35,7 +35,20 @@ Upstream issue: https://github.com/openshift/ci-operator-prowgen/issues/79
 ## Unit test
 
 Packages under `pkg` directory contain their individual unit tests.
-To run all unit tests locally, execute: `make unit` or `go test ./...`
+
+To run all unit tests locally, execute: `make unit`
+
+```makefile
+unit: generate testinsights
+  go test ./... -coverprofile=coverage.out -covermode=atomic -json | ./testinsights
+```
+
+or
+
+```go 
+go test ./...
+```
+
 To run a single package's tests:
 `go test ./pkg/util/tls`
 
@@ -48,11 +61,25 @@ The project has its own end-to-end testing test suite. You can find it under:
 `test/e2e/`. It uses [ginko](https://github.com/onsi/ginkgo) and [gomega](https://github.com/onsi/gomega).
 
 To run these tests you will need to have OpenShift cluster running.
-to execute e2e tests locally, execute: `make e2e` or `go test -tags e2e ./test/e2e`.
+
+The cluster running that you are trying to test **must** have the required files and environment variables described in [e2e requirements](e2e/requirements.md).
+
+To execute e2e tests **locally**, execute:
+`make e2e`   
+
+```Makefile
+e2e:
+  FOCUS="\[CustomerAdmin\]|\[EndUser\]" TIMEOUT=60m ./hack/e2e.sh
+```
+
+or
+```golang
+go test -tags e2e ./test/e2e
+```
 
 See [e2e requirements](e2e/requirements.md) for more information on the expected inputs to our e2e tests.
 
-See [running](e2e/README.md) for more information on how to run the e2e tests with the container image.
+See [running e2e](e2e/README.md) for more information on how to run the e2e tests with the container image.
 
 ## OpenShift Origin Conformance tests
 
@@ -62,7 +89,8 @@ found in [OpenShift Release repository](https://github.com/openshift/release/)
 
 ### Conformance test development
 
-If you want just to run conformance test locally, you can use docker image to do so.
+If you want just to run conformance test **locally**, you can use docker image to do so.
+
 ```
 # run and attach to test the container
 docker run -v $(pwd)/_data:/tmp/_data  -it openshift/origin-tests:v3.11 sh
