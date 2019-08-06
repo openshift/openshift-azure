@@ -90,7 +90,7 @@ func (cli *Client) dumpPodLogs(namespace, dir string) error {
 }
 
 func (cli *Client) dumpBuilds(namespace, dir string) error {
-	out, err := os.OpenFile(filepath.Join(dir, "builds.yaml"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	out, err := os.OpenFile(filepath.Join(dir, "builds.yaml"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return err
 	}
@@ -121,7 +121,7 @@ func (cli *Client) dumpBuilds(namespace, dir string) error {
 }
 
 func (cli *Client) dumpEvents(namespace, dir string) error {
-	out, err := os.OpenFile(filepath.Join(dir, "events.yaml"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	out, err := os.OpenFile(filepath.Join(dir, "events.yaml"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return err
 	}
@@ -147,7 +147,7 @@ func (cli *Client) dumpEvents(namespace, dir string) error {
 }
 
 func (cli *Client) dumpPods(namespace, dir string) error {
-	out, err := os.OpenFile(filepath.Join(dir, "pods.yaml"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	out, err := os.OpenFile(filepath.Join(dir, "pods.yaml"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return err
 	}
@@ -188,7 +188,7 @@ func (cli *Client) dumpPodsLogs(namespace, dir string) error {
 		}
 		defer podLogs.Close()
 
-		out, err := os.OpenFile(filepath.Join(dir, pod.Name+".log"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+		out, err := os.OpenFile(filepath.Join(dir, pod.Name+".log"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 		if err != nil {
 			return err
 		}
