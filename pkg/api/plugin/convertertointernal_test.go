@@ -1,6 +1,9 @@
 package plugin
 
 import (
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"net"
 	"reflect"
 	"testing"
 
@@ -8,8 +11,9 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/cmp"
+	"github.com/openshift/openshift-azure/pkg/util/tls"
 	"github.com/openshift/openshift-azure/test/util/populate"
-	"github.com/openshift/openshift-azure/test/util/tls"
+	testtls "github.com/openshift/openshift-azure/test/util/tls"
 )
 
 func externalPluginConfig() *Config {
@@ -48,16 +52,16 @@ func internalPluginConfig() api.Config {
 		GenevaLoggingControlPlaneRegion:      "GenevaLoggingControlPlaneRegion",
 		Certificates: api.CertificateConfig{
 			GenevaLogging: api.CertKeyPair{
-				Cert: tls.DummyCertificate,
-				Key:  tls.DummyPrivateKey,
+				Cert: testtls.DummyCertificate,
+				Key:  testtls.DummyPrivateKey,
 			},
 			GenevaMetrics: api.CertKeyPair{
-				Cert: tls.DummyCertificate,
-				Key:  tls.DummyPrivateKey,
+				Cert: testtls.DummyCertificate,
+				Key:  testtls.DummyPrivateKey,
 			},
 			PackageRepository: api.CertKeyPair{
-				Cert: tls.DummyCertificate,
-				Key:  tls.DummyPrivateKey,
+				Cert: testtls.DummyCertificate,
+				Key:  testtls.DummyPrivateKey,
 			},
 		},
 		// Container images configuration
@@ -112,5 +116,69 @@ func TestToInternal(t *testing.T) {
 	output, _ := ToInternal(&external, &api.Config{PluginVersion: "Versions.key"}, true)
 	if !reflect.DeepEqual(*output, internal) {
 		t.Errorf("unexpected diff %s", cmp.Diff(*output, internal))
+	}
+}
+
+func TestToInternalSecretUpdate(t *testing.T) {
+	// prepare external type
+	var external Config
+	populate.Walk(&external, func(v reflect.Value) {})
+	external.PluginVersion = "should not be copied"
+
+	cn := "dummy-test-certificate.local"
+	key, cert, err := tls.NewCert(&tls.CertParams{
+		Subject: pkix.Name{
+			CommonName:   cn,
+			Organization: []string{cn},
+		},
+		DNSNames:    []string{cn},
+		IPAddresses: []net.IP{net.ParseIP("192.168.0.1")},
+		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth | x509.ExtKeyUsageClientAuth},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = key.Validate()
+	if err != nil {
+		t.Error(err)
+	}
+
+	// this test is to ensure that the following secrets can be force updated using
+	// the setVersionFields flag.
+	external.Certificates.GenevaLogging.Key = key
+	external.Certificates.GenevaLogging.Cert = cert
+	external.Certificates.GenevaMetrics.Key = key
+	external.Certificates.GenevaMetrics.Cert = cert
+	external.Certificates.PackageRepository.Key = key
+	external.Certificates.PackageRepository.Cert = cert
+	external.GenevaImagePullSecret = []byte("hello")
+	external.ImagePullSecret = []byte("hello")
+
+	old := internalPluginConfig()
+	output, _ := ToInternal(&external, &old, true)
+	if !reflect.DeepEqual(output.Certificates.GenevaLogging.Cert, external.Certificates.GenevaLogging.Cert) {
+		t.Errorf("unexpected diff %s", cmp.Diff(output.Certificates.GenevaLogging.Cert, external.Certificates.GenevaLogging.Cert))
+	}
+	if !reflect.DeepEqual(output.Certificates.GenevaLogging.Key, external.Certificates.GenevaLogging.Key) {
+		t.Errorf("unexpected diff %s", cmp.Diff(output.Certificates.GenevaLogging.Key, external.Certificates.GenevaLogging.Key))
+	}
+	if !reflect.DeepEqual(output.Certificates.GenevaMetrics.Cert, external.Certificates.GenevaMetrics.Cert) {
+		t.Errorf("unexpected diff %s", cmp.Diff(output.Certificates.GenevaMetrics.Cert, external.Certificates.GenevaMetrics.Cert))
+	}
+	if !reflect.DeepEqual(output.Certificates.GenevaMetrics.Key, external.Certificates.GenevaMetrics.Key) {
+		t.Errorf("unexpected diff %s", cmp.Diff(output.Certificates.GenevaMetrics.Key, external.Certificates.GenevaMetrics.Key))
+	}
+	if !reflect.DeepEqual(output.Certificates.PackageRepository.Cert, external.Certificates.PackageRepository.Cert) {
+		t.Errorf("unexpected diff %s", cmp.Diff(output.Certificates.PackageRepository.Cert, external.Certificates.PackageRepository.Cert))
+	}
+	if !reflect.DeepEqual(output.Certificates.PackageRepository.Key, external.Certificates.PackageRepository.Key) {
+		t.Errorf("unexpected diff %s", cmp.Diff(output.Certificates.PackageRepository.Key, external.Certificates.PackageRepository.Key))
+	}
+	if !reflect.DeepEqual(output.Images.ImagePullSecret, external.ImagePullSecret) {
+		t.Errorf("unexpected diff %s", cmp.Diff(output.Images.ImagePullSecret, external.ImagePullSecret))
+	}
+	if !reflect.DeepEqual(output.Images.GenevaImagePullSecret, external.GenevaImagePullSecret) {
+		t.Errorf("unexpected diff %s", cmp.Diff(output.Images.GenevaImagePullSecret, external.GenevaImagePullSecret))
 	}
 }
