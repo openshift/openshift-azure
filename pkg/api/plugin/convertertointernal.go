@@ -92,22 +92,24 @@ func ToInternal(in *Config, old *api.Config, setVersionFields bool) (*api.Config
 		c.Images.TLSProxy = inVersion.Images.TLSProxy
 	}
 
-	if c.Certificates.GenevaLogging.Key == nil {
+	// use setVersionFields to override the secrets below otherwise
+	// they become un-updatable..
+	if c.Certificates.GenevaLogging.Key == nil || setVersionFields {
 		c.Certificates.GenevaLogging.Key = in.Certificates.GenevaLogging.Key
 	}
-	if c.Certificates.GenevaLogging.Cert == nil {
+	if c.Certificates.GenevaLogging.Cert == nil || setVersionFields {
 		c.Certificates.GenevaLogging.Cert = in.Certificates.GenevaLogging.Cert
 	}
-	if c.Certificates.GenevaMetrics.Key == nil {
+	if c.Certificates.GenevaMetrics.Key == nil || setVersionFields {
 		c.Certificates.GenevaMetrics.Key = in.Certificates.GenevaMetrics.Key
 	}
-	if c.Certificates.GenevaMetrics.Cert == nil {
+	if c.Certificates.GenevaMetrics.Cert == nil || setVersionFields {
 		c.Certificates.GenevaMetrics.Cert = in.Certificates.GenevaMetrics.Cert
 	}
-	if c.Certificates.PackageRepository.Key == nil {
+	if c.Certificates.PackageRepository.Key == nil || setVersionFields {
 		c.Certificates.PackageRepository.Key = in.Certificates.PackageRepository.Key
 	}
-	if c.Certificates.PackageRepository.Cert == nil {
+	if c.Certificates.PackageRepository.Cert == nil || setVersionFields {
 		c.Certificates.PackageRepository.Cert = in.Certificates.PackageRepository.Cert
 	}
 
@@ -137,10 +139,10 @@ func ToInternal(in *Config, old *api.Config, setVersionFields bool) (*api.Config
 		c.GenevaMetricsEndpoint = in.GenevaMetricsEndpoint
 	}
 
-	if c.Images.ImagePullSecret == nil {
+	if c.Images.ImagePullSecret == nil || setVersionFields {
 		c.Images.ImagePullSecret = in.ImagePullSecret
 	}
-	if c.Images.GenevaImagePullSecret == nil {
+	if c.Images.GenevaImagePullSecret == nil || setVersionFields {
 		c.Images.GenevaImagePullSecret = in.GenevaImagePullSecret
 	}
 
