@@ -35,5 +35,3 @@ oscap xccdf eval \
   --oval-results --fetch-remote-resources \
   --cpe /usr/share/xml/scap/ssg/content/ssg-rhel7-cpe-dictionary.xml \
   /usr/share/xml/scap/ssg/content/ssg-rhel7-ds.xml > /tmp/oscap.log || true
-  
-python -c 'import sys; from lxml import html; h = html.fromstring(open("/tmp/scap-report.html").read()); sys.exit(1) if len(h.find_class("rule-result rule-result-fail")) > 0 else sys.exit(0)'
