@@ -101,8 +101,8 @@ Red Hat technologies that are based off RHEL7, such as:
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_package_telnet-server_removed" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_service_auditd_enabled" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_audit_rules_system_shutdown" selected="true"/>
-    <xccdf:select idref="xccdf_org.ssgproject.content_rule_auditd_audispd_configure_remote_server" selected="true"/>
-    <xccdf:select idref="xccdf_org.ssgproject.content_rule_auditd_audispd_encrypt_sent_records" selected="true"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_auditd_audispd_configure_remote_server" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_auditd_audispd_encrypt_sent_records" selected="false"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_auditd_audispd_disk_full_action" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_auditd_data_retention_space_left" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_auditd_data_retention_space_left_action" selected="true"/>
