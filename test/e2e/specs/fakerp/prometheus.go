@@ -47,6 +47,7 @@ var _ = Describe("Prometheus E2E tests ", func() {
 
 		cli := &http.Client{
 			Transport: &http.Transport{
+				/* #nosec - connecting to internal API of a self created cluster */
 				TLSClientConfig: &tls.Config{
 					InsecureSkipVerify: true,
 				},

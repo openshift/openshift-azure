@@ -195,6 +195,7 @@ func (m *monitor) run(ctx context.Context) error {
 						DualStack: true,
 						LocalAddr: &net.TCPAddr{},
 					}).DialContext,
+					/* #nosec - connecting to external IP of a FakeRP cluster, expect self signed cert */
 					TLSClientConfig: &tls.Config{
 						InsecureSkipVerify: true,
 					},

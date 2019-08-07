@@ -5,7 +5,7 @@ metadata:
     description: Red Hat Single Sign-On Continuous Delivery
     openshift.io/display-name: Red Hat Single Sign-On Continuous Delivery
     openshift.io/provider-display-name: Red Hat, Inc.
-    version: "6"
+    version: "7"
   name: redhat-sso-cd-openshift
   namespace: openshift
 spec:
@@ -66,17 +66,40 @@ spec:
     referencePolicy:
       type: Local
   - annotations:
+      description: Red Hat Single Sign-On Continuous Delivery 7 Tech Preview image
+      iconClass: icon-sso
+      openshift.io/display-name: Red Hat Single Sign-On 7 Continuous Delivery (Tech
+        Preview)
+      supports: sso:7
+      tags: sso,keycloak,redhat,hidden
+      version: "7"
+    from:
+      kind: DockerImage
+      name: registry.redhat.io/redhat-sso-cd-tech-preview/sso-cd-openshift-rhel8:7
+    importPolicy: {}
+    name: "7"
+    referencePolicy:
+      type: Local
+  - annotations: null
+    from:
+      kind: ImageStreamTag
+      name: "7"
+    importPolicy: {}
+    name: "7.0"
+    referencePolicy:
+      type: Local
+  - annotations:
       description: Latest build of Red Hat Single Sign-On Continuous Delivery Tech
         Preview image
       iconClass: icon-sso
       openshift.io/display-name: Red Hat Single Sign-On Continuous Delivery (Tech
         Preview)
-      supports: sso:7.4
+      supports: sso:7
       tags: sso,keycloak,redhat,hidden
       version: latest
     from:
       kind: DockerImage
-      name: registry.redhat.io/redhat-sso-7-tech-preview/sso-cd-openshift:latest
+      name: registry.redhat.io/redhat-sso-cd-tech-preview/sso-cd-openshift-rhel8:latest
     importPolicy: {}
     name: latest
     referencePolicy:

@@ -132,6 +132,17 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 		return nil, err
 	}
 
+	am, err := newAADManager(ctx, log, cs, testConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Info("setting up service principals")
+	err = am.ensureApps(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	var errs []error
 	if isAdmin {
 		errs = p.ValidateAdmin(ctx, cs, oldCs)
@@ -156,17 +167,6 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 		}
 		cs.Properties.ClusterVersion = ""
 		cs.Config.PluginVersion = "latest"
-	}
-
-	am, err := newAADManager(ctx, log, cs, testConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	log.Info("setting up service principals")
-	err = am.ensureApps(ctx)
-	if err != nil {
-		return nil, err
 	}
 
 	dm, err := newDNSManager(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
@@ -216,7 +216,7 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 
 	// write out development files
 	log.Info("write helpers")
-	err = os.MkdirAll("_data/_out", 0777)
+	err = os.MkdirAll("_data/_out", 0750)
 	if err != nil {
 		return nil, err
 	}

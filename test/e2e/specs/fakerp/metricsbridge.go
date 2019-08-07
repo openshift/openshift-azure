@@ -101,6 +101,7 @@ var _ = Describe("Metricsbridge E2E check configured queries ", func() {
 			Address: "https://" + route.Spec.Host,
 			RoundTripper: &roundtrippers.AuthorizingRoundTripper{
 				RoundTripper: &http.Transport{
+					/* #nosec - connecting to internal API of a self created cluster */
 					TLSClientConfig: &tls.Config{
 						RootCAs:            nil,
 						InsecureSkipVerify: true,

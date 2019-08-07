@@ -42,9 +42,5 @@ func NewConfig(log *logrus.Entry) (*Config, error) {
 		return nil, fmt.Errorf("must set AZURE_REGIONS to a comma separated list")
 	}
 	log.Infof("using region %s", c.Region)
-	if c.AADClientID == "" {
-		c.AADClientID = c.ClientID
-		c.AADClientSecret = c.ClientSecret
-	}
 	return &c, nil
 }

@@ -37,7 +37,7 @@ func (s *storage) Put(cs *api.OpenShiftManagedCluster) error {
 		return err
 	}
 
-	err = os.MkdirAll(s.dir, 0777)
+	err = os.MkdirAll(s.dir, 0750)
 	if err != nil {
 		return err
 	}
