@@ -35,16 +35,16 @@ if [[ -z "$RESOURCEGROUP" ]]; then
   export RESOURCEGROUP="${IMAGE_RESOURCENAME//./}-e2e"
 fi
 
-make create
+#make create
 
-make e2e
+#make e2e
 
 # Run the image validation and capture the artifacts
-go generate ./... && go run -ldflags "-X main.gitCommit=$GITCOMMIT" ./cmd/vmimage -buildResourceGroup "${BUILD_RESOURCE_GROUP}" -imageResourceGroup "${IMAGE_RESOURCEGROUP}" -image "${IMAGE_RESOURCENAME}" -imageStorageAccount "${IMAGE_STORAGEACCOUNT}" -validate -preserveBuildResourceGroup
+#go generate ./... && go run -ldflags "-X main.gitCommit=$GITCOMMIT" ./cmd/vmimage -buildResourceGroup "${BUILD_RESOURCE_GROUP}" -imageResourceGroup "${IMAGE_RESOURCEGROUP}" -image "${IMAGE_RESOURCENAME}" -imageStorageAccount "${IMAGE_STORAGEACCOUNT}" -validate -preserveBuildResourceGroup
 
 echo "vmimage validate succ"
 # Currently there are only 3 logs we want to capture
-mv /tmp/{yum_update_info,yum_check_update,scap-report.html} ${ARTIFACTS:-/tmp}/ || true
+#mv /tmp/{yum_update_info,yum_check_update,scap-report.html} ${ARTIFACTS:-/tmp}/ || true
 
 echo "az account show"
 az account show
@@ -53,6 +53,8 @@ echo "az image show"
 
 TAGS=$(az image show -g "$IMAGE_RESOURCEGROUP" -n "$IMAGE_RESOURCENAME" --query tags | python -c 'import sys; import json; tags = json.load(sys.stdin); print " ".join(["%s=%s" % (k, v) for (k, v) in tags.items()])')
 echo "az resource tag "
+echo $TAG
+
 az resource tag -g "$IMAGE_RESOURCEGROUP" -n $IMAGE_RESOURCENAME --resource-type Microsoft.Compute/images --tags $TAGS valid=true
 
 echo "Built image $IMAGE_RESOURCENAME"
