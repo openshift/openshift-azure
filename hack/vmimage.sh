@@ -48,7 +48,8 @@ echo "vmimage validate succ"
 
 echo "az account show"
 az account show
-
+. hack/tests/ci-prepare.sh
+az account show
 echo "az image show"
 
 TAGS=$(az image show -g "$IMAGE_RESOURCEGROUP" -n "$IMAGE_RESOURCENAME" --query tags | python -c 'import sys; import json; tags = json.load(sys.stdin); print " ".join(["%s=%s" % (k, v) for (k, v) in tags.items()])')
