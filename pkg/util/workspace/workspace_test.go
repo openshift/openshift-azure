@@ -1,4 +1,4 @@
-package fakerp
+package workspace
 
 import (
 	"testing"
@@ -25,7 +25,7 @@ func TestParseLogAnalyticsResourceID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.resourceID, func(t *testing.T) {
-			got, got1, got2, err := parseLogAnalyticsResourceID(tt.resourceID)
+			got, got1, got2, err := ParseLogAnalyticsResourceID(tt.resourceID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("parseLogAnalyticsResourceID() error = %v, wantErr %v", err, tt.wantErr)
 				return

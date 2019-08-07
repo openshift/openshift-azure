@@ -8,8 +8,10 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/keyvault"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/operationalinsights"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
+	"github.com/openshift/openshift-azure/pkg/util/workspace"
 )
 
 func StorageAccountKeys(ctx context.Context, azs storage.AccountsClient, cs *api.OpenShiftManagedCluster) error {
@@ -80,5 +82,20 @@ func CertificatesFromVault(ctx context.Context, kvc keyvault.KeyVaultClient, cs 
 	}
 	cs.Config.Certificates.Router = *kp
 
+	return nil
+}
+
+func MonitorIDAndKey(ctx context.Context, client operationalinsights.WorkspacesClient, cs *api.OpenShiftManagedCluster) error {
+	wID := ""
+	wKey := ""
+	var err error
+	if cs.Properties.MonitorProfile.WorkspaceResourceID != "" {
+		wID, wKey, err = workspace.GetWorkspaceInfo(ctx, client, cs.Properties.MonitorProfile.WorkspaceResourceID)
+		if err != nil {
+			return err
+		}
+	}
+	cs.Properties.MonitorProfile.WorkspaceID = wID
+	cs.Properties.MonitorProfile.WorkspaceKey = wKey
 	return nil
 }

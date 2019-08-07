@@ -129,7 +129,7 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 	isUpdate := (oldCs != nil) // this is until we have called writeHelpers()
 
 	log.Info("enrich")
-	err := enrich(cs)
+	err := enrichCs(cs)
 	if err != nil {
 		return nil, err
 	}
@@ -203,17 +203,13 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 		return nil, err
 	}
 
-	wResourceID := os.Getenv("AZURE_WORKSPACE_ID")
-	wID := ""
-	wKey := ""
-	if wResourceID != "" {
-		wID, wKey, err = getWorkspaceInfo(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), wResourceID)
+	if cs.Properties.MonitorProfile.WorkspaceResourceID != "" {
+		log.Info("enabling ContainerInsights solution on the workspace")
+		err = createOrUpdateContainerInsights(ctx, log, cs)
 		if err != nil {
 			return nil, err
 		}
 	}
-	cs.Properties.MonitorProfile.WorkspaceID = wID
-	cs.Properties.MonitorProfile.WorkspaceKey = wKey
 
 	if !isAdmin {
 		errs = p.Validate(ctx, cs, oldCs, false)
@@ -258,7 +254,7 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 	return cs, nil
 }
 
-func enrich(cs *api.OpenShiftManagedCluster) error {
+func enrichCs(cs *api.OpenShiftManagedCluster) error {
 	// TODO: Use kelseyhightower/envconfig
 	for _, env := range []string{
 		"AZURE_CLIENT_ID",
