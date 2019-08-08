@@ -69,11 +69,11 @@ func (h *Hash) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoolP
 		hash.Write(cs.Config.Certificates.Router.Certs[0].Raw)
 
 		if h.TestConfig.DebugHashFunctions {
-			err = ioutil.WriteFile(fmt.Sprintf("cert-console-%d", time.Now().Unix()), cs.Config.Certificates.OpenShiftConsole.Certs[0].Raw, 0666)
+			err = ioutil.WriteFile(fmt.Sprintf("cert-console-%d", time.Now().UnixNano()), cs.Config.Certificates.OpenShiftConsole.Certs[0].Raw, 0666)
 			if err != nil {
 				return nil, err
 			}
-			err = ioutil.WriteFile(fmt.Sprintf("cert-router-%d", time.Now().Unix()), cs.Config.Certificates.Router.Certs[0].Raw, 0666)
+			err = ioutil.WriteFile(fmt.Sprintf("cert-router-%d", time.Now().UnixNano()), cs.Config.Certificates.Router.Certs[0].Raw, 0666)
 			if err != nil {
 				return nil, err
 			}

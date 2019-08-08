@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -353,7 +354,7 @@ func setupNewCluster(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftMa
 	kc := newFakeKubeclient(log, cli, seccli)
 	p := &plugin{
 		pluginConfig: template,
-		testConfig:   api.TestConfig{RunningUnderTest: true},
+		testConfig:   api.TestConfig{RunningUnderTest: true, DebugHashFunctions: os.Getenv("DEBUG_HASH_FUNCTIONS") == "true"},
 		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
 			return newFakeUpgrader(ctx, log, cs, testConfig, kc, az)
 		},
