@@ -112,7 +112,7 @@ func (g *simpleGenerator) Hash(app *api.AgentPoolProfile) ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		err = ioutil.WriteFile(fmt.Sprintf("vmss-%s-%d", app.Role, time.Now().Unix()), b, 0666)
+		err = ioutil.WriteFile(fmt.Sprintf("vmss-%s-%d", app.Role, time.Now().UnixNano()), b, 0666)
 		if err != nil {
 			return nil, err
 		}

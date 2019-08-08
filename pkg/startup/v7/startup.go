@@ -89,7 +89,7 @@ func (s *startup) Hash(role api.AgentPoolProfileRole) ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		err = ioutil.WriteFile(fmt.Sprintf("startup-%s-%d.tar", role, time.Now().Unix()), buf.Bytes(), 0666)
+		err = ioutil.WriteFile(fmt.Sprintf("startup-%s-%d.tar", role, time.Now().UnixNano()), buf.Bytes(), 0666)
 		if err != nil {
 			return nil, err
 		}
@@ -175,5 +175,5 @@ func (s *startup) writeFiles(role api.AgentPoolProfileRole, w writers.Writer, ho
 		}
 	}
 
-	return nil
+	return w.Close()
 }
