@@ -176,7 +176,9 @@ mkdir -pv /var/log/openshift-audit
 chmod -v 0750 /var/log/openshift-audit
 
 # mdsd/azsecd/azmond are enabled by default (but misconfigured), disable them until configured
-find /etc/systemd -name azsecd\\* -or -name azsecmond\\* -or -name mdsd\\* -type l -delete
+systemctl mask mdsd.service
+systemctl mask azsecd.service
+systemctl mask azsecmond.service
 
 # clean yum caches
 yum clean all
