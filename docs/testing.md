@@ -71,12 +71,12 @@ To execute e2e tests **locally**, execute:
 e2e:
   FOCUS="\[CustomerAdmin\]|\[EndUser\]" TIMEOUT=60m ./hack/e2e.sh
 ```
+or 
 
-or
-```golang
-go test -tags e2e ./test/e2e
+```bash
+export FOCUS='\[CustomerAdmin\]|\[EndUser\]'
+go test -v -tags e2e ./test/e2e -ginkgo.focus=$FOCUS
 ```
-
 See [e2e requirements](e2e/requirements.md) for more information on the expected inputs to our e2e tests.
 
 See [running e2e](e2e/README.md) for more information on how to run the e2e tests with the container image.
