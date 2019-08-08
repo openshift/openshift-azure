@@ -1,7 +1,7 @@
 #!/bin/bash -ex
 
 # https://github.com/openshift/openshift-azure/issues/1454
-for pos in /var/log/journald.pos/worker0/storage.json /var/log/openshift-audit.pos; do
+for pos in /var/log/*.pos/*/storage.json /var/log/*-cursor.json; do
     if [[ -e $pos && ! -s $pos ]]; then
         rm $pos
     fi
