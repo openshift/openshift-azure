@@ -26,3 +26,8 @@ go generate ./... && go run -ldflags "-X main.gitCommit=$(git rev-parse --short=
 
 # Currently there are only 3 logs we want to capture
 mv /tmp/{yum_update_info,yum_check_update,scap-report.html} ${ARTIFACTS:-/tmp}/ || true
+
+if grep -q "rule-result rule-result-fail" ${ARTIFACTS:-/tmp}/scap-report.html; then
+  >&2 echo "Some SCAP rules failed. Check report in the build artifacts"
+  exit 1
+fi
