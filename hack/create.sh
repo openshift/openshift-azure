@@ -6,6 +6,10 @@ if [[ $# -ne 1 ]]; then
 fi
 
 export RESOURCEGROUP=$1
+# use image RG images to test latest code
+export IMAGE_RESOURCEGROUP=images
+export IMAGE_RESOURCENAME=$(az image list -g $IMAGE_RESOURCEGROUP -o json --query "[?starts_with(name, 'rhel7-${DEPLOY_VERSION//v}') && tags.valid=='true'].name | sort(@) | [-1]" | tr -d '"')
+
 
 rm -rf _data
 mkdir -p _data/_out
