@@ -10,7 +10,7 @@ done
 
 # if there are multiple crashes, remove all but the most recent
 # mkdir is required or will fail rc.local
-mkdir /var/crash
+mkdir -p /var/crash
 for crash in $(ls -dt /var/crash/* | tail -n +2); do
     rm -rf $crash
 done
