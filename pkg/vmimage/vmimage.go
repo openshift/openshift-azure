@@ -123,7 +123,7 @@ func (builder *Builder) Run(ctx context.Context) error {
 
 	defer func() {
 		if !builder.PreserveBuildResourceGroup {
-			builder.Log.Infof("PerserveBuildResourceGroup not set, deleting build resource group")
+			builder.Log.Infof("PreserveBuildResourceGroup not set, deleting build resource group")
 			builder.Groups.Delete(ctx, builder.BuildResourceGroup)
 		}
 	}()

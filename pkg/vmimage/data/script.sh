@@ -164,7 +164,23 @@ yum -y install \
     tree \
     find \
     WALinuxAgent \
-    yum-utils
+    yum-utils \
+    azure-mdsd \
+    azure-security \
+    azsec-monitor \
+    fluentd \
+    rubygem-fluent-plugin-systemd
+
+# openshift-audit dir ends up with wrong permissions, preemptively fix that
+mkdir -pv /var/log/openshift-audit
+chmod -v 0750 /var/log/openshift-audit
+
+# mdsd/azsecd/azmond are enabled by default (but misconfigured), disable them until configured
+systemctl mask mdsd.service
+systemctl mask azsecd.service
+systemctl mask azsecmond.service
+
+# clean yum caches
 yum clean all
 
 base64 -d <<'EOF' | tar -C / -x
@@ -174,7 +190,8 @@ EOF
 # not commited with a : so that Windows users can check out the repo
 mv /etc/docker/certs.d/docker-registry.default.svc-5000 /etc/docker/certs.d/docker-registry.default.svc:5000
 
-rm /var/lib/yum/client-cert.pem /var/lib/yum/client-key.pem
+rm -fv /var/lib/yum/client-cert.pem \
+  /var/lib/yum/client-key.pem
 
 mkdir /var/lib/etcd
 
