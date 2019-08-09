@@ -9,7 +9,13 @@ partprobe
 xfs_growfs /dev/sda2
 
 yum -y update -x WALinuxAgent # updating WALinuxAgent kills this script
-yum -y install git golang libguestfs-tools-c libvirt-daemon-config-network virt-install
+yum -y install git libguestfs-tools-c libvirt-daemon-config-network virt-install
+
+# install golang-1.11 from source because rhel7 ships with golang 1.9 by default
+curl -s https://storage.googleapis.com/golang/go1.11.12.linux-amd64.tar.gz | tar -C /usr/local -xz
+export GOPATH=/go
+export GOROOT=/usr/local/go
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 
 rpm --import https://packages.microsoft.com/keys/microsoft.asc
 cat >/etc/yum.repos.d/azure-cli.repo <<'EOF'
