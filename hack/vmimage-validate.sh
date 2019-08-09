@@ -24,10 +24,16 @@ echo "Validating: ${IMAGE_RESOURCENAME}"
 # pass -preserveBuildResourceGroup so we can copy artifacts
 go generate ./... && go run -ldflags "-X main.gitCommit=$(git rev-parse --short=10 HEAD)" ./cmd/vmimage -buildResourceGroup "${BUILD_RESOURCE_GROUP}" -imageResourceGroup "${IMAGE_RESOURCEGROUP}" -image "${IMAGE_RESOURCENAME}" -imageStorageAccount "${IMAGE_STORAGEACCOUNT}" -validate -preserveBuildResourceGroup
 
-# Currently there are only 3 logs we want to capture
-mv /tmp/{yum_update_info,yum_check_update,scap-report.html} ${ARTIFACTS:-/tmp}/ || true
+# Logs we want to capture
+mv /tmp/{yum_updateinfo,yum_updateinfo_list_security,yum_check_update,scap_report.html} ${ARTIFACTS:-/tmp}/ || true
 
-if grep -q "rule-result rule-result-fail" ${ARTIFACTS:-/tmp}/scap-report.html; then
+if grep -q "rule-result rule-result-fail" ${ARTIFACTS:-/tmp}/scap_report.html; then
   >&2 echo "Some SCAP rules failed. Check report in the build artifacts"
+  exit 1
+fi
+
+if [ -s "${ARTIFACTS:-/tmp}/yum_updateinfo_list_security" ]; then
+  >&2 echo "Found pending security updates:"
+  >&2 cat /tmp/yum_updateinfo_list_security
   exit 1
 fi

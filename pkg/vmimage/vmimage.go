@@ -165,7 +165,12 @@ func (builder *Builder) Run(ctx context.Context) error {
 
 	if builder.Validate {
 		builder.Log.Infof("copy file from VM")
-		err := builder.scp([]string{"/tmp/yum_update_info", "/tmp/yum_check_update", "/tmp/scap-report.html"})
+		err := builder.scp([]string{
+			"/tmp/yum_updateinfo",
+			"/tmp/yum_updateinfo_list_security",
+			"/tmp/yum_check_update",
+			"/tmp/scap_report.html",
+		})
 		if err != nil {
 			return err
 		}
