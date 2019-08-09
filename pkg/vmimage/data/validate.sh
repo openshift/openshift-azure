@@ -25,7 +25,7 @@ yum updateinfo > /tmp/yum_update_info || true
 
 
 # install openscap and run
-yum install -y openscap-scanner openscap-utils scap-security-guide python-lxml
+yum install -y openscap-scanner openscap-utils scap-security-guide
 
 oscap xccdf eval \
   --profile xccdf_cloud.osadev_profile_stig_customized_aro \
