@@ -138,33 +138,15 @@ func nic(subscriptionID, resourceGroup, location string) *network.Interface {
 	}
 }
 
-func vm(subscriptionID, resourceGroup, location, sshPublicKey, image, imageResourceGroup string, verify bool) *compute.VirtualMachine {
-	var imageReference compute.ImageReference
-	if !verify {
-		imageReference = compute.ImageReference{
-			Publisher: to.StringPtr("RedHat"),
-			Offer:     to.StringPtr("RHEL"),
-			Sku:       to.StringPtr("7-RAW"),
-			Version:   to.StringPtr("latest"),
-		}
-	} else {
-		imageReference = compute.ImageReference{
-			ID: to.StringPtr(resourceid.ResourceID(
-				subscriptionID,
-				imageResourceGroup,
-				"Microsoft.Compute/images",
-				image,
-			)),
-		}
-	}
-
+func vm(subscriptionID, resourceGroup, location, sshPublicKey string, plan *compute.Plan, imageReference *compute.ImageReference) *compute.VirtualMachine {
 	return &compute.VirtualMachine{
+		Plan: plan,
 		VirtualMachineProperties: &compute.VirtualMachineProperties{
 			HardwareProfile: &compute.HardwareProfile{
 				VMSize: compute.VirtualMachineSizeTypesStandardD2sV3,
 			},
 			StorageProfile: &compute.StorageProfile{
-				ImageReference: &imageReference,
+				ImageReference: imageReference,
 				OsDisk: &compute.OSDisk{
 					CreateOption: compute.DiskCreateOptionTypesFromImage,
 					ManagedDisk: &compute.ManagedDiskParameters{

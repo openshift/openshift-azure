@@ -7,14 +7,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	azresources "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/util/arm"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
+	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 	"github.com/openshift/openshift-azure/pkg/util/template"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
@@ -39,6 +42,8 @@ type Builder struct {
 	ImageResourceGroup         string
 	ImageStorageAccount        string
 	ImageContainer             string
+	ImageSku                   string
+	ImageVersion               string
 	SSHKey                     *rsa.PrivateKey
 	ClientKey                  *rsa.PrivateKey
 	ClientCert                 *x509.Certificate
@@ -80,6 +85,16 @@ func (builder *Builder) generateTemplate() (map[string]interface{}, error) {
 		return nil, err
 	}
 
+	imageReference := builder.vmImageReference()
+	var vmPlan *compute.Plan
+	if builder.hasMarketplaceVMImageRef() {
+		vmPlan = &compute.Plan{
+			Name:      imageReference.Sku,
+			Publisher: imageReference.Publisher,
+			Product:   imageReference.Offer,
+		}
+	}
+
 	t := arm.Template{
 		Schema:         "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
 		ContentVersion: "1.0.0.0",
@@ -88,7 +103,7 @@ func (builder *Builder) generateTemplate() (map[string]interface{}, error) {
 			ip(builder.BuildResourceGroup, builder.Location, builder.DomainNameLabel),
 			nsg(builder.Location),
 			nic(builder.SubscriptionID, builder.BuildResourceGroup, builder.Location),
-			vm(builder.SubscriptionID, builder.BuildResourceGroup, builder.Location, sshPublicKey, builder.Image, builder.ImageResourceGroup, builder.Validate),
+			vm(builder.SubscriptionID, builder.BuildResourceGroup, builder.Location, sshPublicKey, vmPlan, imageReference),
 			cse,
 		},
 	}
@@ -114,8 +129,82 @@ func (builder *Builder) generateTemplate() (map[string]interface{}, error) {
 	return template, nil
 }
 
+func (builder *Builder) vmImageReference() *compute.ImageReference {
+	if !builder.Validate {
+		// Building a new image in a VM
+		return &compute.ImageReference{
+			Publisher: to.StringPtr("RedHat"),
+			Offer:     to.StringPtr("RHEL"),
+			Sku:       to.StringPtr("7-RAW"),
+			Version:   to.StringPtr("latest"),
+		}
+	}
+
+	// Validating an existing marketplace image
+	if builder.hasMarketplaceVMImageRef() {
+		return &compute.ImageReference{
+			Publisher: to.StringPtr("redhat"),
+			Offer:     to.StringPtr("osa"),
+			Sku:       to.StringPtr(builder.ImageSku),
+			Version:   to.StringPtr(builder.ImageVersion),
+		}
+	}
+
+	// Validating an existing custom image in one of our resource groups
+	return &compute.ImageReference{
+		ID: to.StringPtr(resourceid.ResourceID(
+			builder.SubscriptionID,
+			builder.ImageResourceGroup,
+			"Microsoft.Compute/images",
+			builder.Image,
+		)),
+	}
+}
+
+func (builder *Builder) hasMarketplaceVMImageRef() bool {
+	return builder.ImageSku != "" && builder.ImageVersion != ""
+}
+
+func (builder *Builder) hasCustomVMIMageRef() bool {
+	return builder.Image != "" &&
+		builder.ImageResourceGroup != "" &&
+		builder.ImageStorageAccount != "" &&
+		builder.ImageContainer != ""
+
+}
+
+// ValidateFields makes sure that the builder struct has correct values in fields
+func (builder *Builder) ValidateFields() error {
+	vmImageRefFields := []string{"ImageSku", "ImageVersion"}
+	customVMIMageRefFields := []string{"Image", "ImageResourceGroup", "ImageStorageAccount", "ImageContainer"}
+
+	if !builder.hasMarketplaceVMImageRef() && !builder.hasCustomVMIMageRef() {
+		return fmt.Errorf(
+			"missing fields: you must provide values for either %s fields or %s fields",
+			strings.Join(vmImageRefFields, ", "),
+			strings.Join(customVMIMageRefFields, ", "),
+		)
+	}
+
+	if builder.hasMarketplaceVMImageRef() && builder.hasCustomVMIMageRef() {
+		return fmt.Errorf(
+			"confilicting fields: you must provide values for either %s fields or %s fields",
+			strings.Join(vmImageRefFields, ", "),
+			strings.Join(customVMIMageRefFields, ", "),
+		)
+	}
+
+	return nil
+}
+
 // Run is the main entry point
 func (builder *Builder) Run(ctx context.Context) error {
+	if builder.hasCustomVMIMageRef() {
+		builder.Log.Debugf("using %s image in %s resource group", builder.Image, builder.ImageResourceGroup)
+	} else {
+		builder.Log.Debugf("using: redhat osa image (SKU: %s; Version: %s)", builder.ImageSku, builder.ImageVersion)
+	}
+
 	template, err := builder.generateTemplate()
 	if err != nil {
 		return err
