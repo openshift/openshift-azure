@@ -53,7 +53,7 @@ have permissions that you may not have.
    `cp env.example env`.
 
 1. **AAD Application / Service principal**.  Create a personal AAD Application:
-   1. `hack/aad.sh app-create user-$USER-aad jminter-team-shared`
+   1. `hack/aad.sh app-create user-$USER-aad aro-team-shared`
    1. Update env to include the AZURE_AAD_CLIENT_ID and AZURE_AAD_CLIENT_SECRET
       values output by aad.sh.
    1. Ask an AAD administrator to grant permissions to your application.
