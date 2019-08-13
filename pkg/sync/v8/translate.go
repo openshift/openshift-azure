@@ -307,7 +307,7 @@ var translations = map[string][]struct {
 	"DaemonSet.apps/openshift-azure-logging/omsagent": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.Images.MonitorAgent }}",
+			Template: "{{ .Config.Images.LogAnalyticsAgent }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='WSID')].value"),
@@ -370,7 +370,7 @@ var translations = map[string][]struct {
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.Images.MonitorAgent }}",
+			Template: "{{ .Config.Images.LogAnalyticsAgent }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='WSID')].value"),

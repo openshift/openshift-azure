@@ -242,7 +242,7 @@ var marshalled = []byte(`{
 			"genevaTDAgent": "Config.Images.GenevaTDAgent",
 			"genevaStatsd": "Config.Images.GenevaStatsd",
 			"metricsBridge": "Config.Images.MetricsBridge",
-			"monitorAgent": "Config.Images.MonitorAgent",
+			"logAnalyticsAgent": "Config.Images.LogAnalyticsAgent",
 			"imagePullSecret": "Q29uZmlnLkltYWdlcy5JbWFnZVB1bGxTZWNyZXQ="
 		},
 		"adminKubeconfig": "eyJwcmVmZXJlbmNlcyI6e30sImNsdXN0ZXJzIjpudWxsLCJ1c2VycyI6bnVsbCwiY29udGV4dHMiOm51bGwsImN1cnJlbnQtY29udGV4dCI6IiJ9",

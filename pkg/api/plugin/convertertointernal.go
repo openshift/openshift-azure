@@ -91,7 +91,7 @@ func ToInternal(in *Config, old *api.Config, setVersionFields bool) (*api.Config
 		c.Images.Sync = inVersion.Images.Sync
 		c.Images.TLSProxy = inVersion.Images.TLSProxy
 
-		c.Images.MonitorAgent = inVersion.Images.MonitorAgent
+		c.Images.LogAnalyticsAgent = inVersion.Images.LogAnalyticsAgent
 	}
 
 	// use setVersionFields to override the secrets below otherwise
