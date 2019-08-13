@@ -9,7 +9,7 @@ Per stream:
 * VM image (operating system, openshift RPMs)
 * OpenShift container images
 * Microsoft container images (mdsd, mdm, etc.)
-* Openshift-azure container images (sync, etcdbackup, azure-controllers, etc.)
+* Openshift-azure "azure" container image
 * Openshift-azure repository, including plugin and manifest per stream
 
 For each stream, the configuration manifest combines the version numbers of all of the above (except the openshift-azure repository) and is checked into the openshift-azure repository.
@@ -30,15 +30,13 @@ Within a stream, our goal is to be able to directly upgrade any deployed product
 # Versioning
 
 ## Major releases
-The plugin major release (“n”) is incremented with each weekly release.
+The plugin major release (“n”) is incremented with each sprint's release.
 
 ### Major release creation flow:
 
 1. Create a branch `release-n` with a plugin code you wish to release. It is preferable, but not essential, that we branch master. We expect the commit that is being branched to be passing tests
 2. Configuration step for CI so new release branch would be tested with our test suites
-
-Follow minor release flow
-The above should be automated as much as possible, e.g. pushing a git tag triggers image builds
+3. Follow minor release flow
 
 ## Minor releases
 
@@ -51,7 +49,6 @@ The above should be automated as much as possible, e.g. pushing a git tag trigge
 2. Git tag release (`vn.x`)
 3. Build openshift-azure container image (`sync:vn.x`, etc)
 4. If the minor release is a cherry-pick (not a straightforward branch of master), carry out update testing before release to MSFT
-5. (TBD) CI test on the result? User documentation release procedure? Release procedure to MSFT?
 
 Branching model
 ```
@@ -64,12 +61,22 @@ Branching model
 
 # Doing a release with current integration:
 
-1. Create a branch from master and push it. This will create branch for us to do release in.
+0. Build and publish the VM image. For major releases, typically this should
+   happen at the end of the second week of the sprint. See the [VM building
+   SOP.](https://github.com/openshift/azure-sop/blob/master/release/README.asciidoc)
+
+1. Container images are built hourly from master. When you are ready to release
+   the container image, [tag
+   it](https://quay.io/repository/openshift-on-azure/azure?tag=latest&tab=tags)
+   with the appropriate version on quay.io. (Note: only members of the
+   `openshift-on-azure` quay.io team have access.)
+
+2. Create a release branch from master and push it.
 
 ```
 git checkout <required commit>
 git checkout -b release-vx
-# we create release branch for first weekly only
+# we create release branch for major releases only
 git push upstream release-vx
 ```
 
@@ -84,14 +91,8 @@ Command `/cherrypick release-vx` prow command can be used too.
 
 Open a PR into release branch.
 
-2. Configure testing for release branch in `openshift/release` repository. This will make sure that any PR to release branches is gated by tests.
-
-```
-git checkout master
-git fetch upstream
-git rebase upstream/master
-git checkout -b osa.vx.y.release
-```
+3. Configure testing for release branch in `openshift/release` repository. This
+   will make sure that any PR to release branches is gated by tests.
 
 Add new branch config file in `ci-operator/config/openshift/openshift-azure/openshift-openshift-azure-release-vx.yaml`
 
@@ -106,66 +107,65 @@ docker run -it -v $(pwd)/ci-operator:/ci-operator:z registry.svc.ci.openshift.or
 
 Merge it to release repository. After this is done, all PR's should run all tests.
 
+Sample PR: https://github.com/openshift/release/pull/4440
 
-3. Create release PR into `openshift/openshift-azure` repository release branch. This is main step, where we configure/edit release specific configuration.
+4. Create release PR into `openshift/openshift-azure` repository release branch. This is main step, where we configure/edit release specific configuration.
 
 ```
 git checkout upstream/release-vx
 git checkout -b release-vx-pluginconfig
 ```
 
-update `pluginconfig/pluginconfig-311.yaml` file with image version for this particular release
+Update `pluginconfig/pluginconfig-311.yaml` file with image versions for this
+particular release where necessary:
+
 ```
 clusterVersion: vx.y
 imageVersion: 311.69.20190214
 images:
   ansibleServiceBroker: registry.access.redhat.com/openshift3/ose-ansible-service-broker:v3.11.69
   azureControllers: quay.io/openshift-on-azure/azure-controllers:vx.y
-  etcdBackup: quay.io/openshift-on-azure/etcdbackup:vx.y
+  etcdBackup: quay.io/openshift-on-azure/azure:vx.y
 ```
 
-create `CHANGELOG.md` at the root of the project starting with the version
-```
-# vx.y
-         <- additional blank line
-```
+Typically you will only update the quay.io container image versions to pin them
+to the latest release. The upstream OpenShift images, supporting software
+versions, and VM image should be frozen mid-sprint to ensure sufficient time
+for testing.
 
-scrape and append release-notes to `CHANGELOG.md`
+You will also need to generate release notes. The `GITHUB_TOKEN` used below
+does not require any special permissions, so you can generate your own, or use
+the team secret if you prefer.
+
 ```
-make releasenotes
 export GITHUB_TOKEN=<github_token_from_team_secret>
-./releasenotes -repopath . -commitrange (vx.y)-1..HEAD >CHANGELOG.md
+go run cmd/releasenotes/releasenotes.go -start-sha=v(x.y-1) -end-sha=HEAD -release-version=v(x.y) -output-file=CHANGELOG.md
 git add CHANGELOG.md
 ```
-note about release numbers to use as commitrange with releasenotes above:
+
+Note about release numbers to use as commitrange with releasenotes above:
 * If you're cutting a new major release, (vx.y)-1 means v(x-1)."latest y on the x-1 branch"
 * If you're cutting a new minor release, (vx.y)-1 means vx.(y-1)
 
-Make sure you update `clusterVersion` field all image version to point to specific version, instead of `latest` tag.
-
 Merge this PR into `release-vx` branch. If step 2 was completed right, this PR now should run all OSA test suites for it to be merged. Test will be using CI infrastructure built images.
 
-4. Tag release for the release you just merged in step 3.
+**Note:** for major releases, you may need to tag the top commit of the release
+PR with the major release version in order for CI to successfully pass (e.g.
+`scaleupdown-vx.y` job needs the `vx.y` tag to be defined). See instructions in
+the next step.
 
-This step requires elevated right on git repo. You might need to ask somebody else to execute these commands.
+Sample PR: https://github.com/openshift/openshift-azure/pull/1851
+
+5. Tag release for the release you just merged in step 3.
+
+This step requires write access on git repo. You might need to ask somebody
+else to execute these commands.
 
 ```
 git checkout upstream/release-vx
 # Better to sign the release, Tagger needs a GPG key setup in github
 git tag -a -s -m "Version vx.y" vx.y
 git push upstream tags/vx.y
-```
-
-5. Build release images from release tags
-
-This step should be executed only when PR from step 3 is merged and 4 is pushed.
-
-```
-git checkout tags/vx.y
-# validate script can see right tag
-make version
-<you should see tag version as an output. It will be used to tag and publish images>
-make all-push
 ```
 
 6. Update upgrade tests for published release in `openshift/release`
@@ -176,17 +176,27 @@ This step can be done together with step 2, but for first release you are doing 
 git checkout -b osa.release.vx.testing
 ```
 
-Add vx.y target to `ci-operator/config/openshift/openshift-azure/openshift-openshift-azure-master.yaml`
+Add vx.y target to `ci-operator/jobs/openshift/openshift-azure/openshift-openshift-azure-master-presubmits.yaml`
 
 ```
-- artifact_dir: /tmp/artifacts
- as: e2e-upgrade-vx.y
- commands: ARTIFACTS=/tmp/artifacts SOURCE=vx.y make upgrade
- secret:
-   name: azure
-   mount_path: /usr/secrets
- container:
-   from: src
+- agent: kubernetes
+  always_run: true
+  branches:
+  - master
+  context: upgrade-vx.y
+  decorate: true
+  name: pull-ci-azure-master-upgrade-vx.y
+  rerun_command: /test upgrade-vx.y
+  spec:
+    containers:
+    - args:
+      - hack/tests/e2e-upgrade.sh
+      - vx.y
+      image: registry.svc.ci.openshift.org/azure/ci-base:latest
+      name: ""
+      resources: {}
+    serviceAccountName: ci-operator
+  trigger: (?m)^/test( | .* )upgrade-vx.y,?($|\s.*)
 ```
 
 Run prowgen to generate test jobs:
@@ -195,12 +205,9 @@ docker pull registry.svc.ci.openshift.org/ci/ci-operator-prowgen:latest
 docker run -it -v $(pwd)/ci-operator:/ci-operator:z registry.svc.ci.openshift.org/ci/ci-operator-prowgen:latest --from-dir /ci-operator/config/ --to-dir /ci-operator/jobs
 ```
 
-Change generated jobs to `always_run: false` and `optional: true`. This will make upgrade tests on master branch optional!
-
-We are not going to use automatic generated jobs with `e2e-upgrade-vx.y` because of lack of targets in the jobs. This should change in the future. See https://github.com/openshift/ci-operator/issues/276 for more details.
-
-Copy existing `upgrade` jobs and create new job with `upgrade-vx.y` syntax. This is consequence of the issue above. `e2e-upgrade-vx.y` jobs lacks necessary targets so they cant complete if ran independently.
 Merge the PR. After this test command `/test upgrade-vx.y` should work on PR's.
+
+Sample PR: https://github.com/openshift/release/pull/4730
 
 7. Start development of v(x+1).0!
 
@@ -209,13 +216,19 @@ Prepare a new PR to master which does the following:
 * updates pluginconfig-311.yaml as follows:
   - sets pluginVersion to v(x+1).0
   - copies versions/vx.n to versions/v(x+1).0
-  - changes versions/vx.n images from :latest to :vx.n
-* copies pkg/{arm,config,startup,sync}/vx directories to
-  pkg/{arm,config,startup,sync}/v(x+1)
+  - changes versions/vx.n images from `:vx.n` to `:latest` (latest versions can
+    be located in the Red Hat container catalog, e.g.
+    https://access.redhat.com/containers/?tab=tags#/registry.access.redhat.com/rhel7/etcd )
+* copies `pkg/{arm,config,startup,sync}/vx` directories to
+  `pkg/{arm,config,startup,sync}/v(x+1)`
 * adds new directory mappings for v(x+1).0 in
-   pkg/{arm,config,startup,sync}/{arm,config,startup,sync}.New()
-* marks the hashes for vx.n in pkg/cluster/hash_test.go as immutable
-* copies those hashes to v(x+1).0
+  `pkg/{arm,config,startup,sync}/{arm,config,startup,sync}.go`
+* sets the hashes for vx.n in `pkg/cluster/hash_test.go` as immutable
+
+Sample PR: https://github.com/openshift/openshift-azure/pull/1852
+
+Each step in the instructions above is included as a separate commit in the
+sample PR.
 
 # Cleaning old release
 
