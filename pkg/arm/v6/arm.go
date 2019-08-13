@@ -16,7 +16,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/arm"
+	armutil "github.com/openshift/openshift-azure/pkg/util/arm"
 )
 
 type simpleGenerator struct {
@@ -25,7 +25,7 @@ type simpleGenerator struct {
 	cs         *api.OpenShiftManagedCluster
 }
 
-func New(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) *simpleGenerator {
+func New(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) api.ARMInterface {
 	return &simpleGenerator{
 		testConfig: testConfig,
 		log:        log,
@@ -34,7 +34,7 @@ func New(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster
 }
 
 func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
-	t := arm.Template{
+	t := armutil.Template{
 		Schema:         "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
 		ContentVersion: "1.0.0.0",
 		Resources: []interface{}{
@@ -74,12 +74,12 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 		return nil, err
 	}
 
-	err = arm.FixupAPIVersions(azuretemplate, versionMap)
+	err = armutil.FixupAPIVersions(azuretemplate, versionMap)
 	if err != nil {
 		return nil, err
 	}
 
-	arm.FixupDepends(g.cs.Properties.AzProfile.SubscriptionID, g.cs.Properties.AzProfile.ResourceGroup, azuretemplate)
+	armutil.FixupDepends(g.cs.Properties.AzProfile.SubscriptionID, g.cs.Properties.AzProfile.ResourceGroup, azuretemplate)
 
 	return azuretemplate, nil
 }

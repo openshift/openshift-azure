@@ -15,7 +15,6 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/startup"
 	"github.com/openshift/openshift-azure/pkg/sync"
 )
@@ -29,7 +28,7 @@ type Hash struct {
 	Log            *logrus.Entry
 	TestConfig     api.TestConfig
 	StartupFactory func(*logrus.Entry, *api.OpenShiftManagedCluster, api.TestConfig) (startup.Interface, error)
-	Arm            arm.Interface
+	Arm            api.ARMInterface
 }
 
 var _ Hasher = &Hash{}

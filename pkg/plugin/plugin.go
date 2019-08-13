@@ -16,6 +16,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/config"
+	_ "github.com/openshift/openshift-azure/pkg/runtime/register"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 )
 

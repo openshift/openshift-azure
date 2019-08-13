@@ -10,30 +10,16 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	v5 "github.com/openshift/openshift-azure/pkg/arm/v5"
-	v6 "github.com/openshift/openshift-azure/pkg/arm/v6"
-	v7 "github.com/openshift/openshift-azure/pkg/arm/v7"
+	"github.com/openshift/openshift-azure/pkg/runtime"
 )
 
-type Interface interface {
-	Generate(ctx context.Context, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error)
-	Vmss(app *api.AgentPoolProfile, backupBlob, suffix string) (*compute.VirtualMachineScaleSet, error)
-	Hash(app *api.AgentPoolProfile) ([]byte, error)
-}
-
-func New(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (Interface, error) {
-	switch cs.Config.PluginVersion {
-	case "v5.1", "v5.2":
-		return v5.New(ctx, log, cs, testConfig), nil
-	case "v6.0":
-		return v6.New(ctx, log, cs, testConfig), nil
-	case "v7.0":
-		return v7.New(ctx, log, cs, testConfig), nil
+func New(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (api.ARMInterface, error) {
+	if runtime.Versions[cs.Config.PluginVersion] != nil {
+		fnc := runtime.Versions[cs.Config.PluginVersion]
+		return fnc(ctx, log, cs, testConfig), nil
 	}
-
 	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)
 }

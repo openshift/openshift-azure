@@ -75,7 +75,7 @@ type Upgrade struct {
 	Log               *logrus.Entry
 	ScalerFactory     scaler.Factory
 	Hasher            Hasher
-	Arm               arm.Interface
+	Arm               api.ARMInterface
 
 	Cs *api.OpenShiftManagedCluster
 
