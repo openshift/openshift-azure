@@ -41,6 +41,7 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 			g.vnet(),
 			g.ipAPIServer(),
 			g.lbAPIServer(),
+			g.ilbAPIServer(),
 			g.storageAccount(g.cs.Config.RegistryStorageAccount, map[string]*string{
 				"type": to.StringPtr("registry"),
 			}),
