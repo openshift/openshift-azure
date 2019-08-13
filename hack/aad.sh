@@ -7,7 +7,7 @@ usage:
 $0 app-create name owner
 
 Examples:
-$0 app-create user-$USER-aad jminter-team-shared
+$0 app-create user-$USER-aad aro-team-shared
 
 EOF
     exit 1
