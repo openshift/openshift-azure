@@ -1,0 +1,292 @@
+apiVersion: v1
+data:
+  config-version: ver1
+  kube.conf: |
+    # Fluentd config file for OMS Docker - cluster components (kubeAPI)
+
+    # Forward port 25225 for container logs
+    <source>
+      type forward
+      port 25225
+      bind 0.0.0.0
+    </source>
+
+    #Kubernetes pod inventory
+    <source>
+      type kubepodinventory
+      tag oms.containerinsights.KubePodInventory
+      run_interval 60s
+      log_level debug
+    </source>
+
+     #Kubernetes events
+     <source>
+      type kubeevents
+      tag oms.containerinsights.KubeEvents
+      run_interval 60s
+      log_level debug
+      </source>
+
+     #Kubernetes logs
+     <source>
+      type kubelogs
+      tag oms.api.KubeLogs
+      run_interval 60s
+     </source>
+
+     #Kubernetes services
+     <source>
+      type kubeservices
+      tag oms.containerinsights.KubeServices
+      run_interval 60s
+      log_level debug
+     </source>
+
+     #Kubernetes Nodes
+     <source>
+      type kubenodeinventory
+      tag oms.containerinsights.KubeNodeInventory
+      run_interval 60s
+      log_level debug
+     </source>
+
+     #Kubernetes perf
+     <source>
+      type kubeperf
+      tag oms.api.KubePerf
+      run_interval 60s
+      log_level debug
+     </source>
+
+     #cadvisor perf- Windows nodes
+     <source>
+      type wincadvisorperf
+      tag oms.api.wincadvisorperf
+      run_interval 60s
+      log_level debug
+     </source>
+
+     <filter mdm.kubepodinventory** mdm.kubenodeinventory**>
+      type filter_inventory2mdm
+      custom_metrics_azure_regions eastus,southcentralus,westcentralus,westus2,southeastasia,northeurope,westEurope
+      log_level info
+     </filter>
+
+     # custom_metrics_mdm filter plugin for perf data from windows nodes
+     <filter mdm.cadvisorperf**>
+      type filter_cadvisor2mdm
+      custom_metrics_azure_regions eastus,southcentralus,westcentralus,westus2,southeastasia,northeurope,westEurope
+      metrics_to_collect cpuUsageNanoCores,memoryWorkingSetBytes
+      log_level info
+     </filter>
+
+     <match oms.containerinsights.KubePodInventory**>
+      type out_oms
+      log_level debug
+      num_threads 5
+      buffer_chunk_limit 20m
+      buffer_type file
+      buffer_path %STATE_DIR_WS%/out_oms_kubepods*.buffer
+      buffer_queue_limit 20
+      buffer_queue_full_action drop_oldest_chunk
+      flush_interval 20s
+      retry_limit 10
+      retry_wait 30s
+      max_retry_wait 9m
+     </match>
+
+     <match oms.containerinsights.KubeEvents**>
+      type out_oms
+      log_level debug
+      num_threads 5
+      buffer_chunk_limit 5m
+      buffer_type file
+      buffer_path %STATE_DIR_WS%/out_oms_kubeevents*.buffer
+      buffer_queue_limit 10
+      buffer_queue_full_action drop_oldest_chunk
+      flush_interval 20s
+      retry_limit 10
+      retry_wait 30s
+      max_retry_wait 9m
+     </match>
+
+     <match oms.api.KubeLogs**>
+      type out_oms_api
+      log_level debug
+      buffer_chunk_limit 10m
+      buffer_type file
+      buffer_path %STATE_DIR_WS%/out_oms_api_kubernetes_logs*.buffer
+      buffer_queue_limit 10
+      flush_interval 20s
+      retry_limit 10
+      retry_wait 30s
+     </match>
+
+     <match oms.containerinsights.KubeServices**>
+      type out_oms
+      log_level debug
+      num_threads 5
+      buffer_chunk_limit 20m
+      buffer_type file
+      buffer_path %STATE_DIR_WS%/out_oms_kubeservices*.buffer
+      buffer_queue_limit 20
+      buffer_queue_full_action drop_oldest_chunk
+      flush_interval 20s
+      retry_limit 10
+      retry_wait 30s
+      max_retry_wait 9m
+     </match>
+
+     <match oms.containerinsights.KubeNodeInventory**>
+      type out_oms
+      log_level debug
+      num_threads 5
+      buffer_chunk_limit 20m
+      buffer_type file
+      buffer_path %STATE_DIR_WS%/state/out_oms_kubenodes*.buffer
+      buffer_queue_limit 20
+      buffer_queue_full_action drop_oldest_chunk
+      flush_interval 20s
+      retry_limit 10
+      retry_wait 30s
+      max_retry_wait 9m
+     </match>
+
+     <match oms.api.ContainerNodeInventory**>
+      type out_oms
+      log_level debug
+      buffer_chunk_limit 20m
+      buffer_type file
+      buffer_path %STATE_DIR_WS%/out_oms_containernodeinventory*.buffer
+      buffer_queue_limit 20
+      flush_interval 20s
+      retry_limit 10
+      retry_wait 15s
+      max_retry_wait 9m
+     </match>
+
+     <match oms.api.KubePerf**>
+      type out_oms
+      log_level debug
+      num_threads 5
+      buffer_chunk_limit 20m
+      buffer_type file
+      buffer_path %STATE_DIR_WS%/out_oms_kubeperf*.buffer
+      buffer_queue_limit 20
+      buffer_queue_full_action drop_oldest_chunk
+      flush_interval 20s
+      retry_limit 10
+      retry_wait 30s
+      max_retry_wait 9m
+     </match>
+
+     <match mdm.kubepodinventory** mdm.kubenodeinventory** >
+      type out_mdm
+      log_level debug
+      num_threads 5
+      buffer_chunk_limit 20m
+      buffer_type file
+      buffer_path %STATE_DIR_WS%/out_mdm_*.buffer
+      buffer_queue_limit 20
+      buffer_queue_full_action drop_oldest_chunk
+      flush_interval 20s
+      retry_limit 10
+      retry_wait 30s
+      max_retry_wait 9m
+      retry_mdm_post_wait_minutes 60
+     </match>
+
+     <match oms.api.wincadvisorperf**>
+      type out_oms
+      log_level debug
+      num_threads 5
+      buffer_chunk_limit 20m
+      buffer_type file
+      buffer_path %STATE_DIR_WS%/out_oms_api_wincadvisorperf*.buffer
+      buffer_queue_limit 20
+      buffer_queue_full_action drop_oldest_chunk
+      flush_interval 20s
+      retry_limit 10
+      retry_wait 30s
+      max_retry_wait 9m
+     </match>
+
+     <match mdm.cadvisorperf**>
+      type out_mdm
+      log_level debug
+      num_threads 5
+      buffer_chunk_limit 20m
+      buffer_type file
+      buffer_path %STATE_DIR_WS%/out_mdm_cdvisorperf*.buffer
+      buffer_queue_limit 20
+      buffer_queue_full_action drop_oldest_chunk
+      flush_interval 20s
+      retry_limit 10
+      retry_wait 30s
+      max_retry_wait 9m
+      retry_mdm_post_wait_minutes 60
+     </match>
+  log-data-collection-settings: |-
+    # Log data collection settings
+    [log_collection_settings]
+       [log_collection_settings.stdout]
+          # In the absense of this configmap, default value for enabled is true
+          enabled = true
+          # exclude_namespaces setting holds good only if enabled is set to true
+          # kube-system log collection is disabled by default in the absence of 'log_collection_settings.stdout' setting. If you want to enable kube-system, remove it from the following setting.
+          # If you want to continue to disable kube-system log collection keep this namespace in the following setting and add any other namespace you want to disable log collection to the array.
+          # In the absense of this configmap, default value for exclude_namespaces = ["kube-system"]
+          exclude_namespaces = ["kube-service-catalog", "kube-system", "openshift", "openshift-ansible-service-broker", "openshift-azure", "openshift-azure-branding", "openshift-azure-logging", "openshift-azure-monitoring", "openshift-console", "openshift-etcd", "openshift-infra", "openshift-logging", "openshift-monitoring", "openshift-node", "openshift-sdn", "openshift-template-service-broker", "openshift-web-console"]
+       [log_collection_settings.stderr]
+          # Default value for enabled is true
+          enabled = true
+          # exclude_namespaces setting holds good only if enabled is set to true
+          # kube-system log collection is disabled by default in the absence of 'log_collection_settings.stderr' setting. If you want to enable kube-system, remove it from the following setting.
+          # If you want to continue to disable kube-system log collection keep this namespace in the following setting and add any other namespace you want to disable log collection to the array.
+          # In the absense of this cofigmap, default value for exclude_namespaces = ["kube-system"]
+          exclude_namespaces = ["kube-service-catalog", "kube-system", "openshift", "openshift-ansible-service-broker", "openshift-azure", "openshift-azure-branding", "openshift-azure-logging", "openshift-azure-monitoring", "openshift-console", "openshift-etcd", "openshift-infra", "openshift-logging", "openshift-monitoring", "openshift-node", "openshift-sdn", "openshift-template-service-broker", "openshift-web-console"]
+       [log_collection_settings.env_var]
+          # In the absense of this configmap, default value for enabled is true
+          enabled = false
+  prometheus-data-collection-settings: |-
+    # Custom Prometheus metrics data collection settings
+    [prometheus_data_collection_settings.cluster]
+        # Cluster level scrape endpoint(s). These metrics will be scraped from agent's Replicaset (singleton)
+        #Interval specifying how often to scrape for metrics. This is duration of time and can be specified for supporting settings by combining an integer value and time unit as a string value. Valid time units are ns, us (or µs), ms, s, m, h.
+        interval = "1m"
+        #fieldpass = ["metric_to_pass1", "metric_to_pass12"]
+        fieldpass = []
+
+        #fielddrop = ["metric_to_drop"]
+        fielddrop = []
+
+        # An array of urls to scrape metrics from.
+        # urls = ["http://myurl:9101/metrics"]
+        urls = []
+        # An array of Kubernetes services to scrape metrics from.
+        # kubernetes_services = ["http://my-service-dns.my-namespace:9102/metrics"]
+        kubernetes_services = []
+        # When monitor_kubernetes_pods = true, replicaset will scrape Kubernetes pods for the following prometheus annotations:
+        # - prometheus.io/scrape: Enable scraping for this pod
+        # - prometheus.io/scheme: If the metrics endpoint is secured then you will need to
+        #     set this to `https` & most likely set the tls config.
+        # - prometheus.io/path: If the metrics path is not /metrics, define it with this annotation.
+        # - prometheus.io/port: If port is not 9102 use this annotation
+        monitor_kubernetes_pods = true
+
+    [prometheus_data_collection_settings.node]
+        # Node level scrape endpoint(s). These metrics will be scraped from agent's DaemonSet running in every node in the cluster
+        #Interval specifying how often to scrape for metrics. This is duration of time and can be specified for supporting settings by combining an integer value and time unit as a string value. Valid time units are ns, us (or µs), ms, s, m, h.
+        interval = "1m"
+        # An array of urls to scrape metrics from. $NODE_IP (all upper case) will substitute of running Node's IP address
+        # urls = ["http://$NODE_IP:9103/metrics"]
+        urls = []
+        #fieldpass = ["metric_to_pass1", "metric_to_pass12"]
+        fieldpass = []
+        #fielddrop = ["metric_to_drop"]
+        fielddrop = []
+  schema-version: v1
+kind: ConfigMap
+metadata:
+  name: container-azm-ms-agentconfig
+  namespace: openshift-azure-logging

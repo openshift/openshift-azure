@@ -40,5 +40,6 @@ users:
 - system:admin
 - system:serviceaccount:openshift-infra:build-controller
 - system:serviceaccount:openshift-etcd:etcd-backup
+- system:serviceaccount:openshift-azure-logging:omsagent
 volumes:
 - '*'

@@ -304,6 +304,32 @@ var translations = map[string][]struct {
 			Template: "{{ .Config.Images.ServiceCatalog }}",
 		},
 	},
+	"DaemonSet.apps/openshift-azure-logging/omsagent": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.Images.MonitorAgent }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='WSID')].value"),
+			Template: "{{ .ContainerService.Properties.MonitorProfile.WorkspaceID }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='KEY')].value"),
+			Template: "{{ .ContainerService.Properties.MonitorProfile.WorkspaceKey }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='ACS_RESOURCE_NAME')].value"),
+			Template: "{{ .ContainerService.Name }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='AKS_RESOURCE_ID')].value"),
+			Template: "{{ .ContainerService.ID }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='AKS_REGION')].value"),
+			Template: "{{ .ContainerService.Location }}",
+		},
+	},
 	"DaemonSet.apps/openshift-template-service-broker/apiserver": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
@@ -330,6 +356,41 @@ var translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
 			Template: "{{ .Config.Images.TLSProxy }}",
+		},
+	},
+	"Deployment.apps/openshift-azure-logging/omsagent-rs": {
+		{
+			Path: jsonpath.MustCompile("$.metadata.labels['azure.openshift.io/sync-pod-optionally-apply']"),
+			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
+				if cs.Properties.MonitorProfile.WorkspaceID != "" && cs.Properties.MonitorProfile.WorkspaceKey != "" {
+					return "true", nil
+				}
+				return "false", nil
+			},
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.Images.MonitorAgent }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='WSID')].value"),
+			Template: "{{ .ContainerService.Properties.MonitorProfile.WorkspaceID }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='KEY')].value"),
+			Template: "{{ .ContainerService.Properties.MonitorProfile.WorkspaceKey }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='ACS_RESOURCE_NAME')].value"),
+			Template: "{{ .ContainerService.Name }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='AKS_RESOURCE_ID')].value"),
+			Template: "{{ .ContainerService.ID }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='AKS_REGION')].value"),
+			Template: "{{ .ContainerService.Location }}",
 		},
 	},
 	"Deployment.apps/default/registry-console": {
