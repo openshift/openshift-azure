@@ -71,6 +71,9 @@ type Properties struct {
 
 	AzProfile AzProfile `json:"azProfile,omitempty"`
 
+	// MonitorProfile configures which log analytics workspace to use.
+	MonitorProfile MonitorProfile `json:"monitorProfile,omitempty"`
+
 	// APICertProfile (in, optional): configures OpenShift API certificate
 	APICertProfile CertProfile `json:"apiCertProfile,omitempty"`
 }
@@ -146,6 +149,13 @@ type AgentPoolProfile struct {
 	OSType     OSType `json:"osType,omitempty"`
 
 	Role AgentPoolProfileRole `json:"role,omitempty"`
+}
+
+// MonitorProfile configuration for Azure Monitor log analytics.
+type MonitorProfile struct {
+	WorkspaceResourceID string `json:"workspaceResourceId,omitempty"`
+	WorkspaceID         string `json:"workspaceId,omitempty"`
+	WorkspaceKey        string `json:"workspaceKey,omitempty"`
 }
 
 // OSType represents the OS type of VMs in an AgentPool.

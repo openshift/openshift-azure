@@ -13,7 +13,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
-	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30"
+	v20190831 "github.com/openshift/openshift-azure/pkg/api/2019-08-31"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin"
 	"github.com/openshift/openshift-azure/pkg/fakerp/store"
 	"github.com/openshift/openshift-azure/pkg/plugin"
@@ -75,11 +75,11 @@ func (s *Server) read20190430Request(body io.ReadCloser, oldCs *api.OpenShiftMan
 	if err != nil {
 		return nil, fmt.Errorf("failed to read request body: %v", err)
 	}
-	var oc *v20190430.OpenShiftManagedCluster
+	var oc *v20190831.OpenShiftManagedCluster
 	if err := yaml.Unmarshal(data, &oc); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal request: %v", err)
 	}
-	return v20190430.ToInternal(oc, oldCs)
+	return v20190831.ToInternal(oc, oldCs)
 }
 
 func (s *Server) readAdminRequest(body io.ReadCloser, oldCs *api.OpenShiftManagedCluster) (*api.OpenShiftManagedCluster, error) {

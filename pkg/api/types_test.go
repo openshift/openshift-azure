@@ -75,6 +75,11 @@ var marshalled = []byte(`{
 			"subscriptionId": "Properties.AzProfile.SubscriptionID",
 			"resourceGroup": "Properties.AzProfile.ResourceGroup"
 		},
+		"monitorProfile": {
+			"workspaceResourceId": "Properties.MonitorProfile.WorkspaceResourceID",
+			"workspaceId": "Properties.MonitorProfile.WorkspaceID",
+			"workspaceKey": "Properties.MonitorProfile.WorkspaceKey"
+		},
 		"apiCertProfile": {
 			"keyVaultSecretURL": "Properties.APICertProfile.KeyVaultSecretURL"
 		}
@@ -237,6 +242,7 @@ var marshalled = []byte(`{
 			"genevaTDAgent": "Config.Images.GenevaTDAgent",
 			"genevaStatsd": "Config.Images.GenevaStatsd",
 			"metricsBridge": "Config.Images.MetricsBridge",
+			"monitorAgent": "Config.Images.MonitorAgent",
 			"imagePullSecret": "Q29uZmlnLkltYWdlcy5JbWFnZVB1bGxTZWNyZXQ="
 		},
 		"adminKubeconfig": "eyJwcmVmZXJlbmNlcyI6e30sImNsdXN0ZXJzIjpudWxsLCJ1c2VycyI6bnVsbCwiY29udGV4dHMiOm51bGwsImN1cnJlbnQtY29udGV4dCI6IiJ9",

@@ -45,6 +45,7 @@ func TestPluginTemplateValidate(t *testing.T) {
 			errors.New(`invalid versions[""].images.genevaLogging ""`),
 			errors.New(`invalid versions[""].images.genevaStatsd ""`),
 			errors.New(`invalid versions[""].images.genevaTDAgent ""`),
+			errors.New(`invalid versions[""].images.monitorAgent ""`),
 			errors.New(`invalid versions[""].images.azureControllers ""`),
 			errors.New(`invalid versions[""].images.canary ""`),
 			errors.New(`invalid versions[""].images.etcdBackup ""`),

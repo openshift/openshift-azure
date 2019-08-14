@@ -69,6 +69,9 @@ var marshalled = []byte(`{
 					}
 				}
 			]
+		},
+		"monitorProfile": {
+			"workspaceResourceId": "Properties.MonitorProfile.WorkspaceResourceID"
 		}
 	},
 	"id": "ID",
@@ -209,7 +212,8 @@ var marshalled = []byte(`{
 			"genevaLogging": "Config.Images.GenevaLogging",
 			"genevaTDAgent": "Config.Images.GenevaTDAgent",
 			"genevaStatsd": "Config.Images.GenevaStatsd",
-			"metricsBridge": "Config.Images.MetricsBridge"
+			"metricsBridge": "Config.Images.MetricsBridge",
+			"monitorAgent": "Config.Images.MonitorAgent"
 		},
 		"serviceCatalogClusterId": "01010101-0101-0101-0101-010101010101",
 		"genevaLoggingSector": "Config.GenevaLoggingSector",
@@ -339,15 +343,24 @@ func TestAPIParity(t *testing.T) {
 		regexp.MustCompile(`^\.Config\.Images\.ImagePullSecret$`),
 		regexp.MustCompile(`^\.Config\.EtcdMetrics`),
 		regexp.MustCompile(`^\.Config\.(Master|Worker)StartupSASURI$`),
+		regexp.MustCompile(`^\.Properties\.MonitorProfile\.Workspace(ID|Key)`),
 		regexp.MustCompile(`^\.Properties\.AzProfile\.`),
-		regexp.MustCompile(`^\.Properties\.MasterServicePrincipalProfile\.`),
-		regexp.MustCompile(`^\.Properties\.WorkerServicePrincipalProfile\.`),
+		regexp.MustCompile(`^\.Properties\.(Master|Worker)ServicePrincipalProfile\.`),
+		regexp.MustCompile(`^\.Properties\.APICertProfile\.`),
 	}
 
 loop:
 	for len(afields) > 0 || len(ifields) > 0 {
 		if len(afields) > 0 {
 			for _, rx := range notInInternal {
+				if strings.Contains(afields[0], "Key") ||
+					strings.Contains(afields[0], "Kubeconfig") ||
+					strings.Contains(afields[0], "Passwd") ||
+					strings.Contains(afields[0], "Password") ||
+					strings.Contains(afields[0], "Secret") {
+					afields = afields[1:]
+					continue
+				}
 				if rx.MatchString(afields[0]) {
 					afields = afields[1:]
 					continue loop

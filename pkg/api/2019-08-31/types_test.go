@@ -1,4 +1,4 @@
-package v20190430
+package v20190831
 
 import (
 	"bytes"
@@ -67,6 +67,9 @@ var marshalled = []byte(`{
 					}
 				}
 			]
+		},
+		"monitorProfile": {
+			"workspaceResourceId": "Properties.MonitorProfile.WorkspaceResourceID"
 		}
 	},
 	"id": "ID",
@@ -201,7 +204,7 @@ func TestAPIParity(t *testing.T) {
 		regexp.MustCompile(`^\.Properties\.MasterServicePrincipalProfile`),
 		regexp.MustCompile(`^\.Properties\.WorkerServicePrincipalProfile`),
 		regexp.MustCompile(`^\.Properties\.AzProfile`),
-		regexp.MustCompile(`^\.Properties\.MonitorProfile`),
+		regexp.MustCompile(`^\.Properties\.MonitorProfile\.Workspace(ID|Key)`),
 		regexp.MustCompile(`^\.Properties\.APICertProfile\.`),
 		regexp.MustCompile(`\.RouterCertProfile\.`),
 		regexp.MustCompile(`^\.Config`),

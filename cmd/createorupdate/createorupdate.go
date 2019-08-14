@@ -17,14 +17,14 @@ import (
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30"
+	v20190831 "github.com/openshift/openshift-azure/pkg/api/2019-08-31"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin"
 	fakerp "github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/aadapp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/graphrbac"
-	v20190430client "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/2019-04-30"
+	v20190831client "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/2019-08-31"
 	adminclient "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/admin"
 	utilerrors "github.com/openshift/openshift-azure/pkg/util/errors"
 )
@@ -56,7 +56,7 @@ func validate() error {
 	return nil
 }
 
-func delete(ctx context.Context, log *logrus.Entry, rpc v20190430client.OpenShiftManagedClustersClient, resourceGroup string, noWait bool) error {
+func delete(ctx context.Context, log *logrus.Entry, rpc v20190831client.OpenShiftManagedClustersClient, resourceGroup string, noWait bool) error {
 	log.Info("deleting cluster")
 	future, err := rpc.Delete(ctx, resourceGroup, resourceGroup)
 	if err != nil {
@@ -74,7 +74,7 @@ func delete(ctx context.Context, log *logrus.Entry, rpc v20190430client.OpenShif
 	return nil
 }
 
-func createOrUpdatev20190430(ctx context.Context, log *logrus.Entry, rpc v20190430client.OpenShiftManagedClustersClient, resourceGroup string, oc *v20190430.OpenShiftManagedCluster, manifestFile string) (*v20190430.OpenShiftManagedCluster, error) {
+func createOrUpdatev20190831(ctx context.Context, log *logrus.Entry, rpc v20190831client.OpenShiftManagedClustersClient, resourceGroup string, oc *v20190831.OpenShiftManagedCluster, manifestFile string) (*v20190831.OpenShiftManagedCluster, error) {
 	log.Info("creating/updating cluster")
 	resp, err := rpc.CreateOrUpdateAndWait(ctx, resourceGroup, resourceGroup, *oc)
 	if err != nil {
@@ -87,7 +87,7 @@ func createOrUpdatev20190430(ctx context.Context, log *logrus.Entry, rpc v201904
 	return &resp, nil
 }
 
-func createOrUpdateAdmin(ctx context.Context, log *logrus.Entry, ac *adminclient.Client, rpc v20190430client.OpenShiftManagedClustersClient, resourceGroup string, oc *admin.OpenShiftManagedCluster, manifestFile string) (*v20190430.OpenShiftManagedCluster, error) {
+func createOrUpdateAdmin(ctx context.Context, log *logrus.Entry, ac *adminclient.Client, rpc v20190831client.OpenShiftManagedClustersClient, resourceGroup string, oc *admin.OpenShiftManagedCluster, manifestFile string) (*v20190831.OpenShiftManagedCluster, error) {
 	log.Info("creating/updating cluster")
 	resp, err := ac.CreateOrUpdate(ctx, resourceGroup, resourceGroup, oc)
 	if err != nil {
@@ -113,10 +113,10 @@ func execute(
 	ctx context.Context,
 	log *logrus.Entry,
 	ac *adminclient.Client,
-	rpc v20190430client.OpenShiftManagedClustersClient,
+	rpc v20190831client.OpenShiftManagedClustersClient,
 	conf *fakerp.Config,
 	adminManifest string,
-) (*v20190430.OpenShiftManagedCluster, error) {
+) (*v20190831.OpenShiftManagedCluster, error) {
 	if adminManifest != "" {
 		var oc *admin.OpenShiftManagedCluster
 		err := fakerp.GenerateManifest(conf, adminManifest, &oc)
@@ -145,13 +145,13 @@ func execute(
 		manifest = defaultManifestFile
 	}
 
-	var oc *v20190430.OpenShiftManagedCluster
+	var oc *v20190831.OpenShiftManagedCluster
 	err := fakerp.GenerateManifest(conf, manifest, &oc)
 	if err != nil {
 		return nil, fmt.Errorf("failed reading manifest: %v", err)
 	}
 
-	oc, err = createOrUpdatev20190430(ctx, log, rpc, conf.ResourceGroup, oc, defaultManifestFile)
+	oc, err = createOrUpdatev20190831(ctx, log, rpc, conf.ResourceGroup, oc, defaultManifestFile)
 	if err != nil {
 		return nil, err
 	}
@@ -164,7 +164,7 @@ func execute(
 	return oc, nil
 }
 
-func updateAadApplication(ctx context.Context, oc *v20190430.OpenShiftManagedCluster, log *logrus.Entry, conf *fakerp.Config) error {
+func updateAadApplication(ctx context.Context, oc *v20190831.OpenShiftManagedCluster, log *logrus.Entry, conf *fakerp.Config) error {
 	if len(conf.AADClientID) > 0 && conf.AADClientID != conf.ClientID {
 		log.Info("updating the aad application")
 		graphauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azure.PublicCloud.GraphEndpoint)
@@ -213,7 +213,7 @@ func main() {
 	}
 
 	// simulate the RP
-	rpURL := v20190430client.DefaultBaseURI
+	rpURL := v20190831client.DefaultBaseURI
 	if !*useProd {
 		rpURL = fmt.Sprintf("http://%s", shared.LocalHttpAddr)
 
@@ -235,16 +235,16 @@ func main() {
 
 	// setup the osa clients
 	adminClient := adminclient.NewClient(rpURL, conf.SubscriptionID)
-	v20190430Client := v20190430client.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, conf.SubscriptionID)
+	v20190831Client := v20190831client.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, conf.SubscriptionID)
 	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID, "")
 	if err != nil {
 		log.Fatal(err)
 	}
-	v20190430Client.Authorizer = authorizer
+	v20190831Client.Authorizer = authorizer
 
 	ctx := context.Background()
 	if isDelete {
-		err = delete(ctx, log, v20190430Client, conf.ResourceGroup, conf.NoWait)
+		err = delete(ctx, log, v20190831Client, conf.ResourceGroup, conf.NoWait)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -258,7 +258,7 @@ func main() {
 		}
 	}
 
-	oc, err := execute(ctx, log, adminClient, v20190430Client, conf, *adminManifest)
+	oc, err := execute(ctx, log, adminClient, v20190831Client, conf, *adminManifest)
 	if err != nil {
 		log.Fatal(err)
 	}

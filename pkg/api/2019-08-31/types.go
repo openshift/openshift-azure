@@ -1,13 +1,19 @@
-package admin
+package v20190831
+
+import (
+	"github.com/Azure/go-autorest/autorest"
+)
 
 const (
 	// APIVersion is the version of this API
-	APIVersion = "admin"
+	APIVersion = "2019-08-31"
 )
 
 // OpenShiftManagedCluster complies with the ARM model of resource definition in
 // a JSON template.
 type OpenShiftManagedCluster struct {
+	autorest.Response `json:"-"`
+
 	Plan       *ResourcePurchasePlan `json:"plan,omitempty"`
 	Properties *Properties           `json:"properties,omitempty"`
 	ID         *string               `json:"id,omitempty"`
@@ -15,8 +21,6 @@ type OpenShiftManagedCluster struct {
 	Type       *string               `json:"type,omitempty"`
 	Location   *string               `json:"location,omitempty"`
 	Tags       map[string]*string    `json:"tags"`
-
-	Config *Config `json:"config,omitempty"`
 }
 
 // ResourcePurchasePlan defines the resource plan as required by ARM for billing
@@ -106,11 +110,6 @@ type NetworkProfile struct {
 	PeerVnetID *string `json:"peerVnetId,omitempty"`
 }
 
-// MonitorProfile configuration for Azure Monitor log analytics.
-type MonitorProfile struct {
-	WorkspaceResourceID *string `json:"workspaceResourceId,omitempty"`
-}
-
 // RouterProfile represents an OpenShift router.
 type RouterProfile struct {
 	Name *string `json:"name,omitempty"`
@@ -142,6 +141,11 @@ type AgentPoolProfile struct {
 	Role *AgentPoolProfileRole `json:"role,omitempty"`
 }
 
+// MonitorProfile configuration for Azure Monitor log analytics.
+type MonitorProfile struct {
+	WorkspaceResourceID *string `json:"workspaceResourceId,omitempty"`
+}
+
 // OSType represents the OS type of VMs in an AgentPool.
 type OSType string
 
@@ -160,8 +164,6 @@ const (
 	AgentPoolProfileRoleCompute AgentPoolProfileRole = "compute"
 	// AgentPoolProfileRoleInfra is the infra role.
 	AgentPoolProfileRoleInfra AgentPoolProfileRole = "infra"
-	// AgentPoolProfileRoleMaster is the master role.
-	AgentPoolProfileRoleMaster AgentPoolProfileRole = "master"
 )
 
 // VMSize represents supported VMSizes
@@ -206,6 +208,7 @@ type IdentityProvider struct {
 type AADIdentityProvider struct {
 	Kind     *string `json:"kind,omitempty"`
 	ClientID *string `json:"clientId,omitempty"`
+	Secret   *string `json:"secret,omitempty"`
 	TenantID *string `json:"tenantId,omitempty"`
 	// CustomerAdminGroupID group memberships will get synced into the OpenShift group "osa-customer-admins"
 	CustomerAdminGroupID *string `json:"customerAdminGroupId,omitempty"`

@@ -102,6 +102,8 @@ type ImageConfig struct {
 	Startup          string `json:"startup,omitempty"`
 	Sync             string `json:"sync,omitempty"`
 	TLSProxy         string `json:"tlsProxy,omitempty"`
+
+	MonitorAgent string `json:"monitorAgent,omitempty"`
 }
 
 // CertificateConfig contains all certificate configuration for the cluster.
