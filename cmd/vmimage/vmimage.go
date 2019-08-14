@@ -29,10 +29,12 @@ var (
 	location                   = flag.String("location", "eastus", "location")
 	buildResourceGroup         = flag.String("buildResourceGroup", "vmimage-"+timestamp, "build resource group")
 	preserveBuildResourceGroup = flag.Bool("preserveBuildResourceGroup", false, "preserve build resource group after build")
-	image                      = flag.String("image", "rhel7-3.11-"+timestamp, "image name")
+	image                      = flag.String("image", "", "image name")
 	imageResourceGroup         = flag.String("imageResourceGroup", "images", "image resource group")
 	imageStorageAccount        = flag.String("imageStorageAccount", "openshiftimages", "image storage account")
 	imageContainer             = flag.String("imageContainer", "images", "image container")
+	imageSku                   = flag.String("imageSku", "", "image SKU")
+	imageVersion               = flag.String("imageVersion", "", "image version")
 	clientKey                  = flag.String("clientKey", "secrets/client-key.pem", "cdn client key")
 	clientCert                 = flag.String("clientCert", "secrets/client-cert.pem", "cdn client cert")
 	validate                   = flag.Bool("validate", false, "If set, will create VM with provided image and will try to update it")
@@ -98,14 +100,17 @@ func run(ctx context.Context, log *logrus.Entry) error {
 		ImageResourceGroup:         *imageResourceGroup,
 		ImageStorageAccount:        *imageStorageAccount,
 		ImageContainer:             *imageContainer,
+		ImageSku:                   *imageSku,
+		ImageVersion:               *imageVersion,
 		SSHKey:                     sshkey,
 		ClientKey:                  clientKey,
 		ClientCert:                 clientCert,
 		Validate:                   *validate,
 	}
 
-	if *logLevel == "Debug" {
-		log.Printf("using image %s/%s/%s/%s", builder.ImageResourceGroup, builder.ImageStorageAccount, builder.ImageContainer, builder.Image)
+	err = builder.ValidateFields()
+	if err != nil {
+		return err
 	}
 
 	err = builder.Run(ctx)

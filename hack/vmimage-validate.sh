@@ -19,10 +19,18 @@ then
   IMAGE_RESOURCENAME=$(az image list -g $IMAGE_RESOURCEGROUP --query '[-1].name' -o tsv)
 fi
 
-echo "Validating: ${IMAGE_RESOURCENAME}"
+if [ -n "$IMAGE_VERSION" ] && [ -n "$IMAGE_SKU" ] ;
+then
+  echo "Validating: redhat osa image (SKU: ${IMAGE_SKU}; Version: ${IMAGE_VERSION})"
+  CMD_VMIMAGE_ARGS="-imageSku $IMAGE_SKU -imageVersion $IMAGE_VERSION"
+else
+  echo "Validating: ${IMAGE_RESOURCENAME} image in ${IMAGE_RESOURCEGROUP} resource group"
+  CMD_VMIMAGE_ARGS="-imageResourceGroup ${IMAGE_RESOURCEGROUP} -image ${IMAGE_RESOURCENAME} -imageStorageAccount ${IMAGE_STORAGEACCOUNT}"
+fi
+
 
 # pass -preserveBuildResourceGroup so we can copy artifacts
-go generate ./... && go run -ldflags "-X main.gitCommit=$(git rev-parse --short=10 HEAD)" ./cmd/vmimage -buildResourceGroup "${BUILD_RESOURCE_GROUP}" -imageResourceGroup "${IMAGE_RESOURCEGROUP}" -image "${IMAGE_RESOURCENAME}" -imageStorageAccount "${IMAGE_STORAGEACCOUNT}" -validate -preserveBuildResourceGroup
+go generate ./... && go run -ldflags "-X main.gitCommit=$(git rev-parse --short=10 HEAD)" ./cmd/vmimage -buildResourceGroup "${BUILD_RESOURCE_GROUP}" -validate -preserveBuildResourceGroup $CMD_VMIMAGE_ARGS
 
 # Logs we want to capture
 mv /tmp/{yum_updateinfo,yum_updateinfo_list_security,yum_check_update,scap_report.html} ${ARTIFACTS:-/tmp}/ || true
