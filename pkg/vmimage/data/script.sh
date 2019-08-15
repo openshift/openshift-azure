@@ -49,7 +49,7 @@ cd /go/src/github.com/openshift/openshift-azure/cmd/azure
 go build 
 
 set -x
-/go/src/github.com/openshift/openshift-azure/cmd/azure/azure tlsproxy --insecure --key client-key.pem --cert client-cert.pem --hostname https://cdn.redhat.com/ &
+/go/src/github.com/openshift/openshift-azure/cmd/azure/azure tlsproxy --insecure --key /root/client-key.pem --cert /root/client-cert.pem --hostname https://cdn.redhat.com/ &
 while [[ "$(fuser -n tcp 8080)" == "" ]]; do
   sleep 1
 done
