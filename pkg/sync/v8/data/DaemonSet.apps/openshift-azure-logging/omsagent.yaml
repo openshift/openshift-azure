@@ -64,8 +64,8 @@ spec:
         - mountPath: /hostfs
           name: host-root
           readOnly: true
-        - mountPath: /var/run/host/docker.sock
-          name: docker-sock
+        - mountPath: /var/run/host
+          name: var-run
         - mountPath: /var/log
           name: host-log
         - mountPath: /var/lib/docker/containers
@@ -89,8 +89,8 @@ spec:
           path: /
         name: host-root
       - hostPath:
-          path: /var/run/docker.sock
-        name: docker-sock
+          path: /var/run
+        name: var-run
       - hostPath:
           path: /etc/hostname
         name: container-hostname
