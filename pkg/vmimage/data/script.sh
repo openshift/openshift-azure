@@ -42,12 +42,19 @@ cat >client-key.pem <<'EOF'
 {{ .Builder.ClientKey | PrivateKeyAsBytes | String }}
 EOF
 
-go get github.com/mjudeikis/openshift-azure/cmd/azure
+go get github.com/openshift/openshift-azure/cmd/azure
+curl -o /go/src/github.com/openshift/openshift-azure/pkg/entrypoint/tlsproxy/tlsproxy.go https://raw.githubusercontent.com/mjudeikis/openshift-azure/master/pkg/entrypoint/tlsproxy/tlsproxy.go
+
+cd /go/src/github.com/openshift/openshift-azure/cmd/azure
+go build 
+
 set -x
-/go/bin/azure tlsproxy --insecure --key client-key.pem --cert client-cert.pem --hostname https://cdn.redhat.com/ &
+/go/src/github.com/openshift/openshift-azure/cmd/azure/azure tlsproxy --insecure --key client-key.pem --cert client-cert.pem --hostname https://cdn.redhat.com/ &
 while [[ "$(fuser -n tcp 8080)" == "" ]]; do
   sleep 1
 done
+
+cd $HOME
 
 firewall-cmd --zone=public --add-port=8080/tcp
 
