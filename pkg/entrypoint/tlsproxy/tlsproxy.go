@@ -24,7 +24,7 @@ func (c *cmdConfig) validate() (errs []error) {
 	}
 	if c.password == "" && c.username != "" ||
 		c.password != "" && c.username == "" {
-		errs = append(errs, fmt.Errorf("if either USERNAME or PASSWORD environment variable is set, both must be unset"))
+		errs = append(errs, fmt.Errorf("if either USERNAME or PASSWORD environment variable is unset, both must be unset"))
 	}
 
 	return
