@@ -92,6 +92,9 @@ for attempt in {1..5}; do
   if [[ ${attempt} -lt 5 ]]; then sleep 60; else exit 1; fi
 done
 
+#
+# NOTE: In future, move that information outside of environment variables
+#
 set +x
 export SASURI='{{ .Config.WorkerStartupSASURI }}'
 set -x
