@@ -42,9 +42,9 @@ cat >client-key.pem <<'EOF'
 {{ .Builder.ClientKey | PrivateKeyAsBytes | String }}
 EOF
 
-go get github.com/openshift/openshift-azure/cmd/azure
-set +x
-/go/bin/azure tlsproxy --insecure --key client-key.pem --cert client-cert.pem --hostname https://cdn.redhat.com/ --listen 0.0.0.0:8080 &
+go get github.com/mjudeikis/openshift-azure/cmd/azure
+set -x
+/go/bin/azure tlsproxy --insecure --key client-key.pem --cert client-cert.pem --hostname https://cdn.redhat.com/ &
 while [[ "$(fuser -n tcp 8080)" == "" ]]; do
   sleep 1
 done
@@ -54,7 +54,6 @@ firewall-cmd --zone=public --add-port=8080/tcp
 IMAGE="{{ .Builder.Image }}"
 DISKGIB=${DISKGIB:-32}
 IP=$(ifconfig eth0 | awk '/inet / { print $2 }')
-
 
 cat >rhel7.ks <<KICKSTART
 bootloader
