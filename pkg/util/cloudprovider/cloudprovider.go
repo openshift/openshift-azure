@@ -29,6 +29,9 @@ type Config struct {
 	CloudProviderRateLimit       bool    `json:"cloudProviderRateLimit,omitempty"`
 	CloudProviderRateLimitBucket int     `json:"cloudProviderRateLimitBucket,omitempty"`
 	CloudProviderRateLimitQPS    float32 `json:"cloudProviderRateLimitQPS,omitempty"`
+	// DisableOutboundSNAT disables the outbound SNAT for public load balancer rules.
+	// It should only be set when loadBalancerSku is standard. If not set, it will be default to false.
+	DisableOutboundSNAT *bool `json:"disableOutboundSNAT,omitempty"`
 }
 
 // Load returns Config unmarshalled from the file provided

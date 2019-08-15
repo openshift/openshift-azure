@@ -51,6 +51,7 @@ cloudProviderBackoffRetries: 6
 cloudProviderRateLimit: true
 cloudProviderRateLimitBucket: 10
 cloudProviderRateLimitQPS: 3
+disableOutboundSNAT: true
 loadBalancerSku: standard
 location: eastus
 resourceGroup: rg
@@ -72,6 +73,7 @@ cloudProviderBackoffRetries: 6
 cloudProviderRateLimit: true
 cloudProviderRateLimitBucket: 10
 cloudProviderRateLimitQPS: 3
+disableOutboundSNAT: true
 loadBalancerSku: standard
 location: eastus
 resourceGroup: rg
