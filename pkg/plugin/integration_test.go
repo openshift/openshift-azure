@@ -73,7 +73,7 @@ func getFakeDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, az *fak
 	}
 }
 
-func enrich(cs *api.OpenShiftManagedCluster) error {
+func enrichCs(cs *api.OpenShiftManagedCluster) error {
 	rg := "testRG"
 	dnsDomain := "cloudapp.azure.com"
 	tenantID := uuid.NewV4().String()
@@ -362,7 +362,7 @@ func setupNewCluster(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftMa
 		log:                    log,
 		now:                    time.Now,
 	}
-	err = enrich(cs)
+	err = enrichCs(cs)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -601,6 +601,14 @@ func TestHowUserConfigChangesCausesRotations(t *testing.T) {
 			expectRotation: map[rotationType]bool{rotationMaster: true, rotationInfra: false, rotationSync: true, rotationCompute: false},
 			change: func(oc *api.OpenShiftManagedCluster) {
 				oc.Properties.AuthProfile.IdentityProviders[0].Provider.(*api.AADIdentityProvider).Secret = "new"
+			},
+		},
+		{
+			name:           "change MonitorProfile",
+			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: true, rotationCompute: false},
+			change: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.MonitorProfile.WorkspaceID = "new"
+				oc.Properties.MonitorProfile.WorkspaceKey = "new"
 			},
 		},
 	}

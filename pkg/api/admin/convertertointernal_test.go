@@ -286,20 +286,22 @@ func TestToInternal(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		expected := internalManagedCluster()
-		if test.expectedChange != nil {
-			test.expectedChange(expected)
-		}
-
-		output, err := ToInternal(test.input, test.base)
-		if !reflect.DeepEqual(err, test.err) {
-			t.Errorf("%s: expected error: %v, got error: %v", test.name, test.err, err)
-		}
-		if err == nil {
-			if !reflect.DeepEqual(output, expected) {
-				t.Errorf("%s: unexpected diff %s", test.name, cmp.Diff(output, expected))
+		t.Run(test.name, func(t *testing.T) {
+			expected := internalManagedCluster()
+			if test.expectedChange != nil {
+				test.expectedChange(expected)
 			}
-		}
+
+			output, err := ToInternal(test.input, test.base)
+			if !reflect.DeepEqual(err, test.err) {
+				t.Errorf("%s: expected error: %v, got error: %v", test.name, test.err, err)
+			}
+			if err == nil {
+				if !reflect.DeepEqual(output, expected) {
+					t.Errorf("%s: unexpected diff %s", test.name, cmp.Diff(output, expected))
+				}
+			}
+		})
 	}
 }
 

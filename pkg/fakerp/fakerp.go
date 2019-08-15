@@ -126,8 +126,10 @@ func parsePluginVersion(pluginVersion string) (major, minor int, err error) {
 }
 
 func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, oldCs *api.OpenShiftManagedCluster, isAdmin bool, testConfig api.TestConfig) (*api.OpenShiftManagedCluster, error) {
+	isUpdate := (oldCs != nil) // this is until we have called writeHelpers()
+
 	log.Info("enrich")
-	err := enrich(cs)
+	err := enrichCs(cs)
 	if err != nil {
 		return nil, err
 	}
@@ -201,6 +203,14 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 		return nil, err
 	}
 
+	if cs.Properties.MonitorProfile.WorkspaceResourceID != "" {
+		log.Info("enabling ContainerInsights solution on the workspace")
+		err = createOrUpdateContainerInsights(ctx, log, cs)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	if !isAdmin {
 		errs = p.Validate(ctx, cs, oldCs, false)
 	}
@@ -209,7 +219,7 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 	}
 
 	// generate or update the OpenShift config blob
-	err = p.GenerateConfig(ctx, cs, oldCs != nil)
+	err = p.GenerateConfig(ctx, cs, isUpdate)
 	if err != nil {
 		return nil, err
 	}
@@ -230,7 +240,7 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 
 	log.Info("plugin createorupdate")
 	deployer := GetDeployer(log, cs, testConfig)
-	if err := p.CreateOrUpdate(ctx, cs, oldCs != nil, deployer); err != nil {
+	if err := p.CreateOrUpdate(ctx, cs, isUpdate, deployer); err != nil {
 		return nil, err
 	}
 
@@ -244,7 +254,7 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 	return cs, nil
 }
 
-func enrich(cs *api.OpenShiftManagedCluster) error {
+func enrichCs(cs *api.OpenShiftManagedCluster) error {
 	// TODO: Use kelseyhightower/envconfig
 	for _, env := range []string{
 		"AZURE_CLIENT_ID",

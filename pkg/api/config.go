@@ -136,6 +136,8 @@ type ImageConfig struct {
 	GenevaStatsd  string `json:"genevaStatsd,omitempty"`
 	MetricsBridge string `json:"metricsBridge,omitempty"`
 
+	LogAnalyticsAgent string `json:"logAnalyticsAgent,omitempty"`
+
 	// ImagePullSecret defines the secret used to pull from the private registries, used system-wide
 	ImagePullSecret []byte `json:"imagePullSecret,omitempty"`
 }

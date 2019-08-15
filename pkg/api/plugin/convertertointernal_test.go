@@ -102,6 +102,7 @@ func internalPluginConfig() api.Config {
 			GenevaTDAgent:             "Versions.key.Images.GenevaTDAgent",
 			GenevaStatsd:              "Versions.key.Images.GenevaStatsd",
 			MetricsBridge:             "Versions.key.Images.MetricsBridge",
+			LogAnalyticsAgent:         "Versions.key.Images.LogAnalyticsAgent",
 		},
 	}
 }

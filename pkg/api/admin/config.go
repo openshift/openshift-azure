@@ -103,6 +103,8 @@ type ImageConfig struct {
 	GenevaTDAgent *string `json:"genevaTDAgent,omitempty"`
 	GenevaStatsd  *string `json:"genevaStatsd,omitempty"`
 	MetricsBridge *string `json:"metricsBridge,omitempty"`
+
+	LogAnalyticsAgent *string `json:"logAnalyticsAgent,omitempty"`
 }
 
 // CertificateConfig contains all certificate configuration for the cluster.

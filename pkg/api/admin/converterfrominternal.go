@@ -18,7 +18,6 @@ func FromInternal(cs *api.OpenShiftManagedCluster) *OpenShiftManagedCluster {
 		v := cs.Tags[k]
 		oc.Tags[k] = &v
 	}
-
 	if cs.Plan != nil {
 		oc.Plan = &ResourcePurchasePlan{
 			Name:          cs.Plan.Name,
@@ -41,6 +40,9 @@ func FromInternal(cs *api.OpenShiftManagedCluster) *OpenShiftManagedCluster {
 		VnetID:     &cs.Properties.NetworkProfile.VnetID,
 		VnetCIDR:   &cs.Properties.NetworkProfile.VnetCIDR,
 		PeerVnetID: cs.Properties.NetworkProfile.PeerVnetID,
+	}
+	oc.Properties.MonitorProfile = &MonitorProfile{
+		WorkspaceResourceID: &cs.Properties.MonitorProfile.WorkspaceResourceID,
 	}
 
 	oc.Properties.RouterProfiles = make([]RouterProfile, len(cs.Properties.RouterProfiles))
@@ -216,5 +218,6 @@ func convertImageConfigToAdmin(in api.ImageConfig) *ImageConfig {
 		GenevaTDAgent:             &in.GenevaTDAgent,
 		GenevaStatsd:              &in.GenevaStatsd,
 		MetricsBridge:             &in.MetricsBridge,
+		LogAnalyticsAgent:         &in.LogAnalyticsAgent,
 	}
 }

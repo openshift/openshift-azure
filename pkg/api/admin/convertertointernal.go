@@ -100,6 +100,12 @@ func mergePropertiesAdmin(oc *OpenShiftManagedCluster, cs *api.OpenShiftManagedC
 		cs.Properties.NetworkProfile.PeerVnetID = oc.Properties.NetworkProfile.PeerVnetID
 	}
 
+	if oc.Properties.MonitorProfile != nil {
+		if oc.Properties.MonitorProfile.WorkspaceResourceID != nil {
+			cs.Properties.MonitorProfile.WorkspaceResourceID = *oc.Properties.MonitorProfile.WorkspaceResourceID
+		}
+	}
+
 	if err := mergeRouterProfilesAdmin(oc, cs); err != nil {
 		return err
 	}
@@ -610,6 +616,9 @@ func mergeImageConfig(in *ImageConfig, out *api.ImageConfig) {
 	}
 	if in.MetricsBridge != nil {
 		out.MetricsBridge = *in.MetricsBridge
+	}
+	if in.LogAnalyticsAgent != nil {
+		out.LogAnalyticsAgent = *in.LogAnalyticsAgent
 	}
 	return
 }

@@ -1,0 +1,41 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "[Concat('ContainerInsights', '({{ .WorkspaceName }})')]",
+            "apiVersion": "2017-05-10",
+            "subscriptionId": "{{ .SubscriptionID }}",
+            "resourceGroup": "{{ .ResourceGroup }}",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "apiVersion": "2015-11-01-preview",
+                            "type": "Microsoft.OperationsManagement/solutions",
+                            "location": "{{ .Location | js }}",
+                            "name": "[Concat('ContainerInsights', '({{ .WorkspaceName }})')]",
+                            "properties": {
+                                "workspaceResourceId": "{{ .WorkspaceResourceID }}"
+                            },
+                            "plan": {
+                                "name": "[Concat('ContainerInsights', '({{ .WorkspaceName }})')]",
+                                "product": "[Concat('OMSGallery/', 'ContainerInsights')]",
+                                "promotionCode": "",
+                                "publisher": "Microsoft"
+                            }
+                        }
+                    ]
+                },
+                "parameters": {}
+            }
+        }
+    ]
+}

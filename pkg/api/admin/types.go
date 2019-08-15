@@ -61,6 +61,9 @@ type Properties struct {
 
 	// AuthProfile (in): configures OpenShift authentication
 	AuthProfile *AuthProfile `json:"authProfile,omitempty"`
+
+	// MonitorProfile configures which log analytics workspace to use.
+	MonitorProfile *MonitorProfile `json:"monitorProfile,omitempty"`
 }
 
 // ProvisioningState represents the current state of the OSA resource.
@@ -101,6 +104,11 @@ type NetworkProfile struct {
 	//   /providers/Microsoft.Network
 	//   /virtualNetworks/[^/]+$`
 	PeerVnetID *string `json:"peerVnetId,omitempty"`
+}
+
+// MonitorProfile configuration for Azure Monitor log analytics.
+type MonitorProfile struct {
+	WorkspaceResourceID *string `json:"workspaceResourceId,omitempty"`
 }
 
 // RouterProfile represents an OpenShift router.

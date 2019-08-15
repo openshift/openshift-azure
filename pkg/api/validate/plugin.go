@@ -255,6 +255,10 @@ func validateImageConfig(path, version string, i *pluginapi.ImageConfig) (errs [
 		errs = append(errs, fmt.Errorf("invalid %s.genevaTDAgent %q", path, i.GenevaTDAgent))
 	}
 
+	if i.LogAnalyticsAgent == "" {
+		errs = append(errs, fmt.Errorf("invalid %s.logAnalyticsAgent %q", path, i.LogAnalyticsAgent))
+	}
+
 	if i.AzureControllers == "" {
 		errs = append(errs, fmt.Errorf("invalid %s.azureControllers %q", path, i.AzureControllers))
 	}

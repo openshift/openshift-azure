@@ -45,6 +45,8 @@ kubeletArguments:
   - {{ print "node-role.kubernetes.io/" .Role "=true" | quote }}
   pod-manifest-path:
   - /etc/origin/node/pods
+  read-only-port:
+  - "10255"
   rotate-certificates:
   - "true"
   runtime-request-timeout:
