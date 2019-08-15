@@ -11,7 +11,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/compute"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/insights"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient/managedapplications"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/network"
 	externalapi "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/2019-04-30"
 	adminapi "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/admin"
@@ -27,7 +26,6 @@ var RPClient *Client
 type Client struct {
 	Accounts                         storage.AccountsClient
 	ActivityLogs                     insights.ActivityLogsClient
-	Applications                     managedapplications.ApplicationsClient
 	BlobStorage                      storage.BlobStorageClient
 	OpenShiftManagedClusters         externalapi.OpenShiftManagedClustersClient
 	OpenShiftManagedClustersAdmin    *adminapi.Client
@@ -74,7 +72,6 @@ func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry) error {
 	RPClient = &Client{
 		Accounts:                         storage.NewAccountsClient(ctx, log, subscriptionID, authorizer),
 		ActivityLogs:                     insights.NewActivityLogsClient(ctx, log, subscriptionID, authorizer),
-		Applications:                     managedapplications.NewApplicationsClient(ctx, log, subscriptionID, authorizer),
 		BlobStorage:                      storageClient,
 		OpenShiftManagedClusters:         rpc,
 		OpenShiftManagedClustersAdmin:    rpcAdmin,
