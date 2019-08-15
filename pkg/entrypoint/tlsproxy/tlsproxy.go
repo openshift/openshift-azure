@@ -24,7 +24,7 @@ func (c *cmdConfig) validate() (errs []error) {
 	}
 	if c.password == "" && c.username != "" ||
 		c.password != "" && c.username == "" {
-		errs = append(errs, fmt.Errorf("if either USERNAME or PASSWORD environment variable is set, both must be set"))
+		errs = append(errs, fmt.Errorf("if either USERNAME or PASSWORD environment variable is set, both must be unset"))
 	}
 
 	return
@@ -50,9 +50,11 @@ func (c *cmdConfig) Init() error {
 		return err
 	}
 
-	c.whitelistRegexp, err = regexp.Compile(c.whitelist)
-	if err != nil {
-		return err
+	if c.whitelist != "" {
+		c.whitelistRegexp, err = regexp.Compile(c.whitelist)
+		if err != nil {
+			return err
+		}
 	}
 
 	cert, err := tls.LoadX509KeyPair(c.cert, c.key)
@@ -91,9 +93,11 @@ func (c *cmdConfig) Run() error {
 		req.RequestURI = ""
 		req.Host = ""
 
-		if !c.whitelistRegexp.MatchString(req.URL.Path) || req.Method != http.MethodGet {
-			http.Error(rw, http.StatusText(http.StatusForbidden), http.StatusForbidden)
-			return
+		if c.whitelist != "" {
+			if !c.whitelistRegexp.MatchString(req.URL.Path) || req.Method != http.MethodGet {
+				http.Error(rw, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+				return
+			}
 		}
 
 		// check authentication
