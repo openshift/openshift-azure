@@ -113,11 +113,10 @@ systemctl start mdsd.service azsecd.service azsecmond.service
 
 # note: atomic-openshift-node crash loops until master is up
 systemctl enable atomic-openshift-node.service
-systemctl start atomic-openshift-node.service &
 {{ if .Config.SecurityPatchPackages }}
-needs-restarting --reboothint &>/dev/null || {
-  logger -t node-startup.sh "rebooting $(hostname) to complete ARO security updates"
-  shutdown --reboot now
-}
+logger -t node-startup.sh "scheduling $(hostname) reboot to complete ARO security updates"
+shutdown --reboot +2
+{{else}}
+systemctl start atomic-openshift-node.service || true
 {{end}}
 
