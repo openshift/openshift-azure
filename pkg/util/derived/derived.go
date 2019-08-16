@@ -35,6 +35,7 @@ func baseCloudProviderConf(cs *api.OpenShiftManagedCluster, disableOutboundSNAT 
 	return &cfg, nil
 }
 
+// MasterCloudProviderConf returns cloudprovider config for masters
 func MasterCloudProviderConf(cs *api.OpenShiftManagedCluster, disableOutboundSNAT bool) ([]byte, error) {
 	cpc, err := baseCloudProviderConf(cs, disableOutboundSNAT)
 	if err != nil {
@@ -45,6 +46,7 @@ func MasterCloudProviderConf(cs *api.OpenShiftManagedCluster, disableOutboundSNA
 	return yaml.Marshal(cpc)
 }
 
+// WorkerCloudProviderConf returns cloudprovider config for workers
 func WorkerCloudProviderConf(cs *api.OpenShiftManagedCluster, disableOutboundSNAT bool) ([]byte, error) {
 	cpc, err := baseCloudProviderConf(cs, disableOutboundSNAT)
 	if err != nil {
