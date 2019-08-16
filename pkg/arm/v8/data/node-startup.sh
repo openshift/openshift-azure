@@ -85,9 +85,13 @@ docker pull {{ .Config.Images.Node }} &>/dev/null &
 # if waagent runs before dns is known to the node we end up with empty string
 while [[ $(hostname -d) == "" ]]; do sleep 1; done
 
-while ! docker pull {{ .Config.Images.Startup }}; do
-  sleep 1
+logger -t node-startup.sh "pulling {{ .Config.Images.Startup }}"
+for attempt in {1..5}; do
+  docker pull {{ .Config.Images.Startup }} && break
+  logger -t node-startup.sh "[attempt ${attempt}] docker pull {{ .Config.Images.Startup }} failed"
+  if [[ ${attempt} -lt 5 ]]; then sleep 60; else exit 1; fi
 done
+
 set +x
 export SASURI='{{ .Config.WorkerStartupSASURI }}'
 set -x

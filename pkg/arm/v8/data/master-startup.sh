@@ -105,9 +105,13 @@ iptables-save >/etc/sysconfig/iptables
 # if waagent runs before dns is known to the node we end up with empty string
 while [[ $(hostname -d) == "" ]]; do sleep 1; done
 
-while ! docker pull {{ .Config.Images.Startup }}; do
-  sleep 1
+logger -t master-startup.sh "pulling {{ .Config.Images.Startup }}"
+for attempt in {1..5}; do
+  docker pull {{ .Config.Images.Startup }} && break
+  logger -t master-startup.sh "[attempt ${attempt}] docker pull {{ .Config.Images.Startup }} failed"
+  if [[ ${attempt} -lt 5 ]]; then sleep 60; else exit 1; fi
 done
+
 set +x
 export SASURI='{{ .Config.MasterStartupSASURI }}'
 set -x
@@ -130,10 +134,14 @@ rm -Rf /var/lib/etcd/*
 tempBackDir=/var/lib/etcd/backup
 mkdir $tempBackDir
 
-logger -t master-startup.sh "downloading backup"
-while ! docker pull {{ .Config.Images.EtcdBackup }}; do
-  sleep 1
+logger -t master-startup.sh "pulling {{ .Config.Images.EtcdBackup }}"
+for attempt in {1..5}; do
+  docker pull {{ .Config.Images.EtcdBackup }} && break
+  logger -t master-startup.sh "[attempt ${attempt}] docker pull {{ .Config.Images.EtcdBackup }} failed"
+  if [[ ${attempt} -lt 5 ]]; then sleep 60; else exit 1; fi
 done
+
+logger -t master-startup.sh "downloading backup"
 docker run --rm --network host \
   -v /etc/origin/master:/etc/origin/master \
   -v /etc/origin/cloudprovider/:/_data/_out \
@@ -145,10 +153,14 @@ docker run --rm --network host \
 logger -t master-startup.sh "backup downloaded"
 
 # step 2 restore
-logger -t master-startup.sh "restoring snapshot"
-while ! docker pull {{ .Config.Images.MasterEtcd }}; do
-  sleep 1
+logger -t master-startup.sh "pulling {{ .Config.Images.MasterEtcd }}"
+for attempt in {1..5}; do
+  docker pull {{ .Config.Images.MasterEtcd }} && break
+  logger -t master-startup.sh "[attempt ${attempt}] docker pull {{ .Config.Images.MasterEtcd }} failed"
+  if [[ ${attempt} -lt 5 ]]; then sleep 60; else exit 1; fi
 done
+
+logger -t master-startup.sh "restoring snapshot"
 docker run --rm --network host \
   -v /etc/etcd:/etc/etcd \
   -v /var/lib/etcd:/var/lib/etcd:z \
