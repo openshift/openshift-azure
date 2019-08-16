@@ -175,7 +175,7 @@ objects:
         - ${APPLICATION_NAME}
         from:
           kind: ImageStreamTag
-          name: sso-cd-openshift-rhel8:7
+          name: redhat-sso-cd-openshift-rhel8:7
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: ImageChange
     - type: ConfigChange

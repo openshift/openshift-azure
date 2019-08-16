@@ -1,7 +1,7 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhpam: "1.0"
+  rhpam: "1.1"
   template: rhpam74-prod-immutable-kieserver-amq
 message: |-
   A new immutable Red Hat Process Automation Manager KIE server have been created in your project.
@@ -29,7 +29,7 @@ metadata:
       deployment configuration, secure and insecure http communication and persistent
       volume to store data that needs to survive to a restart.
     template.openshift.io/support-url: https://access.redhat.com
-    version: "1.0"
+    version: "1.1"
   name: rhpam74-prod-immutable-kieserver-amq
   namespace: openshift
 objects:
@@ -483,6 +483,10 @@ objects:
             value: ${APPLICATION_NAME}-postgresql
           - name: TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL
             value: ${TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL}
+          - name: KIE_SERVER_EXECUTOR_JMS
+            value: ${KIE_SERVER_EXECUTOR_JMS}
+          - name: KIE_SERVER_EXECUTOR_JMS_TRANSACTED
+            value: ${KIE_SERVER_EXECUTOR_JMS_TRANSACTED}
           - name: KIE_SERVER_JMS_QUEUE_REQUEST
             value: ${KIE_SERVER_JMS_QUEUE_REQUEST}
           - name: KIE_SERVER_JMS_QUEUE_RESPONSE
@@ -898,11 +902,11 @@ parameters:
   name: KIE_SERVER_IMAGE_STREAM_NAME
   required: true
   value: rhpam74-kieserver-openshift
-- description: A named pointer to an image in an image stream. Default is "1.0".
+- description: A named pointer to an image in an image stream. Default is "1.1".
   displayName: ImageStream Tag
   name: IMAGE_STREAM_TAG
   required: true
-  value: "1.0"
+  value: "1.1"
 - description: KIE server persistence datasource (Sets the org.kie.server.persistence.ds
     system property)
   displayName: KIE Server Persistence DS
@@ -1060,6 +1064,14 @@ parameters:
   name: KIE_SERVER_MGMT_DISABLED
   required: true
   value: "true"
+- description: Enables the JMS executor, set false to disable it.
+  displayName: KIE Server JMS Executor
+  name: KIE_SERVER_EXECUTOR_JMS
+  value: "true"
+- description: Enable transactions for JMS executor, disabled by default
+  displayName: KIE Server Transacted Executor
+  name: KIE_SERVER_EXECUTOR_JMS_TRANSACTED
+  value: "false"
 - description: JNDI name of request queue for JMS. The default value is queue/KIE.SERVER.REQUEST
   displayName: KIE Server JMS Request Queue
   name: KIE_SERVER_JMS_QUEUE_REQUEST
