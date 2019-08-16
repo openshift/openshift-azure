@@ -1,7 +1,7 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhdm: "1.0"
+  rhdm: "1.1"
   template: rhdm74-trial-ephemeral
 message: |-
   A new Decision Manager trial environment has been created.
@@ -31,7 +31,7 @@ metadata:
       7.4, including application deployment configuration, secure and insecure http
       communication.
     template.openshift.io/support-url: https://access.redhat.com
-    version: "1.0"
+    version: "1.1"
   name: rhdm74-trial-ephemeral
   namespace: openshift
 objects:
@@ -635,11 +635,11 @@ parameters:
   name: KIE_SERVER_IMAGE_STREAM_NAME
   required: true
   value: rhdm74-kieserver-openshift
-- description: A named pointer to an image in an image stream. Default is "1.0".
+- description: A named pointer to an image in an image stream. Default is "1.1".
   displayName: ImageStream Tag
   name: IMAGE_STREAM_TAG
   required: true
-  value: "1.0"
+  value: "1.1"
 - description: 'KIE Server Container deployment configuration in format: containerId=groupId:artifactId:version|c2=g2:a2:v2'
   displayName: KIE Server Container Deployment
   name: KIE_SERVER_CONTAINER_DEPLOYMENT

@@ -1,7 +1,7 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhpam: "1.0"
+  rhpam: "1.1"
   template: rhpam74-prod
 message: |-
   A new environment has been set up for Red Hat Process Automation Manager 7.
@@ -33,7 +33,7 @@ metadata:
       7.4, including application deployment configuration, secure and insecure http
       communication and persistent volume to store data that needs to survive a restart.
     template.openshift.io/support-url: https://access.redhat.com
-    version: "1.0"
+    version: "1.1"
   name: rhpam74-prod
   namespace: openshift
 objects:
@@ -1465,11 +1465,11 @@ parameters:
   name: KIE_SERVER_IMAGE_STREAM_NAME
   required: true
   value: rhpam74-kieserver-openshift
-- description: A named pointer to an image in an image stream. Default is "1.0".
+- description: A named pointer to an image in an image stream. Default is "1.1".
   displayName: ImageStream Tag
   name: IMAGE_STREAM_TAG
   required: true
-  value: "1.0"
+  value: "1.1"
 - description: Custom hostname for http service route.  Leave blank for default hostname,
     e.g. <application-name>-smartrouter-<project>.<default-domain-suffix>'
   displayName: Smart Router Custom http Route Hostname

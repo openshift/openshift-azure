@@ -1,7 +1,7 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhdm: "1.0"
+  rhdm: "1.1"
   template: rhdm74-authoring
 message: |-
   A new persistent Decision Manager application has been created in your project.
@@ -33,7 +33,7 @@ metadata:
       deployment configuration, secure and insecure http communication and a persistent
       volume to store data that needs to survive to a restart.
     template.openshift.io/support-url: https://access.redhat.com
-    version: "1.0"
+    version: "1.1"
   name: rhdm74-authoring
   namespace: openshift
 objects:
@@ -756,11 +756,11 @@ parameters:
   name: KIE_SERVER_IMAGE_STREAM_NAME
   required: true
   value: rhdm74-kieserver-openshift
-- description: A named pointer to an image in an image stream. Default is "1.0".
+- description: A named pointer to an image in an image stream. Default is "1.1".
   displayName: ImageStream Tag
   name: IMAGE_STREAM_TAG
   required: true
-  value: "1.0"
+  value: "1.1"
 - description: Maven mirror that Decision Central and KIE server must use. If you
     configure a mirror, this mirror must contain all artifacts that are required for
     building and deploying your services.
