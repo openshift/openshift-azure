@@ -177,6 +177,9 @@ yum -y install \
     fluentd \
     rubygem-fluent-plugin-systemd
 
+# create docker group whose members will have access to /var/run/docker.sock
+groupadd docker
+
 # openshift-audit dir ends up with wrong permissions, preemptively fix that
 mkdir -pv /var/log/openshift-audit
 chmod -v 0750 /var/log/openshift-audit
