@@ -1,7 +1,0 @@
-apiVersion: v1
-data:
-  mdsd.xml: '*** GENERATED ***'
-kind: ConfigMap
-metadata:
-  name: mdsd-config
-  namespace: openshift-azure-logging
