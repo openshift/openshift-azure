@@ -201,5 +201,5 @@ data:
     </match>
 kind: ConfigMap
 metadata:
-  name: omsagent-rs-config
+  name: log-analytics-cluster-agent-config
   namespace: openshift-azure-logging

@@ -1,11 +1,12 @@
 apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: log-analytics-agent-entrypoint
-  namespace: openshift-azure-logging
 data:
   main.sh: |-
     #!/bin/bash
+
+    # NOTE: This script was lifted from /opt/main.sh in the azuremonitor/containerinsights/ciprod:ciprod07092019
+    # image and the docker group creation logic was modified by directly writing the group mapping to /etc/group.
+    # This script is to be mounted to the log analytics agent pods at /opt/main.sh, the same entrypoint configured
+    # for the image. This script should be removed as soon as we converge with upstream.
 
     if [ -e "/etc/config/kube.conf" ]; then
         cat /etc/config/kube.conf > /etc/opt/microsoft/omsagent/sysconf/omsagent.d/container.conf
@@ -288,5 +289,7 @@ data:
     trap "shutdown" SIGTERM
 
     sleep inf & wait
-
-
+kind: ConfigMap
+metadata:
+  name: log-analytics-agent-entrypoint
+  namespace: openshift-azure-logging

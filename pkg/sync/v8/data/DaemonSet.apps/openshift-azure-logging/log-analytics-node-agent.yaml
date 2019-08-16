@@ -4,19 +4,19 @@ metadata:
   labels:
     azure.openshift.io/sync-pod-optionally-apply: '*** GENERATED ***'
     azure.openshift.io/sync-pod-wait-for-readiness: "false"
-  name: omsagent
+  name: log-analytics-node-agent
   namespace: openshift-azure-logging
 spec:
   selector:
     matchLabels:
-      app: omsagent
+      app: log-analytics-node-agent
   template:
     metadata:
       labels:
         agentVersion: 1.10.0.1
-        app: omsagent
+        app: log-analytics-node-agent
         dockerProviderVersion: 6.0.0-0
-        dsName: omsagent
+        dsName: log-analytics-node-agent
     spec:
       containers:
       - env:
@@ -43,7 +43,7 @@ spec:
             - /opt/livenessprobe.sh
           initialDelaySeconds: 60
           periodSeconds: 60
-        name: omsagent
+        name: log-analytics-node-agent
         ports:
         - containerPort: 25226
         - containerPort: 25225
@@ -76,12 +76,12 @@ spec:
           name: settings-vol-config
           readOnly: true
         - mountPath: /opt/main.sh
-          subPath: main.sh
           name: log-analytics-agent-entrypoint
+          subPath: main.sh
       nodeSelector:
         beta.kubernetes.io/os: linux
         node-role.kubernetes.io/compute: "true"
-      serviceAccountName: omsagent
+      serviceAccountName: log-analytics-agent
       tolerations:
       - effect: NoExecute
         operator: Exists
@@ -111,6 +111,6 @@ spec:
           optional: true
         name: settings-vol-config
       - configMap:
-          defaultMode: 0775
+          defaultMode: 509
           name: log-analytics-agent-entrypoint
         name: log-analytics-agent-entrypoint
