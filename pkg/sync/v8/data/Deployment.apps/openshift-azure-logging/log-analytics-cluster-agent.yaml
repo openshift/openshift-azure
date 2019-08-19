@@ -4,22 +4,24 @@ metadata:
   labels:
     azure.openshift.io/sync-pod-optionally-apply: '*** GENERATED ***'
     azure.openshift.io/sync-pod-wait-for-readiness: "false"
-  name: omsagent-rs
+  name: log-analytics-cluster-agent
   namespace: openshift-azure-logging
 spec:
   selector:
     matchLabels:
-      app: omsagent
+      app: log-analytics-cluster-agent
   template:
     metadata:
       labels:
         agentVersion: 1.10.0.1
-        app: omsagent
+        app: log-analytics-cluster-agent
         dockerProviderVersion: 6.0.0-0
-        rsName: omsagent-rs
+        rsName: log-analytics-cluster-agent
     spec:
       containers:
-      - env:
+      - command:
+        - /opt/main-wrapper.sh
+        env:
         - name: WSID
           value: '*** GENERATED ***'
         - name: KEY
@@ -43,7 +45,7 @@ spec:
             - /opt/livenessprobe.sh
           initialDelaySeconds: 60
           periodSeconds: 60
-        name: omsagent
+        name: log-analytics-cluster-agent
         ports:
         - containerPort: 25226
         - containerPort: 25225
@@ -73,14 +75,17 @@ spec:
         - mountPath: /etc/kubernetes/host
           name: azure-json-path
         - mountPath: /etc/config
-          name: omsagent-rs-config
+          name: log-analytics-cluster-agent-config
         - mountPath: /etc/config/settings
           name: settings-vol-config
           readOnly: true
+        - mountPath: /opt/main-wrapper.sh
+          name: log-analytics-agent-entrypoint
+          subPath: main-wrapper.sh
       nodeSelector:
         beta.kubernetes.io/os: linux
         node-role.kubernetes.io/infra: "true"
-      serviceAccountName: omsagent
+      serviceAccountName: log-analytics-agent
       tolerations:
       - effect: NoExecute
         operator: Exists
@@ -106,9 +111,13 @@ spec:
           path: /etc/kubernetes
         name: azure-json-path
       - configMap:
-          name: omsagent-rs-config
-        name: omsagent-rs-config
+          name: log-analytics-cluster-agent-config
+        name: log-analytics-cluster-agent-config
       - configMap:
           name: container-azm-ms-agentconfig
           optional: true
         name: settings-vol-config
+      - configMap:
+          defaultMode: 509
+          name: log-analytics-agent-entrypoint
+        name: log-analytics-agent-entrypoint

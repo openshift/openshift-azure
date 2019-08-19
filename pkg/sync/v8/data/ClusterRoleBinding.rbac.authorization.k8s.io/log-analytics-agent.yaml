@@ -1,12 +1,12 @@
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
-  name: omsagent
+  name: log-analytics-agent
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: omsagent
+  name: log-analytics-agent
 subjects:
 - kind: ServiceAccount
-  name: omsagent
+  name: log-analytics-agent
   namespace: openshift-azure-logging

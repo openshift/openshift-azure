@@ -304,7 +304,7 @@ var translations = map[string][]struct {
 			Template: "{{ .Config.Images.ServiceCatalog }}",
 		},
 	},
-	"DaemonSet.apps/openshift-azure-logging/omsagent": {
+	"DaemonSet.apps/openshift-azure-logging/log-analytics-node-agent": {
 		{
 			Path: jsonpath.MustCompile("$.metadata.labels['azure.openshift.io/sync-pod-optionally-apply']"),
 			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
@@ -367,7 +367,7 @@ var translations = map[string][]struct {
 			Template: "{{ .Config.Images.TLSProxy }}",
 		},
 	},
-	"Deployment.apps/openshift-azure-logging/omsagent-rs": {
+	"Deployment.apps/openshift-azure-logging/log-analytics-cluster-agent": {
 		{
 			Path: jsonpath.MustCompile("$.metadata.labels['azure.openshift.io/sync-pod-optionally-apply']"),
 			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
