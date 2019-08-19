@@ -19,7 +19,9 @@ spec:
         rsName: log-analytics-cluster-agent
     spec:
       containers:
-      - env:
+      - command:
+        - /opt/main-wrapper.sh
+        env:
         - name: WSID
           value: '*** GENERATED ***'
         - name: KEY
@@ -77,9 +79,9 @@ spec:
         - mountPath: /etc/config/settings
           name: settings-vol-config
           readOnly: true
-        - mountPath: /opt/main.sh
+        - mountPath: /opt/main-wrapper.sh
           name: log-analytics-agent-entrypoint
-          subPath: main.sh
+          subPath: main-wrapper.sh
       nodeSelector:
         beta.kubernetes.io/os: linux
         node-role.kubernetes.io/infra: "true"
