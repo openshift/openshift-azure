@@ -74,7 +74,7 @@ e2e:
 or 
 
 ```bash
-export FOCUS='\[CustomerAdmin\]|\[EndUser\]'
+export FOCUS='\[CustomerAdmin\]|\[EndUser\]';
 go test -v -tags e2e ./test/e2e -ginkgo.focus=$FOCUS
 ```
 See [e2e requirements](e2e/requirements.md) for more information on the expected inputs to our e2e tests.
