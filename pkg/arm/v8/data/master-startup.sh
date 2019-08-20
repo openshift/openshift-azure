@@ -64,7 +64,7 @@ rm -rf /var/lib/yum/client-cert.pem /var/lib/yum/client-key.pem
 {{end}}
 
 # TODO: delete the following group creation after it is baked into our VM images
-groupadd docker
+groupadd -f docker
 
 if ! grep /var/lib/docker /etc/fstab; then
   systemctl stop docker-cleanup.timer
