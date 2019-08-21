@@ -12,26 +12,17 @@ spec:
       app: log-analytics-node-agent
   template:
     metadata:
-      labels:
+      annotations:
         agentVersion: 1.10.0.1
+        dockerProviderVersion: 7.0.0-5
+        schema-versions: v1
+      labels:
         app: log-analytics-node-agent
-        dockerProviderVersion: 6.0.0-0
-        dsName: log-analytics-node-agent
     spec:
       containers:
       - command:
         - /opt/main-wrapper.sh
         env:
-        - name: WSID
-          valueFrom:
-            secretKeyRef:
-              key: WSID
-              name: log-analytics
-        - name: KEY
-          valueFrom:
-            secretKeyRef:
-              key: KEY
-              name: log-analytics
         - name: AKS_RESOURCE_ID
           value: '*** GENERATED ***'
         - name: AKS_REGION
@@ -43,6 +34,8 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: status.hostIP
+        - name: REPLICASET_SERVICE_ENDPOINT
+          value: healthmodel-replicaset-service.openshift-azure-logging
         image: '*** GENERATED ***'
         livenessProbe:
           exec:
@@ -83,6 +76,8 @@ spec:
           name: containerlog-path
         - mountPath: /etc/kubernetes/host
           name: azure-json-path
+        - mountPath: /etc/omsagent-secret
+          name: log-analytics
         - mountPath: /etc/config/settings
           name: settings-vol-config
           readOnly: true

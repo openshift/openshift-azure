@@ -13,26 +13,17 @@ spec:
       app: log-analytics-cluster-agent
   template:
     metadata:
-      labels:
+      annotations:
         agentVersion: 1.10.0.1
+        dockerProviderVersion: 7.0.0-5
+        schema-versions: v1
+      labels:
         app: log-analytics-cluster-agent
-        dockerProviderVersion: 6.0.0-0
-        rsName: log-analytics-cluster-agent
     spec:
       containers:
       - command:
         - /opt/main-wrapper.sh
         env:
-        - name: WSID
-          valueFrom:
-            secretKeyRef:
-              key: WSID
-              name: log-analytics
-        - name: KEY
-          valueFrom:
-            secretKeyRef:
-              key: KEY
-              name: log-analytics
         - name: AKS_RESOURCE_ID
           value: '*** GENERATED ***'
         - name: AKS_REGION
@@ -59,6 +50,8 @@ spec:
         - containerPort: 25225
         - containerPort: 25224
           protocol: UDP
+        - containerPort: 25227
+          name: in-rs-tcp
         resources:
           limits:
             cpu: 150m
@@ -81,6 +74,9 @@ spec:
           name: containerlog-path
         - mountPath: /etc/kubernetes/host
           name: azure-json-path
+        - mountPath: /etc/omsagent-secret
+          name: log-analytics
+          readOnly: true
         - mountPath: /etc/config
           name: log-analytics-cluster-agent-config
         - mountPath: /etc/config/settings
@@ -117,6 +113,10 @@ spec:
       - hostPath:
           path: /etc/kubernetes
         name: azure-json-path
+      - name: log-analytics
+        secret:
+          defaultMode: 288
+          secretName: log-analytics
       - configMap:
           name: log-analytics-cluster-agent-config
         name: log-analytics-cluster-agent-config
@@ -128,7 +128,3 @@ spec:
           defaultMode: 509
           name: log-analytics-agent-entrypoint
         name: log-analytics-agent-entrypoint
-      - name: log-analytics
-        secret:
-          defaultMode: 288
-          secretName: log-analytics
