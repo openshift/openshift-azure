@@ -80,6 +80,9 @@ spec:
         - mountPath: /opt/main-wrapper.sh
           name: log-analytics-agent-entrypoint
           subPath: main-wrapper.sh
+        - mountPath: /etc/rsyslog.d/95-omsagent.conf
+          name: log-analytics-rsyslog-config
+          subPath: rsyslog.conf
       nodeSelector:
         beta.kubernetes.io/os: linux
         node-role.kubernetes.io/compute: "true"
@@ -116,3 +119,6 @@ spec:
           defaultMode: 509
           name: log-analytics-agent-entrypoint
         name: log-analytics-agent-entrypoint
+      - configMap:
+          name: log-analytics-rsyslog-config
+        name: log-analytics-rsyslog-config
