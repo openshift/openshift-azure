@@ -15,7 +15,7 @@ spec:
       labels:
         agentVersion: 1.10.0.1
         app: log-analytics-node-agent
-        dockerProviderVersion: 6.0.0-0
+        dockerProviderVersion: 7.0.0-0
         dsName: log-analytics-node-agent
     spec:
       containers:
@@ -32,6 +32,8 @@ spec:
           value: DaemonSet
         - name: NODE_IP
           value: localhost
+        - name: REPLICASET_SERVICE_ENDPOINT
+          value: healthmodel-replicaset-service.openshift-azure-logging
         image: '*** GENERATED ***'
         livenessProbe:
           exec:
@@ -56,7 +58,6 @@ spec:
             memory: 225Mi
         securityContext:
           privileged: true
-          runAsGroup: 0
           runAsUser: 0
         volumeMounts:
         - mountPath: /hostfs

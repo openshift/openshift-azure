@@ -1,5 +1,10 @@
 apiVersion: v1
 data:
+  agent-settings: |-
+    # agent health model feature settings
+    [agent_settings.health_model]
+      # In the absence of this configmap, default value for enabled is false
+      enabled = true
   config-version: ver1
   log-data-collection-settings: |-
     # Log data collection settings
