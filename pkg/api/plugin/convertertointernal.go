@@ -17,27 +17,16 @@ func ToInternal(in *Config, old *api.Config, setVersionFields bool) (*api.Config
 		c = old.DeepCopy()
 	}
 
-	if c.SecurityPatchPackages == nil {
-		c.SecurityPatchPackages = in.SecurityPatchPackages
-	}
-
 	// setting c.PluginVersion = in.PluginVersion is done up-front by the plugin
 	// code.  It could be done here as well (gated by setVersionFields) but
 	// would/should be a no-op.  To simplify the logic, we don't do it.
 
-	if c.ComponentLogLevel.APIServer == nil {
-		c.ComponentLogLevel.APIServer = &in.ComponentLogLevel.APIServer
-	}
-	if c.ComponentLogLevel.ControllerManager == nil {
-		c.ComponentLogLevel.ControllerManager = &in.ComponentLogLevel.ControllerManager
-	}
-	if c.ComponentLogLevel.Node == nil {
-		c.ComponentLogLevel.Node = &in.ComponentLogLevel.Node
-	}
+	c.ComponentLogLevel.APIServer = &in.ComponentLogLevel.APIServer
+	c.ComponentLogLevel.ControllerManager = &in.ComponentLogLevel.ControllerManager
+	c.ComponentLogLevel.Node = &in.ComponentLogLevel.Node
 
-	if c.SSHSourceAddressPrefixes == nil {
-		c.SSHSourceAddressPrefixes = in.SSHSourceAddressPrefixes
-	}
+	c.SecurityPatchPackages = in.SecurityPatchPackages
+	c.SSHSourceAddressPrefixes = in.SSHSourceAddressPrefixes
 
 	if setVersionFields {
 		inVersion, found := in.Versions[c.PluginVersion]
