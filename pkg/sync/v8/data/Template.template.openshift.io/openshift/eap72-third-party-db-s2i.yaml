@@ -2,7 +2,7 @@ apiVersion: template.openshift.io/v1
 kind: Template
 labels:
   template: eap72-third-party-db-s2i
-  xpaas: 1.0.0
+  xpaas: 1.1.0
 message: A new EAP based application with SSL support has been created in your project.
   Please be sure to create the following secrets:"${CONFIGURATION_NAME}" containing
   the datasource configuration details required by the deployed application(s);  "${HTTPS_SECRET}"
@@ -22,7 +22,7 @@ metadata:
       including a build configuration, application deployment configuration, using
       third-party DB drivers and secure communication using passthrough TLS.
     template.openshift.io/support-url: https://access.redhat.com
-    version: 1.0.0
+    version: 1.1.0
   name: eap72-third-party-db-s2i
   namespace: openshift
 objects:
@@ -143,7 +143,7 @@ objects:
         forcePull: true
         from:
           kind: ImageStreamTag
-          name: jboss-eap72-openshift:1.0
+          name: jboss-eap72-openshift:1.1
           namespace: ${IMAGE_STREAM_NAMESPACE}
         incremental: true
       type: Source
@@ -250,7 +250,8 @@ objects:
               command:
               - /bin/bash
               - -c
-              - /opt/eap/bin/readinessProbe.sh
+              - /opt/eap/bin/readinessProbe.sh false
+            initialDelaySeconds: 10
           resources:
             limits:
               memory: ${MEMORY_LIMIT}
