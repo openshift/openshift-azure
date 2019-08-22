@@ -1,4 +1,4 @@
-package v20190831
+package v20190930preview
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 )
 
 // ToInternal converts from a
-// v20190831.OpenShiftManagedCluster to an internal.OpenShiftManagedCluster.
+// v20190930preview.OpenShiftManagedCluster to an internal.OpenShiftManagedCluster.
 // If old is non-nil, it is going to be used as the base for the internal
 // output where the external request is merged on top of.
 func ToInternal(oc *OpenShiftManagedCluster, old *api.OpenShiftManagedCluster) (*api.OpenShiftManagedCluster, error) {

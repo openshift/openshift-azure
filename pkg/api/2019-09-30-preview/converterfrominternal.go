@@ -1,11 +1,11 @@
-package v20190831
+package v20190930preview
 
 import (
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
 // FromInternal converts from an internal.OpenShiftManagedCluster to a
-// v20190831.OpenShiftManagedCluster.
+// v20190930preview.OpenShiftManagedCluster.
 func FromInternal(cs *api.OpenShiftManagedCluster) *OpenShiftManagedCluster {
 	oc := &OpenShiftManagedCluster{
 		ID:       &cs.ID,
