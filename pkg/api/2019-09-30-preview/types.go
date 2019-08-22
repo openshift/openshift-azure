@@ -1,4 +1,4 @@
-package v20190831
+package v20190930preview
 
 import (
 	"github.com/Azure/go-autorest/autorest"
@@ -6,7 +6,7 @@ import (
 
 const (
 	// APIVersion is the version of this API
-	APIVersion = "2019-08-31"
+	APIVersion = "2019-09-30-preview"
 )
 
 // OpenShiftManagedCluster complies with the ARM model of resource definition in

@@ -12,7 +12,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/compute"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/insights"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/network"
-	externalapi "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/2019-08-31"
+	externalapi "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/2019-09-30-preview"
 	adminapi "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/admin"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"

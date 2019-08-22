@@ -13,7 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	v20190831 "github.com/openshift/openshift-azure/pkg/api/2019-08-31"
+	v20190930preview "github.com/openshift/openshift-azure/pkg/api/2019-09-30-preview"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin"
 	"github.com/openshift/openshift-azure/pkg/util/derived"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
@@ -65,7 +65,7 @@ func (s *Server) reply(w http.ResponseWriter, req *http.Request, cs *api.OpenShi
 		oc := admin.FromInternal(cs)
 		res, err = json.Marshal(oc)
 	} else {
-		oc := v20190831.FromInternal(cs)
+		oc := v20190930preview.FromInternal(cs)
 		res, err = json.Marshal(&oc)
 	}
 	if err != nil {
