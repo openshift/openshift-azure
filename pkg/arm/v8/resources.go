@@ -2,6 +2,7 @@ package arm
 
 import (
 	"encoding/base64"
+	"fmt"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-07-01/network"
@@ -439,6 +440,12 @@ func vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 								EnableIPForwarding: to.BoolPtr(true),
 							},
 						},
+					},
+				},
+				DiagnosticsProfile: &compute.DiagnosticsProfile{
+					BootDiagnostics: &compute.BootDiagnostics{
+						Enabled:    to.BoolPtr(true),
+						StorageURI: to.StringPtr(fmt.Sprintf("https://%s.blob.core.windows.net", cs.Config.ConfigStorageAccount)),
 					},
 				},
 				ExtensionProfile: &compute.VirtualMachineScaleSetExtensionProfile{
