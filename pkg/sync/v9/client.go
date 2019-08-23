@@ -294,6 +294,12 @@ func (s *sync) isReconcileProtected(existing, o *unstructured.Unstructured) bool
 			(o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "rbac.authorization.k8s.io", Kind: "ClusterRoleBinding"}) {
 			return true
 		}
+		// log analytics agent data collection configuration
+		if o.GetNamespace() == "openshift-azure-logging" &&
+			(o.GroupVersionKind().GroupKind() == schema.GroupKind{Kind: "ConfigMap"} &&
+				o.GetName() == "container-azm-ms-agentconfig") {
+			return true
+		}
 	}
 
 	return false
