@@ -26,11 +26,11 @@ var (
 )
 
 func unwrapNetHTTPError(err error) (bool, error) {
-	if !strings.HasPrefix(err.Error(), netHTTPErrorPrefix) {
+	if !strings.Contains(err.Error(), netHTTPErrorPrefix) {
 		return false, err
 	}
 	for sysMsg, errno := range str2Syscall {
-		if strings.Contains(err.Error()[netHTTPErrorPrefixLen:], sysMsg) {
+		if strings.Contains(err.Error(), sysMsg) {
 			return true, errno
 		}
 	}
