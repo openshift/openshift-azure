@@ -520,6 +520,13 @@ func TestHowAdminConfigChangesCausesRotations(t *testing.T) {
 			expectRotation: map[rotationType]bool{rotationMaster: true, rotationInfra: true, rotationSync: false, rotationCompute: true},
 			change:         func(cs *api.OpenShiftManagedCluster) { cs.Config.SecurityPatchPackages = []string{"patch-rpm"} },
 		},
+		{
+			name:           "change SSHSourceAddressPrefixes",
+			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
+			change: func(cs *api.OpenShiftManagedCluster) {
+				cs.Config.SSHSourceAddressPrefixes = []string{"101.165.48.112/24"}
+			},
+		},
 	}
 
 	log := logrus.NewEntry(logrus.StandardLogger())
