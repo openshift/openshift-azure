@@ -15,7 +15,7 @@ CHECKSUM=14ec881815eb9e6618f95df5eb385d961283efc196d97912595ba6484a56180d
 # install golang-1.11 from source because rhel7 ships with golang 1.9 by default
 curl -s https://storage.googleapis.com/golang/go1.11.12.linux-amd64.tar.gz --output /tmp/go.1.11.12.linux.amd64.tar.gz
 if [[ $(sha256sum /tmp/go.1.11.12.linux-amd64.tar.gz | awk '{print $1}') == $CHECKSUM ]]; then
-	cd /tmp && tar go1.11.12.linux-amd64.tar.gz -C /usr/local -xz
+	cd /tmp && tar -xzf go1.11.12.linux-amd64.tar.gz -C /usr/local
 else
 	echo "Golang binary mismatch checksum"
 	exit
