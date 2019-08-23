@@ -13,6 +13,18 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure"
 )
 
+type fakeAddr struct {
+	network string
+	address string
+}
+
+func (a *fakeAddr) Network() string {
+	return a.network
+}
+func (a *fakeAddr) String() string {
+	return a.address
+}
+
 func TestIsMatchingSyscallError(t *testing.T) {
 	urltocheck := "http://localhost:12345/nowhere"
 
@@ -73,6 +85,22 @@ func TestIsMatchingSyscallError(t *testing.T) {
 			want:  false,
 			match: []syscall.Errno{syscall.ECONNREFUSED},
 			err:   fmt.Errorf("net/http: HTTP/1.x transport connection broken: %v", os.NewSyscallError("open", syscall.EADDRNOTAVAIL)),
+		},
+		{
+			name:  "net/http: HTTP/1.x transport connection broken",
+			want:  true,
+			match: []syscall.Errno{syscall.ECONNRESET},
+			err: &url.Error{
+				URL: urltocheck,
+				Op:  "Put",
+				Err: fmt.Errorf("net/http: HTTP/1.x transport connection broken: %v", &net.OpError{
+					Addr:   &fakeAddr{network: "tcp", address: "40.71.240.16:443"},
+					Source: &fakeAddr{network: "tcp", address: "172.16.108.55:36980"},
+					Op:     "write",
+					Net:    "tcp",
+					Err:    os.NewSyscallError("write", syscall.ECONNRESET),
+				}),
+			},
 		},
 		{
 			name:  "no match",
