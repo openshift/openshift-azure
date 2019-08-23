@@ -12,7 +12,9 @@ yum -y update -x WALinuxAgent # updating WALinuxAgent kills this script
 yum -y install git libguestfs-tools-c libvirt-daemon-config-network virt-install
 
 # install golang-1.11 from source because rhel7 ships with golang 1.9 by default
-curl -s https://storage.googleapis.com/golang/go1.11.12.linux-amd64.tar.gz | tar -C /usr/local -xz
+curl -s https://storage.googleapis.com/golang/go1.11.12.linux-amd64.tar.gz --output /tmp/go1.11.12.linux-amd64.tar.gz
+echo "14ec881815eb9e6618f95df5eb385d961283efc196d97912595ba6484a56180d /tmp/go1.11.12.linux-amd64.tar.gz" | sha256sum -c
+tar -xzf /tmp/go1.11.12.linux-amd64.tar.gz -C /usr/local
 export GOPATH=/go
 export GOROOT=/usr/local/go
 export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
