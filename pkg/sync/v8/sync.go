@@ -34,6 +34,7 @@ import (
 	kaggregator "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/util/healthcheck"
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
@@ -514,6 +515,20 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (
 			return nil, err
 		}
 		s.restconfig.RateLimiter = flowcontrol.NewFakeAlwaysRateLimiter()
+		s.restconfig.WrapTransport = func(rt http.RoundTripper) http.RoundTripper {
+			// first, tweak values on the incoming RoundTripper, which we are
+			// relying on being an *http.Transport.
+
+			rt.(*http.Transport).DisableKeepAlives = true
+
+			// now wrap our retryingRoundTripper around the incoming RoundTripper.
+			return &kubeclient.RetryingRoundTripper{
+				Log:          log,
+				RoundTripper: rt,
+				Retries:      5,
+				GetTimeout:   30 * time.Second,
+			}
+		}
 
 		s.kc, err = kubernetes.NewForConfig(s.restconfig)
 		if err != nil {
