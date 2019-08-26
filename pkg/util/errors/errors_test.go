@@ -13,6 +13,18 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure"
 )
 
+type fakeAddr struct {
+	network string
+	address string
+}
+
+func (a *fakeAddr) Network() string {
+	return a.network
+}
+func (a *fakeAddr) String() string {
+	return a.address
+}
+
 func TestIsMatchingSyscallError(t *testing.T) {
 	urltocheck := "http://localhost:12345/nowhere"
 
@@ -75,6 +87,38 @@ func TestIsMatchingSyscallError(t *testing.T) {
 			err:   fmt.Errorf("net/http: HTTP/1.x transport connection broken: %v", os.NewSyscallError("open", syscall.EADDRNOTAVAIL)),
 		},
 		{
+			name:  "net/http: HTTP/1.x transport connection broken (structured)",
+			want:  true,
+			match: []syscall.Errno{syscall.ECONNRESET},
+			err: &url.Error{
+				URL: urltocheck,
+				Op:  "Put",
+				Err: fmt.Errorf("net/http: HTTP/1.x transport connection broken: %v", &net.OpError{
+					Addr:   &fakeAddr{network: "tcp", address: "40.71.240.16:443"},
+					Source: &fakeAddr{network: "tcp", address: "172.16.108.55:36980"},
+					Op:     "write",
+					Net:    "tcp",
+					Err:    os.NewSyscallError("write", syscall.ECONNRESET),
+				}),
+			},
+		},
+		{
+			name:  "net/http: HTTP/1.x transport connection broken (formatted)",
+			want:  true,
+			match: []syscall.Errno{syscall.ECONNRESET},
+			err: fmt.Errorf("%v", &url.Error{
+				URL: urltocheck,
+				Op:  "Put",
+				Err: fmt.Errorf("net/http: HTTP/1.x transport connection broken: %v", &net.OpError{
+					Addr:   &fakeAddr{network: "tcp", address: "40.71.240.16:443"},
+					Source: &fakeAddr{network: "tcp", address: "172.16.108.55:36980"},
+					Op:     "write",
+					Net:    "tcp",
+					Err:    os.NewSyscallError("write", syscall.ECONNRESET),
+				}),
+			}),
+		},
+		{
 			name:  "no match",
 			want:  false,
 			match: []syscall.Errno{syscall.ENETUNREACH},
@@ -117,6 +161,9 @@ func TestIsMatchingSyscallError(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := IsMatchingSyscallError(tt.err, tt.match...)
 			if tt.want != got {
+				if tt.err != nil {
+					t.Errorf("%v", tt.err.Error())
+				}
 				t.Errorf("IsMatchingSyscallError(%s) = %v, want %v", tt.name, got, tt.want)
 			}
 		})
