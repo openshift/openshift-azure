@@ -16,8 +16,7 @@ const (
 )
 
 var (
-	netHTTPErrorPrefixLen = len(netHTTPErrorPrefix)
-	str2Syscall           = map[string]syscall.Errno{
+	str2Syscall = map[string]syscall.Errno{
 		"connection reset by peer":  syscall.ECONNRESET,
 		"connection refused":        syscall.ECONNREFUSED,
 		"network is unreachable":    syscall.ENETUNREACH,
