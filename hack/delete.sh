@@ -15,11 +15,16 @@ if [[ -n "$TEST_IN_PRODUCTION" ]]; then
     TEST_IN_PRODUCTION="-use-prod=true"
 else
     [[ -e /var/run/secrets/kubernetes.io ]] || go generate ./...
-    go run cmd/fakerp/main.go &
+    # building takes time, so if we use "go run" we will not get the PID of
+    # the server as it won't have started yet.
+    go build ./cmd/fakerp
+    ./fakerp &
+    trap 'return_id=$?; set +ex; kill $(lsof -t -i :8080); wait $(lsof -t -i :8080); exit $return_id' EXIT
 fi
 
-trap 'return_id=$?; set +ex; kill $(lsof -t -i :8080); wait $(lsof -t -i :8080); exit $return_id' EXIT
-
 go run cmd/createorupdate/createorupdate.go -request=DELETE ${TEST_IN_PRODUCTION:-}
-
-rm -rf _data
+RESULT=$?
+if [[ $RESULT -eq 0 ]]
+    rm -rf _data
+fi
+exit $RESULT
