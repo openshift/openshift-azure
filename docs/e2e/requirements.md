@@ -20,7 +20,7 @@ export FOCUS=\[EveryPR\]
 or if you want to tests two focuses
 
 ```bash
- export FOCUS='\[CustomerAdmin\]|\[EndUser\]'
+export FOCUS="\[CustomerAdmin\]|\[EndUser\]"
  ```
 
 **Note:** Even if this document refers to focuses such as `[EveryPR]`, you should always escape them
@@ -28,7 +28,7 @@ before passing them to `FOCUS`.
 
 #### Environment requirements
 
-The following are required for running all e2e tests against the fake RP.  To generate these files you can use `make secrets` at the root of this repository.  See [environment file](../../README.md) to see how to retrieve the environment variables.
+The following are required for running all e2e tests against the fake RP.  To generate these files you can use `make secrets` at the root of this repository.  See [environment file](../../README.md#prerequisites) to see how to retrieve the environment variables.
 
 | Artifact Kind | Name | Notes |
 | --- | --- | --- |

@@ -34,18 +34,7 @@ Upstream issue: https://github.com/openshift/ci-operator-prowgen/issues/79
 
 ## Verify 
 
-This repository runs multiple checks to **verify** if it complies with standard go conventions.  The scripts from the target run through a series of checks to ensure the repository remains compliant with standard go practices. This can be ran **locally** with the command `make verify`.  When creating a pull-request, this tests is part of the acceptance criteria. 
-
-```makefile
-verify:
-    ./hack/verify/validate-generated.sh
-    go vet ./...
-    ./hack/verify/validate-code-format.sh
-    ./hack/verify/validate-util.sh
-    ./hack/verify/validate-codecov.sh
-    go run ./hack/validate-imports/validate-imports.go   cmd hack pkg test
-    ./hack/verify/validate-sec.sh
-```
+This make target runs a series of checks to **verify** if it complies with standard Golang conventions and practices.  This can be run **locally** with the command `make verify`.  When creating a pull-request, this test is part of the acceptance criteria. 
 
 ## Unit test
 
@@ -53,10 +42,6 @@ Packages under `pkg` directory contain their individual unit tests.
 
 To run all unit tests **locally**, execute: `make unit`
 
-```makefile
-unit: generate testinsights
-  go test ./... -coverprofile=coverage.out -covermode=atomic -json | ./testinsights
-```
 _Note: This will **generate** bindata.go files when using this Makefile target as well as testinsights._
 
 or 
@@ -68,11 +53,13 @@ go test ./... -v
 ```
 
 To run a single package's tests:
+
 ```go
 go test ./pkg/util/tls
 ```
 
 To run a subset of tests in a package:
+
 ```go
 go test -run TestFoo ./pkg/util/tls
 ```
@@ -86,15 +73,11 @@ To run these tests you will need to have OpenShift cluster running.
 
 _Note: To have a OpenShift cluster running refer to the following [documentation](../README.md). To create a cluster use `make create` at the root of this repository with the prerequisites from the documentation above._
 
-The cluster running that you are trying to test **must** have the required files and environment variables described in [e2e requirements](e2e/requirements.md).
+The running cluster that you are trying to test **must** have the required files and environment variables described in [e2e requirements](e2e/requirements.md).
 
 To execute e2e tests **locally**, execute:
 `make e2e`
 
-```Makefile
-e2e:
-  FOCUS="\[CustomerAdmin\]|\[EndUser\]" TIMEOUT=60m ./hack/e2e.sh
-```
 
 or
 
