@@ -44,8 +44,9 @@ cat >client-key.pem <<'EOF'
 {{ .Builder.ClientKey | PrivateKeyAsBytes | String }}
 EOF
 
-go get github.com/jim-minter/tlsproxy
-tlsproxy -insecure -key client-key.pem -cert client-cert.pem https://cdn.redhat.com/ &
+go get github.com/openshift/openshift-azure/cmd/azure
+set -x
+azure tlsproxy --insecure --key client-key.pem --cert client-cert.pem --hostname https://cdn.redhat.com/ &
 while [[ "$(fuser -n tcp 8080)" == "" ]]; do
   sleep 1
 done
@@ -317,8 +318,8 @@ virt-sparsify --in-place /var/lib/libvirt/images/$IMAGE.raw
 
 mv /var/lib/libvirt/images/$IMAGE.raw /var/lib/libvirt/images/$IMAGE.vhd
 
-go get github.com/jim-minter/vhd-footer
-vhd-footer -size $((DISKGIB << 30)) >>/var/lib/libvirt/images/$IMAGE.vhd
+go get github.com/openshift/openshift-azure/cmd/vhdfooter
+vhdfooter -size $((DISKGIB << 30)) >>/var/lib/libvirt/images/$IMAGE.vhd
 
 set +x
 az login --service-principal -u '{{ .ClientID }}' -p '{{ .ClientSecret }}' -t '{{ .TenantID }}'
@@ -335,9 +336,9 @@ set -x
 # a large and mainly sparse disk image.  Use `azureblobupload` to speed things
 # up.
 
-go get github.com/jim-minter/azureblobupload
-set +x
 # az storage blob upload --account-name '{{ .Builder.ImageStorageAccount }}' --account-key $KEY --container-name '{{ .Builder.ImageContainer }}' --type page --file /var/lib/libvirt/images/$IMAGE.vhd
+go get github.com/openshift/openshift-azure/cmd/azureblobupload
+set +x
 azureblobupload -account-name '{{ .Builder.ImageStorageAccount }}' -account-key $KEY -container-name '{{ .Builder.ImageContainer }}' -file /var/lib/libvirt/images/$IMAGE.vhd -name $IMAGE.vhd
 set -x
 
