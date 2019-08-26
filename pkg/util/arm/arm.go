@@ -104,3 +104,22 @@ func FixupDepends(subscriptionID, resourceGroup string, template map[string]inte
 		}
 	}
 }
+
+// FixupSDKMismatch adds missing configurations and objects into the generated template
+func FixupSDKMismatch(subscriptionID, resourceGroup string, template map[string]interface{}) error {
+	for _, resource := range jsonpath.MustCompile("$.resources.*").Get(template) {
+		typ := jsonpath.MustCompile("$.type").MustGetString(resource)
+		// inject management vnet conigurations into the VNET config
+		if typ == "Microsoft.Network/virtualNetworks" {
+			for _, subnet := range jsonpath.MustCompile("$.properties.subnets.*").Get(resource) {
+				name := jsonpath.MustCompile("$.name").MustGetString(subnet)
+				if name == "management" {
+					jsonpath.MustCompile("$.properties.privateEndpointNetworkPolicies").Set(subnet, "Disabled")
+					jsonpath.MustCompile("$.properties.privateLinkServiceNetworkPolicies").Set(subnet, "Disabled")
+				}
+			}
+		}
+
+	}
+	return nil
+}

@@ -10,6 +10,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
+	plsnetwork "github.com/openshift/openshift-azure/pkg/util/network"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 	"github.com/openshift/openshift-azure/pkg/util/template"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
@@ -20,7 +21,8 @@ var (
 	// above.
 	versionMap = map[string]string{
 		"Microsoft.Compute": "2018-10-01",
-		"Microsoft.Network": "2018-07-01",
+		// FIXME: This bumps network version due to PLS requirment. Need to revendor
+		"Microsoft.Network": "2019-06-01",
 		"Microsoft.Storage": "2018-02-01",
 	}
 )
@@ -56,7 +58,8 @@ const (
 
 	// management infrastructure components
 	// management infrastructure components
-	privateLinkName = "pl-management"
+	privateLinkName    = "pl-management"
+	privateLinkNicName = "plsnic"
 )
 
 func (g *simpleGenerator) vnet() *network.VirtualNetwork {
@@ -84,6 +87,50 @@ func (g *simpleGenerator) vnet() *network.VirtualNetwork {
 		},
 		Name:     to.StringPtr(vnetName),
 		Type:     to.StringPtr("Microsoft.Network/virtualNetworks"),
+		Location: to.StringPtr(g.cs.Location),
+	}
+}
+
+func (g *simpleGenerator) privateLinkService() *plsnetwork.PrivateLinkService {
+	subList := []string{"*"}
+	return &plsnetwork.PrivateLinkService{
+		PrivateLinkServiceProperties: &plsnetwork.PrivateLinkServiceProperties{
+			Visibility: &plsnetwork.PrivateLinkServicePropertiesVisibility{
+				Subscriptions: &subList,
+			},
+			AutoApproval: &plsnetwork.PrivateLinkServicePropertiesAutoApproval{
+				Subscriptions: &subList,
+			},
+			LoadBalancerFrontendIPConfigurations: &[]network.FrontendIPConfiguration{
+				{
+					ID: to.StringPtr(resourceid.ResourceID(
+						g.cs.Properties.AzProfile.SubscriptionID,
+						g.cs.Properties.AzProfile.ResourceGroup,
+						"Microsoft.Network/loadBalancers",
+						ilbAPIServerName,
+					) + "/frontendIPConfigurations/" + ilbAPIServerFrontendConfigurationName),
+				},
+			},
+			IPConfigurations: &[]plsnetwork.PrivateLinkServiceIPConfiguration{
+				{
+					PrivateLinkServiceIPConfigurationProperties: &plsnetwork.PrivateLinkServiceIPConfigurationProperties{
+						PrivateIPAllocationMethod: network.Static,
+						PrivateIPAddress:          to.StringPtr("10.0.1.5"),
+						Subnet: &network.Subnet{
+							ID: to.StringPtr(resourceid.ResourceID(
+								g.cs.Properties.AzProfile.SubscriptionID,
+								g.cs.Properties.AzProfile.ResourceGroup,
+								"Microsoft.Network/virtualNetworks",
+								vnetName,
+							) + "/subnets/" + vnetmManagementSubnetName),
+						},
+					},
+					Name: to.StringPtr(privateLinkNicName),
+				},
+			},
+		},
+		Name:     to.StringPtr(privateLinkName),
+		Type:     to.StringPtr("Microsoft.Network/privateLinkServices"),
 		Location: to.StringPtr(g.cs.Location),
 	}
 }

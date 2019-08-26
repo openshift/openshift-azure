@@ -26,11 +26,10 @@ var (
 )
 
 const (
-	vnetName        = "vnet"
-	vnetSubnetName  = "default"
-	ipAPIServerName = "ip-apiserver"
-	ipOutboundName  = "ip-outbound"
-
+	vnetName                                      = "vnet"
+	vnetSubnetName                                = "default"
+	ipAPIServerName                               = "ip-apiserver"
+	ipOutboundName                                = "ip-outbound"
 	lbAPIServerName                               = "lb-apiserver"
 	lbAPIServerFrontendConfigurationName          = "frontend"
 	lbAPIServerBackendPoolName                    = "backend"
