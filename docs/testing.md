@@ -71,7 +71,7 @@ The project has its own end-to-end testing test suite. You can find it under:
 
 To run these tests you will need to have OpenShift cluster running.
 
-_Note: To have a OpenShift cluster running refer to the following [documentation](../README.md). To create a cluster use `make create` at the root of this repository with the prerequisites from the documentation above._
+_Note: To create a cluster use `make create` at the root of this repository with the prerequisites from the following [documentation](../README#prerequisites)._
 
 The running cluster that you are trying to test **must** have the required files and environment variables described in [e2e requirements](e2e/requirements.md).
 
