@@ -14,6 +14,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
+	"github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
 	"github.com/openshift/openshift-azure/pkg/util/random"
@@ -129,18 +130,23 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 	isUpdate := (oldCs != nil) // this is until we have called writeHelpers()
 
 	log.Info("enrich")
-	err := enrichCs(cs)
+	conf, err := client.NewConfig(log)
 	if err != nil {
 		return nil, err
 	}
 
-	am, err := newAADManager(ctx, log, cs, testConfig)
+	err = enrichCs(cs, conf)
+	if err != nil {
+		return nil, err
+	}
+
+	clients, err := newClients(ctx, log, cs, testConfig, conf)
 	if err != nil {
 		return nil, err
 	}
 
 	log.Info("setting up service principals")
-	err = am.ensureApps(ctx)
+	err = clients.aadMgr.ensureApps(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -171,18 +177,8 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 		cs.Config.PluginVersion = "latest"
 	}
 
-	dm, err := newDNSManager(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
-	if err != nil {
-		return nil, err
-	}
-
 	log.Info("setting up DNS")
-	err = dm.createOrUpdateDns(ctx, cs)
-	if err != nil {
-		return nil, err
-	}
-
-	vm, err := newVaultManager(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"))
+	err = clients.dnsMgr.createOrUpdateDns(ctx, cs)
 	if err != nil {
 		return nil, err
 	}
@@ -193,12 +189,12 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 	}
 
 	log.Info("setting up key vault")
-	err = vm.createOrUpdateVault(ctx, log, os.Getenv("AZURE_CLIENT_ID"), cs.Properties.MasterServicePrincipalProfile.ClientID, os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, vaultURL)
+	err = clients.vaultMgr.createOrUpdateVault(ctx, log, conf.ClientID, cs.Properties.MasterServicePrincipalProfile.ClientID, conf.TenantID, conf.ResourceGroup, cs.Location, vaultURL)
 	if err != nil {
 		return nil, err
 	}
 
-	err = vm.writeTLSCertsToVault(ctx, cs, vaultURL)
+	err = clients.vaultMgr.writeTLSCertsToVault(ctx, cs, vaultURL)
 	if err != nil {
 		return nil, err
 	}
@@ -254,25 +250,11 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 	return cs, nil
 }
 
-func enrichCs(cs *api.OpenShiftManagedCluster) error {
-	// TODO: Use kelseyhightower/envconfig
-	for _, env := range []string{
-		"AZURE_CLIENT_ID",
-		"AZURE_CLIENT_SECRET",
-		"AZURE_SUBSCRIPTION_ID",
-		"AZURE_TENANT_ID",
-		"DNS_DOMAIN",
-		"RESOURCEGROUP",
-	} {
-		if os.Getenv(env) == "" {
-			return fmt.Errorf("must set %s", env)
-		}
-	}
-
+func enrichCs(cs *api.OpenShiftManagedCluster, conf *client.Config) error {
 	cs.Properties.AzProfile = api.AzProfile{
-		TenantID:       os.Getenv("AZURE_TENANT_ID"),
-		SubscriptionID: os.Getenv("AZURE_SUBSCRIPTION_ID"),
-		ResourceGroup:  os.Getenv("RESOURCEGROUP"),
+		TenantID:       conf.TenantID,
+		SubscriptionID: conf.SubscriptionID,
+		ResourceGroup:  conf.ResourceGroup,
 	}
 
 	// /subscriptions/{subscription}/resourcegroups/{resource_group}/providers/Microsoft.ContainerService/openshiftmanagedClusters/{cluster_name}
@@ -295,8 +277,8 @@ func enrichCs(cs *api.OpenShiftManagedCluster) error {
 	cs.Properties.APICertProfile.KeyVaultSecretURL = vaultURL + "/secrets/" + vaultKeyNamePublicHostname
 	cs.Properties.RouterProfiles[0].RouterCertProfile.KeyVaultSecretURL = vaultURL + "/secrets/" + vaultKeyNameRouter
 
-	cs.Properties.PublicHostname = "openshift." + os.Getenv("RESOURCEGROUP") + "." + os.Getenv("DNS_DOMAIN")
-	cs.Properties.RouterProfiles[0].PublicSubdomain = "apps." + os.Getenv("RESOURCEGROUP") + "." + os.Getenv("DNS_DOMAIN")
+	cs.Properties.PublicHostname = "openshift." + conf.ResourceGroup + "." + conf.DNSDomain
+	cs.Properties.RouterProfiles[0].PublicSubdomain = "apps." + conf.ResourceGroup + "." + conf.DNSDomain
 
 	if cs.Properties.FQDN == "" {
 		cs.Properties.FQDN, err = random.FQDN(cs.Location+".cloudapp.azure.com", 20)
