@@ -15,9 +15,13 @@ if [[ -z "$TIMEOUT" ]]; then
 fi
 
 [[ -e /var/run/secrets/kubernetes.io ]] || go generate ./...
-go run cmd/fakerp/main.go &
-while [[ "$(curl -s -o /dev/null -w '%{http_code}' localhost:8080)" == "000" ]]; do sleep 2; done
+# building takes time, so if we use "go run" we will not get the PID of
+# the server as it won't have started yet.
+go build ./cmd/fakerp
+./fakerp &
+
 trap 'return_id=$?; set +ex; kill $(lsof -t -i :8080); wait $(lsof -t -i :8080); exit $return_id' EXIT
+while [[ "$(curl -s -o /dev/null -w '%{http_code}' localhost:8080)" == "000" ]]; do sleep 2; done
 
 go test \
 -race \

@@ -13,6 +13,7 @@ import (
 // GroupsClient is a minimal interface for azure Resources Client
 type GroupsClient interface {
 	CreateOrUpdate(ctx context.Context, resourceGroupName string, parameters resources.Group) (result resources.Group, err error)
+	Get(ctx context.Context, resourceGroupName string) (result resources.Group, err error)
 	GroupsClientAddons
 }
 
