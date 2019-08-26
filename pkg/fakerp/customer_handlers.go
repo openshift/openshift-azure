@@ -3,11 +3,9 @@ package fakerp
 import (
 	"fmt"
 	"net/http"
-	"os"
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
+	"github.com/openshift/openshift-azure/pkg/fakerp/client"
 )
 
 func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
@@ -16,41 +14,34 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	cs.Properties.ProvisioningState = internalapi.Deleting
 	s.store.Put(cs)
 
-	s.log.Info("deleting service principals")
-	am, err := newAADManager(req.Context(), s.log, cs, s.testConfig)
+	conf, err := client.NewConfig(s.log)
 	if err != nil {
-		s.badRequest(w, fmt.Sprintf("Failed to delete service principals: %v", err))
 		return
 	}
 
-	err = am.deleteApps(req.Context())
+	s.log.Info("creating clients")
+	clients, err := newClients(req.Context(), s.log, cs, s.testConfig, conf)
+	if err != nil {
+		s.badRequest(w, fmt.Sprintf("Failed to create clients: %v", err))
+		return
+	}
+
+	s.log.Info("deleting service principals")
+	err = clients.aadMgr.deleteApps(req.Context())
 	if err != nil {
 		s.badRequest(w, fmt.Sprintf("Failed to delete service principals: %v", err))
 		return
 	}
 
 	s.log.Info("deleting dns records")
-	dm, err := newDNSManager(req.Context(), s.log, cs.Properties.AzProfile.SubscriptionID, os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
-	if err != nil {
-		s.badRequest(w, fmt.Sprintf("Failed to delete dns records: %v", err))
-		return
-	}
-
-	err = dm.deleteDns(req.Context(), cs)
+	err = clients.dnsMgr.deleteDns(req.Context(), cs)
 	if err != nil {
 		s.badRequest(w, fmt.Sprintf("Failed to delete dns records: %v", err))
 		return
 	}
 
 	s.log.Infof("deleting resource group")
-	authorizer, err := azureclient.GetAuthorizerFromContext(req.Context(), internalapi.ContextKeyClientAuthorizer)
-	if err != nil {
-		s.badRequest(w, fmt.Sprintf("Failed to determine request credentials: %v", err))
-		return
-	}
-
-	gc := resources.NewGroupsClient(req.Context(), s.log, cs.Properties.AzProfile.SubscriptionID, authorizer)
-	err = gc.Delete(req.Context(), cs.Properties.AzProfile.ResourceGroup)
+	err = clients.groupClient.Delete(req.Context(), cs.Properties.AzProfile.ResourceGroup)
 	if err != nil {
 		s.badRequest(w, fmt.Sprintf("Failed to delete resource group: %v", err))
 		return

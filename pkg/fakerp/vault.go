@@ -6,7 +6,6 @@ import (
 	"crypto/x509/pkix"
 	"net"
 	"net/url"
-	"os"
 	"strings"
 	"time"
 
@@ -37,7 +36,7 @@ type vaultManager struct {
 	kvc keyvault.KeyVaultClient
 }
 
-func newVaultManager(ctx context.Context, log *logrus.Entry, subscriptionID string) (*vaultManager, error) {
+func newVaultManager(ctx context.Context, log *logrus.Entry, subscriptionID, tenantID string) (*vaultManager, error) {
 	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 	if err != nil {
 		return nil, err
@@ -54,8 +53,8 @@ func newVaultManager(ctx context.Context, log *logrus.Entry, subscriptionID stri
 	}
 
 	return &vaultManager{
-		vc:  vaultmgmt.NewVaultMgmtClient(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer),
-		spc: graphrbac.NewServicePrincipalsClient(ctx, log, os.Getenv("AZURE_TENANT_ID"), graphauthorizer),
+		vc:  vaultmgmt.NewVaultMgmtClient(ctx, log, subscriptionID, authorizer),
+		spc: graphrbac.NewServicePrincipalsClient(ctx, log, tenantID, graphauthorizer),
 		kvc: keyvault.NewKeyVaultClient(ctx, log, vaultauthorizer),
 	}, nil
 }

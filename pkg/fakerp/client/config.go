@@ -26,6 +26,9 @@ type Config struct {
 	Regions       string `envconfig:"AZURE_REGIONS" required:"true"`
 	ResourceGroup string `envconfig:"RESOURCEGROUP" required:"true"`
 
+	DNSDomain        string `envconfig:"DNS_DOMAIN" required:"true"`
+	DNSResourceGroup string `envconfig:"DNS_RESOURCEGROUP" required:"true"`
+
 	ResourceGroupTTL string `envconfig:"RESOURCEGROUP_TTL"`
 	Manifest         string `envconfig:"MANIFEST"`
 	NoWait           bool   `envconfig:"NO_WAIT"`
