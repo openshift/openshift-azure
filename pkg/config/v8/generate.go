@@ -352,7 +352,15 @@ func (g *simpleGenerator) Generate(template *pluginapi.Config, setVersionFields 
 			clientCert: c.Certificates.BlackBoxMonitor.Cert,
 			endpoint:   g.cs.Properties.FQDN,
 			username:   "system:serviceaccount:openshift-azure:blackboxmonitor",
-			kubeconfig: &c.BlackBoxMonitorKubeconfig,
+			kubeconfig: &c.ExternalBlackBoxMonitorKubeconfig,
+			namespace:  "openshift-azure",
+		},
+		{
+			clientKey:  c.Certificates.BlackBoxMonitor.Key,
+			clientCert: c.Certificates.BlackBoxMonitor.Cert,
+			endpoint:   "10.0.1.4",
+			username:   "system:serviceaccount:openshift-azure:blackboxmonitor",
+			kubeconfig: &c.InternalBlackBoxMonitorKubeconfig,
 			namespace:  "openshift-azure",
 		},
 	}

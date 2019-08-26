@@ -41,11 +41,19 @@ type Config struct {
 	Images       ImageConfig       `json:"images,omitempty"`
 
 	// kubeconfigs
-	AdminKubeconfig           *v1.Config `json:"adminKubeconfig,omitempty"`
-	MasterKubeconfig          *v1.Config `json:"masterKubeconfig,omitempty"`
-	NodeBootstrapKubeconfig   *v1.Config `json:"nodeBootstrapKubeconfig,omitempty"`
-	SDNKubeconfig             *v1.Config `json:"sdnKubeconfig,omitempty"`
+	AdminKubeconfig         *v1.Config `json:"adminKubeconfig,omitempty"`
+	MasterKubeconfig        *v1.Config `json:"masterKubeconfig,omitempty"`
+	NodeBootstrapKubeconfig *v1.Config `json:"nodeBootstrapKubeconfig,omitempty"`
+	SDNKubeconfig           *v1.Config `json:"sdnKubeconfig,omitempty"`
+
+	// DEPRECATED: BlackBoxMonitorKubeconfig is deprecated in favor of
+	// ExternalBlackBoxMonitorKubeconfig and InternalBlackBoxMonitorKubeconfig
+	// and will be removed in future API versions
 	BlackBoxMonitorKubeconfig *v1.Config `json:"blackBoxMonitorKubeconfig,omitempty"`
+	// ExternalBlackBoxMonitorKubeconfig uses external loadbalancer to access API Server
+	ExternalBlackBoxMonitorKubeconfig *v1.Config `json:"externalBlackBoxMonitorKubeconfig,omitempty"`
+	// InternalBlackBoxMonitorKubeconfig uses internal loadbalancer to access API server
+	InternalBlackBoxMonitorKubeconfig *v1.Config `json:"internalBlackBoxMonitorKubeconfig,omitempty"`
 
 	// misc control plane configurables
 	ServiceAccountKey *rsa.PrivateKey `json:"serviceAccountKey,omitempty"`

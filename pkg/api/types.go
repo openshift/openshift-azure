@@ -76,6 +76,9 @@ type Properties struct {
 
 	// APICertProfile (in, optional): configures OpenShift API certificate
 	APICertProfile CertProfile `json:"apiCertProfile,omitempty"`
+
+	// PrivateLinkProfile (in): configures privateLink service object
+	PrivateLinkProfile PrivateLinkProfile `json:"privateLinkProfile,omitempty"`
 }
 
 // ProvisioningState represents the current state of the OSA resource.
@@ -105,6 +108,9 @@ const (
 type NetworkProfile struct {
 	// VnetCIDR (in): the CIDR with which the OSA cluster's Vnet is configured
 	VnetCIDR string `json:"vnetCidr,omitempty"`
+
+	// ManagementCIDR (in): the CIDR used to configure management subnet
+	ManagementCIDR string `json:"managementCIDR,omitempty"`
 
 	// VnetID (out): the ID of the Vnet created for the OSA cluster
 	VnetID string `json:"vnetId,omitempty"`
@@ -156,6 +162,12 @@ type MonitorProfile struct {
 	WorkspaceResourceID string `json:"workspaceResourceId,omitempty"`
 	WorkspaceID         string `json:"workspaceId,omitempty"`
 	WorkspaceKey        string `json:"workspaceKey,omitempty"`
+}
+
+// PrivateLinkProfile configures Azure PrivateLinks objects
+type PrivateLinkProfile struct {
+	PrivateLinkServicePropertiesVisibility   []string
+	PrivateLinkServicePropertiesAutoApproval []string
 }
 
 // OSType represents the OS type of VMs in an AgentPool.
