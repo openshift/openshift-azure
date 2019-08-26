@@ -5,23 +5,25 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
+	azresources "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
 )
 
 // EnsureResourceGroup creates a resource group and returns whether the
 // resource group was actually created or not and any error encountered.
-func EnsureResourceGroup(conf *Config) error {
+func EnsureResourceGroup(log *logrus.Entry, conf *Config) error {
 	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID, "")
 	if err != nil {
 		return err
 	}
-	gc := resources.NewGroupsClient(conf.SubscriptionID)
-	gc.Authorizer = authorizer
+	ctx := context.Background()
+	gc := resources.NewGroupsClient(ctx, log, conf.SubscriptionID, authorizer)
 
-	if _, err := gc.Get(context.Background(), conf.ResourceGroup); err == nil {
+	if _, err := gc.Get(ctx, conf.ResourceGroup); err == nil {
 		return nil
 	}
 
@@ -36,6 +38,6 @@ func EnsureResourceGroup(conf *Config) error {
 		tags["ttl"] = &conf.ResourceGroupTTL
 	}
 
-	_, err = gc.CreateOrUpdate(context.Background(), conf.ResourceGroup, resources.Group{Location: &conf.Region, Tags: tags})
+	_, err = gc.CreateOrUpdate(ctx, conf.ResourceGroup, azresources.Group{Location: &conf.Region, Tags: tags})
 	return err
 }

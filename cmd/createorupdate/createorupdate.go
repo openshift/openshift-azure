@@ -206,7 +206,7 @@ func main() {
 
 	if !isDelete {
 		log.Infof("ensuring resource group %s", conf.ResourceGroup)
-		err = fakerp.EnsureResourceGroup(conf)
+		err = fakerp.EnsureResourceGroup(log, conf)
 		if err != nil {
 			log.Fatal(err)
 		}
