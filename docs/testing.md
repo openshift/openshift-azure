@@ -48,19 +48,19 @@ or
 
 at the root of the repository `openshift-azure/` 
 
-```go 
+```bash 
 go test ./... -v 
 ```
 
 To run a single package's tests:
 
-```go
+```bash
 go test ./pkg/util/tls
 ```
 
 To run a subset of tests in a package:
 
-```go
+```bash
 go test -run TestFoo ./pkg/util/tls
 ```
 
