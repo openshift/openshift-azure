@@ -294,5 +294,9 @@ func enrichCs(cs *api.OpenShiftManagedCluster, conf *client.Config) error {
 		}
 	}
 
+	// private link configuration
+	cs.Properties.PrivateLinkServicePropertiesVisibility = []string{"*"}
+	cs.Properties.PrivateLinkServicePropertiesAutoApproval = []string{"*"}
+
 	return nil
 }
