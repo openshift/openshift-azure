@@ -1,6 +1,8 @@
 package arm
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"sort"
 	"strings"
@@ -103,4 +105,50 @@ func FixupDepends(subscriptionID, resourceGroup string, template map[string]inte
 			jsonpath.MustCompile("$.dependsOn").Set(resource, depends)
 		}
 	}
+}
+
+// FixupSDKMismatch adds missing configurations and objects into the generated template
+func FixupSDKMismatch(template map[string]interface{}) error {
+	for _, resource := range jsonpath.MustCompile("$.resources.*").Get(template) {
+		typ := jsonpath.MustCompile("$.type").MustGetString(resource)
+		name := jsonpath.MustCompile("$.name").MustGetString(resource)
+		// inject management vnet conigurations into the VNET config
+		if typ == "Microsoft.Network/virtualNetworks" && name == VnetName {
+			jsonpath.MustCompile("$.apiVersion").Set(resource, "2019-06-01")
+			for _, subnet := range jsonpath.MustCompile("$.properties.subnets.*").Get(resource) {
+				name := jsonpath.MustCompile("$.name").MustGetString(subnet)
+				if name == VnetManagementSubnetName {
+					jsonpath.MustCompile("$.properties.privateEndpointNetworkPolicies").Set(subnet, "Disabled")
+					jsonpath.MustCompile("$.properties.privateLinkServiceNetworkPolicies").Set(subnet, "Disabled")
+				}
+			}
+		}
+
+	}
+	return nil
+}
+
+// Generate generates ARM template, based on resource interface provided
+// This version of Generate will not do any version fixup
+func Generate(ctx context.Context, subscriptionID, resourceGroup string, resource []interface{}) (map[string]interface{}, error) {
+	t := Template{
+		Schema:         "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+		ContentVersion: "1.0.0.0",
+		Resources:      resource,
+	}
+
+	b, err := json.Marshal(t)
+	if err != nil {
+		return nil, err
+	}
+
+	var azuretemplate map[string]interface{}
+	err = json.Unmarshal(b, &azuretemplate)
+	if err != nil {
+		return nil, err
+	}
+
+	FixupDepends(subscriptionID, resourceGroup, azuretemplate)
+
+	return azuretemplate, nil
 }

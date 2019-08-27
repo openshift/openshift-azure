@@ -63,7 +63,7 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 
 	backupName := chi.URLParam(req, "backupName")
 
-	pluginErr := s.plugin.RecoverEtcdCluster(req.Context(), cs, GetDeployer(s.log, cs, s.testConfig), backupName)
+	pluginErr := s.plugin.RecoverEtcdCluster(req.Context(), cs, GetDeployer(s.log, cs, nil, s.testConfig), backupName)
 	var err error
 	if pluginErr != nil {
 		// TODO: fix this nastiness: https://golang.org/doc/faq#nil_error
@@ -76,7 +76,7 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
 
-	deployer := GetDeployer(s.log, cs, s.testConfig)
+	deployer := GetDeployer(s.log, cs, nil, s.testConfig)
 	pluginErr := s.plugin.RotateClusterSecrets(req.Context(), cs, deployer)
 	if pluginErr != nil {
 		s.badRequest(w, pluginErr.Error())
@@ -92,7 +92,7 @@ func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 func (s *Server) handleRotateCertificates(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
 
-	deployer := GetDeployer(s.log, cs, s.testConfig)
+	deployer := GetDeployer(s.log, cs, nil, s.testConfig)
 	pluginErr := s.plugin.RotateClusterCertificates(req.Context(), cs, deployer)
 	if pluginErr != nil {
 		s.badRequest(w, pluginErr.Error())
@@ -107,7 +107,7 @@ func (s *Server) handleRotateCertificates(w http.ResponseWriter, req *http.Reque
 func (s *Server) handleRotateCertificatesAndSecrets(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
 
-	deployer := GetDeployer(s.log, cs, s.testConfig)
+	deployer := GetDeployer(s.log, cs, nil, s.testConfig)
 	pluginErr := s.plugin.RotateClusterCertificatesAndSecrets(req.Context(), cs, deployer)
 	if pluginErr != nil {
 		s.badRequest(w, pluginErr.Error())
@@ -123,7 +123,7 @@ func (s *Server) handleRotateCertificatesAndSecrets(w http.ResponseWriter, req *
 func (s *Server) handleForceUpdate(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
 
-	pluginErr := s.plugin.ForceUpdate(req.Context(), cs, GetDeployer(s.log, cs, s.testConfig))
+	pluginErr := s.plugin.ForceUpdate(req.Context(), cs, GetDeployer(s.log, cs, nil, s.testConfig))
 	var err error
 	if pluginErr != nil {
 		// TODO: fix this nastiness: https://golang.org/doc/faq#nil_error

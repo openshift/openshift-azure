@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	azresources "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/sirupsen/logrus"
@@ -14,7 +15,9 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
+	"github.com/openshift/openshift-azure/pkg/fakerp/arm"
 	"github.com/openshift/openshift-azure/pkg/fakerp/client"
+	utilarm "github.com/openshift/openshift-azure/pkg/util/arm"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
 	"github.com/openshift/openshift-azure/pkg/util/enrich"
@@ -93,12 +96,13 @@ func debugDeployerError(ctx context.Context, log *logrus.Entry, cs *api.OpenShif
 	return nil
 }
 
-func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) api.DeployFn {
-	return func(ctx context.Context, azuretemplate map[string]interface{}) error {
+// GetDeployer return deplyer function for ARM operations
+func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, conf *client.Config, testConfig api.TestConfig) api.DeployFn {
+	return func(ctx context.Context, azuretemplate map[string]interface{}) (*string, error) {
 		log.Info("applying arm template deployment")
 		authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		deployments := resources.NewDeploymentsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer)
@@ -109,7 +113,7 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig 
 			},
 		})
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		log.Info("waiting for arm template deployment to complete")
@@ -118,7 +122,72 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig 
 			log.Warnf("deployment failed: %#v", err)
 			debugDeployerError(ctx, log, cs, err, testConfig)
 		}
-		return err
+
+		// This causes fails in our tests because deployer function is not versioned.
+		// TODO: Remove this when v7 is gone and PLS is default in the deployer function
+		if cs.Config.PluginVersion == "v9.0" &&
+			conf != nil {
+			log.Info("applying PLS deployment")
+			now := time.Now().Unix()
+			plsTemplate, err := arm.GenerateClusterSide(ctx, cs)
+			if err != nil {
+				return nil, err
+			}
+
+			future, err = deployments.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "plsdeploy", azresources.Deployment{
+				Properties: &azresources.DeploymentProperties{
+					Template: plsTemplate,
+					Mode:     azresources.Incremental,
+				},
+			})
+			if err != nil {
+				return nil, err
+			}
+
+			log.Info("waiting for arm template deployment to complete")
+			err = future.WaitForCompletionRef(ctx, deployments.Client())
+			if err != nil {
+				log.Warnf("deployment failed: %#v", err)
+				debugDeployerError(ctx, log, cs, err, testConfig)
+			}
+
+			log.Info("applying PE deployment")
+			peTemplate, err := arm.GenerateRPSide(ctx, cs, conf, now)
+			if err != nil {
+				return nil, err
+			}
+
+			future, err = deployments.CreateOrUpdate(ctx, conf.ManagementResourceGroup, fmt.Sprintf("pedeploy-%d", now), azresources.Deployment{
+				Properties: &azresources.DeploymentProperties{
+					Template: peTemplate,
+					Mode:     azresources.Incremental,
+				},
+			})
+			if err != nil {
+				return nil, err
+			}
+
+			log.Info("waiting for arm template deployment to complete")
+			err = future.WaitForCompletionRef(ctx, deployments.Client())
+			if err != nil {
+				log.Warnf("deployment failed: %#v", err)
+				debugDeployerError(ctx, log, cs, err, testConfig)
+			}
+
+			log.Info("get PE IP address")
+			nm, err := newNetworkManager(ctx, log, cs.Properties.AzProfile.SubscriptionID, conf.ManagementResourceGroup)
+			if err != nil {
+				return nil, err
+			}
+			peIP, err := nm.getPrivateEndpointIP(ctx, fmt.Sprintf("%s-%s-%d", utilarm.PrivateEndpointNamePrefix, cs.Name, now))
+			if err != nil {
+				return nil, err
+			}
+			log.Debugf("PE IP Address %s ", *peIP)
+			return peIP, err
+		}
+
+		return nil, err
 	}
 }
 
@@ -131,7 +200,7 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 	isUpdate := (oldCs != nil) // this is until we have called writeHelpers()
 
 	log.Info("enrich")
-	conf, err := client.NewConfig(log)
+	conf, err := client.NewConfig(log, cs)
 	if err != nil {
 		return nil, err
 	}
@@ -252,7 +321,7 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 	}
 
 	log.Info("plugin createorupdate")
-	deployer := GetDeployer(log, cs, testConfig)
+	deployer := GetDeployer(log, cs, conf, testConfig)
 	if err := p.CreateOrUpdate(ctx, cs, isUpdate, deployer); err != nil {
 		return nil, err
 	}

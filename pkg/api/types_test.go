@@ -316,6 +316,10 @@ func TestUnmarshal(t *testing.T) {
 	populatedOc.Config.MasterStartupSASURI = ""
 	populatedOc.Config.WorkerStartupSASURI = ""
 
+	populatedOc.Properties.NetworkProfile.PrivateEndpoint = ""
+	populatedOc.Properties.NetworkProfile.ManagementSubnetID = ""
+	populatedOc.Properties.NetworkProfile.InternalLoadBalancerFrontendIPID = ""
+
 	var unmarshalledOc OpenShiftManagedCluster
 	err := json.Unmarshal(marshalled, &unmarshalledOc)
 	if err != nil {

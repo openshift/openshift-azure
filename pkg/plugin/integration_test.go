@@ -55,7 +55,7 @@ const (
 )
 
 func getFakeDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) api.DeployFn {
-	return func(ctx context.Context, azuretemplate map[string]interface{}) error {
+	return func(ctx context.Context, azuretemplate map[string]interface{}) (*string, error) {
 		log.Info("applying arm template deployment")
 
 		err := az.DeploymentsClient.CreateOrUpdateAndWait(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
@@ -66,10 +66,10 @@ func getFakeDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, az *fak
 		})
 		if err != nil {
 			log.Warnf("deployment failed: %#v", err)
-			return err
+			return nil, err
 		}
 
-		return nil
+		return nil, nil
 	}
 }
 

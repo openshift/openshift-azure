@@ -15,6 +15,7 @@ func ToInternal(oc *OpenShiftManagedCluster, old *api.OpenShiftManagedCluster) (
 	if old != nil {
 		cs = old.DeepCopy()
 	}
+
 	if oc.ID != nil {
 		cs.ID = *oc.ID
 	}

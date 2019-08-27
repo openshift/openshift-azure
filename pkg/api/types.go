@@ -116,6 +116,17 @@ type NetworkProfile struct {
 	//   /providers/Microsoft.Network
 	//   /virtualNetworks/[^/]+$`
 	PeerVnetID *string `json:"peerVnetId,omitempty"`
+
+	// PrivateEndpoint contains IP or DNS of PrivateEndpoint
+	// If this field is not nil, value should be used to reach
+	// api server. Otherwise, use public API DNS.
+	PrivateEndpoint string `json:"-"`
+	// ManagementSubnetID is ID of  management subnet.
+	// Used for PrivateLinkService creation in callback function.
+	ManagementSubnetID string `json:"-"`
+	// InternalLoadBalancerFrontendIPID is ID of internal loadbalancer.
+	// Used for PrivateLinkService creation in callback function
+	InternalLoadBalancerFrontendIPID string `json:"-"`
 }
 
 // RouterProfile represents an OpenShift router.

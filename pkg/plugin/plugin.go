@@ -16,6 +16,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/util/arm"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 )
 
@@ -114,6 +115,13 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return err
 	}
+
+	// These values are used in the PrivateLink setup.
+	// Values set here, because callback function will need them
+	cs.Properties.NetworkProfile.VnetID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/virtualNetworks", arm.VnetName)
+	cs.Properties.NetworkProfile.ManagementSubnetID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/virtualNetworks", arm.VnetName+"/subnets/"+arm.VnetManagementSubnetName)
+	cs.Properties.NetworkProfile.InternalLoadBalancerFrontendIPID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/loadBalancers", arm.IlbAPIServerName+"/frontendIPConfigurations/"+arm.IlbAPIServerFrontendConfigurationName)
+
 	return nil
 }
 
@@ -174,7 +182,7 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 	if err := clusterUpgrader.EtcdRestoreDeleteMasterScaleSet(ctx); err != nil {
 		return err
 	}
-	err = deployFn(ctx, azuretemplate)
+	_, err = deployFn(ctx, azuretemplate)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
 	}
@@ -247,10 +255,6 @@ func (p *plugin) createOrUpdateExt(ctx context.Context, cs *api.OpenShiftManaged
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}
 
-	// set VnetID based on VnetName, do this before writing the blobs so that
-	// they are exactly correct
-	cs.Properties.NetworkProfile.VnetID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/virtualNetworks", "vnet") // TODO: should be using const
-
 	// blobs must exist before deploy
 	err = clusterUpgrader.WriteStartupBlobs()
 	if err != nil {
@@ -263,9 +267,14 @@ func (p *plugin) createOrUpdateExt(ctx context.Context, cs *api.OpenShiftManaged
 		p.log.Info("starting deploy")
 	}
 
-	err = deployFn(ctx, azuretemplate)
+	epIP, err := deployFn(ctx, azuretemplate)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
+	}
+	// If deployer returned IP, we set it.
+	// Usage of this field is defined by Private/Public cluster API field
+	if epIP != nil {
+		cs.Properties.NetworkProfile.PrivateEndpoint = *epIP
 	}
 
 	// enrich is required for the hash functions which are used below

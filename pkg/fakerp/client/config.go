@@ -8,6 +8,8 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
+
+	"github.com/openshift/openshift-azure/pkg/api"
 )
 
 type Config struct {
@@ -22,9 +24,10 @@ type Config struct {
 	RunningUnderTest    string `envconfig:"RUNNING_UNDER_TEST"`
 	WorkspaceResourceID string `envconfig:"AZURE_WORKSPACE_ID"`
 
-	Region        string
-	Regions       string `envconfig:"AZURE_REGIONS" required:"true"`
-	ResourceGroup string `envconfig:"RESOURCEGROUP" required:"true"`
+	ManagementResourceGroup string
+	Region                  string `envconfig:"AZURE_REGION" required:"false"`
+	Regions                 string `envconfig:"AZURE_REGIONS" required:"true"`
+	ResourceGroup           string `envconfig:"RESOURCEGROUP" required:"true"`
 
 	DNSDomain        string `envconfig:"DNS_DOMAIN" required:"true"`
 	DNSResourceGroup string `envconfig:"DNS_RESOURCEGROUP" required:"true"`
@@ -34,17 +37,38 @@ type Config struct {
 	NoWait           bool   `envconfig:"NO_WAIT"`
 }
 
-func NewConfig(log *logrus.Entry) (*Config, error) {
+// NewConfig parses env variables and sets fakeRP configuration.
+// This function is being re-used in client and server side of fakeRP.
+// Server side uses CS object, passed from client in a form of manifest to
+// prepopulate some of the random generated fields with the same value
+// as client side.
+func NewConfig(log *logrus.Entry, cs *api.OpenShiftManagedCluster) (*Config, error) {
 	var c Config
 	if err := envconfig.Process("", &c); err != nil {
 		return nil, err
 	}
-	regions := strings.Split(c.Regions, ",")
-	rand.Seed(time.Now().UTC().UnixNano())
-	c.Region = regions[rand.Intn(len(regions))]
-	if c.Region == "" {
-		return nil, fmt.Errorf("must set AZURE_REGIONS to a comma separated list")
+
+	// we need this, otherwise we sometimes end-up with client creating RG
+	// in region A and server side creating all resources in region B
+	if cs != nil && len(cs.Location) > 0 {
+		c.Region = cs.Location
+	} else {
+		if len(c.Region) == 0 {
+			regions := strings.Split(c.Regions, ",")
+			rand.Seed(time.Now().UTC().UnixNano())
+			c.Region = regions[rand.Intn(len(regions))]
+			if c.Region == "" {
+				return nil, fmt.Errorf("must set AZURE_REGIONS to a comma separated list")
+			}
+		} else if len(c.Region) > 0 && !strings.Contains(c.Regions, c.Region) {
+			return nil, fmt.Errorf("must set AZURE_REGION to the one of the regions from AZURE_REGIONS")
+		}
 	}
 	log.Infof("using region %s", c.Region)
+
+	// Set management RG name
+	c.ManagementResourceGroup = fmt.Sprintf("management-%s", c.Region)
+	log.Infof("using management resource group %s", c.ManagementResourceGroup)
+
 	return &c, nil
 }

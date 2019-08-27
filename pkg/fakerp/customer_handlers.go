@@ -6,6 +6,7 @@ import (
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp/client"
+	"github.com/openshift/openshift-azure/pkg/util/arm"
 )
 
 func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
@@ -14,7 +15,7 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	cs.Properties.ProvisioningState = internalapi.Deleting
 	s.store.Put(cs)
 
-	conf, err := client.NewConfig(s.log)
+	conf, err := client.NewConfig(s.log, cs)
 	if err != nil {
 		return
 	}
@@ -35,6 +36,13 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 
 	s.log.Info("deleting dns records")
 	err = clients.dnsMgr.deleteDns(req.Context(), cs)
+	if err != nil {
+		s.badRequest(w, fmt.Sprintf("Failed to delete dns records: %v", err))
+		return
+	}
+
+	s.log.Info("delete pe resources")
+	err = clients.nmMgr.deletePLSPE(req.Context(), cs.Name, arm.PrivateLinkName)
 	if err != nil {
 		s.badRequest(w, fmt.Sprintf("Failed to delete dns records: %v", err))
 		return
@@ -65,12 +73,14 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	var cs *internalapi.OpenShiftManagedCluster
 	var err error
 	if isAdmin {
+		s.log.Info("admin request")
 		cs, err = s.readAdminRequest(req.Body, oldCs)
 		if err == nil {
 			cs.Properties.ProvisioningState = internalapi.AdminUpdating
 			s.store.Put(cs)
 		}
 	} else {
+		s.log.Info("customer request")
 		cs, err = s.read20190430Request(req.Body, oldCs)
 		if err == nil {
 			cs.Properties.ProvisioningState = internalapi.Updating

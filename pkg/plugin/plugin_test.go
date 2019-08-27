@@ -58,8 +58,8 @@ func TestCreateOrUpdate(t *testing.T) {
 			isUpdate: true,
 		},
 	}
-	deployer := func(ctx context.Context, azuretemplate map[string]interface{}) error {
-		return nil
+	deployer := func(ctx context.Context, azuretemplate map[string]interface{}) (*string, error) {
+		return nil, nil
 	}
 	cs := &api.OpenShiftManagedCluster{
 		Config: api.Config{ConfigStorageAccount: "config"},
@@ -138,8 +138,8 @@ func TestRecoverEtcdCluster(t *testing.T) {
 	gmc := gomock.NewController(t)
 	defer gmc.Finish()
 
-	deployer := func(ctx context.Context, azuretemplate map[string]interface{}) error {
-		return nil
+	deployer := func(ctx context.Context, azuretemplate map[string]interface{}) (*string, error) {
+		return nil, nil
 	}
 	cs := &api.OpenShiftManagedCluster{
 		Properties: api.Properties{
@@ -182,8 +182,8 @@ func TestRotateClusterSecrets(t *testing.T) {
 	gmc := gomock.NewController(t)
 	defer gmc.Finish()
 
-	deployer := func(ctx context.Context, azuretemplate map[string]interface{}) error {
-		return nil
+	deployer := func(ctx context.Context, azuretemplate map[string]interface{}) (*string, error) {
+		return nil, nil
 	}
 	cs := &api.OpenShiftManagedCluster{
 		Properties: api.Properties{
@@ -223,8 +223,8 @@ func TestForceUpdate(t *testing.T) {
 	gmc := gomock.NewController(t)
 	defer gmc.Finish()
 
-	deployer := func(ctx context.Context, azuretemplate map[string]interface{}) error {
-		return nil
+	deployer := func(ctx context.Context, azuretemplate map[string]interface{}) (*string, error) {
+		return nil, nil
 	}
 	cs := &api.OpenShiftManagedCluster{
 		Properties: api.Properties{

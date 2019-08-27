@@ -231,7 +231,7 @@ func main() {
 	}
 
 	isDelete := strings.ToUpper(*method) == http.MethodDelete
-	conf, err := fakerp.NewConfig(log)
+	conf, err := fakerp.NewConfig(log, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
