@@ -128,6 +128,18 @@ images:
   etcdBackup: quay.io/openshift-on-azure/azure:vx.y
 ```
 
+Also ensure you update the client binary links in our custom branding
+(`pkg/sync/vx/data/ConfigMap/openshift-azure-branding/branding.yaml`) to match
+the image versions in the pluginconfig:
+
+```
+        window.OPENSHIFT_CONSTANTS.CLI = {
+            "Linux (64 bits)": "https://mirror.openshift.com/pub/openshift-v3/clients/3.11.69/linux/oc.tar.gz",
+            "Windows":         "https://mirror.openshift.com/pub/openshift-v3/clients/3.11.69/windows/oc.zip",
+            "Mac OS X":        "https://mirror.openshift.com/pub/openshift-v3/clients/3.11.69/macosx/oc.tar.gz"
+        };
+```
+
 Typically you will only update the quay.io container image versions to pin them
 to the latest release. The upstream OpenShift images, supporting software
 versions, and VM image should be frozen mid-sprint to ensure sufficient time

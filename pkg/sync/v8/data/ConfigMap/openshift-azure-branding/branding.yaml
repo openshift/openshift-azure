@@ -16,9 +16,9 @@ data:
     (function() {
         /* Customize the CLI download locations */
         window.OPENSHIFT_CONSTANTS.CLI = {
-            "Linux (64 bits)": "https://mirror.openshift.com/pub/openshift-v3/clients/3.11.98/linux/oc.tar.gz",
-            "Windows":         "https://mirror.openshift.com/pub/openshift-v3/clients/3.11.98/windows/oc.zip",
-            "Mac OS X":        "https://mirror.openshift.com/pub/openshift-v3/clients/3.11.98/macosx/oc.tar.gz"
+            "Linux (64 bits)": "https://mirror.openshift.com/pub/openshift-v3/clients/3.11.135/linux/oc.tar.gz",
+            "Windows":         "https://mirror.openshift.com/pub/openshift-v3/clients/3.11.135/windows/oc.zip",
+            "Mac OS X":        "https://mirror.openshift.com/pub/openshift-v3/clients/3.11.135/macosx/oc.tar.gz"
         };
 
         /* Customize the base URL for all documentation links across the console */
