@@ -1,7 +1,9 @@
 package fakerp
 
 import (
+	"fmt"
 	"regexp"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -18,12 +20,28 @@ var _ = Describe("sync pod tests [EveryPR]", func() {
 		Expect(err).ToNot(HaveOccurred())
 		Expect(len(pods.Items)).To(BeNumerically(">", 0))
 
-		b, err := sanity.Checker.Client.Admin.CoreV1.Pods("kube-system").GetLogs(pods.Items[0].Name, &corev1.PodLogOptions{}).DoRaw()
-		Expect(err).ToNot(HaveOccurred())
-
 		rx := regexp.MustCompile(`(?ms)^[^\n]* msg="starting sync"[^\n]*$.*?^[^\n]* msg="sync done"[^\n]*$`)
-		runs := rx.FindAllString(string(b), -1)
-		// check for constantly updated objects
-		Expect(runs).To(ContainElement(Not(ContainSubstring("Update"))))
+		for {
+			b, err := sanity.Checker.Client.Admin.CoreV1.Pods("kube-system").GetLogs(pods.Items[0].Name, &corev1.PodLogOptions{}).DoRaw()
+			Expect(err).ToNot(HaveOccurred())
+
+			runs := rx.FindAllString(string(b), -1)
+			if len(runs) > 1 {
+				for i, run := range runs {
+					Expect(run).To(Not(ContainSubstring("level=error")))
+					if i == 0 {
+						By(fmt.Sprintf("ignoring the run %d/%d as it will have updates", i, len(runs)))
+						continue
+					}
+					// check for constantly updated objects
+					By(fmt.Sprintf("inspecting run %d/%d", i, len(runs)))
+					Expect(run).To(Not(ContainSubstring("Update")))
+				}
+				break
+			} else {
+				By("waiting for another sync loop")
+				time.Sleep(time.Minute)
+			}
+		}
 	})
 })
