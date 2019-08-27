@@ -24,7 +24,7 @@ fi
 
 go run cmd/createorupdate/createorupdate.go -request=DELETE ${TEST_IN_PRODUCTION:-}
 RESULT=$?
-if [[ $RESULT -eq 0 ]]
+if [[ $RESULT -eq 0 ]]; then
     rm -rf _data
 fi
 exit $RESULT
