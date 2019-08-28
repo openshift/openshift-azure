@@ -95,14 +95,50 @@ func validateProperties(p *api.Properties, location string, externalOnly bool) (
 	return
 }
 
+// In example configuration
+// SubnetCIRD - 10.0.0.0/8
+// -> DefaultCIDR - 10.0.0.0/23
+//   -> Master VMSS - 10.0.0.0/24
+//   -> Infra VMSS - 10.0.0.0/24
+//   -> Compute VMSS 10.0.0.0/24 (all these 3 potentially individual)
+// -> ManagementCIRD - 10.0.2.0/24
+
 func validateNetworkProfile(path string, np *api.NetworkProfile) (errs []error) {
 	if np == nil {
 		errs = append(errs, fmt.Errorf("%s cannot be nil", path))
 		return
 	}
 
+	// validate if provided CIRD's are valid. We terminate here if one of these are invalid
 	if !isValidIPV4CIDR(np.VnetCIDR) {
 		errs = append(errs, fmt.Errorf("invalid %s.vnetCidr %q", path, np.VnetCIDR))
+	}
+	if !isValidIPV4CIDR(np.ManagementCIDR) {
+		errs = append(errs, fmt.Errorf("invalid %s.managementCIDR %q", path, np.ManagementCIDR))
+	}
+	if !isValidIPV4CIDR(np.DefaultCIDR) {
+		errs = append(errs, fmt.Errorf("invalid %s.defaultCIDR %q", path, np.DefaultCIDR))
+	}
+	if len(errs) > 0 {
+		return
+	}
+
+	_, mgmSubnet, _ := net.ParseCIDR(np.ManagementCIDR)
+	_, defaultSubnet, _ := net.ParseCIDR(np.DefaultCIDR)
+	_, vnet, _ := net.ParseCIDR(np.VnetCIDR)
+
+	// validate if default and management subnet are unique
+	if cidrIntersect(mgmSubnet, defaultSubnet) {
+		errs = append(errs, fmt.Errorf("invalid %s.managementCIDR %q and %s.defaultCIDR %q - overlap", path, np.ManagementCIDR, path, np.DefaultCIDR))
+	}
+
+	// validate that vnetCIRD contains default and management subnets
+	if !vnetContainsSubnet(vnet, mgmSubnet) {
+		errs = append(errs, fmt.Errorf("invalid %s.managementCIDR %q: it is not part of %q.vnetCIDR %q", path, np.ManagementCIDR, path, np.VnetCIDR))
+	}
+
+	if !vnetContainsSubnet(vnet, defaultSubnet) {
+		errs = append(errs, fmt.Errorf("invalid %s.defaultCIDR %q: it is not part of %q.vnetCIDR %q", path, np.DefaultCIDR, path, np.VnetCIDR))
 	}
 
 	if np.VnetID != "" && !rxVNetID.MatchString(np.VnetID) {

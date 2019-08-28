@@ -45,4 +45,18 @@ func setDefaults(oc *OpenShiftManagedCluster) {
 			},
 		}
 	}
+
+	if oc.Properties.NetworkProfile == nil {
+		oc.Properties.NetworkProfile = &NetworkProfile{}
+	}
+
+	if oc.Properties.NetworkProfile.VnetCIDR == nil {
+		oc.Properties.NetworkProfile.VnetCIDR = to.StringPtr("10.0.0.0/8")
+	}
+	if oc.Properties.NetworkProfile.DefaultCIDR == nil {
+		oc.Properties.NetworkProfile.DefaultCIDR = to.StringPtr("10.0.0.0/24")
+	}
+	if oc.Properties.NetworkProfile.ManagementCIDR == nil {
+		oc.Properties.NetworkProfile.ManagementCIDR = to.StringPtr("10.0.2.0/24")
+	}
 }

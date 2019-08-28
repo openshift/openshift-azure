@@ -2,6 +2,7 @@ package arm
 
 import (
 	"fmt"
+	"net"
 	"sort"
 	"strings"
 
@@ -124,4 +125,32 @@ func FixupSDKMismatch(subscriptionID, resourceGroup string, template map[string]
 
 	}
 	return nil
+}
+
+// GetInternalLoadBalancerIP return 1st avaialble azure IP address to
+// to be used for InternalLoadBalancer from provided subnet.
+// https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-faq#are-there-any-restrictions-on-using-ip-addresses-within-these-subnets
+func GetInternalLoadBalancerIP(cidr string) *string {
+	ip, ipnet, err := net.ParseCIDR(cidr)
+	if err != nil {
+		return nil
+	}
+
+	var ips []string
+	for ip := ip.Mask(ipnet.Mask); ipnet.Contains(ip); inc(ip) {
+		ips = append(ips, ip.String())
+	}
+	// remove network address, azure reserved and broadcast address
+	// https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-faq#are-there-any-restrictions-on-using-ip-addresses-within-these-subnets
+	return &ips[4]
+
+}
+
+func inc(ip net.IP) {
+	for j := len(ip) - 1; j >= 0; j-- {
+		ip[j]++
+		if ip[j] > 0 {
+			break
+		}
+	}
 }

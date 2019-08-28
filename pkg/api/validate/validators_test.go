@@ -54,6 +54,8 @@ properties:
     secret: secret
   networkProfile:
     vnetCidr: 10.0.0.0/8
+    defaultCidr: 10.0.0.0/23
+    managementCidr: 10.0.2.0/24
   openShiftVersion: v3.11
   publicHostname: test.example.com
   routerProfiles:
@@ -245,6 +247,8 @@ func TestValidate(t *testing.T) {
 				oc.Properties.NetworkProfile.VnetCIDR = "192.168.0.0/16"
 			},
 			expectedErrs: []error{
+				errors.New(`invalid properties.networkProfile.managementCIDR "10.0.2.0/24": it is not part of "properties.networkProfile".vnetCIDR "192.168.0.0/16"`),
+				errors.New(`invalid properties.networkProfile.defaultCIDR "10.0.0.0/23": it is not part of "properties.networkProfile".vnetCIDR "192.168.0.0/16"`),
 				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "10.0.0.0/24": not contained in properties.networkProfile.vnetCidr "192.168.0.0/16"`),
 				errors.New(`invalid properties.agentPoolProfiles["infra"].subnetCidr "10.0.0.0/24": not contained in properties.networkProfile.vnetCidr "192.168.0.0/16"`),
 				errors.New(`invalid properties.agentPoolProfiles["mycompute"].subnetCidr "10.0.0.0/24": not contained in properties.networkProfile.vnetCidr "192.168.0.0/16"`),
@@ -265,6 +269,35 @@ func TestValidate(t *testing.T) {
 				oc.Properties.NetworkProfile.PeerVnetID = to.StringPtr("foo")
 			},
 			expectedErrs: []error{errors.New(`invalid properties.networkProfile.peerVnetId "foo"`)},
+		},
+		"network profile invalid vnetCIDR clash": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.NetworkProfile.VnetCIDR = "10.0.0.0/24"
+			},
+			expectedErrs: []error{
+				errors.New(`invalid properties.networkProfile.managementCIDR "10.0.2.0/24": it is not part of "properties.networkProfile".vnetCIDR "10.0.0.0/24"`),
+				errors.New(`invalid properties.networkProfile.defaultCIDR "10.0.0.0/23": it is not part of "properties.networkProfile".vnetCIDR "10.0.0.0/24"`),
+			},
+		},
+		"network profile invalid managementCIDR and defaultCIDR overlap": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.NetworkProfile.ManagementCIDR = "10.0.1.0/24"
+				oc.Properties.NetworkProfile.DefaultCIDR = "10.0.1.0/24"
+			},
+			expectedErrs: []error{
+				errors.New(`invalid properties.networkProfile.managementCIDR "10.0.1.0/24" and properties.networkProfile.defaultCIDR "10.0.1.0/24" - overlap`),
+			},
+		},
+		"network profile invalid managementCIDR and defaultCIDR - not part of vnet": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.NetworkProfile.VnetCIDR = "10.0.0.0/22"
+				oc.Properties.NetworkProfile.ManagementCIDR = "10.1.0.0/24"
+				oc.Properties.NetworkProfile.DefaultCIDR = "10.2.0.0/24"
+			},
+			expectedErrs: []error{
+				errors.New(`invalid properties.networkProfile.managementCIDR "10.1.0.0/24": it is not part of "properties.networkProfile".vnetCIDR "10.0.0.0/22"`),
+				errors.New(`invalid properties.networkProfile.defaultCIDR "10.2.0.0/24": it is not part of "properties.networkProfile".vnetCIDR "10.0.0.0/22"`),
+			},
 		},
 		"router profile duplicate names": {
 			f: func(oc *api.OpenShiftManagedCluster) {
@@ -424,6 +457,8 @@ func TestValidate(t *testing.T) {
 				}
 			},
 			expectedErrs: []error{
+				errors.New(`invalid properties.networkProfile.managementCIDR "10.0.2.0/24": it is not part of "properties.networkProfile".vnetCIDR "172.0.0.0/8"`),
+				errors.New(`invalid properties.networkProfile.defaultCIDR "10.0.0.0/23": it is not part of "properties.networkProfile".vnetCIDR "172.0.0.0/8"`),
 				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "172.30.0.0/16": overlaps with service network "172.30.0.0/16"`),
 				errors.New(`invalid properties.agentPoolProfiles["infra"].subnetCidr "172.30.0.0/16": overlaps with service network "172.30.0.0/16"`),
 				errors.New(`invalid properties.agentPoolProfiles["mycompute"].subnetCidr "172.30.0.0/16": overlaps with service network "172.30.0.0/16"`),

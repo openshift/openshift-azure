@@ -421,7 +421,11 @@ func newTestCs() *api.OpenShiftManagedCluster {
 				{Role: api.AgentPoolProfileRoleCompute, Count: 1, Name: "compute", VMSize: "Standard_D2s_v3", SubnetCIDR: "10.0.0.0/24", OSType: "Linux"},
 				{Role: api.AgentPoolProfileRoleInfra, Count: 2, Name: "infra", VMSize: "Standard_D2s_v3", SubnetCIDR: "10.0.0.0/24", OSType: "Linux"},
 			},
-			NetworkProfile: api.NetworkProfile{VnetCIDR: "10.0.0.0/8"},
+			NetworkProfile: api.NetworkProfile{
+				VnetCIDR:       "10.0.0.0/8",
+				DefaultCIDR:    "10.0.0.0/24",
+				ManagementCIDR: "10.0.2.0/24",
+			},
 		},
 	}
 }

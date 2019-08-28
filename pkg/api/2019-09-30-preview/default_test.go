@@ -41,6 +41,11 @@ func sampleManagedCluster() *OpenShiftManagedCluster {
 					PublicSubdomain: to.StringPtr("NewPublicSubdomain"),
 				},
 			},
+			NetworkProfile: &NetworkProfile{
+				DefaultCIDR:    to.StringPtr("10.0.0.0/24"),
+				ManagementCIDR: to.StringPtr("10.0.2.0/24"),
+				VnetCIDR:       to.StringPtr("10.0.0.0/8"),
+			},
 		},
 	}
 }
@@ -73,6 +78,11 @@ func TestDefaults(t *testing.T) {
 						Name: to.StringPtr("default"),
 					},
 				}
+				oc.Properties.NetworkProfile = &NetworkProfile{
+					DefaultCIDR:    to.StringPtr("10.0.0.0/24"),
+					ManagementCIDR: to.StringPtr("10.0.2.0/24"),
+					VnetCIDR:       to.StringPtr("10.0.0.0/8"),
+				}
 			},
 		},
 		{
@@ -104,6 +114,18 @@ func TestDefaults(t *testing.T) {
 			},
 			expectedChange: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.AgentPoolProfiles[0].OSType = (*OSType)(to.StringPtr("Linux"))
+			},
+		},
+		{
+			name: "sets NetorkProfile when empty",
+			changeInput: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.NetworkProfile = nil
+			},
+		},
+		{
+			name: "sets NetorkProfile.ManagementCIDR when empty",
+			changeInput: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.NetworkProfile.ManagementCIDR = nil
 			},
 		},
 		{

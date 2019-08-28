@@ -150,6 +150,7 @@ func isValidIPV4CIDR(cidr string) bool {
 	return true
 }
 
+// IsValidBlobName validates azure blob name
 func IsValidBlobName(c string) bool {
 	// https://docs.microsoft.com/en-us/rest/api/storageservices/naming-and-referencing-containers--blobs--and-metadata
 	if len(c) < 1 || len(c) > 1024 {
@@ -169,6 +170,10 @@ func IsValidBlobName(c string) bool {
 		return false
 	}
 	return true
+}
+
+func cidrIntersect(cidr1, cidr2 *net.IPNet) bool {
+	return cidr1.Contains(cidr2.IP) || cidr2.Contains(cidr1.IP)
 }
 
 func vnetContainsSubnet(vnet, subnet *net.IPNet) bool {

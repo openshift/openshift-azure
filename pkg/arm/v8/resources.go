@@ -11,6 +11,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
+	"github.com/openshift/openshift-azure/pkg/util/arm"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 	"github.com/openshift/openshift-azure/pkg/util/template"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
@@ -65,13 +66,13 @@ func (g *simpleGenerator) vnet() *network.VirtualNetwork {
 			Subnets: &[]network.Subnet{
 				{
 					SubnetPropertiesFormat: &network.SubnetPropertiesFormat{
-						AddressPrefix: to.StringPtr(g.cs.Properties.AgentPoolProfiles[0].SubnetCIDR),
+						AddressPrefix: to.StringPtr(g.cs.Properties.NetworkProfile.DefaultCIDR),
 					},
 					Name: to.StringPtr(vnetSubnetName),
 				},
 				{
 					SubnetPropertiesFormat: &network.SubnetPropertiesFormat{
-						AddressPrefix: to.StringPtr("10.0.1.0/24"),
+						AddressPrefix: to.StringPtr(g.cs.Properties.NetworkProfile.ManagementCIDR),
 					},
 					Name: to.StringPtr(vnetmManagementSubnetName),
 				},
@@ -214,8 +215,8 @@ func (g *simpleGenerator) ilbAPIServer() *network.LoadBalancer {
 				{
 					FrontendIPConfigurationPropertiesFormat: &network.FrontendIPConfigurationPropertiesFormat{
 						PrivateIPAllocationMethod: network.Static,
-						// https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-faq#are-there-any-restrictions-on-using-ip-addresses-within-these-subnets
-						PrivateIPAddress: to.StringPtr("10.0.1.4"),
+
+						PrivateIPAddress: arm.GetInternalLoadBalancerIP(g.cs.Properties.NetworkProfile.ManagementCIDR),
 						Subnet: &network.Subnet{
 							ID: to.StringPtr(resourceid.ResourceID(
 								g.cs.Properties.AzProfile.SubscriptionID,
