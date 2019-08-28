@@ -17,8 +17,10 @@ limitations under the License.
 package proxy
 
 import (
+	"bufio"
 	"bytes"
 	"compress/gzip"
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
@@ -341,6 +343,7 @@ func TestProxyUpgrade(t *testing.T) {
 	if !localhostPool.AppendCertsFromPEM(localhostCert) {
 		t.Errorf("error setting up localhostCert pool")
 	}
+	var d net.Dialer
 
 	testcases := map[string]struct {
 		ServerFunc       func(http.Handler) *httptest.Server
@@ -395,7 +398,7 @@ func TestProxyUpgrade(t *testing.T) {
 				ts.StartTLS()
 				return ts
 			},
-			ProxyTransport: utilnet.SetTransportDefaults(&http.Transport{Dial: net.Dial, TLSClientConfig: &tls.Config{RootCAs: localhostPool}}),
+			ProxyTransport: utilnet.SetTransportDefaults(&http.Transport{DialContext: d.DialContext, TLSClientConfig: &tls.Config{RootCAs: localhostPool}}),
 		},
 		"https (valid hostname + RootCAs + custom dialer + bearer token)": {
 			ServerFunc: func(h http.Handler) *httptest.Server {
@@ -410,9 +413,9 @@ func TestProxyUpgrade(t *testing.T) {
 				ts.StartTLS()
 				return ts
 			},
-			ProxyTransport: utilnet.SetTransportDefaults(&http.Transport{Dial: net.Dial, TLSClientConfig: &tls.Config{RootCAs: localhostPool}}),
+			ProxyTransport: utilnet.SetTransportDefaults(&http.Transport{DialContext: d.DialContext, TLSClientConfig: &tls.Config{RootCAs: localhostPool}}),
 			UpgradeTransport: NewUpgradeRequestRoundTripper(
-				utilnet.SetOldTransportDefaults(&http.Transport{Dial: net.Dial, TLSClientConfig: &tls.Config{RootCAs: localhostPool}}),
+				utilnet.SetOldTransportDefaults(&http.Transport{DialContext: d.DialContext, TLSClientConfig: &tls.Config{RootCAs: localhostPool}}),
 				RoundTripperFunc(func(req *http.Request) (*http.Response, error) {
 					req = utilnet.CloneRequest(req)
 					req.Header.Set("Authorization", "Bearer 1234")
@@ -496,9 +499,15 @@ func TestProxyUpgradeErrorResponse(t *testing.T) {
 		expectedErr = errors.New("EXPECTED")
 	)
 	proxy := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		transport := http.DefaultTransport.(*http.Transport)
-		transport.Dial = func(network, addr string) (net.Conn, error) {
-			return &fakeConn{err: expectedErr}, nil
+		transport := &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
+			DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+				return &fakeConn{err: expectedErr}, nil
+			},
+			MaxIdleConns:          100,
+			IdleConnTimeout:       90 * time.Second,
+			TLSHandshakeTimeout:   10 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
 		}
 		responder = &fakeResponder{t: t, w: w}
 		proxyHandler := NewUpgradeAwareHandler(
@@ -528,6 +537,52 @@ func TestProxyUpgradeErrorResponse(t *testing.T) {
 	msg, err := ioutil.ReadAll(resp.Body)
 	require.NoError(t, err)
 	assert.Contains(t, string(msg), expectedErr.Error())
+}
+
+func TestProxyUpgradeErrorResponseTerminates(t *testing.T) {
+	backend := http.NewServeMux()
+	backend.Handle("/hello", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "Bad Request", 422)
+	}))
+	backend.Handle("/there", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		t.Error("request to /there")
+	}))
+	backendServer := httptest.NewServer(backend)
+	defer backendServer.Close()
+	backendServerURL, _ := url.Parse(backendServer.URL)
+	backendServerURL.Path = "/hello"
+
+	for _, intercept := range []bool{true, false} {
+		t.Run(fmt.Sprintf("intercept=%v", intercept), func(t *testing.T) {
+			proxyHandler := NewUpgradeAwareHandler(backendServerURL, nil, false, false, &noErrorsAllowed{t: t})
+			proxyHandler.InterceptRedirects = intercept
+			proxy := httptest.NewServer(proxyHandler)
+			defer proxy.Close()
+			proxyURL, _ := url.Parse(proxy.URL)
+
+			conn, err := net.Dial("tcp", proxyURL.Host)
+			require.NoError(t, err)
+			bufferedReader := bufio.NewReader(conn)
+
+			// Send upgrade request resulting in an error to the proxy server
+			req, _ := http.NewRequest("GET", "/", nil)
+			req.Header.Set(httpstream.HeaderConnection, httpstream.HeaderUpgrade)
+			require.NoError(t, req.Write(conn))
+			resp, err := http.ReadResponse(bufferedReader, nil)
+			require.NoError(t, err)
+			_, err = ioutil.ReadAll(resp.Body)
+			require.NoError(t, err)
+			resp.Body.Close()
+
+			// Send another request
+			req, _ = http.NewRequest("GET", "/there", nil)
+			require.NoError(t, req.Write(conn))
+			time.Sleep(time.Second)
+			conn.SetReadDeadline(time.Now().Add(time.Second))
+			resp, err = http.ReadResponse(bufferedReader, nil)
+			require.Error(t, err)
+		})
+	}
 }
 
 func TestDefaultProxyTransport(t *testing.T) {

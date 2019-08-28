@@ -139,7 +139,9 @@ func NewDefaultClientConfigLoadingRules() *ClientConfigLoadingRules {
 
 	envVarFiles := os.Getenv(RecommendedConfigPathEnvVar)
 	if len(envVarFiles) != 0 {
-		chain = append(chain, filepath.SplitList(envVarFiles)...)
+		fileList := filepath.SplitList(envVarFiles)
+		// prevent the same path load multiple times
+		chain = append(chain, deduplicate(fileList)...)
 
 	} else {
 		chain = append(chain, RecommendedHomeFile)
@@ -418,33 +420,6 @@ func WriteToFile(config clientcmdapi.Config, filename string) error {
 	return nil
 }
 
-func lockFile(filename string) error {
-	// TODO: find a way to do this with actual file locks. Will
-	// probably need separate solution for windows and Linux.
-
-	// Make sure the dir exists before we try to create a lock file.
-	dir := filepath.Dir(filename)
-	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		if err = os.MkdirAll(dir, 0755); err != nil {
-			return err
-		}
-	}
-	f, err := os.OpenFile(lockName(filename), os.O_CREATE|os.O_EXCL, 0)
-	if err != nil {
-		return err
-	}
-	f.Close()
-	return nil
-}
-
-func unlockFile(filename string) error {
-	return os.Remove(lockName(filename))
-}
-
-func lockName(filename string) string {
-	return filename + ".lock"
-}
-
 // Write serializes the config to yaml.
 // Encapsulates serialization without assuming the destination is a file.
 func Write(config clientcmdapi.Config) ([]byte, error) {
@@ -614,4 +589,18 @@ func MakeRelative(path, base string) (string, error) {
 		return rel, nil
 	}
 	return path, nil
+}
+
+// deduplicate removes any duplicated values and returns a new slice, keeping the order unchanged
+func deduplicate(s []string) []string {
+	encountered := map[string]bool{}
+	ret := make([]string, 0)
+	for i := range s {
+		if encountered[s[i]] {
+			continue
+		}
+		encountered[s[i]] = true
+		ret = append(ret, s[i])
+	}
+	return ret
 }

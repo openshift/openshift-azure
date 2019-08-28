@@ -311,7 +311,7 @@ type LighthouseResultV5 struct {
 
 	// RunWarnings: List of all run warnings in the LHR. Will always output
 	// to at least `[]`.
-	RunWarnings []interface{} `json:"runWarnings,omitempty"`
+	RunWarnings []GoogleprotobufValue `json:"runWarnings,omitempty"`
 
 	// RuntimeError: A top-level error message that, if present, indicates a
 	// serious enough problem that this Lighthouse result may need to be
@@ -1049,6 +1049,7 @@ func (c *PagespeedapiRunpagespeedCall) Header() http.Header {
 
 func (c *PagespeedapiRunpagespeedCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1156,7 +1157,7 @@ func (c *PagespeedapiRunpagespeedCall) Do(opts ...googleapi.CallOption) (*Pagesp
 	//     "url": {
 	//       "description": "The URL to fetch and analyze",
 	//       "location": "query",
-	//       "pattern": "(?i)http(s)?://.*",
+	//       "pattern": "(?i)(site:|origin:)?http(s)?://.*",
 	//       "required": true,
 	//       "type": "string"
 	//     },

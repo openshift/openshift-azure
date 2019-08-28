@@ -256,9 +256,9 @@ type Action struct {
 
 	// Environment: The environment to pass into the container. This
 	// environment is merged
-	// with any values specified in the `Pipeline` message. These
-	// values
-	// overwrite any in the `Pipeline` message.
+	// with values specified in the
+	// google.genomics.v2alpha1.Pipeline
+	// message, overwriting any duplicate values.
 	//
 	// In addition to the values passed here, a few other values
 	// are
@@ -335,14 +335,30 @@ type Action struct {
 	// flag disables this functionality.
 	Flags []string `json:"flags,omitempty"`
 
-	// ImageUri: The URI to pull the container image from. Note that all
-	// images referenced
+	// ImageUri: Required. The URI to pull the container image from. Note
+	// that all images referenced
 	// by actions in the pipeline are pulled before the first action runs.
 	// If
 	// multiple actions reference the same image, it is only pulled
 	// once,
 	// ensuring that the same image is used for all actions in a single
 	// pipeline.
+	//
+	// The image URI can be either a complete host and image specification
+	// (e.g.,
+	// quay.io/biocontainers/samtools), a library and image name
+	// (e.g.,
+	// google/cloud-sdk) or a bare image name ('bash') to pull from the
+	// default
+	// library.  No schema is required in any of these cases.
+	//
+	// If the specified image is not public, the service account specified
+	// for
+	// the Virtual Machine must have access to pull the images from GCR,
+	// or
+	// appropriate credentials must be specified in
+	// the
+	// google.genomics.v2alpha1.Action.credentials field.
 	ImageUri string `json:"imageUri,omitempty"`
 
 	// Labels: Labels to associate with the action. This field is provided
@@ -1580,7 +1596,7 @@ type RunPipelineRequest struct {
 	// see the appropriate resource message (for example, `VirtualMachine`).
 	Labels map[string]string `json:"labels,omitempty"`
 
-	// Pipeline: The description of the pipeline to run.
+	// Pipeline: Required. The description of the pipeline to run.
 	Pipeline *Pipeline `json:"pipeline,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Labels") to
@@ -1694,7 +1710,8 @@ type ServiceAccount struct {
 
 	// Scopes: List of scopes to be enabled for this service account on the
 	// VM, in
-	// addition to the Cloud Genomics API scope.
+	// addition to the cloud-platform API scope that will be added by
+	// default.
 	Scopes []string `json:"scopes,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Email") to
@@ -1869,9 +1886,11 @@ type VirtualMachine struct {
 
 	// Labels: Optional set of labels to apply to the VM and any attached
 	// disk resources.
-	// These labels must adhere to the name and value restrictions on VM
-	// labels
-	// imposed by Compute Engine.
+	// These labels must adhere to the [name and
+	// value
+	// restrictions](https://cloud.google.com/compute/docs/labeling-res
+	// ources) on
+	// VM labels imposed by Compute Engine.
 	//
 	// Labels keys with the prefix 'google-' are reserved for use by
 	// Google.
@@ -1881,8 +1900,8 @@ type VirtualMachine struct {
 	// to attached disk resources shortly after VM creation.
 	Labels map[string]string `json:"labels,omitempty"`
 
-	// MachineType: The machine type of the virtual machine to create. Must
-	// be the short name
+	// MachineType: Required. The machine type of the virtual machine to
+	// create. Must be the short name
 	// of a standard machine type (such as "n1-standard-1") or a custom
 	// machine
 	// type (such as "custom-1-4096", where "1" indicates the number of
@@ -2058,7 +2077,15 @@ type PipelinesRunCall struct {
 	header_            http.Header
 }
 
-// Run: Runs a pipeline.
+// Run: Runs a pipeline.  The returned Operation's metadata field will
+// contain a
+// google.genomics.v2alpha1.Metadata object describing the status of
+// the
+// pipeline execution.  The [response] field will contain
+// a
+// google.genomics.v2alpha1.RunPipelineResponse object if the
+// pipeline
+// completes successfully.
 //
 // **Note:** Before you can use this method, the Genomics Service
 // Agent
@@ -2111,6 +2138,7 @@ func (c *PipelinesRunCall) Header() http.Header {
 
 func (c *PipelinesRunCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2171,7 +2199,7 @@ func (c *PipelinesRunCall) Do(opts ...googleapi.CallOption) (*Operation, error) 
 	}
 	return ret, nil
 	// {
-	//   "description": "Runs a pipeline.\n\n**Note:** Before you can use this method, the Genomics Service Agent\nmust have access to your project. This is done automatically when the\nCloud Genomics API is first enabled, but if you delete this permission,\nor if you enabled the Cloud Genomics API before the v2alpha1 API\nlaunch, you must disable and re-enable the API to grant the Genomics\nService Agent the required permissions.\nAuthorization requires the following [Google\nIAM](https://cloud.google.com/iam/) permission:\n\n* `genomics.operations.create`\n\n[1]: /genomics/gsa",
+	//   "description": "Runs a pipeline.  The returned Operation's metadata field will contain a\ngoogle.genomics.v2alpha1.Metadata object describing the status of the\npipeline execution.  The [response] field will contain a\ngoogle.genomics.v2alpha1.RunPipelineResponse object if the pipeline\ncompletes successfully.\n\n**Note:** Before you can use this method, the Genomics Service Agent\nmust have access to your project. This is done automatically when the\nCloud Genomics API is first enabled, but if you delete this permission,\nor if you enabled the Cloud Genomics API before the v2alpha1 API\nlaunch, you must disable and re-enable the API to grant the Genomics\nService Agent the required permissions.\nAuthorization requires the following [Google\nIAM](https://cloud.google.com/iam/) permission:\n\n* `genomics.operations.create`\n\n[1]: /genomics/gsa",
 	//   "flatPath": "v2alpha1/pipelines:run",
 	//   "httpMethod": "POST",
 	//   "id": "genomics.pipelines.run",
@@ -2250,6 +2278,7 @@ func (c *ProjectsOperationsCancelCall) Header() http.Header {
 
 func (c *ProjectsOperationsCancelCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2406,6 +2435,7 @@ func (c *ProjectsOperationsGetCall) Header() http.Header {
 
 func (c *ProjectsOperationsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2611,6 +2641,7 @@ func (c *ProjectsOperationsListCall) Header() http.Header {
 
 func (c *ProjectsOperationsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2785,6 +2816,7 @@ func (c *WorkersCheckInCall) Header() http.Header {
 
 func (c *WorkersCheckInCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

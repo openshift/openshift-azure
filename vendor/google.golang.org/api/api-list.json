@@ -550,6 +550,36 @@
     },
     {
       "kind": "discovery#directoryItem",
+      "id": "bigqueryreservation:v1alpha2",
+      "name": "bigqueryreservation",
+      "version": "v1alpha2",
+      "title": "BigQuery Reservation API",
+      "description": "A service to modify your BigQuery flat-rate reservations.",
+      "discoveryRestUrl": "https://bigqueryreservation.googleapis.com/$discovery/rest?version=v1alpha2",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://cloud.google.com/bigquery/",
+      "preferred": false
+    },
+    {
+      "kind": "discovery#directoryItem",
+      "id": "bigqueryreservation:v1",
+      "name": "bigqueryreservation",
+      "version": "v1",
+      "title": "BigQuery Reservation API",
+      "description": "A service to modify your BigQuery flat-rate reservations.",
+      "discoveryRestUrl": "https://bigqueryreservation.googleapis.com/$discovery/rest?version=v1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://cloud.google.com/bigquery/",
+      "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
       "id": "bigtableadmin:v1",
       "name": "bigtableadmin",
       "version": "v1",
@@ -1728,6 +1758,21 @@
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
       },
       "documentationLink": "https://developers.google.com/docs/",
+      "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
+      "id": "domainsrdap:v1",
+      "name": "domainsrdap",
+      "version": "v1",
+      "title": "Domains RDAP API",
+      "description": "Read-only public API that lets users search for information about domain names.",
+      "discoveryRestUrl": "https://domainsrdap.googleapis.com/$discovery/rest?version=v1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://developers.google.com/domains/rdap/",
       "preferred": true
     },
     {
@@ -2971,21 +3016,6 @@
     },
     {
       "kind": "discovery#directoryItem",
-      "id": "run:v1beta1",
-      "name": "run",
-      "version": "v1beta1",
-      "title": "Cloud Run API",
-      "description": "Deploy and manage user provided container images that scale automatically based on HTTP traffic.",
-      "discoveryRestUrl": "https://run.googleapis.com/$discovery/rest?version=v1beta1",
-      "icons": {
-        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
-        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
-      },
-      "documentationLink": "https://cloud.google.com/run/",
-      "preferred": false
-    },
-    {
-      "kind": "discovery#directoryItem",
       "id": "runtimeconfig:v1",
       "name": "runtimeconfig",
       "version": "v1",
@@ -3338,6 +3368,21 @@
       "title": "Cloud Speech-to-Text API",
       "description": "Converts audio to text by applying powerful neural network models.",
       "discoveryRestUrl": "https://speech.googleapis.com/$discovery/rest?version=v1p1beta1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://cloud.google.com/speech-to-text/docs/quickstart-protocol",
+      "preferred": false
+    },
+    {
+      "kind": "discovery#directoryItem",
+      "id": "speech:v2beta",
+      "name": "speech",
+      "version": "v2beta",
+      "title": "Cloud Speech-to-Text API",
+      "description": "Converts audio to text by applying powerful neural network models.",
+      "discoveryRestUrl": "https://speech.googleapis.com/$discovery/rest?version=v2beta",
       "icons": {
         "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"

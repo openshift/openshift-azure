@@ -160,7 +160,7 @@ type PlatformSummary struct {
 	// Possible values:
 	//   "UNKNOWN" - Not reviewed.
 	//   "PASSING" - Passing.
-	//   "WARNING" - Warning.
+	//   "WARNING" - Warning. No longer a possible status.
 	//   "FAILING" - Failing.
 	BetterAdsStatus string `json:"betterAdsStatus,omitempty"`
 
@@ -181,6 +181,9 @@ type PlatformSummary struct {
 	LastChangeTime string `json:"lastChangeTime,omitempty"`
 
 	// Region: The assigned regions for the site and platform.
+	// No longer populated, because there is no longer any semantic
+	// difference
+	// between sites in different regions.
 	//
 	// Possible values:
 	//   "REGION_UNKNOWN" - Ad standard not yet defined for your region.
@@ -346,6 +349,7 @@ func (c *SitesGetCall) Header() http.Header {
 
 func (c *SitesGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -488,6 +492,7 @@ func (c *ViolatingSitesListCall) Header() http.Header {
 
 func (c *ViolatingSitesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

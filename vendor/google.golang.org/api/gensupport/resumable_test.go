@@ -13,6 +13,7 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 )
 
 type unexpectedReader struct{}
@@ -64,6 +65,9 @@ func (tc *trackingCloser) Open() {
 }
 
 func (t *interruptibleTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	if len(t.events) == 0 {
+		panic("Ran out of events, but got a request")
+	}
 	ev := t.events[0]
 	t.events = t.events[1:]
 	if got, want := req.Header.Get("Content-Range"), ev.byteRange; got != want {
@@ -112,6 +116,7 @@ func (pr *progressRecorder) ProgressUpdate(current int64) {
 
 func TestInterruptedTransferChunks(t *testing.T) {
 	type testCase struct {
+		name         string
 		data         string
 		chunkSize    int
 		events       []event
@@ -120,6 +125,7 @@ func TestInterruptedTransferChunks(t *testing.T) {
 
 	for _, tc := range []testCase{
 		{
+			name:      "large",
 			data:      strings.Repeat("a", 300),
 			chunkSize: 90,
 			events: []event{
@@ -130,10 +136,10 @@ func TestInterruptedTransferChunks(t *testing.T) {
 				{"bytes 180-269/*", 308},
 				{"bytes 270-299/300", 200},
 			},
-
 			wantProgress: []int64{90, 180, 270, 300},
 		},
 		{
+			name:      "small",
 			data:      strings.Repeat("a", 20),
 			chunkSize: 10,
 			events: []event{
@@ -145,51 +151,56 @@ func TestInterruptedTransferChunks(t *testing.T) {
 				{"bytes */20", http.StatusServiceUnavailable},
 				{"bytes */20", 200},
 			},
-
 			wantProgress: []int64{10, 20},
 		},
 	} {
-		media := strings.NewReader(tc.data)
+		t.Run(tc.name, func(t *testing.T) {
+			media := strings.NewReader(tc.data)
 
-		tr := &interruptibleTransport{
-			buf:    make([]byte, 0, len(tc.data)),
-			events: tc.events,
-			bodies: bodyTracker{},
-		}
-
-		pr := progressRecorder{}
-		rx := &ResumableUpload{
-			Client:    &http.Client{Transport: tr},
-			Media:     NewMediaBuffer(media, tc.chunkSize),
-			MediaType: "text/plain",
-			Callback:  pr.ProgressUpdate,
-			Backoff:   NoPauseStrategy,
-		}
-		res, err := rx.Upload(context.Background())
-		if err == nil {
-			res.Body.Close()
-		}
-		if err != nil || res == nil || res.StatusCode != http.StatusOK {
-			if res == nil {
-				t.Errorf("Upload not successful, res=nil: %v", err)
-			} else {
-				t.Errorf("Upload not successful, statusCode=%v: %v", res.StatusCode, err)
+			tr := &interruptibleTransport{
+				buf:    make([]byte, 0, len(tc.data)),
+				events: tc.events,
+				bodies: bodyTracker{},
 			}
-		}
-		if !reflect.DeepEqual(tr.buf, []byte(tc.data)) {
-			t.Errorf("transferred contents:\ngot %s\nwant %s", tr.buf, tc.data)
-		}
 
-		if !reflect.DeepEqual(pr.updates, tc.wantProgress) {
-			t.Errorf("progress updates: got %v, want %v", pr.updates, tc.wantProgress)
-		}
+			pr := progressRecorder{}
+			rx := &ResumableUpload{
+				Client:    &http.Client{Transport: tr},
+				Media:     NewMediaBuffer(media, tc.chunkSize),
+				MediaType: "text/plain",
+				Callback:  pr.ProgressUpdate,
+			}
 
-		if len(tr.events) > 0 {
-			t.Errorf("did not observe all expected events.  leftover events: %v", tr.events)
-		}
-		if len(tr.bodies) > 0 {
-			t.Errorf("unclosed request bodies: %v", tr.bodies)
-		}
+			oldBackoff := backoff
+			backoff = func() Backoff { return new(NoPauseBackoff) }
+			defer func() { backoff = oldBackoff }()
+
+			res, err := rx.Upload(context.Background())
+			if err == nil {
+				res.Body.Close()
+			}
+			if err != nil || res == nil || res.StatusCode != http.StatusOK {
+				if res == nil {
+					t.Fatalf("Upload not successful, res=nil: %v", err)
+				} else {
+					t.Fatalf("Upload not successful, statusCode=%v, err=%v", res.StatusCode, err)
+				}
+			}
+			if !reflect.DeepEqual(tr.buf, []byte(tc.data)) {
+				t.Fatalf("transferred contents:\ngot %s\nwant %s", tr.buf, tc.data)
+			}
+
+			if !reflect.DeepEqual(pr.updates, tc.wantProgress) {
+				t.Fatalf("progress updates: got %v, want %v", pr.updates, tc.wantProgress)
+			}
+
+			if len(tr.events) > 0 {
+				t.Fatalf("did not observe all expected events.  leftover events: %v", tr.events)
+			}
+			if len(tr.bodies) > 0 {
+				t.Errorf("unclosed request bodies: %v", tr.bodies)
+			}
+		})
 	}
 }
 
@@ -202,6 +213,9 @@ func TestCancelUploadFast(t *testing.T) {
 
 	tr := &interruptibleTransport{
 		buf: make([]byte, 0, mediaSize),
+		// Shouldn't really need an event, but sometimes the test loses the
+		// race. So, this is just a filler event.
+		events: []event{{"bytes 0-9/*", http.StatusServiceUnavailable}},
 	}
 
 	pr := progressRecorder{}
@@ -210,16 +224,20 @@ func TestCancelUploadFast(t *testing.T) {
 		Media:     NewMediaBuffer(media, chunkSize),
 		MediaType: "text/plain",
 		Callback:  pr.ProgressUpdate,
-		Backoff:   NoPauseStrategy,
 	}
+
+	oldBackoff := backoff
+	backoff = func() Backoff { return new(NoPauseBackoff) }
+	defer func() { backoff = oldBackoff }()
+
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	cancelFunc() // stop the upload that hasn't started yet
 	res, err := rx.Upload(ctx)
 	if err != context.Canceled {
-		t.Errorf("Upload err: got: %v; want: context cancelled", err)
+		t.Fatalf("Upload err: got: %v; want: context cancelled", err)
 	}
 	if res != nil {
-		t.Errorf("Upload result: got: %v; want: nil", res)
+		t.Fatalf("Upload result: got: %v; want: nil", res)
 	}
 	if pr.updates != nil {
 		t.Errorf("progress updates: got %v; want: nil", pr.updates)
@@ -259,22 +277,141 @@ func TestCancelUpload(t *testing.T) {
 		Media:     NewMediaBuffer(media, chunkSize),
 		MediaType: "text/plain",
 		Callback:  pr.ProgressUpdate,
-		Backoff:   NoPauseStrategy,
 	}
+
+	oldBackoff := backoff
+	backoff = func() Backoff { return new(NoPauseBackoff) }
+	defer func() { backoff = oldBackoff }()
+
 	res, err := rx.Upload(ctx)
 	if err != context.Canceled {
-		t.Errorf("Upload err: got: %v; want: context cancelled", err)
+		t.Fatalf("Upload err: got: %v; want: context cancelled", err)
 	}
 	if res != nil {
-		t.Errorf("Upload result: got: %v; want: nil", res)
+		t.Fatalf("Upload result: got: %v; want: nil", res)
 	}
 	if got, want := tr.buf, []byte(strings.Repeat("a", chunkSize*2)); !reflect.DeepEqual(got, want) {
-		t.Errorf("transferred contents:\ngot %s\nwant %s", got, want)
+		t.Fatalf("transferred contents:\ngot %s\nwant %s", got, want)
 	}
 	if got, want := pr.updates, []int64{chunkSize, chunkSize * 2}; !reflect.DeepEqual(got, want) {
-		t.Errorf("progress updates: got %v; want: %v", got, want)
+		t.Fatalf("progress updates: got %v; want: %v", got, want)
 	}
 	if len(tr.bodies) > 0 {
 		t.Errorf("unclosed request bodies: %v", tr.bodies)
+	}
+}
+
+func TestRetry_Bounded(t *testing.T) {
+	const (
+		chunkSize = 90
+		mediaSize = 300
+	)
+	media := strings.NewReader(strings.Repeat("a", mediaSize))
+
+	tr := &interruptibleTransport{
+		buf: make([]byte, 0, mediaSize),
+		events: []event{
+			{"bytes 0-89/*", http.StatusServiceUnavailable},
+			{"bytes 0-89/*", http.StatusServiceUnavailable},
+		},
+		bodies: bodyTracker{},
+	}
+
+	rx := &ResumableUpload{
+		Client:    &http.Client{Transport: tr},
+		Media:     NewMediaBuffer(media, chunkSize),
+		MediaType: "text/plain",
+		Callback:  func(int64) {},
+	}
+
+	oldRetryDeadline := retryDeadline
+	retryDeadline = time.Second
+	defer func() { retryDeadline = oldRetryDeadline }()
+
+	oldBackoff := backoff
+	backoff = func() Backoff { return new(PauseForeverBackoff) }
+	defer func() { backoff = oldBackoff }()
+
+	resCode := make(chan int, 1)
+	go func() {
+		resp, err := rx.Upload(context.Background())
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		resCode <- resp.StatusCode
+	}()
+
+	select {
+	case <-time.After(5 * time.Second):
+		t.Fatal("timed out waiting for Upload to complete")
+	case got := <-resCode:
+		if want, got := http.StatusServiceUnavailable, got; got != want {
+			t.Fatalf("want %d, got %d", want, got)
+		}
+	}
+}
+
+func TestRetry_EachChunkHasItsOwnRetryDeadline(t *testing.T) {
+	const (
+		chunkSize = 90
+		mediaSize = 300
+	)
+	media := strings.NewReader(strings.Repeat("a", mediaSize))
+
+	tr := &interruptibleTransport{
+		buf: make([]byte, 0, mediaSize),
+		events: []event{
+			{"bytes 0-89/*", http.StatusServiceUnavailable},
+			// cum: 1s sleep
+			{"bytes 0-89/*", http.StatusServiceUnavailable},
+			// cum: 2s sleep
+			{"bytes 0-89/*", http.StatusServiceUnavailable},
+			// cum: 3s sleep
+			{"bytes 0-89/*", http.StatusServiceUnavailable},
+			// cum: 4s sleep
+			{"bytes 0-89/*", 308},
+			// cum: 1s sleep <-- resets because it's a new chunk
+			{"bytes 90-179/*", 308},
+			// cum: 1s sleep <-- resets because it's a new chunk
+			{"bytes 180-269/*", 308},
+			// cum: 1s sleep <-- resets because it's a new chunk
+			{"bytes 270-299/300", 200},
+		},
+		bodies: bodyTracker{},
+	}
+
+	rx := &ResumableUpload{
+		Client:    &http.Client{Transport: tr},
+		Media:     NewMediaBuffer(media, chunkSize),
+		MediaType: "text/plain",
+		Callback:  func(int64) {},
+	}
+
+	oldRetryDeadline := retryDeadline
+	retryDeadline = 5 * time.Second
+	defer func() { retryDeadline = oldRetryDeadline }()
+
+	oldBackoff := backoff
+	backoff = func() Backoff { return new(PauseOneSecond) }
+	defer func() { backoff = oldBackoff }()
+
+	resCode := make(chan int, 1)
+	go func() {
+		resp, err := rx.Upload(context.Background())
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		resCode <- resp.StatusCode
+	}()
+
+	select {
+	case <-time.After(15 * time.Second):
+		t.Fatal("timed out waiting for Upload to complete")
+	case got := <-resCode:
+		if want := http.StatusOK; got != want {
+			t.Fatalf("want %d, got %d", want, got)
+		}
 	}
 }

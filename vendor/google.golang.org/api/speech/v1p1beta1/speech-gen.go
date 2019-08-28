@@ -524,10 +524,9 @@ type RecognitionConfig struct {
 	// DiarizationSpeakerCount: *Optional*
 	// If set, specifies the estimated number of speakers in the
 	// conversation.
-	// If not set, defaults to '2'.
-	// Ignored unless enable_speaker_diarization is set to true."
-	// Note: Use diarization_config instead. This field will be DEPRECATED
-	// soon.
+	// Defaults to '2'. Ignored unless enable_speaker_diarization is set to
+	// true.
+	// Note: Use diarization_config instead.
 	DiarizationSpeakerCount int64 `json:"diarizationSpeakerCount,omitempty"`
 
 	// EnableAutomaticPunctuation: *Optional* If 'true', adds punctuation to
@@ -562,8 +561,7 @@ type RecognitionConfig struct {
 	// the top alternative of the recognition result using a speaker_tag
 	// provided
 	// in the WordInfo.
-	// Note: Use diarization_config instead. This field will be DEPRECATED
-	// soon.
+	// Note: Use diarization_config instead.
 	EnableSpeakerDiarization bool `json:"enableSpeakerDiarization,omitempty"`
 
 	// EnableWordConfidence: *Optional* If `true`, the top result includes a
@@ -729,8 +727,8 @@ type RecognitionConfig struct {
 	// SpeechContexts: *Optional* array of SpeechContext.
 	// A means to provide context to assist the speech recognition. For
 	// more
-	// information, see [Phrase
-	// Hints](/speech-to-text/docs/basics#phrase-hints).
+	// information, see
+	// [speech adaptation](/speech-to-text/docs/context-strength).
 	SpeechContexts []*SpeechContext `json:"speechContexts,omitempty"`
 
 	// UseEnhanced: *Optional* Set to true to use an enhanced model for
@@ -972,6 +970,8 @@ func (s *RecognizeResponse) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// SpeakerDiarizationConfig: *Optional* Config to enable speaker
+// diarization.
 type SpeakerDiarizationConfig struct {
 	// EnableSpeakerDiarization: *Optional* If 'true', enables speaker
 	// detection for each recognized word in
@@ -980,8 +980,7 @@ type SpeakerDiarizationConfig struct {
 	// in the WordInfo.
 	EnableSpeakerDiarization bool `json:"enableSpeakerDiarization,omitempty"`
 
-	// MaxSpeakerCount: *Optional* Only used if diarization_speaker_count is
-	// not set.
+	// MaxSpeakerCount: *Optional*
 	// Maximum number of speakers in the conversation. This range gives you
 	// more
 	// flexibility by allowing the system to automatically determine the
@@ -989,8 +988,7 @@ type SpeakerDiarizationConfig struct {
 	// number of speakers. If not set, the default value is 6.
 	MaxSpeakerCount int64 `json:"maxSpeakerCount,omitempty"`
 
-	// MinSpeakerCount: *Optional* Only used if diarization_speaker_count is
-	// not set.
+	// MinSpeakerCount: *Optional*
 	// Minimum number of speakers in the conversation. This range gives you
 	// more
 	// flexibility by allowing the system to automatically determine the
@@ -1417,6 +1415,7 @@ func (c *OperationsGetCall) Header() http.Header {
 
 func (c *OperationsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1602,6 +1601,7 @@ func (c *OperationsListCall) Header() http.Header {
 
 func (c *OperationsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1779,6 +1779,7 @@ func (c *ProjectsLocationsOperationsGetCall) Header() http.Header {
 
 func (c *ProjectsLocationsOperationsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1959,6 +1960,7 @@ func (c *ProjectsLocationsOperationsListCall) Header() http.Header {
 
 func (c *ProjectsLocationsOperationsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2137,6 +2139,7 @@ func (c *SpeechLongrunningrecognizeCall) Header() http.Header {
 
 func (c *SpeechLongrunningrecognizeCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2263,6 +2266,7 @@ func (c *SpeechRecognizeCall) Header() http.Header {
 
 func (c *SpeechRecognizeCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

@@ -474,10 +474,17 @@ type ApplicationPolicy struct {
 	//   "REQUIRED_FOR_SETUP" - The app is automatically installed and can't
 	// be removed by the user and will prevent setup from completion until
 	// installation is complete.
+	//   "KIOSK" - The app is automatically installed in kiosk mode: it's
+	// set as the preferred home intent and whitelisted for lock task mode.
+	// Device setup won't complete until the app is installed. After
+	// installation, users won't be able to remove the app. You can only set
+	// this installType for one app per policy. When this is present in the
+	// policy, status bar will be automatically disabled.
 	InstallType string `json:"installType,omitempty"`
 
 	// LockTaskAllowed: Whether the app is allowed to lock itself in
-	// full-screen mode.
+	// full-screen mode. DEPRECATED. Use InstallType KIOSK or
+	// kioskCustomLauncherEnabled to to configure a dedicated device.
 	LockTaskAllowed bool `json:"lockTaskAllowed,omitempty"`
 
 	// ManagedConfiguration: Managed configuration applied to the app. The
@@ -995,6 +1002,10 @@ type Device struct {
 	// same physical device has enrolled previously. The names are in
 	// chronological order.
 	PreviousDeviceNames []string `json:"previousDeviceNames,omitempty"`
+
+	// SecurityPosture: Device's security posture value that reflects how
+	// secure the device is.
+	SecurityPosture *SecurityPosture `json:"securityPosture,omitempty"`
 
 	// SoftwareInfo: Detailed information about the device software. This
 	// information is only available if softwareInfoEnabled is true in the
@@ -2428,7 +2439,8 @@ func (s *PermissionGrant) MarshalJSON() ([]byte, error) {
 }
 
 // PersistentPreferredActivity: A default activity for handling intents
-// that match a particular intent filter.
+// that match a particular intent filter. Note: To set up a kiosk, use
+// InstallType to KIOSK rather than use persistent preferred activities.
 type PersistentPreferredActivity struct {
 	// Actions: The intent actions to match in the filter. If any actions
 	// are included in the filter, then an intent's action must be one of
@@ -2656,9 +2668,8 @@ type Policy struct {
 	// KioskCustomLauncherEnabled: Whether the kiosk custom launcher is
 	// enabled. This replaces the home screen with a launcher that locks
 	// down the device to the apps installed via the applications setting.
-	// The apps appear on a single page in alphabetical order. It is
-	// recommended to also use status_bar_disabled to block access to device
-	// settings.
+	// Apps appear on a single page in alphabetical order. The status bar is
+	// disabled when this is set.
 	KioskCustomLauncherEnabled bool `json:"kioskCustomLauncherEnabled,omitempty"`
 
 	// LocationMode: The degree of location detection enabled. The user may
@@ -2817,7 +2828,9 @@ type Policy struct {
 
 	// StatusBarDisabled: Whether the status bar is disabled. This disables
 	// notifications, quick settings, and other screen overlays that allow
-	// escape from full-screen mode.
+	// escape from full-screen mode. DEPRECATED. To disable the status bar
+	// on a kiosk device, use InstallType KIOSK or
+	// kioskCustomLauncherEnabled.
 	StatusBarDisabled bool `json:"statusBarDisabled,omitempty"`
 
 	// StatusReportingSettings: Status reporting settings
@@ -2944,6 +2957,47 @@ func (s *PolicyEnforcementRule) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// PostureDetail: Detail that provides further information if the device
+// is not in the most secure state.
+type PostureDetail struct {
+	// Advice: Corresponding pieces of advice to mitigate the security risk.
+	Advice []*UserFacingMessage `json:"advice,omitempty"`
+
+	// SecurityRisk: The risk that makes the device not in the most secure
+	// state.
+	//
+	// Possible values:
+	//   "SECURITY_RISK_UNSPECIFIED" - Unspecified. Cannot determine the
+	// risk detail.
+	//   "UNKNOWN_OS" - SafetyNet detects that the device uses an unknown OS
+	// (basicIntegrity check passes while ctsProfileMatch fails).
+	//   "COMPROMISED_OS" - SafetyNet detects that the device uses a
+	// compromised OS (basicIntegrity check fails).
+	SecurityRisk string `json:"securityRisk,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Advice") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Advice") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *PostureDetail) MarshalJSON() ([]byte, error) {
+	type NoMethod PostureDetail
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // PowerManagementEvent: A power management event.
 type PowerManagementEvent struct {
 	// BatteryLevel: For BATTERY_LEVEL_COLLECTED events, the battery level
@@ -3040,6 +3094,52 @@ type ProxyInfo struct {
 
 func (s *ProxyInfo) MarshalJSON() ([]byte, error) {
 	type NoMethod ProxyInfo
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// SecurityPosture: . Device's security posture value that reflects how
+// secure the device is.
+type SecurityPosture struct {
+	// DevicePosture: Device's security posture value.
+	//
+	// Possible values:
+	//   "POSTURE_UNSPECIFIED" - Unspecified. It is unable to determine the
+	// correct device posture because of insufficient data (for example, in
+	// the case of SafetyNet outage, there is no SafetyNet result). There is
+	// no posture detail for this posture value.
+	//   "SECURE" - The device is in the most secure state (both SafetyNet's
+	// ctsProfileMatch check and basicIntegrity check pass).
+	//   "AT_RISK" - The device is at risk (both SafetyNet's ctsProfileMatch
+	// check and basicIntegrity check pass).
+	//   "POTENTIALLY_COMPROMISED" - The device is potentially compromised
+	// (either SafetyNet's ctsProfileMatch check or basicIntegrity check
+	// fails).
+	DevicePosture string `json:"devicePosture,omitempty"`
+
+	// PostureDetails: Details that provide further information if the
+	// device is not in the most secure state.
+	PostureDetails []*PostureDetail `json:"postureDetails,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "DevicePosture") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "DevicePosture") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *SecurityPosture) MarshalJSON() ([]byte, error) {
+	type NoMethod SecurityPosture
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -3302,6 +3402,10 @@ type StatusReportingSettings struct {
 
 	// SoftwareInfoEnabled: Whether software info reporting is enabled.
 	SoftwareInfoEnabled bool `json:"softwareInfoEnabled,omitempty"`
+
+	// SystemPropertiesEnabled: Whether system properties reporting is
+	// enabled.
+	SystemPropertiesEnabled bool `json:"systemPropertiesEnabled,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g.
 	// "ApplicationReportingSettings") to unconditionally include in API
@@ -3742,6 +3846,7 @@ func (c *EnterprisesCreateCall) Header() http.Header {
 
 func (c *EnterprisesCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3893,6 +3998,7 @@ func (c *EnterprisesGetCall) Header() http.Header {
 
 func (c *EnterprisesGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4035,6 +4141,7 @@ func (c *EnterprisesPatchCall) Header() http.Header {
 
 func (c *EnterprisesPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4198,6 +4305,7 @@ func (c *EnterprisesApplicationsGetCall) Header() http.Header {
 
 func (c *EnterprisesApplicationsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4347,6 +4455,7 @@ func (c *EnterprisesDevicesDeleteCall) Header() http.Header {
 
 func (c *EnterprisesDevicesDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4498,6 +4607,7 @@ func (c *EnterprisesDevicesGetCall) Header() http.Header {
 
 func (c *EnterprisesDevicesGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4634,6 +4744,7 @@ func (c *EnterprisesDevicesIssueCommandCall) Header() http.Header {
 
 func (c *EnterprisesDevicesIssueCommandCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4796,6 +4907,7 @@ func (c *EnterprisesDevicesListCall) Header() http.Header {
 
 func (c *EnterprisesDevicesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4970,6 +5082,7 @@ func (c *EnterprisesDevicesPatchCall) Header() http.Header {
 
 func (c *EnterprisesDevicesPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5122,6 +5235,7 @@ func (c *EnterprisesDevicesOperationsCancelCall) Header() http.Header {
 
 func (c *EnterprisesDevicesOperationsCancelCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5254,6 +5368,7 @@ func (c *EnterprisesDevicesOperationsDeleteCall) Header() http.Header {
 
 func (c *EnterprisesDevicesOperationsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5396,6 +5511,7 @@ func (c *EnterprisesDevicesOperationsGetCall) Header() http.Header {
 
 func (c *EnterprisesDevicesOperationsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5569,6 +5685,7 @@ func (c *EnterprisesDevicesOperationsListCall) Header() http.Header {
 
 func (c *EnterprisesDevicesOperationsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5740,6 +5857,7 @@ func (c *EnterprisesEnrollmentTokensCreateCall) Header() http.Header {
 
 func (c *EnterprisesEnrollmentTokensCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5878,6 +5996,7 @@ func (c *EnterprisesEnrollmentTokensDeleteCall) Header() http.Header {
 
 func (c *EnterprisesEnrollmentTokensDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6008,6 +6127,7 @@ func (c *EnterprisesPoliciesDeleteCall) Header() http.Header {
 
 func (c *EnterprisesPoliciesDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6148,6 +6268,7 @@ func (c *EnterprisesPoliciesGetCall) Header() http.Header {
 
 func (c *EnterprisesPoliciesGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6305,6 +6426,7 @@ func (c *EnterprisesPoliciesListCall) Header() http.Header {
 
 func (c *EnterprisesPoliciesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6479,6 +6601,7 @@ func (c *EnterprisesPoliciesPatchCall) Header() http.Header {
 
 func (c *EnterprisesPoliciesPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6624,6 +6747,7 @@ func (c *EnterprisesWebAppsCreateCall) Header() http.Header {
 
 func (c *EnterprisesWebAppsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6761,6 +6885,7 @@ func (c *EnterprisesWebAppsDeleteCall) Header() http.Header {
 
 func (c *EnterprisesWebAppsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6901,6 +7026,7 @@ func (c *EnterprisesWebAppsGetCall) Header() http.Header {
 
 func (c *EnterprisesWebAppsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7058,6 +7184,7 @@ func (c *EnterprisesWebAppsListCall) Header() http.Header {
 
 func (c *EnterprisesWebAppsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7232,6 +7359,7 @@ func (c *EnterprisesWebAppsPatchCall) Header() http.Header {
 
 func (c *EnterprisesWebAppsPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7378,6 +7506,7 @@ func (c *EnterprisesWebTokensCreateCall) Header() http.Header {
 
 func (c *EnterprisesWebTokensCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7532,6 +7661,7 @@ func (c *SignupUrlsCreateCall) Header() http.Header {
 
 func (c *SignupUrlsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

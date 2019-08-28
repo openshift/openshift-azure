@@ -152,7 +152,7 @@
       }
     }
   },
-  "revision": "20181017",
+  "revision": "20190814",
   "rootUrl": "https://adexperiencereport.googleapis.com/",
   "schemas": {
     "PlatformSummary": {
@@ -170,7 +170,7 @@
           "enumDescriptions": [
             "Not reviewed.",
             "Passing.",
-            "Warning.",
+            "Warning. No longer a possible status.",
             "Failing."
           ],
           "type": "string"
@@ -204,7 +204,7 @@
           "type": "string"
         },
         "region": {
-          "description": "The assigned regions for the site and platform.",
+          "description": "The assigned regions for the site and platform.\nNo longer populated, because there is no longer any semantic difference\nbetween sites in different regions.",
           "enumDescriptions": [
             "Ad standard not yet defined for your region.",
             "Region A.",

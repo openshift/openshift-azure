@@ -174,7 +174,10 @@ type UserActivityService struct {
 // hits.
 // These hits will be merged into one ECOMMERCE Activity.
 type Activity struct {
-	// ActivityTime: Timestamp of the activity.
+	// ActivityTime: Timestamp of the activity. If activities for a visit
+	// cross midnight and
+	// occur in two separate dates, then two sessions (one per date)
+	// share the session identifier.
 	ActivityTime string `json:"activityTime,omitempty"`
 
 	// ActivityType: Type of this activity.
@@ -3004,6 +3007,7 @@ func (c *ReportsBatchGetCall) Header() http.Header {
 
 func (c *ReportsBatchGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3129,6 +3133,7 @@ func (c *UserActivitySearchCall) Header() http.Header {
 
 func (c *UserActivitySearchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

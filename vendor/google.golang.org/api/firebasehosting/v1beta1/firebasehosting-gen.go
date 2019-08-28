@@ -565,14 +565,20 @@ type Empty struct {
 // custom headers to
 // add to a response should the request URL path match the pattern.
 type Header struct {
-	// Glob: Required. The user-supplied
-	// [glob pattern](/docs/hosting/full-config#glob_pattern_matching) to
+	// Glob: The user-supplied
+	// [glob
+	// pattern](/docs/hosting/full-config#glob_pattern_matching) to
 	// match
 	// against the request URL path.
 	Glob string `json:"glob,omitempty"`
 
 	// Headers: Required. The additional headers to add to the response.
 	Headers map[string]string `json:"headers,omitempty"`
+
+	// Regex: The user-supplied RE2 regular expression to match against the
+	// request
+	// URL path.
+	Regex string `json:"regex,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Glob") to
 	// unconditionally include in API requests. By default, fields with
@@ -789,8 +795,9 @@ func (s *PopulateVersionFilesResponse) MarshalJSON() ([]byte, error) {
 // matching
 // request URL path.
 type Redirect struct {
-	// Glob: Required. The user-supplied
-	// [glob pattern](/docs/hosting/full-config#glob_pattern_matching) to
+	// Glob: The user-supplied
+	// [glob
+	// pattern](/docs/hosting/full-config#glob_pattern_matching) to
 	// match
 	// against the request URL path.
 	Glob string `json:"glob,omitempty"`
@@ -807,6 +814,11 @@ type Redirect struct {
 	// <br>"statusCode": 301,
 	// <br>"location": "https://example.com/foo/:capture"</code>
 	Location string `json:"location,omitempty"`
+
+	// Regex: The user-supplied RE2 regular expression to match against the
+	// request
+	// URL path.
+	Regex string `json:"regex,omitempty"`
 
 	// StatusCode: Required. The status HTTP code to return in the response.
 	// It must be a
@@ -881,7 +893,7 @@ type Release struct {
 	// as if the site never existed.
 	Type string `json:"type,omitempty"`
 
-	// Version: Output only.  The configuration and content that was
+	// Version: Output only. The configuration and content that was
 	// released.
 	Version *Version `json:"version,omitempty"`
 
@@ -929,14 +941,20 @@ type Rewrite struct {
 	// name exactly.
 	Function string `json:"function,omitempty"`
 
-	// Glob: Required. The user-supplied
-	// [glob pattern](/docs/hosting/full-config#glob_pattern_matching) to
+	// Glob: The user-supplied
+	// [glob
+	// pattern](/docs/hosting/full-config#glob_pattern_matching) to
 	// match
 	// against the request URL path.
 	Glob string `json:"glob,omitempty"`
 
 	// Path: The URL path to rewrite the request to.
 	Path string `json:"path,omitempty"`
+
+	// Regex: The user-supplied RE2 regular expression to match against the
+	// request
+	// URL path.
+	Regex string `json:"regex,omitempty"`
 
 	// Run: The request will be forwarded to Cloud Run.
 	Run *CloudRunRewrite `json:"run,omitempty"`
@@ -1304,6 +1322,7 @@ func (c *SitesGetConfigCall) Header() http.Header {
 
 func (c *SitesGetConfigCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1454,6 +1473,7 @@ func (c *SitesUpdateConfigCall) Header() http.Header {
 
 func (c *SitesUpdateConfigCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1600,6 +1620,7 @@ func (c *SitesDomainsCreateCall) Header() http.Header {
 
 func (c *SitesDomainsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1738,6 +1759,7 @@ func (c *SitesDomainsDeleteCall) Header() http.Header {
 
 func (c *SitesDomainsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1879,6 +1901,7 @@ func (c *SitesDomainsGetCall) Header() http.Header {
 
 func (c *SitesDomainsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2039,6 +2062,7 @@ func (c *SitesDomainsListCall) Header() http.Header {
 
 func (c *SitesDomainsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2210,6 +2234,7 @@ func (c *SitesDomainsUpdateCall) Header() http.Header {
 
 func (c *SitesDomainsUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2369,6 +2394,7 @@ func (c *SitesReleasesCreateCall) Header() http.Header {
 
 func (c *SitesReleasesCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2538,6 +2564,7 @@ func (c *SitesReleasesListCall) Header() http.Header {
 
 func (c *SitesReleasesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2723,6 +2750,7 @@ func (c *SitesVersionsCreateCall) Header() http.Header {
 
 func (c *SitesVersionsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2872,6 +2900,7 @@ func (c *SitesVersionsDeleteCall) Header() http.Header {
 
 func (c *SitesVersionsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3026,6 +3055,7 @@ func (c *SitesVersionsPatchCall) Header() http.Header {
 
 func (c *SitesVersionsPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3172,6 +3202,7 @@ func (c *SitesVersionsPopulateFilesCall) Header() http.Header {
 
 func (c *SitesVersionsPopulateFilesCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3351,6 +3382,7 @@ func (c *SitesVersionsFilesListCall) Header() http.Header {
 
 func (c *SitesVersionsFilesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

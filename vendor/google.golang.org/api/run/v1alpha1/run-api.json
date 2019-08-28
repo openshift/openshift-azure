@@ -1858,7 +1858,7 @@
                   ],
                   "parameters": {
                     "options.requestedPolicyVersion": {
-                      "description": "Optional. The policy format version to be returned.\nAcceptable values are 0 and 1.\nIf the value is 0, or the field is omitted, policy format version 1 will be\nreturned.",
+                      "description": "Optional. The policy format version to be returned.\nAcceptable values are 0, 1, and 3.\nIf the value is 0, or the field is omitted, policy format version 1 will be\nreturned.",
                       "format": "int32",
                       "location": "query",
                       "type": "integer"
@@ -2217,7 +2217,7 @@
       }
     }
   },
-  "revision": "20190703",
+  "revision": "20190816",
   "rootUrl": "https://run.googleapis.com/",
   "schemas": {
     "Addressable": {
@@ -2235,7 +2235,7 @@
       "type": "object"
     },
     "AuditConfig": {
-      "description": "Specifies the audit configuration for a service.\nThe configuration determines which permission types are logged, and what\nidentities, if any, are exempted from logging.\nAn AuditConfig must have one or more AuditLogConfigs.\n\nIf there are AuditConfigs for both `allServices` and a specific service,\nthe union of the two AuditConfigs is used for that service: the log_types\nspecified in each AuditConfig are enabled, and the exempted_members in each\nAuditLogConfig are exempted.\n\nExample Policy with multiple AuditConfigs:\n\n    {\n      \"audit_configs\": [\n        {\n          \"service\": \"allServices\"\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n              \"exempted_members\": [\n                \"user:foo@gmail.com\"\n              ]\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n            },\n            {\n              \"log_type\": \"ADMIN_READ\",\n            }\n          ]\n        },\n        {\n          \"service\": \"fooservice.googleapis.com\"\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n              \"exempted_members\": [\n                \"user:bar@gmail.com\"\n              ]\n            }\n          ]\n        }\n      ]\n    }\n\nFor fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ\nlogging. It also exempts foo@gmail.com from DATA_READ logging, and\nbar@gmail.com from DATA_WRITE logging.",
+      "description": "Specifies the audit configuration for a service.\nThe configuration determines which permission types are logged, and what\nidentities, if any, are exempted from logging.\nAn AuditConfig must have one or more AuditLogConfigs.\n\nIf there are AuditConfigs for both `allServices` and a specific service,\nthe union of the two AuditConfigs is used for that service: the log_types\nspecified in each AuditConfig are enabled, and the exempted_members in each\nAuditLogConfig are exempted.\n\nExample Policy with multiple AuditConfigs:\n\n    {\n      \"audit_configs\": [\n        {\n          \"service\": \"allServices\"\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n              \"exempted_members\": [\n                \"user:jose@example.com\"\n              ]\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n            },\n            {\n              \"log_type\": \"ADMIN_READ\",\n            }\n          ]\n        },\n        {\n          \"service\": \"sampleservice.googleapis.com\"\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n              \"exempted_members\": [\n                \"user:aliya@example.com\"\n              ]\n            }\n          ]\n        }\n      ]\n    }\n\nFor sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ\nlogging. It also exempts jose@example.com from DATA_READ logging, and\naliya@example.com from DATA_WRITE logging.",
       "id": "AuditConfig",
       "properties": {
         "auditLogConfigs": {
@@ -2253,7 +2253,7 @@
       "type": "object"
     },
     "AuditLogConfig": {
-      "description": "Provides the configuration for logging a type of permissions.\nExample:\n\n    {\n      \"audit_log_configs\": [\n        {\n          \"log_type\": \"DATA_READ\",\n          \"exempted_members\": [\n            \"user:foo@gmail.com\"\n          ]\n        },\n        {\n          \"log_type\": \"DATA_WRITE\",\n        }\n      ]\n    }\n\nThis enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting\nfoo@gmail.com from DATA_READ logging.",
+      "description": "Provides the configuration for logging a type of permissions.\nExample:\n\n    {\n      \"audit_log_configs\": [\n        {\n          \"log_type\": \"DATA_READ\",\n          \"exempted_members\": [\n            \"user:jose@example.com\"\n          ]\n        },\n        {\n          \"log_type\": \"DATA_WRITE\",\n        }\n      ]\n    }\n\nThis enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting\njose@example.com from DATA_READ logging.",
       "id": "AuditLogConfig",
       "properties": {
         "exemptedMembers": {
@@ -2262,10 +2262,6 @@
             "type": "string"
           },
           "type": "array"
-        },
-        "ignoreChildExemptions": {
-          "description": "Specifies whether principals can be exempted for the same LogType in\nlower-level resource policies. If true, any lower-level exemptions will\nbe ignored.",
-          "type": "boolean"
         },
         "logType": {
           "description": "The log type that this config enables.",
@@ -2310,7 +2306,7 @@
           "description": "The condition that is associated with this binding.\nNOTE: An unsatisfied condition will not allow user access via current\nbinding. Different bindings, including their conditions, are examined\nindependently."
         },
         "members": {
-          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@gmail.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
+          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@example.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
           "items": {
             "type": "string"
           },
@@ -2354,6 +2350,25 @@
         },
         "optional": {
           "description": "Specify whether the ConfigMap must be defined\n+optional",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "ConfigMapKeySelector": {
+      "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nSelects a key from a ConfigMap.",
+      "id": "ConfigMapKeySelector",
+      "properties": {
+        "key": {
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nThe key to select.",
+          "type": "string"
+        },
+        "localObjectReference": {
+          "$ref": "LocalObjectReference",
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nThe ConfigMap to select from."
+        },
+        "optional": {
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nSpecify whether the ConfigMap or its key must be defined\n+optional",
           "type": "boolean"
         }
       },
@@ -2787,6 +2802,25 @@
         "value": {
           "description": "Variable references $(VAR_NAME) are expanded\nusing the previous defined environment variables in the container and\nany route environment variables. If a variable cannot be resolved,\nthe reference in the input string will be unchanged. The $(VAR_NAME)\nsyntax can be escaped with a double $$, ie: $$(VAR_NAME). Escaped\nreferences will never be expanded, regardless of whether the variable\nexists or not.\nDefaults to \"\".\n+optional",
           "type": "string"
+        },
+        "valueFrom": {
+          "$ref": "EnvVarSource",
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nSource for the environment variable's value. Cannot be used if value is not\nempty. +optional"
+        }
+      },
+      "type": "object"
+    },
+    "EnvVarSource": {
+      "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nEnvVarSource represents a source for the value of an EnvVar.",
+      "id": "EnvVarSource",
+      "properties": {
+        "configMapKeyRef": {
+          "$ref": "ConfigMapKeySelector",
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nSelects a key of a ConfigMap.\n+optional"
+        },
+        "secretKeyRef": {
+          "$ref": "SecretKeySelector",
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nSelects a key of a secret in the pod's namespace\n+optional"
         }
       },
       "type": "object"
@@ -2813,6 +2847,41 @@
       },
       "type": "object"
     },
+    "EventTypeImporter": {
+      "id": "EventTypeImporter",
+      "properties": {
+        "apiVersion": {
+          "description": "The API version of the importer CRD.",
+          "type": "string"
+        },
+        "kind": {
+          "description": "The kind of the importer CRD.",
+          "type": "string"
+        },
+        "parameters": {
+          "description": "Parameters required to create an importer for the EventType.",
+          "items": {
+            "$ref": "EventTypeParameter"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "EventTypeParameter": {
+      "id": "EventTypeParameter",
+      "properties": {
+        "description": {
+          "description": "Description of the parameter. E.g. \"Google Cloud Project Id.\"",
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the parameter. E.g. googleCloudProject.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "EventTypeSpec": {
       "id": "EventTypeSpec",
       "properties": {
@@ -2823,6 +2892,10 @@
         "description": {
           "description": "Description is a string describing what the EventType is about.\n+optional",
           "type": "string"
+        },
+        "importer": {
+          "$ref": "EventTypeImporter",
+          "description": "The importer that provides this EventType to the eventing mesh."
         },
         "schema": {
           "description": "Schema is a URI with the EventType schema. It may be a JSON schema, a\nprotobuf schema, etc.\n+optional",
@@ -2868,6 +2941,33 @@
         },
         "title": {
           "description": "An optional title for the expression, i.e. a short string describing\nits purpose. This can be used e.g. in UIs which allow to enter the\nexpression.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleRpcStatus": {
+      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https://cloud.google.com/apis/design/errors).",
+      "id": "GoogleRpcStatus",
+      "properties": {
+        "code": {
+          "description": "The status code, which should be an enum value of google.rpc.Code.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "details": {
+          "description": "A list of messages that carry the error details.  There is a common set of\nmessage types for APIs to use.",
+          "items": {
+            "additionalProperties": {
+              "description": "Properties of the object. Contains field @type with type URL.",
+              "type": "any"
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "message": {
+          "description": "A developer-facing error message, which should be in English. Any\nuser-facing error message should be localized and sent in the\ngoogle.rpc.Status.details field, or localized by the client.",
           "type": "string"
         }
       },
@@ -3059,6 +3159,13 @@
           "$ref": "ListMeta",
           "description": "Metadata associated with this Configuration list."
         },
+        "regionDetails": {
+          "additionalProperties": {
+            "$ref": "RegionDetails"
+          },
+          "description": "Details for the regions used during a global call including any failures.\nThis is not populated when targeting a specific region.",
+          "type": "object"
+        },
         "unreachable": {
           "description": "Locations that could not be reached.",
           "items": {
@@ -3091,6 +3198,13 @@
         "metadata": {
           "$ref": "ListMeta",
           "description": "Metadata associated with this DomainMapping list."
+        },
+        "regionDetails": {
+          "additionalProperties": {
+            "$ref": "RegionDetails"
+          },
+          "description": "Details for the regions used during a global call including any failures.\nThis is not populated when targeting a specific region.",
+          "type": "object"
         }
       },
       "type": "object"
@@ -3117,6 +3231,13 @@
         "metadata": {
           "$ref": "ListMeta",
           "description": "Metadata associated with this EventType list."
+        },
+        "regionDetails": {
+          "additionalProperties": {
+            "$ref": "RegionDetails"
+          },
+          "description": "Details for the regions used during a global call including any failures.\nThis is not populated when targeting a specific region.",
+          "type": "object"
         },
         "unreachable": {
           "description": "Locations that could not be reached.",
@@ -3188,6 +3309,13 @@
           "$ref": "ListMeta",
           "description": "Metadata associated with this revision list."
         },
+        "regionDetails": {
+          "additionalProperties": {
+            "$ref": "RegionDetails"
+          },
+          "description": "Details for the regions used during a global call including any failures.\nThis is not populated when targeting a specific region.",
+          "type": "object"
+        },
         "unreachable": {
           "description": "Locations that could not be reached.",
           "items": {
@@ -3220,6 +3348,13 @@
         "metadata": {
           "$ref": "ListMeta",
           "description": "Metadata associated with this Route list."
+        },
+        "regionDetails": {
+          "additionalProperties": {
+            "$ref": "RegionDetails"
+          },
+          "description": "Details for the regions used during a global call including any failures.\nThis is not populated when targeting a specific region.",
+          "type": "object"
         },
         "unreachable": {
           "description": "Locations that could not be reached.",
@@ -3254,6 +3389,13 @@
           "$ref": "ListMeta",
           "description": "Metadata associated with this Service list."
         },
+        "regionDetails": {
+          "additionalProperties": {
+            "$ref": "RegionDetails"
+          },
+          "description": "Details for the regions used during a global call including any failures.\nThis is not populated when targeting a specific region.",
+          "type": "object"
+        },
         "unreachable": {
           "description": "Locations that could not be reached.",
           "items": {
@@ -3286,6 +3428,13 @@
         "metadata": {
           "$ref": "ListMeta",
           "description": "Metadata associated with this Trigger list."
+        },
+        "regionDetails": {
+          "additionalProperties": {
+            "$ref": "RegionDetails"
+          },
+          "description": "Details for the regions used during a global call including any failures.\nThis is not populated when targeting a specific region.",
+          "type": "object"
         },
         "unreachable": {
           "description": "Locations that could not be reached.",
@@ -3514,7 +3663,7 @@
           "type": "array"
         },
         "etag": {
-          "description": "`etag` is used for optimistic concurrency control as a way to help\nprevent simultaneous updates of a policy from overwriting each other.\nIt is strongly suggested that systems make use of the `etag` in the\nread-modify-write cycle to perform policy updates in order to avoid race\nconditions: An `etag` is returned in the response to `getIamPolicy`, and\nsystems are expected to put that etag in the request to `setIamPolicy` to\nensure that their change will be applied to the same version of the policy.\n\nIf no `etag` is provided in the call to `setIamPolicy`, then the existing\npolicy is overwritten blindly.",
+          "description": "`etag` is used for optimistic concurrency control as a way to help\nprevent simultaneous updates of a policy from overwriting each other.\nIt is strongly suggested that systems make use of the `etag` in the\nread-modify-write cycle to perform policy updates in order to avoid race\nconditions: An `etag` is returned in the response to `getIamPolicy`, and\nsystems are expected to put that etag in the request to `setIamPolicy` to\nensure that their change will be applied to the same version of the policy.\n\nIf no `etag` is provided in the call to `setIamPolicy`, then the existing\npolicy is overwritten.",
           "format": "byte",
           "type": "string"
         },
@@ -3569,6 +3718,17 @@
         "string": {
           "description": "Stringified version of the quantity, e.g., \"800 MiB\".",
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "RegionDetails": {
+      "description": "Information for a regional call used for a global API.",
+      "id": "RegionDetails",
+      "properties": {
+        "error": {
+          "$ref": "GoogleRpcStatus",
+          "description": "The status indicating why the regional call failed"
         }
       },
       "type": "object"
@@ -3960,6 +4120,25 @@
         },
         "optional": {
           "description": "Specify whether the Secret must be defined\n+optional",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "SecretKeySelector": {
+      "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nSecretKeySelector selects a key of a Secret.",
+      "id": "SecretKeySelector",
+      "properties": {
+        "key": {
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nThe key of the secret to select from.  Must be a valid secret key.",
+          "type": "string"
+        },
+        "localObjectReference": {
+          "$ref": "LocalObjectReference",
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nThe name of the secret in the pod's namespace to select from."
+        },
+        "optional": {
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nSpecify whether the Secret or its key must be defined\n+optional",
           "type": "boolean"
         }
       },
@@ -4421,6 +4600,23 @@
       },
       "type": "object"
     },
+    "TriggerImporterSpec": {
+      "id": "TriggerImporterSpec",
+      "properties": {
+        "arguments": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arguments to use for the importer. These must match the parameters in the\nEventType's importer.",
+          "type": "object"
+        },
+        "eventTypeName": {
+          "description": "Name of the EventType that this importer provides.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "TriggerSpec": {
       "description": "The desired state of the Trigger.",
       "id": "TriggerSpec",
@@ -4431,7 +4627,14 @@
         },
         "filter": {
           "$ref": "TriggerFilter",
-          "description": "Filter is the filter to apply against all events from the Broker. Only\nevents that pass this filter will be sent to the Subscriber. If not\nspecified, will default to allowing all events.\n\nThis must be specified in Cloud Run."
+          "description": "Filter is the filter to apply against all events from the Broker. Only\nevents that pass this filter will be sent to the Subscriber."
+        },
+        "importers": {
+          "description": "Specification of the importers that will provide events to the trigger.\nNote, for Cloud Run, the importers will only be used if a filter is not\nspecified.",
+          "items": {
+            "$ref": "TriggerImporterSpec"
+          },
+          "type": "array"
         },
         "subscriber": {
           "$ref": "SubscriberSpec",

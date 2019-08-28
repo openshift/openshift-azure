@@ -88,7 +88,12 @@ func NewAvailableConditionController(
 		endpointsLister:  endpointsInformer.Lister(),
 		endpointsSynced:  endpointsInformer.Informer().HasSynced,
 		serviceResolver:  serviceResolver,
-		queue:            workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "AvailableConditionController"),
+		queue: workqueue.NewNamedRateLimitingQueue(
+			// We want a fairly tight requeue time.  The controller listens to the API, but because it relies on the routability of the
+			// service network, it is possible for an external, non-watchable factor to affect availability.  This keeps
+			// the maximum disruption time to a minimum, but it does prevent hot loops.
+			workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 30*time.Second),
+			"AvailableConditionController"),
 	}
 
 	// construct an http client that will ignore TLS verification (if someone owns the network and messes with your status
@@ -101,7 +106,7 @@ func NewAvailableConditionController(
 		Timeout: 5 * time.Second,
 	}
 	if proxyTransport != nil {
-		discoveryClient.Transport = proxyTransport
+		//discoveryClient.Transport = proxyTransport
 	}
 	c.discoveryClient = discoveryClient
 
@@ -176,6 +181,22 @@ func (c *AvailableConditionController) sync(key string) error {
 	}
 
 	if service.Spec.Type == v1.ServiceTypeClusterIP {
+		// if we have a cluster IP service, it must be listening on 443 and we can check that
+		foundPort := false
+		for _, port := range service.Spec.Ports {
+			if port.Port == 443 {
+				foundPort = true
+			}
+		}
+		if !foundPort {
+			availableCondition.Status = apiregistration.ConditionFalse
+			availableCondition.Reason = "ServicePortError"
+			availableCondition.Message = fmt.Sprintf("service/%s in %q is not listening on port 443", apiService.Spec.Service.Name, apiService.Spec.Service.Namespace)
+			apiregistration.SetAPIServiceCondition(apiService, availableCondition)
+			_, err := c.apiServiceClient.APIServices().UpdateStatus(apiService)
+			return err
+		}
+
 		endpoints, err := c.endpointsLister.Endpoints(apiService.Spec.Service.Namespace).Get(apiService.Spec.Service.Name)
 		if apierrors.IsNotFound(err) {
 			availableCondition.Status = apiregistration.ConditionFalse

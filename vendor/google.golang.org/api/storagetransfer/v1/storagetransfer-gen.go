@@ -517,8 +517,8 @@ type ErrorSummary struct {
 
 	// ErrorLogEntries: Error samples.
 	//
-	// No more than 100 error log entries may be recorded for a given
-	// error code for a single task.
+	// At most 5 error log entries will be recorded for a given
+	// error code for a single transfer operation.
 	ErrorLogEntries []*ErrorLogEntry `json:"errorLogEntries,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "ErrorCode") to
@@ -544,14 +544,14 @@ func (s *ErrorSummary) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
-// GcsData: In a GcsData resource, an object's name is the Google Cloud
-// Storage object's
+// GcsData: In a GcsData resource, an object's name is the Cloud Storage
+// object's
 // name and its `lastModificationTime` refers to the object's updated
 // time,
 // which changes when the content or the metadata of the object is
 // updated.
 type GcsData struct {
-	// BucketName: Required. Google Cloud Storage bucket name (see
+	// BucketName: Required. Cloud Storage bucket name (see
 	// [Bucket
 	// Name
 	// Requirements](https://cloud.google.com/storage/docs/naming#requir
@@ -659,7 +659,7 @@ func (s *GoogleServiceAccount) MarshalJSON() ([]byte, error) {
 //
 // * Ensure that each URL you specify is publicly accessible.
 // For
-// example, in Google Cloud Storage you can
+// example, in Cloud Storage you can
 // [share an object
 // publicly]
 // (https://cloud.google.com/storage/docs/cloud-console#_sharin
@@ -780,7 +780,7 @@ func (s *ListTransferJobsResponse) MarshalJSON() ([]byte, error) {
 
 // ObjectConditions: Conditions that determine which objects will be
 // transferred. Applies only
-// to S3 and GCS objects.
+// to S3 and Cloud Storage objects.
 type ObjectConditions struct {
 	// ExcludePrefixes: `excludePrefixes` must follow the requirements
 	// described for
@@ -855,7 +855,9 @@ type ObjectConditions struct {
 	// the
 	// object's content or metadata - specifically, this would be the
 	// `updated`
-	// property of GCS objects and the `LastModified` field of S3 objects.
+	// property of Cloud Storage objects and the `LastModified` field of
+	// S3
+	// objects.
 	MaxTimeElapsedSinceLastModification string `json:"maxTimeElapsedSinceLastModification,omitempty"`
 
 	// MinTimeElapsedSinceLastModification: If specified, only objects with
@@ -872,7 +874,9 @@ type ObjectConditions struct {
 	// the
 	// object's content or metadata - specifically, this would be the
 	// `updated`
-	// property of GCS objects and the `LastModified` field of S3 objects.
+	// property of Cloud Storage objects and the `LastModified` field of
+	// S3
+	// objects.
 	MinTimeElapsedSinceLastModification string `json:"minTimeElapsedSinceLastModification,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "ExcludePrefixes") to
@@ -1433,10 +1437,10 @@ type TransferSpec struct {
 	// AwsS3DataSource: An AWS S3 data source.
 	AwsS3DataSource *AwsS3Data `json:"awsS3DataSource,omitempty"`
 
-	// GcsDataSink: A Google Cloud Storage data sink.
+	// GcsDataSink: A Cloud Storage data sink.
 	GcsDataSink *GcsData `json:"gcsDataSink,omitempty"`
 
-	// GcsDataSource: A Google Cloud Storage data source.
+	// GcsDataSource: A Cloud Storage data source.
 	GcsDataSource *GcsData `json:"gcsDataSource,omitempty"`
 
 	// HttpDataSource: An HTTP URL data source.
@@ -1599,6 +1603,7 @@ func (c *GoogleServiceAccountsGetCall) Header() http.Header {
 
 func (c *GoogleServiceAccountsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1730,6 +1735,7 @@ func (c *TransferJobsCreateCall) Header() http.Header {
 
 func (c *TransferJobsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1873,6 +1879,7 @@ func (c *TransferJobsGetCall) Header() http.Header {
 
 func (c *TransferJobsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2052,6 +2059,7 @@ func (c *TransferJobsListCall) Header() http.Header {
 
 func (c *TransferJobsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2215,6 +2223,7 @@ func (c *TransferJobsPatchCall) Header() http.Header {
 
 func (c *TransferJobsPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2354,6 +2363,7 @@ func (c *TransferOperationsCancelCall) Header() http.Header {
 
 func (c *TransferOperationsCancelCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2484,6 +2494,7 @@ func (c *TransferOperationsDeleteCall) Header() http.Header {
 
 func (c *TransferOperationsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2628,6 +2639,7 @@ func (c *TransferOperationsGetCall) Header() http.Header {
 
 func (c *TransferOperationsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2818,6 +2830,7 @@ func (c *TransferOperationsListCall) Header() http.Header {
 
 func (c *TransferOperationsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2989,6 +3002,7 @@ func (c *TransferOperationsPauseCall) Header() http.Header {
 
 func (c *TransferOperationsPauseCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3128,6 +3142,7 @@ func (c *TransferOperationsResumeCall) Header() http.Header {
 
 func (c *TransferOperationsResumeCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190802")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
