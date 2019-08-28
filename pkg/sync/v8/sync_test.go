@@ -75,6 +75,7 @@ func TestReadDB(t *testing.T) {
 	var cs api.OpenShiftManagedCluster
 	populate.Walk(&cs, prepare)
 	cs.Config.ImageVersion = "311.123.456"
+	cs.Config.Images.Console = "foo:v3.11.22"
 	cs.Config.Images.PrometheusOperator = ":"
 	cs.Config.Images.PrometheusConfigReloader = ":"
 	cs.Config.Images.ConfigReloader = ":"

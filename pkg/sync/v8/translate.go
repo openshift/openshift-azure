@@ -3,6 +3,7 @@ package sync
 import (
 	"encoding/base64"
 	"fmt"
+	"strings"
 
 	"github.com/ghodss/yaml"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -35,7 +36,7 @@ func translateAsset(o unstructured.Unstructured, cs *api.OpenShiftManagedCluster
 		var s interface{}
 		if tr.F != nil {
 			var err error
-			s, err = tr.F(cs)
+			s, err = tr.F(cs, o.Object)
 			if err != nil {
 				return unstructured.Unstructured{}, err
 			}
@@ -106,7 +107,7 @@ var translations = map[string][]struct {
 	NestedPath  jsonpath.Path
 	nestedFlags nestedFlags
 	Template    string
-	F           func(*api.OpenShiftManagedCluster) (interface{}, error)
+	F           func(*api.OpenShiftManagedCluster, interface{}) (interface{}, error)
 }{
 	// IMPORTANT: translations must NOT use the quote function (i.e., write
 	// "{{ .Config.Foo }}", NOT "{{ .Config.Foo | quote }}").  This is because
@@ -259,6 +260,19 @@ var translations = map[string][]struct {
 			Template:   "{{ .ContainerService.Properties.AzProfile.SubscriptionID }}",
 		},
 	},
+	"ConfigMap/openshift-azure-branding/branding": {
+		{
+			Path: jsonpath.MustCompile("$.data.'branding.js'"),
+			F: func(cs *api.OpenShiftManagedCluster, o interface{}) (interface{}, error) {
+				ver, err := derived.OpenShiftClientVersion(cs)
+				if err != nil {
+					return nil, err
+				}
+				bjs := jsonpath.MustCompile("$.data.'branding.js'")
+				return strings.Replace(bjs.MustGetString(o), "{VERSION}", ver, -1), nil
+			},
+		},
+	},
 	"ConfigMap/openshift-web-console/webconsole-config": {
 		{
 			Path:       jsonpath.MustCompile("$.data.'webconsole-config.yaml'"),
@@ -307,7 +321,7 @@ var translations = map[string][]struct {
 	"DaemonSet.apps/openshift-azure-logging/log-analytics-node-agent": {
 		{
 			Path: jsonpath.MustCompile("$.metadata.labels['azure.openshift.io/sync-pod-optionally-apply']"),
-			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
+			F: func(cs *api.OpenShiftManagedCluster, o interface{}) (interface{}, error) {
 				if cs.Properties.MonitorProfile.WorkspaceID != "" && cs.Properties.MonitorProfile.WorkspaceKey != "" {
 					return "true", nil
 				}
@@ -370,7 +384,7 @@ var translations = map[string][]struct {
 	"Deployment.apps/openshift-azure-logging/log-analytics-cluster-agent": {
 		{
 			Path: jsonpath.MustCompile("$.metadata.labels['azure.openshift.io/sync-pod-optionally-apply']"),
-			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
+			F: func(cs *api.OpenShiftManagedCluster, o interface{}) (interface{}, error) {
 				if cs.Properties.MonitorProfile.WorkspaceID != "" && cs.Properties.MonitorProfile.WorkspaceKey != "" {
 					return "true", nil
 				}
@@ -429,7 +443,7 @@ var translations = map[string][]struct {
 		},
 		{
 			Path: jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='statsd')].args"),
-			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
+			F: func(cs *api.OpenShiftManagedCluster, o interface{}) (interface{}, error) {
 				return derived.StatsdArgs(cs)
 			},
 		},
@@ -463,7 +477,7 @@ var translations = map[string][]struct {
 		},
 		{
 			Path: jsonpath.MustCompile("$.spec.template.spec.containers[0].args"),
-			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
+			F: func(cs *api.OpenShiftManagedCluster, o interface{}) (interface{}, error) {
 				return derived.ClusterMonitoringOperatorArgs(cs)
 			},
 		},
@@ -577,7 +591,7 @@ var translations = map[string][]struct {
 	"Secret/openshift-infra/aad-group-sync-config": {
 		{
 			Path: jsonpath.MustCompile("$.stringData.'aad-group-sync.yaml'"),
-			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
+			F: func(cs *api.OpenShiftManagedCluster, o interface{}) (interface{}, error) {
 				b, err := derived.AadGroupSyncConf(cs)
 				return string(b), err
 			},
@@ -656,7 +670,7 @@ var translations = map[string][]struct {
 	"Service/default/router": {
 		{
 			Path: jsonpath.MustCompile("$.metadata.annotations['service.beta.kubernetes.io/azure-dns-label-name']"),
-			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
+			F: func(cs *api.OpenShiftManagedCluster, o interface{}) (interface{}, error) {
 				return derived.RouterLBCNamePrefix(cs), nil
 			},
 		},
