@@ -25,6 +25,15 @@ func (derivedType) OpenShiftVersionTag(cs *api.OpenShiftManagedCluster) (string,
 	return fmt.Sprintf("v%s.%s.%s", parts[0][:1], parts[0][1:], parts[1]), nil
 }
 
+// OpenShiftClientVersion gets the version out of the following registry.access.redhat.com/openshift3/ose-console:v3.11.135
+func (derivedType) OpenShiftClientVersion(cs *api.OpenShiftManagedCluster) (string, error) {
+	verIndex := strings.LastIndex(cs.Config.Images.Console, ":v")
+	if verIndex < 2 {
+		return "", fmt.Errorf("could not get version from %s", cs.Config.Images.Console)
+	}
+	return cs.Config.Images.Console[verIndex+2:], nil
+}
+
 func (derivedType) RouterLBCNamePrefix(cs *api.OpenShiftManagedCluster) string {
 	return strings.Split(cs.Properties.RouterProfiles[0].FQDN, ".")[0]
 }
