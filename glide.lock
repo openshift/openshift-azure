@@ -248,7 +248,7 @@ imports:
   - matchers/support/goraph/util
   - types
 - name: github.com/openshift/api
-  version: 7eef55a5dc24306c455777b9897ddc3cbeaf8b59
+  version: 8741ff068a473be041d7bafb4502c12e4f10aab5
   subpackages:
   - apps/v1
   - build/v1
@@ -263,7 +263,7 @@ imports:
   - template/v1
   - user/v1
 - name: github.com/openshift/client-go
-  version: 6a9817e0a0720dd8e837d1d18cd2938342ef6e54
+  version: 431ec9a26e5021f35fa41ee9a89842db9bfdb370
   subpackages:
   - apps/clientset/versioned/scheme
   - apps/clientset/versioned/typed/apps/v1
