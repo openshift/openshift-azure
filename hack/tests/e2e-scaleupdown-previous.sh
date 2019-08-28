@@ -21,6 +21,8 @@ trap cleanup EXIT
 
 . hack/tests/ci-prepare.sh
 
+check_skip_ci
+
 T="$(mktemp -d)"
 start_monitoring $T/src/github.com/openshift/openshift-azure/_data/containerservice.yaml
 

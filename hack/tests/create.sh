@@ -10,6 +10,8 @@ cleanup() {
 
 . hack/tests/ci-prepare.sh
 
+check_skip_ci
+
 start_monitoring
 set_build_images
 

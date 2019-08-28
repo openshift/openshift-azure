@@ -62,10 +62,23 @@ delete() {
   make delete
 }
 
+check_skip_ci() {
+    if [ ${SKIP_CI:-1} -eq 0 ]; then
+      # No need to run CI
+      exit
+    fi
+}
+
 if [[ ! -e /var/run/secrets/kubernetes.io ]]; then
     reset_xtrace
     return
 fi
+
+set +e
+# check the latest commit
+go run hack/skipci/main.go
+export SKIP_CI=$?
+set -e
 
 export NO_WAIT=true
 export RESOURCEGROUP_TTL=4h
