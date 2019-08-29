@@ -10,9 +10,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/client-go/discovery"
-	"k8s.io/client-go/dynamic"
+	deprecated_dynamic "k8s.io/client-go/deprecated-dynamic"
 	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/restmapper"
 
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 )
@@ -53,13 +53,13 @@ func (cli *Client) InstantiateTemplate(srcTemplateName, dstNamespace string) err
 
 // InstantiateTemplateFromBytes instantiates an openshift template from a byte slice
 func (cli *Client) InstantiateTemplateFromBytes(yamldata []byte, dstNamespace string, parameters map[string]string) error {
-	groupresources, err := discovery.GetAPIGroupResources(cli.Discovery)
+	groupresources, err := restmapper.GetAPIGroupResources(cli.Discovery)
 	if err != nil {
 		return err
 	}
 
-	restmapper := discovery.NewRESTMapper(groupresources, meta.InterfacesForUnstructured)
-	dynamicclientpool := dynamic.NewClientPool(cli.config, restmapper, dynamic.LegacyAPIPathResolverFunc)
+	rmapper := restmapper.NewDiscoveryRESTMapper(groupresources)
+	dynamicclientpool := deprecated_dynamic.NewClientPool(cli.config, rmapper, deprecated_dynamic.LegacyAPIPathResolverFunc)
 
 	s := json.NewYAMLSerializer(json.DefaultMetaFactory, scheme.Scheme, scheme.Scheme)
 
@@ -99,7 +99,7 @@ func (cli *Client) InstantiateTemplateFromBytes(yamldata []byte, dstNamespace st
 	for _, o := range template.Objects {
 		o := o.Object.(*unstructured.Unstructured)
 		gvk := o.GroupVersionKind()
-		restmapping, err := restmapper.RESTMapping(gvk.GroupKind(), gvk.Version)
+		rmapper, err := rmapper.RESTMapping(gvk.GroupKind(), gvk.Version)
 		if err != nil {
 			return err
 		}
@@ -110,8 +110,8 @@ func (cli *Client) InstantiateTemplateFromBytes(yamldata []byte, dstNamespace st
 		}
 
 		apiresource := &metav1.APIResource{
-			Name:       restmapping.Resource,
-			Namespaced: restmapping.Scope.Name() == meta.RESTScopeNameNamespace,
+			Name:       rmapper.Resource.Resource,
+			Namespaced: rmapper.Scope.Name() == meta.RESTScopeNameNamespace,
 		}
 		if apiresource.Namespaced {
 			o.SetNamespace(dstNamespace)
