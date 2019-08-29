@@ -65,12 +65,14 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	var cs *internalapi.OpenShiftManagedCluster
 	var err error
 	if isAdmin {
+		s.log.Info("admin request")
 		cs, err = s.readAdminRequest(req.Body, oldCs)
 		if err == nil {
 			cs.Properties.ProvisioningState = internalapi.AdminUpdating
 			s.store.Put(cs)
 		}
 	} else {
+		s.log.Info("customer request")
 		cs, err = s.read20190430Request(req.Body, oldCs)
 		if err == nil {
 			cs.Properties.ProvisioningState = internalapi.Updating

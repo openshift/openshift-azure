@@ -270,6 +270,20 @@ func TestToInternal(t *testing.T) {
 			},
 		},
 		{
+			name: "networkProfile update",
+			input: &OpenShiftManagedCluster{
+				Properties: &Properties{
+					NetworkProfile: &NetworkProfile{
+						DefaultCIDR: to.StringPtr("10.0.0.0/16"),
+					},
+				},
+			},
+			base: internalManagedCluster(),
+			expectedChange: func(expectedCs *api.OpenShiftManagedCluster) {
+				expectedCs.Properties.NetworkProfile.DefaultCIDR = "10.0.0.0/16"
+			},
+		},
+		{
 			name: "loglevel update",
 			input: &OpenShiftManagedCluster{
 				Config: &Config{

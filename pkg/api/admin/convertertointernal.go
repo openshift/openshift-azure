@@ -15,6 +15,7 @@ func ToInternal(oc *OpenShiftManagedCluster, old *api.OpenShiftManagedCluster) (
 	if old != nil {
 		cs = old.DeepCopy()
 	}
+
 	if oc.ID != nil {
 		cs.ID = *oc.ID
 	}
@@ -49,6 +50,15 @@ func ToInternal(oc *OpenShiftManagedCluster, old *api.OpenShiftManagedCluster) (
 	if oc.Config != nil {
 		mergeConfig(oc, cs)
 	}
+
+	// During any admin operation we need to make sure we
+	// do API conversion from old type to new on the internal type
+	// We need to do this on the internal type to avoid repeated update
+	// on the same values while executing admin actions multiple times
+	// In example:
+	// 1. AdminPut to change managementSubnet - ok
+	// 2. AdminPut to change console image - ManagementSubnet gets defaulted back - not ok
+	setDefaults(cs)
 
 	return cs, nil
 }
@@ -103,7 +113,9 @@ func mergePropertiesAdmin(oc *OpenShiftManagedCluster, cs *api.OpenShiftManagedC
 		if oc.Properties.NetworkProfile.ManagementCIDR != nil {
 			cs.Properties.NetworkProfile.ManagementCIDR = *oc.Properties.NetworkProfile.ManagementCIDR
 		}
-		cs.Properties.NetworkProfile.PeerVnetID = oc.Properties.NetworkProfile.PeerVnetID
+		if oc.Properties.NetworkProfile.PeerVnetID != nil {
+			cs.Properties.NetworkProfile.PeerVnetID = oc.Properties.NetworkProfile.PeerVnetID
+		}
 	}
 
 	if oc.Properties.MonitorProfile != nil {
