@@ -3,11 +3,11 @@
 cleanup() {
   set +e
 
-  if [[ -e /var/run/secrets/kubernetes.io ]] && [ "${JOB_TYPE} == "periodic" ]; then
+  if [[ -e /var/run/secrets/kubernetes.io ]] && [ "${JOB_TYPE}" == "periodic" ]; then
     if [ $PHASE == "build_complete" ]; then
       ARGS="-success"
     fi
-    go run ./hack/ci-notify/main.go -job-name "${JOB_NAME} -comment "Phase: ${PHASE}" $ARGS
+    go run ./hack/ci-notify/main.go -job-name "${JOB_NAME}" -comment "Phase: ${PHASE}" $ARGS
   fi
 
   generate_artifacts
@@ -52,5 +52,5 @@ PHASE=image_tag
 TAGS=$(az image show -g "$IMAGE_RESOURCEGROUP" -n "$IMAGE_RESOURCENAME" --query tags | python -c 'import sys; import json; tags = json.load(sys.stdin); print " ".join(["%s=%s" % (k, v) for (k, v) in tags.items()])')
 az resource tag -g "$IMAGE_RESOURCEGROUP" -n $IMAGE_RESOURCENAME --resource-type Microsoft.Compute/images --tags $TAGS valid=true
 
-echo "Built image $IMAGE_RESOURCENAME"
+echo "Built image ${IMAGE_RESOURCENAME}"
 PHASE=build_complete
