@@ -25,8 +25,7 @@ import (
 )
 
 var (
-	commit = flag.String("commit", "HEAD~1..HEAD", "commit to compare against. defaults to n-1")
-	debug  = flag.Bool("debug", false, "whether to print debug statements")
+	debug = flag.Bool("debug", false, "whether to print debug statements")
 )
 
 type commitFile struct {
@@ -45,6 +44,12 @@ var (
 	whiteListFileExt = []string{
 		".md",
 		".asciidoc",
+	}
+	whiteListFile = []string{
+		"OWNERS",
+		"LICENSE",
+		"env.example",
+		".codecov.yml",
 	}
 )
 
@@ -65,13 +70,21 @@ func whiteListed(f commitFile, debug bool) bool {
 			return true
 		}
 	}
+	for _, wlf := range whiteListFile {
+		if strings.EqualFold(f.filename, wlf) {
+			if debug {
+				fmt.Printf("matched file (%s) on whitelist file (%s) with (%s)\n", f.original, f.filename, wlf)
+			}
+			return true
+		}
+	}
 
 	return false
 }
 
-func getCommitFiles(commit string) ([]commitFile, error) {
+func getCommitFiles() ([]commitFile, error) {
 	cmd := "git"
-	args := []string{"diff-tree", "--no-commit-id", "--name-only", "-r", commit}
+	args := []string{"diff-tree", "--no-commit-id", "--name-only", "-r", "HEAD..origin/master"}
 	c := exec.Command(cmd, args...)
 	cmdOut, err := c.Output()
 	if err != nil {
@@ -95,13 +108,12 @@ func getCommitFiles(commit string) ([]commitFile, error) {
 
 func main() {
 	flag.Parse()
-	fmt.Printf("testing commit: %s\n", *commit)
 	// algorithm:
 	// find all files in recent commits
 	// first determine if they are in a directory that is test worthy
 	// second determine if they have a file extension that can be ignored
 	// any other tests we can think of?
-	files, err := getCommitFiles(*commit)
+	files, err := getCommitFiles()
 	if err != nil {
 		panic(err)
 	}
