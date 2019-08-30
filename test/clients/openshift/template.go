@@ -23,7 +23,7 @@ func init() {
 	// additional OpenShift types must be registered manually.  AddToScheme
 	// registers the API group types (e.g. route.openshift.io/v1, Route) only.
 
-	if err := templatev1.AddToSchemeInCoreGroup(scheme.Scheme); err != nil {
+	if err := templatev1.Install(scheme.Scheme); err != nil {
 		panic(err)
 	}
 }

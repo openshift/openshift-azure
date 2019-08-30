@@ -1,6 +1,6 @@
 # Taken from: https://raw.githubusercontent.com/Azure/open-service-broker-azure/master/contrib/openshift/osba-os-template.yaml
 kind: Template
-apiVersion: v1
+apiVersion: template.openshift.io/v1
 objects:
 - kind: Secret
   apiVersion: v1
