@@ -143,7 +143,7 @@ func vm(subscriptionID, resourceGroup, location, sshPublicKey string, plan *comp
 		Plan: plan,
 		VirtualMachineProperties: &compute.VirtualMachineProperties{
 			HardwareProfile: &compute.HardwareProfile{
-				VMSize: compute.VirtualMachineSizeTypesStandardD2sV3,
+				VMSize: compute.VirtualMachineSizeTypesStandardD4sV3,
 			},
 			StorageProfile: &compute.StorageProfile{
 				ImageReference: imageReference,
