@@ -3,10 +3,12 @@
 cleanup() {
   set +e
 
+  ci_notify $PHASE
   az group delete -g "${BUILD_RESOURCE_GROUP}" --yes --no-wait
 }
 
 trap cleanup EXIT
+PHASE=image_validation
 
 . hack/tests/ci-prepare.sh
 
@@ -45,3 +47,4 @@ if [ -s "${ARTIFACTS:-/tmp}/yum_updateinfo_list_security" ]; then
   >&2 cat /tmp/yum_updateinfo_list_security
   exit 1
 fi
+PHASE=build_complete

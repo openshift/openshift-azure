@@ -62,6 +62,17 @@ delete() {
   make delete
 }
 
+ci_notify() {
+  # We create notifications in CI and only for periodic jobs. This will open an issue
+  # with a link to a failed CI build.
+  if [[ -e /var/run/secrets/kubernetes.io ]] && [ "${JOB_TYPE}" == "periodic" ]; then
+    if [ $PHASE == "build_complete" ]; then
+      ARGS="-success"
+    fi
+    go run ./hack/ci-notify/main.go -job-name "${JOB_NAME}" -comment "Phase: $1" $ARGS
+  fi
+}
+
 if [[ ! -e /var/run/secrets/kubernetes.io ]]; then
     reset_xtrace
     return
