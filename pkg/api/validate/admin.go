@@ -65,6 +65,10 @@ func (v *AdminAPIValidator) validateUpdateContainerService(cs, oldCs *api.OpenSh
 		}
 	}
 
+	// networkProfile is mutatable field in v8+ to accommodate
+	// PLS, expressRoute, private-clusters
+	old.Properties.NetworkProfile = cs.Properties.NetworkProfile
+
 	// validating ProvisioningState and ClusterVersion is the RP's responsibility
 	old.Properties.ProvisioningState = cs.Properties.ProvisioningState
 	old.Properties.ClusterVersion = cs.Properties.ClusterVersion
