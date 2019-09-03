@@ -10,7 +10,52 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-func (builder *Builder) ssh() error {
+// SSHCheckInstall ssh's to instance and check the existance of an install
+func (builder *Builder) SSHCheckInstall() (bool, error) {
+	session, err := builder.newSSHSession()
+	if err != nil {
+		return false, err
+	}
+	defer session.Close()
+	err = session.Run("sudo test -f /var/log/installed")
+	if err != nil {
+		serr, ok := err.(*ssh.ExitError)
+		if !ok {
+			return false, err
+		}
+		if serr.ExitStatus() == 1 {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+func (builder *Builder) sshInstallLog() error {
+	session, err := builder.newSSHSession()
+	if err != nil {
+		return err
+	}
+	defer session.Close()
+
+	stdout, err := session.StdoutPipe()
+	if err != nil {
+		return err
+	}
+
+	err = session.Start("sudo tail -F -n +1 /var/log/install.log")
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(os.Stdout, stdout)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (builder *Builder) sshCSELog() error {
 	session, err := builder.newSSHSession()
 	if err != nil {
 		return err

@@ -8,6 +8,15 @@ echo ,+ | sfdisk --force -u S -N 2 /dev/sda || true
 partprobe
 xfs_growfs /dev/sda2
 
+# background for CSE completion
+cat > install.sh <<'EOFINSTALL'
+#!/bin/bash -e
+
+exec 2>&1
+
+export HOME=/root
+cd
+
 yum -y update -x WALinuxAgent # updating WALinuxAgent kills this script
 yum -y install git libguestfs-tools-c libvirt-daemon-config-network virt-install
 
@@ -343,3 +352,11 @@ azureblobupload -account-name '{{ .Builder.ImageStorageAccount }}' -account-key 
 set -x
 
 az image create -g '{{ .Builder.ImageResourceGroup }}' -n $IMAGE --source "https://{{ .Builder.ImageStorageAccount }}.blob.core.windows.net/{{ .Builder.ImageContainer }}/$IMAGE.vhd" --os-type Linux --tags "kernel=$KERNEL" "openshift=$OPENSHIFT" 'gitcommit={{ .Builder.GitCommit }}'
+
+touch /var/log/installed
+EOFINSTALL
+
+bash ./install.sh > /var/log/install.log &
+
+exit 0
+

@@ -20,6 +20,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 	"github.com/openshift/openshift-azure/pkg/util/template"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
+	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
 //go:generate ../../hack/build-archive.sh
@@ -241,13 +242,21 @@ func (builder *Builder) Run(ctx context.Context) error {
 		return err
 	}
 
-	go builder.ssh()
+	go builder.sshCSELog()
 
 	cli := builder.Deployments.Client()
-	cli.PollingDuration = time.Minute * 90
+	// This is the timeout for the CSE to complete and will conflict
+	// with the parent context which can be different
+	cli.PollingDuration = time.Minute * 15
 
 	builder.Log.Infof("waiting for deployment")
 	err = future.WaitForCompletionRef(ctx, cli)
+	if err != nil {
+		return err
+	}
+
+	go builder.sshInstallLog()
+	err = builder.waitForInstall(ctx)
 	if err != nil {
 		return err
 	}
@@ -266,4 +275,8 @@ func (builder *Builder) Run(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (builder *Builder) waitForInstall(ctx context.Context) error {
+	return wait.PollImmediateUntil(10*time.Second, builder.SSHCheckInstall, ctx.Done())
 }

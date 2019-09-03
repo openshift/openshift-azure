@@ -135,7 +135,9 @@ func main() {
 	log := logrus.NewEntry(logrus.StandardLogger())
 	log.Printf("vmimage starting, git commit %s", gitCommit)
 
-	err := run(context.Background(), log)
+	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Hour*2)
+	defer cancelFunc()
+	err := run(ctx, log)
 	if err != nil {
 		log.Fatal(err)
 	}
