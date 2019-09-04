@@ -10,6 +10,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	v7 "github.com/openshift/openshift-azure/pkg/sync/v7"
 	v8 "github.com/openshift/openshift-azure/pkg/sync/v8"
+	v9 "github.com/openshift/openshift-azure/pkg/sync/v9"
 )
 
 type Interface interface {
@@ -25,6 +26,8 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (
 		return v7.New(log, cs, initClients)
 	case "v8.0":
 		return v8.New(log, cs, initClients)
+	case "v9.0":
+		return v9.New(log, cs, initClients)
 	}
 
 	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)
