@@ -1,4 +1,0 @@
-OPTIONS=
-DEBUG_LOGLEVEL={{ Deref .Config.ComponentLogLevel.Node }}
-IMAGE_VERSION=v3.11
-KUBECONFIG=/etc/origin/node/bootstrap.kubeconfig

@@ -15,48 +15,6 @@ componentLogLevel:
 ## having access to system nodes: default (any ip address)
 sshSourceAddressPrefixes: ['0.0.0.0/0']
 versions:
-  v6.0:
-    ## Node image and version configurables
-    imageOffer: osa
-    imagePublisher: redhat
-    imageSku: osa_311
-    imageVersion: 311.117.20190719
-    images:
-      alertManager: registry.access.redhat.com/openshift3/prometheus-alertmanager:v3.11.117
-      ansibleServiceBroker: registry.access.redhat.com/openshift3/ose-ansible-service-broker:v3.11.117
-      clusterMonitoringOperator: registry.access.redhat.com/openshift3/ose-cluster-monitoring-operator:v3.11.117
-      configReloader: registry.access.redhat.com/openshift3/ose-configmap-reloader:v3.11.117
-      console: registry.access.redhat.com/openshift3/ose-console:v3.11.117
-      controlPlane: registry.access.redhat.com/openshift3/ose-control-plane:v3.11.117
-      grafana: registry.access.redhat.com/openshift3/grafana:v3.11.117
-      kubeRbacProxy: registry.access.redhat.com/openshift3/ose-kube-rbac-proxy:v3.11.117
-      kubeStateMetrics: registry.access.redhat.com/openshift3/ose-kube-state-metrics:v3.11.117
-      node: registry.access.redhat.com/openshift3/ose-node:v3.11.117
-      nodeExporter: registry.access.redhat.com/openshift3/prometheus-node-exporter:v3.11.117
-      oAuthProxy: registry.access.redhat.com/openshift3/oauth-proxy:v3.11.117
-      prometheus: registry.access.redhat.com/openshift3/prometheus:v3.11.117
-      prometheusConfigReloader: registry.access.redhat.com/openshift3/ose-prometheus-config-reloader:v3.11.117
-      prometheusOperator: registry.access.redhat.com/openshift3/ose-prometheus-operator:v3.11.117
-      registry: registry.access.redhat.com/openshift3/ose-docker-registry:v3.11.117
-      registryConsole: registry.access.redhat.com/openshift3/registry-console:v3.11.117
-      router: registry.access.redhat.com/openshift3/ose-haproxy-router:v3.11.117
-      serviceCatalog: registry.access.redhat.com/openshift3/ose-service-catalog:v3.11.117
-      templateServiceBroker: registry.access.redhat.com/openshift3/ose-template-service-broker:v3.11.117
-      webConsole: registry.access.redhat.com/openshift3/ose-web-console:v3.11.117
-      format: registry.access.redhat.com/openshift3/ose-${component}:v3.11.117
-      httpd: registry.access.redhat.com/rhscl/httpd-24-rhel7:2.4-86
-      masterEtcd: registry.access.redhat.com/rhel7/etcd:3.2.22-28
-      genevaLogging: osarpint.azurecr.io/acs/mdsd:master.20190228.1
-      genevaStatsd: osarpint.azurecr.io/acs/mdm:git-a909a2e76
-      genevaTDAgent: osarpint.azurecr.io/acs/td-agent:master.20190228.1
-      azureControllers: quay.io/openshift-on-azure/azure:v6.0
-      canary: quay.io/openshift-on-azure/azure:v6.0
-      etcdBackup: quay.io/openshift-on-azure/azure:v6.0
-      metricsBridge: quay.io/openshift-on-azure/azure:v6.0
-      startup: quay.io/openshift-on-azure/azure:v6.0
-      sync: quay.io/openshift-on-azure/azure:v6.0
-      tlsProxy: quay.io/openshift-on-azure/azure:v6.0
-      logAnalyticsAgent: mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod07092019
   v7.0:
     imageOffer: osa
     imagePublisher: redhat

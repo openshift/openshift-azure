@@ -11,7 +11,6 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
-	v6 "github.com/openshift/openshift-azure/pkg/config/v6"
 	v7 "github.com/openshift/openshift-azure/pkg/config/v7"
 	v8 "github.com/openshift/openshift-azure/pkg/config/v8"
 )
@@ -24,8 +23,6 @@ type Interface interface {
 
 func New(cs *api.OpenShiftManagedCluster) (Interface, error) {
 	switch cs.Config.PluginVersion {
-	case "v6.0":
-		return v6.New(cs), nil
 	case "v7.0":
 		return v7.New(cs), nil
 	case "v8.0":
