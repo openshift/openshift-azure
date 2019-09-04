@@ -244,7 +244,7 @@ func (builder *Builder) Run(ctx context.Context) error {
 	go builder.ssh()
 
 	cli := builder.Deployments.Client()
-	cli.PollingDuration = time.Hour
+	cli.PollingDuration = time.Minute * 90
 
 	builder.Log.Infof("waiting for deployment")
 	err = future.WaitForCompletionRef(ctx, cli)
