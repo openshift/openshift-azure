@@ -26,6 +26,26 @@ func TestFromMSGraphGroup(t *testing.T) {
 				Name: "bar@foo.com",
 			},
 		},
+		&v1.User{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "live.com#user@homecorp.com",
+			},
+		},
+		&v1.User{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "user@nativecorp.com",
+			},
+		},
+		&v1.User{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "user@guestcorp.com",
+			},
+		},
+		&v1.User{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "user@amazingcorp.com",
+			},
+		},
 	).UserV1()
 	tests := []struct {
 		name           string
@@ -134,32 +154,52 @@ func TestFromMSGraphGroup(t *testing.T) {
 			},
 		},
 		{
-			name:          "guest member reconcile",
+			name:          "guest member reconcile external tree",
 			kubeGroupName: osaCustomerAdmins,
 			want1:         true,
 			kubeGroup: &v1.Group{
 				ObjectMeta: meta_v1.ObjectMeta{
 					Name: osaCustomerAdmins,
 				},
-				Users: []string{"foo@bar.com", "bar@foo.com"},
+				Users: []string{"live.com#user@homecorp.com", "user@nativecorp.com", "user@guestcorp.com"},
 			},
 			msGroupMembers: []graphrbac.User{
 				{
-					Mail:         to.StringPtr("foo@bar.com"),
-					UserType:     graphrbac.Guest,
-					MailNickname: to.StringPtr("#EXT#foo@bar.com"),
+					// ocpUser: live.com#user@homecorp.com
+					Mail:              to.StringPtr("user@homecorp.com"),
+					UserType:          graphrbac.Guest,
+					MailNickname:      to.StringPtr("user_homecorp.com#EXT#"),
+					UserPrincipalName: to.StringPtr("user_homecorp.com#EXT#@nativecorp.onmicrosoft.com"),
 				},
 				{
-					Mail:         to.StringPtr("bar@foo.com"),
-					UserType:     graphrbac.Guest,
-					MailNickname: to.StringPtr("bar@foo.com"),
+					// ocpUser: user@guestcorp.com
+					Mail:              to.StringPtr("user@guestcorp.com"),
+					UserType:          graphrbac.Guest,
+					MailNickname:      to.StringPtr("user_guestcorp.com#EXT#"),
+					UserPrincipalName: to.StringPtr("user_guestcorp.com#EXT#@nativecorp.onmicrosoft.com"),
 				},
+				{
+					// ocpUser: user@nativecorp.com
+					Mail:              nil,
+					UserType:          graphrbac.Member,
+					MailNickname:      to.StringPtr("user"),
+					UserPrincipalName: to.StringPtr("user@nativecorp.com"),
+				},
+				// TOFIX: This is usecase which I seen, but without customer I cant replicate without
+				// customer help at the moment.
+				//{
+				//	// ocpUser: user@amazingcorp.com
+				//	Mail:              nil,
+				//	UserType:          graphrbac.Guest,
+				//	MailNickname:      to.StringPtr("user@amazingcorp.com"),
+				//	UserPrincipalName: to.StringPtr("user_amazingcorp.com#EXT#@foo.onmicrosoft.com"),
+				//},
 			},
 			want: &v1.Group{
 				ObjectMeta: meta_v1.ObjectMeta{
 					Name: osaCustomerAdmins,
 				},
-				Users: []string{"bar@foo.com", "live.com#foo@bar.com"},
+				Users: []string{"live.com#user@homecorp.com", "user@guestcorp.com", "user@nativecorp.com"},
 			},
 		},
 	}

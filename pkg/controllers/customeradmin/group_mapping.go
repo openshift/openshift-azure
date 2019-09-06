@@ -52,20 +52,23 @@ func fromMSGraphGroup(log *logrus.Entry, userV1 userv1client.UserV1Interface, ku
 
 // reconcileGuestUsers will take an external user reference from AAD
 // match it with already sign-ed in users and updates required metadata
-// to match external provider prefix.
-// Example: foo@bar.com external guest user in AAD after sign-in
-// would become live.com#foo@bar.com, where live.com# is the origin
-// Function would match user and convert foo@bar.com to live.com#foo@bar.com
+// Function will take and update group memebership to contain foo@bar.com
+// See tests for more details on structure and expected outcome.
+// To check structure:
+// az ad group member list -g 44e69b4e-2e70-42df-bb97-3a890730d7b0
+// https://stackoverflow.com/questions/35727866/azure-ad-appending-ext-to-userprincipalname
 func reconcileGuestUsers(log *logrus.Entry, ocpUserList []v1.User, AADUser graphrbac.User) string {
 	// If AAD user is External type
 	// AADUser.Mail - does NOT contain ext reference
 	// AADUser.MailNickname - does have ext reference
 	if AADUser.MailNickname != nil && strings.Contains(*AADUser.MailNickname, "#EXT#") {
 		for _, usr := range ocpUserList {
-			// if login name exist and contains email, we gonna use it as ref
-			loginEmail := strings.Split(usr.Name, "#")[len(strings.Split(usr.Name, "#"))-1]
-			if strings.EqualFold(loginEmail, *AADUser.Mail) {
-				return usr.Name
+			// if OpenShift user contains # - we need to drop it for checking.
+			if strings.Contains(usr.Name, "#") {
+				loginEmail := strings.Split(usr.Name, "#")[len(strings.Split(usr.Name, "#"))-1]
+				if strings.EqualFold(loginEmail, *AADUser.Mail) {
+					return usr.Name
+				}
 			}
 		}
 	}
