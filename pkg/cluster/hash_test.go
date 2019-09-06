@@ -36,34 +36,34 @@ func TestHashScaleSetStability(t *testing.T) {
 			{
 				role: api.AgentPoolProfileRoleMaster,
 				// this value should not change
-				expectedHash: "9758f2d02a551c3c157636994c93d5c07678ee4a28341e81356b0cce7d0a8fc1",
+				expectedHash: "51df71b5d8b4586dbdb5736f54f65d201b31ee5d7facd0378a4c59507aaa2e61",
 			},
 			{
 				role: api.AgentPoolProfileRoleInfra,
 				// this value should not change
-				expectedHash: "6eeed214cb09c42ecc1a665fed139d53c42884c9a536601a02b59bf5e4b97422",
+				expectedHash: "84c7e8f1ec270a1685a08542746a6c000306217562d9d475baf52b22eb05e490",
 			},
 			{
 				role: api.AgentPoolProfileRoleCompute,
 				// this value should not change
-				expectedHash: "9a5c0476b5e152736202d87ee25903830e17a757534e9de24060e36e3080fcb3",
+				expectedHash: "78dd1e1c4d1c80cb1aa20d448daebe9cc378c50c8c65c300814eb2a944046362",
 			},
 		},
 		"v8.0": {
 			{
 				role: api.AgentPoolProfileRoleMaster,
 				// this value should not change
-				expectedHash: "c1e17c7ae4ba5c722a8f14e99f7d0b5bc5c63ded09f1ef4ed4a59a96ab2d3ea8",
+				expectedHash: "2c1269b9ae5354ece2096765153ccf9b16324ea26886508e7dc33a63a449f372",
 			},
 			{
 				role: api.AgentPoolProfileRoleInfra,
 				// this value should not change
-				expectedHash: "b5ec0820567b6ed6dd5e798d5fe2f20aa345d77b17f80f9d1bafce37893f3bcf",
+				expectedHash: "5878450eb025850420f5d6ef3bfac407eff30273e839808bb1b0929dde02f7a7",
 			},
 			{
 				role: api.AgentPoolProfileRoleCompute,
 				// this value should not change
-				expectedHash: "5945fa8733ef655278a643092f4774e58bd0e2572607bee6ebd7927e40dce868",
+				expectedHash: "3f1904ce1391e1323a83f949d2e3052eff327d19fbe75035a1a7102cea0cb39d",
 			},
 		},
 	}
