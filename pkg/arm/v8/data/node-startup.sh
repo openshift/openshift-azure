@@ -114,9 +114,9 @@ systemctl disable rsyslog.service
 systemctl stop rsyslog.service
 
 # setting up geneva logging stack
-systemctl unmask mdsd.service azsecd.service azsecmond.service
-systemctl enable mdsd.service azsecd.service azsecmond.service
-systemctl start mdsd.service azsecd.service azsecmond.service
+systemctl unmask mdsd.service azsecd.service azsecmond.service fluentd.service
+systemctl enable mdsd.service azsecd.service azsecmond.service fluentd.service
+systemctl start mdsd.service azsecd.service azsecmond.service fluentd.service
 
 # note: atomic-openshift-node crash loops until master is up
 systemctl enable atomic-openshift-node.service

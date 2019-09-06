@@ -119,7 +119,6 @@ func (s *startup) writeFiles(role api.AgentPoolProfileRole, w writers.Writer, ho
 			filepath = strings.TrimPrefix(filepath, "common")
 
 			filesToWrite[filepath] = string(b)
-
 		} else {
 
 			switch role {
