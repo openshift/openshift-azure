@@ -3,13 +3,7 @@
 cleanup() {
   set +e
 
-  if [[ -e /var/run/secrets/kubernetes.io ]] && [ "${JOB_TYPE}" == "periodic" ]; then
-    if [ $PHASE == "build_complete" ]; then
-      ARGS="-success"
-    fi
-    go run ./hack/ci-notify/main.go -job-name "${JOB_NAME}" -comment "Phase: ${PHASE}" $ARGS
-  fi
-
+  ci_notify $PHASE
   generate_artifacts
   delete
 }
