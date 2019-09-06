@@ -58,12 +58,13 @@ func fromMSGraphGroup(log *logrus.Entry, userV1 userv1client.UserV1Interface, ku
 // Function would match user and convert foo@bar.com to live.com#foo@bar.com
 func reconcileGuestUsers(log *logrus.Entry, ocpUserList []v1.User, AADUser graphrbac.User) string {
 	// If AAD user is External type
-	// AADUser.Mail - does not contain ext reference
+	// AADUser.Mail - does NOT contain ext reference
 	// AADUser.MailNickname - does have ext reference
 	if AADUser.MailNickname != nil && strings.Contains(*AADUser.MailNickname, "#EXT#") {
 		for _, usr := range ocpUserList {
 			// if login name exist and contains email, we gonna use it as ref
-			if strings.Contains(usr.Name, *AADUser.Mail) {
+			loginEmail := strings.Split(usr.Name, "#")[len(strings.Split(usr.Name, "#"))-1]
+			if strings.EqualFold(loginEmail, *AADUser.Mail) {
 				return usr.Name
 			}
 		}
