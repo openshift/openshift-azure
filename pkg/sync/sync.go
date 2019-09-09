@@ -26,7 +26,7 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (
 		return v5.New(log, cs, initClients)
 	case "v6.0":
 		return v6.New(log, cs, initClients)
-	case "v7.0":
+	case "v7.0", "v7.1":
 		return v7.New(log, cs, initClients)
 	}
 
