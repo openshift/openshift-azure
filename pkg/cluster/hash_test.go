@@ -49,23 +49,6 @@ func TestHashScaleSetStability(t *testing.T) {
 				expectedHash: "78dd1e1c4d1c80cb1aa20d448daebe9cc378c50c8c65c300814eb2a944046362",
 			},
 		},
-		"v8.0": {
-			{
-				role: api.AgentPoolProfileRoleMaster,
-				// this value should not change
-				expectedHash: "2c1269b9ae5354ece2096765153ccf9b16324ea26886508e7dc33a63a449f372",
-			},
-			{
-				role: api.AgentPoolProfileRoleInfra,
-				// this value should not change
-				expectedHash: "5878450eb025850420f5d6ef3bfac407eff30273e839808bb1b0929dde02f7a7",
-			},
-			{
-				role: api.AgentPoolProfileRoleCompute,
-				// this value should not change
-				expectedHash: "3f1904ce1391e1323a83f949d2e3052eff327d19fbe75035a1a7102cea0cb39d",
-			},
-		},
 	}
 
 	// check we're testing all versions in our pluginconfig
@@ -153,10 +136,6 @@ func TestHashSyncPodStability(t *testing.T) {
 		"v7.0": {
 			// this value should not change
 			expectedHash: "40f9a51d8328ad65e4cdda62e460b53a6b2a5b71908f43220f4a17685c49d562",
-		},
-		"v8.0": {
-			// this value should not change
-			expectedHash: "74ca5980be48bc8efd9bd0b7d1929bf3c28ae3d60e3be666e6df41aa74fa14d4",
 		},
 	}
 

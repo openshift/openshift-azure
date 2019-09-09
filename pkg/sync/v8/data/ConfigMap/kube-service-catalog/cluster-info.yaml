@@ -1,7 +1,0 @@
-apiVersion: v1
-data:
-  id: '*** GENERATED ***'
-kind: ConfigMap
-metadata:
-  name: cluster-info
-  namespace: kube-service-catalog
