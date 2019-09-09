@@ -295,10 +295,10 @@ python -c "import pty; pty.spawn([
     '--extra-args', 'console=ttyS0,115200n8 earlyprintk=ttyS0,115200 ks=file:/rhel7.ks',
     '--graphics', 'none',
     '--initrd-inject', 'rhel7.ks',
-    '--location', 'http://$IP:8080/content/dist/rhel/server/7/7.6/x86_64/kickstart',
+    '--location', 'http://$IP:8080/content/dist/rhel/server/7/7.7/x86_64/kickstart',
     '--memory', '1536',
     '--name', '$(date +%s)',
-    '--os-variant', 'rhel7.6',
+    '--os-variant', 'rhel7.7',
     '--transient',
 ])"
 
