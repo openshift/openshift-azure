@@ -26,9 +26,7 @@ import (
 	"net/http"
 )
 
-// ProfilesClient is the use these APIs to manage Azure CDN resources through the Azure Resource Manager. You must make
-// sure that requests made to these resources are secure. For more information, see
-// https://msdn.microsoft.com/en-us/library/azure/dn790557.aspx.
+// ProfilesClient is the cdn Management Client
 type ProfilesClient struct {
 	BaseClient
 }
@@ -108,9 +106,9 @@ func (client ProfilesClient) CreatePreparer(ctx context.Context, profileName str
 // CreateSender sends the Create request. The method will close the
 // http.Response Body if it receives an error.
 func (client ProfilesClient) CreateSender(req *http.Request) (future ProfilesCreateFuture, err error) {
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
 	var resp *http.Response
-	resp, err = autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	resp, err = autorest.SendWithSender(client, req, sd...)
 	if err != nil {
 		return
 	}
@@ -185,9 +183,9 @@ func (client ProfilesClient) DeleteIfExistsPreparer(ctx context.Context, profile
 // DeleteIfExistsSender sends the DeleteIfExists request. The method will close the
 // http.Response Body if it receives an error.
 func (client ProfilesClient) DeleteIfExistsSender(req *http.Request) (future ProfilesDeleteIfExistsFuture, err error) {
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
 	var resp *http.Response
-	resp, err = autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	resp, err = autorest.SendWithSender(client, req, sd...)
 	if err != nil {
 		return
 	}
@@ -267,8 +265,8 @@ func (client ProfilesClient) GenerateSsoURIPreparer(ctx context.Context, profile
 // GenerateSsoURISender sends the GenerateSsoURI request. The method will close the
 // http.Response Body if it receives an error.
 func (client ProfilesClient) GenerateSsoURISender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GenerateSsoURIResponder handles the response to the GenerateSsoURI request. The method always
@@ -344,8 +342,8 @@ func (client ProfilesClient) GetPreparer(ctx context.Context, profileName string
 // GetSender sends the Get request. The method will close the
 // http.Response Body if it receives an error.
 func (client ProfilesClient) GetSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetResponder handles the response to the Get request. The method always
@@ -419,8 +417,8 @@ func (client ProfilesClient) ListByResourceGroupPreparer(ctx context.Context, re
 // ListByResourceGroupSender sends the ListByResourceGroup request. The method will close the
 // http.Response Body if it receives an error.
 func (client ProfilesClient) ListByResourceGroupSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListByResourceGroupResponder handles the response to the ListByResourceGroup request. The method always
@@ -491,8 +489,8 @@ func (client ProfilesClient) ListBySubscriptionIDPreparer(ctx context.Context) (
 // ListBySubscriptionIDSender sends the ListBySubscriptionID request. The method will close the
 // http.Response Body if it receives an error.
 func (client ProfilesClient) ListBySubscriptionIDSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListBySubscriptionIDResponder handles the response to the ListBySubscriptionID request. The method always
@@ -565,9 +563,9 @@ func (client ProfilesClient) UpdatePreparer(ctx context.Context, profileName str
 // UpdateSender sends the Update request. The method will close the
 // http.Response Body if it receives an error.
 func (client ProfilesClient) UpdateSender(req *http.Request) (future ProfilesUpdateFuture, err error) {
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
 	var resp *http.Response
-	resp, err = autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	resp, err = autorest.SendWithSender(client, req, sd...)
 	if err != nil {
 		return
 	}

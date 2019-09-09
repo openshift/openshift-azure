@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import original "github.com/Azure/azure-sdk-for-go/services/datafactory/mgmt/201
 
 type ActivityRunsClientAPI = original.ActivityRunsClientAPI
 type DatasetsClientAPI = original.DatasetsClientAPI
+type ExposureControlClientAPI = original.ExposureControlClientAPI
 type FactoriesClientAPI = original.FactoriesClientAPI
 type IntegrationRuntimeNodesClientAPI = original.IntegrationRuntimeNodesClientAPI
 type IntegrationRuntimeObjectMetadataClientAPI = original.IntegrationRuntimeObjectMetadataClientAPI

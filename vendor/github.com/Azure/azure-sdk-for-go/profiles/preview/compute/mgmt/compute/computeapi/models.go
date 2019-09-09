@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,17 +19,22 @@
 
 package computeapi
 
-import original "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute/computeapi"
+import original "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-07-01/compute/computeapi"
 
 type AvailabilitySetsClientAPI = original.AvailabilitySetsClientAPI
 type ContainerServicesClientAPI = original.ContainerServicesClientAPI
+type DedicatedHostGroupsClientAPI = original.DedicatedHostGroupsClientAPI
+type DedicatedHostsClientAPI = original.DedicatedHostsClientAPI
 type DisksClientAPI = original.DisksClientAPI
 type GalleriesClientAPI = original.GalleriesClientAPI
+type GalleryApplicationVersionsClientAPI = original.GalleryApplicationVersionsClientAPI
+type GalleryApplicationsClientAPI = original.GalleryApplicationsClientAPI
 type GalleryImageVersionsClientAPI = original.GalleryImageVersionsClientAPI
 type GalleryImagesClientAPI = original.GalleryImagesClientAPI
 type ImagesClientAPI = original.ImagesClientAPI
 type LogAnalyticsClientAPI = original.LogAnalyticsClientAPI
 type OperationsClientAPI = original.OperationsClientAPI
+type ProximityPlacementGroupsClientAPI = original.ProximityPlacementGroupsClientAPI
 type ResourceSkusClientAPI = original.ResourceSkusClientAPI
 type SnapshotsClientAPI = original.SnapshotsClientAPI
 type UsageClientAPI = original.UsageClientAPI

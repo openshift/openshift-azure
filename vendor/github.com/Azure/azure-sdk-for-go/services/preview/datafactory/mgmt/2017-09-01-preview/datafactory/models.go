@@ -68,21 +68,6 @@ func PossibleAuthorizationTypeValues() []AuthorizationType {
 	return []AuthorizationType{AuthorizationTypeKey, AuthorizationTypeLinkedIntegrationRuntimeProperties, AuthorizationTypeRBAC}
 }
 
-// AzureSearchIndexWriteBehaviorType enumerates the values for azure search index write behavior type.
-type AzureSearchIndexWriteBehaviorType string
-
-const (
-	// Merge ...
-	Merge AzureSearchIndexWriteBehaviorType = "Merge"
-	// Upload ...
-	Upload AzureSearchIndexWriteBehaviorType = "Upload"
-)
-
-// PossibleAzureSearchIndexWriteBehaviorTypeValues returns an array of possible values for the AzureSearchIndexWriteBehaviorType const type.
-func PossibleAzureSearchIndexWriteBehaviorTypeValues() []AzureSearchIndexWriteBehaviorType {
-	return []AzureSearchIndexWriteBehaviorType{Merge, Upload}
-}
-
 // BlobEventTypes enumerates the values for blob event types.
 type BlobEventTypes string
 
@@ -96,69 +81,6 @@ const (
 // PossibleBlobEventTypesValues returns an array of possible values for the BlobEventTypes const type.
 func PossibleBlobEventTypesValues() []BlobEventTypes {
 	return []BlobEventTypes{MicrosoftStorageBlobCreated, MicrosoftStorageBlobDeleted}
-}
-
-// CassandraSourceReadConsistencyLevels enumerates the values for cassandra source read consistency levels.
-type CassandraSourceReadConsistencyLevels string
-
-const (
-	// ALL ...
-	ALL CassandraSourceReadConsistencyLevels = "ALL"
-	// EACHQUORUM ...
-	EACHQUORUM CassandraSourceReadConsistencyLevels = "EACH_QUORUM"
-	// LOCALONE ...
-	LOCALONE CassandraSourceReadConsistencyLevels = "LOCAL_ONE"
-	// LOCALQUORUM ...
-	LOCALQUORUM CassandraSourceReadConsistencyLevels = "LOCAL_QUORUM"
-	// LOCALSERIAL ...
-	LOCALSERIAL CassandraSourceReadConsistencyLevels = "LOCAL_SERIAL"
-	// ONE ...
-	ONE CassandraSourceReadConsistencyLevels = "ONE"
-	// QUORUM ...
-	QUORUM CassandraSourceReadConsistencyLevels = "QUORUM"
-	// SERIAL ...
-	SERIAL CassandraSourceReadConsistencyLevels = "SERIAL"
-	// THREE ...
-	THREE CassandraSourceReadConsistencyLevels = "THREE"
-	// TWO ...
-	TWO CassandraSourceReadConsistencyLevels = "TWO"
-)
-
-// PossibleCassandraSourceReadConsistencyLevelsValues returns an array of possible values for the CassandraSourceReadConsistencyLevels const type.
-func PossibleCassandraSourceReadConsistencyLevelsValues() []CassandraSourceReadConsistencyLevels {
-	return []CassandraSourceReadConsistencyLevels{ALL, EACHQUORUM, LOCALONE, LOCALQUORUM, LOCALSERIAL, ONE, QUORUM, SERIAL, THREE, TWO}
-}
-
-// CopyBehaviorType enumerates the values for copy behavior type.
-type CopyBehaviorType string
-
-const (
-	// FlattenHierarchy ...
-	FlattenHierarchy CopyBehaviorType = "FlattenHierarchy"
-	// MergeFiles ...
-	MergeFiles CopyBehaviorType = "MergeFiles"
-	// PreserveHierarchy ...
-	PreserveHierarchy CopyBehaviorType = "PreserveHierarchy"
-)
-
-// PossibleCopyBehaviorTypeValues returns an array of possible values for the CopyBehaviorType const type.
-func PossibleCopyBehaviorTypeValues() []CopyBehaviorType {
-	return []CopyBehaviorType{FlattenHierarchy, MergeFiles, PreserveHierarchy}
-}
-
-// DatasetCompressionLevel enumerates the values for dataset compression level.
-type DatasetCompressionLevel string
-
-const (
-	// Fastest ...
-	Fastest DatasetCompressionLevel = "Fastest"
-	// Optimal ...
-	Optimal DatasetCompressionLevel = "Optimal"
-)
-
-// PossibleDatasetCompressionLevelValues returns an array of possible values for the DatasetCompressionLevel const type.
-func PossibleDatasetCompressionLevelValues() []DatasetCompressionLevel {
-	return []DatasetCompressionLevel{Fastest, Optimal}
 }
 
 // DayOfWeek enumerates the values for day of week.
@@ -441,6 +363,21 @@ func PossibleIntegrationRuntimeEditionValues() []IntegrationRuntimeEdition {
 	return []IntegrationRuntimeEdition{Enterprise, Standard}
 }
 
+// IntegrationRuntimeEntityReferenceType enumerates the values for integration runtime entity reference type.
+type IntegrationRuntimeEntityReferenceType string
+
+const (
+	// IntegrationRuntimeEntityReferenceTypeIntegrationRuntimeReference ...
+	IntegrationRuntimeEntityReferenceTypeIntegrationRuntimeReference IntegrationRuntimeEntityReferenceType = "IntegrationRuntimeReference"
+	// IntegrationRuntimeEntityReferenceTypeLinkedServiceReference ...
+	IntegrationRuntimeEntityReferenceTypeLinkedServiceReference IntegrationRuntimeEntityReferenceType = "LinkedServiceReference"
+)
+
+// PossibleIntegrationRuntimeEntityReferenceTypeValues returns an array of possible values for the IntegrationRuntimeEntityReferenceType const type.
+func PossibleIntegrationRuntimeEntityReferenceTypeValues() []IntegrationRuntimeEntityReferenceType {
+	return []IntegrationRuntimeEntityReferenceType{IntegrationRuntimeEntityReferenceTypeIntegrationRuntimeReference, IntegrationRuntimeEntityReferenceTypeLinkedServiceReference}
+}
+
 // IntegrationRuntimeInternalChannelEncryptionMode enumerates the values for integration runtime internal
 // channel encryption mode.
 type IntegrationRuntimeInternalChannelEncryptionMode string
@@ -472,26 +409,6 @@ const (
 // PossibleIntegrationRuntimeLicenseTypeValues returns an array of possible values for the IntegrationRuntimeLicenseType const type.
 func PossibleIntegrationRuntimeLicenseTypeValues() []IntegrationRuntimeLicenseType {
 	return []IntegrationRuntimeLicenseType{BasePrice, LicenseIncluded}
-}
-
-// IntegrationRuntimeSsisCatalogPricingTier enumerates the values for integration runtime ssis catalog pricing
-// tier.
-type IntegrationRuntimeSsisCatalogPricingTier string
-
-const (
-	// IntegrationRuntimeSsisCatalogPricingTierBasic ...
-	IntegrationRuntimeSsisCatalogPricingTierBasic IntegrationRuntimeSsisCatalogPricingTier = "Basic"
-	// IntegrationRuntimeSsisCatalogPricingTierPremium ...
-	IntegrationRuntimeSsisCatalogPricingTierPremium IntegrationRuntimeSsisCatalogPricingTier = "Premium"
-	// IntegrationRuntimeSsisCatalogPricingTierPremiumRS ...
-	IntegrationRuntimeSsisCatalogPricingTierPremiumRS IntegrationRuntimeSsisCatalogPricingTier = "PremiumRS"
-	// IntegrationRuntimeSsisCatalogPricingTierStandard ...
-	IntegrationRuntimeSsisCatalogPricingTierStandard IntegrationRuntimeSsisCatalogPricingTier = "Standard"
-)
-
-// PossibleIntegrationRuntimeSsisCatalogPricingTierValues returns an array of possible values for the IntegrationRuntimeSsisCatalogPricingTier const type.
-func PossibleIntegrationRuntimeSsisCatalogPricingTierValues() []IntegrationRuntimeSsisCatalogPricingTier {
-	return []IntegrationRuntimeSsisCatalogPricingTier{IntegrationRuntimeSsisCatalogPricingTierBasic, IntegrationRuntimeSsisCatalogPricingTierPremium, IntegrationRuntimeSsisCatalogPricingTierPremiumRS, IntegrationRuntimeSsisCatalogPricingTierStandard}
 }
 
 // IntegrationRuntimeState enumerates the values for integration runtime state.
@@ -727,21 +644,6 @@ func PossiblePipelineRunQueryOrderByFieldValues() []PipelineRunQueryOrderByField
 	return []PipelineRunQueryOrderByField{PipelineRunQueryOrderByFieldRunEnd, PipelineRunQueryOrderByFieldRunStart}
 }
 
-// PolybaseSettingsRejectType enumerates the values for polybase settings reject type.
-type PolybaseSettingsRejectType string
-
-const (
-	// Percentage ...
-	Percentage PolybaseSettingsRejectType = "percentage"
-	// Value ...
-	Value PolybaseSettingsRejectType = "value"
-)
-
-// PossiblePolybaseSettingsRejectTypeValues returns an array of possible values for the PolybaseSettingsRejectType const type.
-func PossiblePolybaseSettingsRejectTypeValues() []PolybaseSettingsRejectType {
-	return []PolybaseSettingsRejectType{Percentage, Value}
-}
-
 // PrestoAuthenticationType enumerates the values for presto authentication type.
 type PrestoAuthenticationType string
 
@@ -780,51 +682,6 @@ const (
 // PossibleRecurrenceFrequencyValues returns an array of possible values for the RecurrenceFrequency const type.
 func PossibleRecurrenceFrequencyValues() []RecurrenceFrequency {
 	return []RecurrenceFrequency{Day, Hour, Minute, Month, NotSpecified, Week, Year}
-}
-
-// SalesforceSinkWriteBehavior enumerates the values for salesforce sink write behavior.
-type SalesforceSinkWriteBehavior string
-
-const (
-	// Insert ...
-	Insert SalesforceSinkWriteBehavior = "Insert"
-	// Upsert ...
-	Upsert SalesforceSinkWriteBehavior = "Upsert"
-)
-
-// PossibleSalesforceSinkWriteBehaviorValues returns an array of possible values for the SalesforceSinkWriteBehavior const type.
-func PossibleSalesforceSinkWriteBehaviorValues() []SalesforceSinkWriteBehavior {
-	return []SalesforceSinkWriteBehavior{Insert, Upsert}
-}
-
-// SalesforceSourceReadBehavior enumerates the values for salesforce source read behavior.
-type SalesforceSourceReadBehavior string
-
-const (
-	// Query ...
-	Query SalesforceSourceReadBehavior = "Query"
-	// QueryAll ...
-	QueryAll SalesforceSourceReadBehavior = "QueryAll"
-)
-
-// PossibleSalesforceSourceReadBehaviorValues returns an array of possible values for the SalesforceSourceReadBehavior const type.
-func PossibleSalesforceSourceReadBehaviorValues() []SalesforceSourceReadBehavior {
-	return []SalesforceSourceReadBehavior{Query, QueryAll}
-}
-
-// SapCloudForCustomerSinkWriteBehavior enumerates the values for sap cloud for customer sink write behavior.
-type SapCloudForCustomerSinkWriteBehavior string
-
-const (
-	// SapCloudForCustomerSinkWriteBehaviorInsert ...
-	SapCloudForCustomerSinkWriteBehaviorInsert SapCloudForCustomerSinkWriteBehavior = "Insert"
-	// SapCloudForCustomerSinkWriteBehaviorUpdate ...
-	SapCloudForCustomerSinkWriteBehaviorUpdate SapCloudForCustomerSinkWriteBehavior = "Update"
-)
-
-// PossibleSapCloudForCustomerSinkWriteBehaviorValues returns an array of possible values for the SapCloudForCustomerSinkWriteBehavior const type.
-func PossibleSapCloudForCustomerSinkWriteBehaviorValues() []SapCloudForCustomerSinkWriteBehavior {
-	return []SapCloudForCustomerSinkWriteBehavior{SapCloudForCustomerSinkWriteBehaviorInsert, SapCloudForCustomerSinkWriteBehaviorUpdate}
 }
 
 // SapHanaAuthenticationType enumerates the values for sap hana authentication type.
@@ -951,42 +808,19 @@ func PossibleSparkThriftTransportProtocolValues() []SparkThriftTransportProtocol
 	return []SparkThriftTransportProtocol{SparkThriftTransportProtocolBinary, SparkThriftTransportProtocolHTTP, SparkThriftTransportProtocolSASL}
 }
 
-// SSISExecutionRuntime enumerates the values for ssis execution runtime.
-type SSISExecutionRuntime string
+// SsisPackageLocationType enumerates the values for ssis package location type.
+type SsisPackageLocationType string
 
 const (
-	// X64 ...
-	X64 SSISExecutionRuntime = "x64"
-	// X86 ...
-	X86 SSISExecutionRuntime = "x86"
+	// File ...
+	File SsisPackageLocationType = "File"
+	// SSISDB ...
+	SSISDB SsisPackageLocationType = "SSISDB"
 )
 
-// PossibleSSISExecutionRuntimeValues returns an array of possible values for the SSISExecutionRuntime const type.
-func PossibleSSISExecutionRuntimeValues() []SSISExecutionRuntime {
-	return []SSISExecutionRuntime{X64, X86}
-}
-
-// StoredProcedureParameterType enumerates the values for stored procedure parameter type.
-type StoredProcedureParameterType string
-
-const (
-	// Boolean ...
-	Boolean StoredProcedureParameterType = "Boolean"
-	// Date ...
-	Date StoredProcedureParameterType = "Date"
-	// Decimal ...
-	Decimal StoredProcedureParameterType = "Decimal"
-	// GUID ...
-	GUID StoredProcedureParameterType = "Guid"
-	// Int ...
-	Int StoredProcedureParameterType = "Int"
-	// String ...
-	String StoredProcedureParameterType = "String"
-)
-
-// PossibleStoredProcedureParameterTypeValues returns an array of possible values for the StoredProcedureParameterType const type.
-func PossibleStoredProcedureParameterTypeValues() []StoredProcedureParameterType {
-	return []StoredProcedureParameterType{Boolean, Date, Decimal, GUID, Int, String}
+// PossibleSsisPackageLocationTypeValues returns an array of possible values for the SsisPackageLocationType const type.
+func PossibleSsisPackageLocationTypeValues() []SsisPackageLocationType {
+	return []SsisPackageLocationType{File, SSISDB}
 }
 
 // SybaseAuthenticationType enumerates the values for sybase authentication type.
@@ -1298,21 +1132,6 @@ const (
 // PossibleTypeBasicCopySourceValues returns an array of possible values for the TypeBasicCopySource const type.
 func PossibleTypeBasicCopySourceValues() []TypeBasicCopySource {
 	return []TypeBasicCopySource{TypeAmazonMWSSource, TypeAmazonRedshiftSource, TypeAzureDataLakeStoreSource, TypeAzureMySQLSource, TypeAzurePostgreSQLSource, TypeAzureTableSource, TypeBlobSource, TypeCassandraSource, TypeConcurSource, TypeCopySource, TypeCouchbaseSource, TypeDocumentDbCollectionSource, TypeDrillSource, TypeDynamicsSource, TypeEloquaSource, TypeFileSystemSource, TypeGoogleBigQuerySource, TypeGreenplumSource, TypeHBaseSource, TypeHdfsSource, TypeHiveSource, TypeHTTPSource, TypeHubspotSource, TypeImpalaSource, TypeJiraSource, TypeMagentoSource, TypeMariaDBSource, TypeMarketoSource, TypeMongoDbSource, TypeNetezzaSource, TypeOracleSource, TypePaypalSource, TypePhoenixSource, TypePrestoSource, TypeQuickBooksSource, TypeRelationalSource, TypeResponsysSource, TypeSalesforceMarketingCloudSource, TypeSalesforceSource, TypeSapCloudForCustomerSource, TypeSapEccSource, TypeServiceNowSource, TypeShopifySource, TypeSparkSource, TypeSQLDWSource, TypeSQLSource, TypeSquareSource, TypeVerticaSource, TypeWebSource, TypeXeroSource, TypeZohoSource}
-}
-
-// TypeBasicCopyTranslator enumerates the values for type basic copy translator.
-type TypeBasicCopyTranslator string
-
-const (
-	// TypeCopyTranslator ...
-	TypeCopyTranslator TypeBasicCopyTranslator = "CopyTranslator"
-	// TypeTabularTranslator ...
-	TypeTabularTranslator TypeBasicCopyTranslator = "TabularTranslator"
-)
-
-// PossibleTypeBasicCopyTranslatorValues returns an array of possible values for the TypeBasicCopyTranslator const type.
-func PossibleTypeBasicCopyTranslatorValues() []TypeBasicCopyTranslator {
-	return []TypeBasicCopyTranslator{TypeCopyTranslator, TypeTabularTranslator}
 }
 
 // TypeBasicDataset enumerates the values for type basic dataset.
@@ -2278,76 +2097,37 @@ func (ap *ActivityPolicy) UnmarshalJSON(body []byte) error {
 type ActivityRun struct {
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
-	// PipelineName - The name of the pipeline.
+	// PipelineName - READ-ONLY; The name of the pipeline.
 	PipelineName *string `json:"pipelineName,omitempty"`
-	// PipelineRunID - The id of the pipeline run.
+	// PipelineRunID - READ-ONLY; The id of the pipeline run.
 	PipelineRunID *string `json:"pipelineRunId,omitempty"`
-	// ActivityName - The name of the activity.
+	// ActivityName - READ-ONLY; The name of the activity.
 	ActivityName *string `json:"activityName,omitempty"`
-	// ActivityType - The type of the activity.
+	// ActivityType - READ-ONLY; The type of the activity.
 	ActivityType *string `json:"activityType,omitempty"`
-	// ActivityRunID - The id of the activity run.
+	// ActivityRunID - READ-ONLY; The id of the activity run.
 	ActivityRunID *string `json:"activityRunId,omitempty"`
-	// LinkedServiceName - The name of the compute linked service.
+	// LinkedServiceName - READ-ONLY; The name of the compute linked service.
 	LinkedServiceName *string `json:"linkedServiceName,omitempty"`
-	// Status - The status of the activity run.
+	// Status - READ-ONLY; The status of the activity run.
 	Status *string `json:"status,omitempty"`
-	// ActivityRunStart - The start time of the activity run in 'ISO 8601' format.
+	// ActivityRunStart - READ-ONLY; The start time of the activity run in 'ISO 8601' format.
 	ActivityRunStart *date.Time `json:"activityRunStart,omitempty"`
-	// ActivityRunEnd - The end time of the activity run in 'ISO 8601' format.
+	// ActivityRunEnd - READ-ONLY; The end time of the activity run in 'ISO 8601' format.
 	ActivityRunEnd *date.Time `json:"activityRunEnd,omitempty"`
-	// DurationInMs - The duration of the activity run.
+	// DurationInMs - READ-ONLY; The duration of the activity run.
 	DurationInMs *int32 `json:"durationInMs,omitempty"`
-	// Input - The input for the activity.
+	// Input - READ-ONLY; The input for the activity.
 	Input interface{} `json:"input,omitempty"`
-	// Output - The output for the activity.
+	// Output - READ-ONLY; The output for the activity.
 	Output interface{} `json:"output,omitempty"`
-	// Error - The error if any from the activity run.
+	// Error - READ-ONLY; The error if any from the activity run.
 	Error interface{} `json:"error,omitempty"`
 }
 
 // MarshalJSON is the custom marshaler for ActivityRun.
 func (ar ActivityRun) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
-	if ar.PipelineName != nil {
-		objectMap["pipelineName"] = ar.PipelineName
-	}
-	if ar.PipelineRunID != nil {
-		objectMap["pipelineRunId"] = ar.PipelineRunID
-	}
-	if ar.ActivityName != nil {
-		objectMap["activityName"] = ar.ActivityName
-	}
-	if ar.ActivityType != nil {
-		objectMap["activityType"] = ar.ActivityType
-	}
-	if ar.ActivityRunID != nil {
-		objectMap["activityRunId"] = ar.ActivityRunID
-	}
-	if ar.LinkedServiceName != nil {
-		objectMap["linkedServiceName"] = ar.LinkedServiceName
-	}
-	if ar.Status != nil {
-		objectMap["status"] = ar.Status
-	}
-	if ar.ActivityRunStart != nil {
-		objectMap["activityRunStart"] = ar.ActivityRunStart
-	}
-	if ar.ActivityRunEnd != nil {
-		objectMap["activityRunEnd"] = ar.ActivityRunEnd
-	}
-	if ar.DurationInMs != nil {
-		objectMap["durationInMs"] = ar.DurationInMs
-	}
-	if ar.Input != nil {
-		objectMap["input"] = ar.Input
-	}
-	if ar.Output != nil {
-		objectMap["output"] = ar.Output
-	}
-	if ar.Error != nil {
-		objectMap["error"] = ar.Error
-	}
 	for k, v := range ar.AdditionalProperties {
 		objectMap[k] = v
 	}
@@ -9465,8 +9245,8 @@ func (adlslstp *AzureDataLakeStoreLinkedServiceTypeProperties) UnmarshalJSON(bod
 
 // AzureDataLakeStoreSink a copy activity Azure Data Lake Store sink.
 type AzureDataLakeStoreSink struct {
-	// CopyBehavior - The type of copy behavior for copy sink. Possible values include: 'PreserveHierarchy', 'FlattenHierarchy', 'MergeFiles'
-	CopyBehavior CopyBehaviorType `json:"copyBehavior,omitempty"`
+	// CopyBehavior - The type of copy behavior for copy sink.
+	CopyBehavior interface{} `json:"copyBehavior,omitempty"`
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
 	// WriteBatchSize - Write batch size. Type: integer (or Expression with resultType integer), minimum: 0.
@@ -9485,7 +9265,7 @@ type AzureDataLakeStoreSink struct {
 func (adlss AzureDataLakeStoreSink) MarshalJSON() ([]byte, error) {
 	adlss.Type = TypeAzureDataLakeStoreSink
 	objectMap := make(map[string]interface{})
-	if adlss.CopyBehavior != "" {
+	if adlss.CopyBehavior != nil {
 		objectMap["copyBehavior"] = adlss.CopyBehavior
 	}
 	if adlss.WriteBatchSize != nil {
@@ -9600,7 +9380,7 @@ func (adlss *AzureDataLakeStoreSink) UnmarshalJSON(body []byte) error {
 		switch k {
 		case "copyBehavior":
 			if v != nil {
-				var copyBehavior CopyBehaviorType
+				var copyBehavior interface{}
 				err = json.Unmarshal(*v, &copyBehavior)
 				if err != nil {
 					return err
@@ -14908,8 +14688,8 @@ type AzureSearchIndexDatasetTypeProperties struct {
 
 // AzureSearchIndexSink a copy activity Azure Search Index sink.
 type AzureSearchIndexSink struct {
-	// WriteBehavior - Specify the write behavior when upserting documents into Azure Search Index. Possible values include: 'Merge', 'Upload'
-	WriteBehavior AzureSearchIndexWriteBehaviorType `json:"writeBehavior,omitempty"`
+	// WriteBehavior - Specify the write behavior when upserting documents into Azure Search Index.
+	WriteBehavior interface{} `json:"writeBehavior,omitempty"`
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
 	// WriteBatchSize - Write batch size. Type: integer (or Expression with resultType integer), minimum: 0.
@@ -14928,7 +14708,7 @@ type AzureSearchIndexSink struct {
 func (asis AzureSearchIndexSink) MarshalJSON() ([]byte, error) {
 	asis.Type = TypeAzureSearchIndexSink
 	objectMap := make(map[string]interface{})
-	if asis.WriteBehavior != "" {
+	if asis.WriteBehavior != nil {
 		objectMap["writeBehavior"] = asis.WriteBehavior
 	}
 	if asis.WriteBatchSize != nil {
@@ -15043,7 +14823,7 @@ func (asis *AzureSearchIndexSink) UnmarshalJSON(body []byte) error {
 		switch k {
 		case "writeBehavior":
 			if v != nil {
-				var writeBehavior AzureSearchIndexWriteBehaviorType
+				var writeBehavior interface{}
 				err = json.Unmarshal(*v, &writeBehavior)
 				if err != nil {
 					return err
@@ -19207,7 +18987,7 @@ type BlobEventsTrigger struct {
 	AdditionalProperties map[string]interface{} `json:""`
 	// Description - Trigger description.
 	Description *string `json:"description,omitempty"`
-	// RuntimeState - Indicates if trigger is running or not. Updated when Start/Stop APIs are called on the Trigger. Possible values include: 'TriggerRuntimeStateStarted', 'TriggerRuntimeStateStopped', 'TriggerRuntimeStateDisabled'
+	// RuntimeState - READ-ONLY; Indicates if trigger is running or not. Updated when Start/Stop APIs are called on the Trigger. Possible values include: 'TriggerRuntimeStateStarted', 'TriggerRuntimeStateStopped', 'TriggerRuntimeStateDisabled'
 	RuntimeState TriggerRuntimeState `json:"runtimeState,omitempty"`
 	// Type - Possible values include: 'TypeTrigger', 'TypeTumblingWindowTrigger', 'TypeBlobEventsTrigger', 'TypeBlobTrigger', 'TypeScheduleTrigger', 'TypeMultiplePipelineTrigger'
 	Type TypeBasicTrigger `json:"type,omitempty"`
@@ -19225,9 +19005,6 @@ func (bet BlobEventsTrigger) MarshalJSON() ([]byte, error) {
 	}
 	if bet.Description != nil {
 		objectMap["description"] = bet.Description
-	}
-	if bet.RuntimeState != "" {
-		objectMap["runtimeState"] = bet.RuntimeState
 	}
 	if bet.Type != "" {
 		objectMap["type"] = bet.Type
@@ -19370,8 +19147,8 @@ type BlobSink struct {
 	BlobWriterDateTimeFormat interface{} `json:"blobWriterDateTimeFormat,omitempty"`
 	// BlobWriterAddHeader - Blob writer add header. Type: boolean (or Expression with resultType boolean).
 	BlobWriterAddHeader interface{} `json:"blobWriterAddHeader,omitempty"`
-	// CopyBehavior - The type of copy behavior for copy sink. Possible values include: 'PreserveHierarchy', 'FlattenHierarchy', 'MergeFiles'
-	CopyBehavior CopyBehaviorType `json:"copyBehavior,omitempty"`
+	// CopyBehavior - The type of copy behavior for copy sink.
+	CopyBehavior interface{} `json:"copyBehavior,omitempty"`
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
 	// WriteBatchSize - Write batch size. Type: integer (or Expression with resultType integer), minimum: 0.
@@ -19399,7 +19176,7 @@ func (bs BlobSink) MarshalJSON() ([]byte, error) {
 	if bs.BlobWriterAddHeader != nil {
 		objectMap["blobWriterAddHeader"] = bs.BlobWriterAddHeader
 	}
-	if bs.CopyBehavior != "" {
+	if bs.CopyBehavior != nil {
 		objectMap["copyBehavior"] = bs.CopyBehavior
 	}
 	if bs.WriteBatchSize != nil {
@@ -19541,7 +19318,7 @@ func (bs *BlobSink) UnmarshalJSON(body []byte) error {
 			}
 		case "copyBehavior":
 			if v != nil {
-				var copyBehavior CopyBehaviorType
+				var copyBehavior interface{}
 				err = json.Unmarshal(*v, &copyBehavior)
 				if err != nil {
 					return err
@@ -20008,7 +19785,7 @@ type BlobTrigger struct {
 	AdditionalProperties map[string]interface{} `json:""`
 	// Description - Trigger description.
 	Description *string `json:"description,omitempty"`
-	// RuntimeState - Indicates if trigger is running or not. Updated when Start/Stop APIs are called on the Trigger. Possible values include: 'TriggerRuntimeStateStarted', 'TriggerRuntimeStateStopped', 'TriggerRuntimeStateDisabled'
+	// RuntimeState - READ-ONLY; Indicates if trigger is running or not. Updated when Start/Stop APIs are called on the Trigger. Possible values include: 'TriggerRuntimeStateStarted', 'TriggerRuntimeStateStopped', 'TriggerRuntimeStateDisabled'
 	RuntimeState TriggerRuntimeState `json:"runtimeState,omitempty"`
 	// Type - Possible values include: 'TypeTrigger', 'TypeTumblingWindowTrigger', 'TypeBlobEventsTrigger', 'TypeBlobTrigger', 'TypeScheduleTrigger', 'TypeMultiplePipelineTrigger'
 	Type TypeBasicTrigger `json:"type,omitempty"`
@@ -20026,9 +19803,6 @@ func (bt BlobTrigger) MarshalJSON() ([]byte, error) {
 	}
 	if bt.Description != nil {
 		objectMap["description"] = bt.Description
-	}
-	if bt.RuntimeState != "" {
-		objectMap["runtimeState"] = bt.RuntimeState
 	}
 	if bt.Type != "" {
 		objectMap["type"] = bt.Type
@@ -20736,8 +20510,8 @@ func (clstp *CassandraLinkedServiceTypeProperties) UnmarshalJSON(body []byte) er
 type CassandraSource struct {
 	// Query - Database query. Should be a SQL-92 query expression or Cassandra Query Language (CQL) command. Type: string (or Expression with resultType string).
 	Query interface{} `json:"query,omitempty"`
-	// ConsistencyLevel - The consistency level specifies how many Cassandra servers must respond to a read request before returning data to the client application. Cassandra checks the specified number of Cassandra servers for data to satisfy the read request. Must be one of cassandraSourceReadConsistencyLevels. The default value is 'ONE'. It is case-insensitive. Possible values include: 'ALL', 'EACHQUORUM', 'QUORUM', 'LOCALQUORUM', 'ONE', 'TWO', 'THREE', 'LOCALONE', 'SERIAL', 'LOCALSERIAL'
-	ConsistencyLevel CassandraSourceReadConsistencyLevels `json:"consistencyLevel,omitempty"`
+	// ConsistencyLevel - The consistency level specifies how many Cassandra servers must respond to a read request before returning data to the client application. Cassandra checks the specified number of Cassandra servers for data to satisfy the read request. Must be one of cassandraSourceReadConsistencyLevels. The default value is 'ONE'. It is case-insensitive.
+	ConsistencyLevel interface{} `json:"consistencyLevel,omitempty"`
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
 	// SourceRetryCount - Source retry count. Type: integer (or Expression with resultType integer).
@@ -20755,7 +20529,7 @@ func (cs CassandraSource) MarshalJSON() ([]byte, error) {
 	if cs.Query != nil {
 		objectMap["query"] = cs.Query
 	}
-	if cs.ConsistencyLevel != "" {
+	if cs.ConsistencyLevel != nil {
 		objectMap["consistencyLevel"] = cs.ConsistencyLevel
 	}
 	if cs.SourceRetryCount != nil {
@@ -21053,7 +20827,7 @@ func (cs *CassandraSource) UnmarshalJSON(body []byte) error {
 			}
 		case "consistencyLevel":
 			if v != nil {
-				var consistencyLevel CassandraSourceReadConsistencyLevels
+				var consistencyLevel interface{}
 				err = json.Unmarshal(*v, &consistencyLevel)
 				if err != nil {
 					return err
@@ -23495,7 +23269,7 @@ type CopyActivityTypeProperties struct {
 	// Sink - Copy activity sink.
 	Sink BasicCopySink `json:"sink,omitempty"`
 	// Translator - Copy activity translator. If not specified, tabular translator is used.
-	Translator BasicCopyTranslator `json:"translator,omitempty"`
+	Translator interface{} `json:"translator,omitempty"`
 	// EnableStaging - Specifies whether to copy data via an interim staging. Default value is false. Type: boolean (or Expression with resultType boolean).
 	EnableStaging interface{} `json:"enableStaging,omitempty"`
 	// StagingSettings - Specifies interim staging settings when EnableStaging is true.
@@ -23537,7 +23311,8 @@ func (catp *CopyActivityTypeProperties) UnmarshalJSON(body []byte) error {
 			}
 		case "translator":
 			if v != nil {
-				translator, err := unmarshalBasicCopyTranslator(*v)
+				var translator interface{}
+				err = json.Unmarshal(*v, &translator)
 				if err != nil {
 					return err
 				}
@@ -24530,121 +24305,6 @@ func (cs *CopySource) UnmarshalJSON(body []byte) error {
 					return err
 				}
 				cs.Type = typeVar
-			}
-		}
-	}
-
-	return nil
-}
-
-// BasicCopyTranslator a copy activity translator.
-type BasicCopyTranslator interface {
-	AsTabularTranslator() (*TabularTranslator, bool)
-	AsCopyTranslator() (*CopyTranslator, bool)
-}
-
-// CopyTranslator a copy activity translator.
-type CopyTranslator struct {
-	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
-	AdditionalProperties map[string]interface{} `json:""`
-	// Type - Possible values include: 'TypeCopyTranslator', 'TypeTabularTranslator'
-	Type TypeBasicCopyTranslator `json:"type,omitempty"`
-}
-
-func unmarshalBasicCopyTranslator(body []byte) (BasicCopyTranslator, error) {
-	var m map[string]interface{}
-	err := json.Unmarshal(body, &m)
-	if err != nil {
-		return nil, err
-	}
-
-	switch m["type"] {
-	case string(TypeTabularTranslator):
-		var tt TabularTranslator
-		err := json.Unmarshal(body, &tt)
-		return tt, err
-	default:
-		var ct CopyTranslator
-		err := json.Unmarshal(body, &ct)
-		return ct, err
-	}
-}
-func unmarshalBasicCopyTranslatorArray(body []byte) ([]BasicCopyTranslator, error) {
-	var rawMessages []*json.RawMessage
-	err := json.Unmarshal(body, &rawMessages)
-	if err != nil {
-		return nil, err
-	}
-
-	ctArray := make([]BasicCopyTranslator, len(rawMessages))
-
-	for index, rawMessage := range rawMessages {
-		ct, err := unmarshalBasicCopyTranslator(*rawMessage)
-		if err != nil {
-			return nil, err
-		}
-		ctArray[index] = ct
-	}
-	return ctArray, nil
-}
-
-// MarshalJSON is the custom marshaler for CopyTranslator.
-func (ct CopyTranslator) MarshalJSON() ([]byte, error) {
-	ct.Type = TypeCopyTranslator
-	objectMap := make(map[string]interface{})
-	if ct.Type != "" {
-		objectMap["type"] = ct.Type
-	}
-	for k, v := range ct.AdditionalProperties {
-		objectMap[k] = v
-	}
-	return json.Marshal(objectMap)
-}
-
-// AsTabularTranslator is the BasicCopyTranslator implementation for CopyTranslator.
-func (ct CopyTranslator) AsTabularTranslator() (*TabularTranslator, bool) {
-	return nil, false
-}
-
-// AsCopyTranslator is the BasicCopyTranslator implementation for CopyTranslator.
-func (ct CopyTranslator) AsCopyTranslator() (*CopyTranslator, bool) {
-	return &ct, true
-}
-
-// AsBasicCopyTranslator is the BasicCopyTranslator implementation for CopyTranslator.
-func (ct CopyTranslator) AsBasicCopyTranslator() (BasicCopyTranslator, bool) {
-	return &ct, true
-}
-
-// UnmarshalJSON is the custom unmarshaler for CopyTranslator struct.
-func (ct *CopyTranslator) UnmarshalJSON(body []byte) error {
-	var m map[string]*json.RawMessage
-	err := json.Unmarshal(body, &m)
-	if err != nil {
-		return err
-	}
-	for k, v := range m {
-		switch k {
-		default:
-			if v != nil {
-				var additionalProperties interface{}
-				err = json.Unmarshal(*v, &additionalProperties)
-				if err != nil {
-					return err
-				}
-				if ct.AdditionalProperties == nil {
-					ct.AdditionalProperties = make(map[string]interface{})
-				}
-				ct.AdditionalProperties[k] = additionalProperties
-			}
-		case "type":
-			if v != nil {
-				var typeVar TypeBasicCopyTranslator
-				err = json.Unmarshal(*v, &typeVar)
-				if err != nil {
-					return err
-				}
-				ct.Type = typeVar
 			}
 		}
 	}
@@ -29205,8 +28865,8 @@ func (dc *DatasetCompression) UnmarshalJSON(body []byte) error {
 
 // DatasetDeflateCompression the Deflate compression method used on a dataset.
 type DatasetDeflateCompression struct {
-	// Level - The Deflate compression level. Possible values include: 'Optimal', 'Fastest'
-	Level DatasetCompressionLevel `json:"level,omitempty"`
+	// Level - The Deflate compression level.
+	Level interface{} `json:"level,omitempty"`
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
 	// Type - Possible values include: 'TypeDatasetCompression', 'TypeZipDeflate', 'TypeDeflate', 'TypeGZip', 'TypeBZip2'
@@ -29217,7 +28877,7 @@ type DatasetDeflateCompression struct {
 func (ddc DatasetDeflateCompression) MarshalJSON() ([]byte, error) {
 	ddc.Type = TypeDeflate
 	objectMap := make(map[string]interface{})
-	if ddc.Level != "" {
+	if ddc.Level != nil {
 		objectMap["level"] = ddc.Level
 	}
 	if ddc.Type != "" {
@@ -29270,7 +28930,7 @@ func (ddc *DatasetDeflateCompression) UnmarshalJSON(body []byte) error {
 		switch k {
 		case "level":
 			if v != nil {
-				var level DatasetCompressionLevel
+				var level interface{}
 				err = json.Unmarshal(*v, &level)
 				if err != nil {
 					return err
@@ -29306,8 +28966,8 @@ func (ddc *DatasetDeflateCompression) UnmarshalJSON(body []byte) error {
 
 // DatasetGZipCompression the GZip compression method used on a dataset.
 type DatasetGZipCompression struct {
-	// Level - The GZip compression level. Possible values include: 'Optimal', 'Fastest'
-	Level DatasetCompressionLevel `json:"level,omitempty"`
+	// Level - The GZip compression level.
+	Level interface{} `json:"level,omitempty"`
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
 	// Type - Possible values include: 'TypeDatasetCompression', 'TypeZipDeflate', 'TypeDeflate', 'TypeGZip', 'TypeBZip2'
@@ -29318,7 +28978,7 @@ type DatasetGZipCompression struct {
 func (dgzc DatasetGZipCompression) MarshalJSON() ([]byte, error) {
 	dgzc.Type = TypeGZip
 	objectMap := make(map[string]interface{})
-	if dgzc.Level != "" {
+	if dgzc.Level != nil {
 		objectMap["level"] = dgzc.Level
 	}
 	if dgzc.Type != "" {
@@ -29371,7 +29031,7 @@ func (dgzc *DatasetGZipCompression) UnmarshalJSON(body []byte) error {
 		switch k {
 		case "level":
 			if v != nil {
-				var level DatasetCompressionLevel
+				var level interface{}
 				err = json.Unmarshal(*v, &level)
 				if err != nil {
 					return err
@@ -29581,13 +29241,13 @@ type DatasetResource struct {
 	autorest.Response `json:"-"`
 	// Properties - Dataset properties.
 	Properties BasicDataset `json:"properties,omitempty"`
-	// ID - The resource identifier.
+	// ID - READ-ONLY; The resource identifier.
 	ID *string `json:"id,omitempty"`
-	// Name - The resource name.
+	// Name - READ-ONLY; The resource name.
 	Name *string `json:"name,omitempty"`
-	// Type - The resource type.
+	// Type - READ-ONLY; The resource type.
 	Type *string `json:"type,omitempty"`
-	// Etag - Etag identifies change in the resource.
+	// Etag - READ-ONLY; Etag identifies change in the resource.
 	Etag *string `json:"etag,omitempty"`
 }
 
@@ -29835,8 +29495,8 @@ func (dsf *DatasetStorageFormat) UnmarshalJSON(body []byte) error {
 
 // DatasetZipDeflateCompression the ZipDeflate compression method used on a dataset.
 type DatasetZipDeflateCompression struct {
-	// Level - The ZipDeflate compression level. Possible values include: 'Optimal', 'Fastest'
-	Level DatasetCompressionLevel `json:"level,omitempty"`
+	// Level - The ZipDeflate compression level.
+	Level interface{} `json:"level,omitempty"`
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
 	// Type - Possible values include: 'TypeDatasetCompression', 'TypeZipDeflate', 'TypeDeflate', 'TypeGZip', 'TypeBZip2'
@@ -29847,7 +29507,7 @@ type DatasetZipDeflateCompression struct {
 func (dzdc DatasetZipDeflateCompression) MarshalJSON() ([]byte, error) {
 	dzdc.Type = TypeZipDeflate
 	objectMap := make(map[string]interface{})
-	if dzdc.Level != "" {
+	if dzdc.Level != nil {
 		objectMap["level"] = dzdc.Level
 	}
 	if dzdc.Type != "" {
@@ -29900,7 +29560,7 @@ func (dzdc *DatasetZipDeflateCompression) UnmarshalJSON(body []byte) error {
 		switch k {
 		case "level":
 			if v != nil {
-				var level DatasetCompressionLevel
+				var level interface{}
 				err = json.Unmarshal(*v, &level)
 				if err != nil {
 					return err
@@ -33802,7 +33462,7 @@ func (dlstp *DynamicsLinkedServiceTypeProperties) UnmarshalJSON(body []byte) err
 // DynamicsSink a copy activity Dynamics sink.
 type DynamicsSink struct {
 	// WriteBehavior - The write behavior for the operation.
-	WriteBehavior *string `json:"writeBehavior,omitempty"`
+	WriteBehavior interface{} `json:"writeBehavior,omitempty"`
 	// IgnoreNullValues - The flag indicating whether ignore null values from input dataset (except key fields) during write operation. Default is false. Type: boolean (or Expression with resultType boolean).
 	IgnoreNullValues interface{} `json:"ignoreNullValues,omitempty"`
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
@@ -33941,12 +33601,12 @@ func (ds *DynamicsSink) UnmarshalJSON(body []byte) error {
 		switch k {
 		case "writeBehavior":
 			if v != nil {
-				var writeBehavior string
+				var writeBehavior interface{}
 				err = json.Unmarshal(*v, &writeBehavior)
 				if err != nil {
 					return err
 				}
-				ds.WriteBehavior = &writeBehavior
+				ds.WriteBehavior = writeBehavior
 			}
 		case "ignoreNullValues":
 			if v != nil {
@@ -35722,6 +35382,14 @@ func (es *EloquaSource) UnmarshalJSON(body []byte) error {
 	return nil
 }
 
+// EntityReference the entity reference.
+type EntityReference struct {
+	// Type - The type of this referenced entity. Possible values include: 'IntegrationRuntimeEntityReferenceTypeIntegrationRuntimeReference', 'IntegrationRuntimeEntityReferenceTypeLinkedServiceReference'
+	Type IntegrationRuntimeEntityReferenceType `json:"type,omitempty"`
+	// ReferenceName - The name of this referenced entity.
+	ReferenceName *string `json:"referenceName,omitempty"`
+}
+
 // ErrorResponse the object that defines the structure of an Azure Data Factory response.
 type ErrorResponse struct {
 	// Code - Error code.
@@ -36297,12 +35965,14 @@ func (espa *ExecuteSSISPackageActivity) UnmarshalJSON(body []byte) error {
 type ExecuteSSISPackageActivityTypeProperties struct {
 	// PackageLocation - SSIS package location.
 	PackageLocation *SSISPackageLocation `json:"packageLocation,omitempty"`
-	// Runtime - Specifies the runtime to execute SSIS package. Possible values include: 'X64', 'X86'
-	Runtime SSISExecutionRuntime `json:"runtime,omitempty"`
-	// LoggingLevel - The logging level of SSIS package execution.
-	LoggingLevel *string `json:"loggingLevel,omitempty"`
-	// EnvironmentPath - The environment path to execute the SSIS package.
-	EnvironmentPath *string `json:"environmentPath,omitempty"`
+	// Runtime - Specifies the runtime to execute SSIS package. The value should be "x86" or "x64". Type: string (or Expression with resultType string).
+	Runtime interface{} `json:"runtime,omitempty"`
+	// LoggingLevel - The logging level of SSIS package execution. Type: string (or Expression with resultType string).
+	LoggingLevel interface{} `json:"loggingLevel,omitempty"`
+	// EnvironmentPath - The environment path to execute the SSIS package. Type: string (or Expression with resultType string).
+	EnvironmentPath interface{} `json:"environmentPath,omitempty"`
+	// ExecutionCredential - The package execution credential.
+	ExecutionCredential *SSISExecutionCredential `json:"executionCredential,omitempty"`
 	// ConnectVia - The integration runtime reference.
 	ConnectVia *IntegrationRuntimeReference `json:"connectVia,omitempty"`
 	// ProjectParameters - The project level parameters to execute the SSIS package.
@@ -36315,6 +35985,8 @@ type ExecuteSSISPackageActivityTypeProperties struct {
 	PackageConnectionManagers map[string]map[string]*SSISExecutionParameter `json:"packageConnectionManagers"`
 	// PropertyOverrides - The property overrides to execute the SSIS package.
 	PropertyOverrides map[string]*SSISPropertyOverride `json:"propertyOverrides"`
+	// LogLocation - SSIS package execution log location.
+	LogLocation *SSISLogLocation `json:"logLocation,omitempty"`
 }
 
 // MarshalJSON is the custom marshaler for ExecuteSSISPackageActivityTypeProperties.
@@ -36323,7 +35995,7 @@ func (espatp ExecuteSSISPackageActivityTypeProperties) MarshalJSON() ([]byte, er
 	if espatp.PackageLocation != nil {
 		objectMap["packageLocation"] = espatp.PackageLocation
 	}
-	if espatp.Runtime != "" {
+	if espatp.Runtime != nil {
 		objectMap["runtime"] = espatp.Runtime
 	}
 	if espatp.LoggingLevel != nil {
@@ -36331,6 +36003,9 @@ func (espatp ExecuteSSISPackageActivityTypeProperties) MarshalJSON() ([]byte, er
 	}
 	if espatp.EnvironmentPath != nil {
 		objectMap["environmentPath"] = espatp.EnvironmentPath
+	}
+	if espatp.ExecutionCredential != nil {
+		objectMap["executionCredential"] = espatp.ExecutionCredential
 	}
 	if espatp.ConnectVia != nil {
 		objectMap["connectVia"] = espatp.ConnectVia
@@ -36349,6 +36024,9 @@ func (espatp ExecuteSSISPackageActivityTypeProperties) MarshalJSON() ([]byte, er
 	}
 	if espatp.PropertyOverrides != nil {
 		objectMap["propertyOverrides"] = espatp.PropertyOverrides
+	}
+	if espatp.LogLocation != nil {
+		objectMap["logLocation"] = espatp.LogLocation
 	}
 	return json.Marshal(objectMap)
 }
@@ -36755,11 +36433,11 @@ type Factory struct {
 	Identity *FactoryIdentity `json:"identity,omitempty"`
 	// FactoryProperties - Properties of the factory.
 	*FactoryProperties `json:"properties,omitempty"`
-	// ID - The resource identifier.
+	// ID - READ-ONLY; The resource identifier.
 	ID *string `json:"id,omitempty"`
-	// Name - The resource name.
+	// Name - READ-ONLY; The resource name.
 	Name *string `json:"name,omitempty"`
-	// Type - The resource type.
+	// Type - READ-ONLY; The resource type.
 	Type *string `json:"type,omitempty"`
 	// Location - The resource location.
 	Location *string `json:"location,omitempty"`
@@ -36775,15 +36453,6 @@ func (f Factory) MarshalJSON() ([]byte, error) {
 	}
 	if f.FactoryProperties != nil {
 		objectMap["properties"] = f.FactoryProperties
-	}
-	if f.ID != nil {
-		objectMap["id"] = f.ID
-	}
-	if f.Name != nil {
-		objectMap["name"] = f.Name
-	}
-	if f.Type != nil {
-		objectMap["type"] = f.Type
 	}
 	if f.Location != nil {
 		objectMap["location"] = f.Location
@@ -36891,9 +36560,9 @@ func (f *Factory) UnmarshalJSON(body []byte) error {
 type FactoryIdentity struct {
 	// Type - The identity type. Currently the only supported type is 'SystemAssigned'.
 	Type *string `json:"type,omitempty"`
-	// PrincipalID - The principal id of the identity.
+	// PrincipalID - READ-ONLY; The principal id of the identity.
 	PrincipalID *uuid.UUID `json:"principalId,omitempty"`
-	// TenantID - The client tenant id of the identity.
+	// TenantID - READ-ONLY; The client tenant id of the identity.
 	TenantID *uuid.UUID `json:"tenantId,omitempty"`
 }
 
@@ -37045,11 +36714,11 @@ func NewFactoryListResponsePage(getNextPage func(context.Context, FactoryListRes
 
 // FactoryProperties factory resource properties.
 type FactoryProperties struct {
-	// ProvisioningState - Factory provisioning state, example Succeeded.
+	// ProvisioningState - READ-ONLY; Factory provisioning state, example Succeeded.
 	ProvisioningState *string `json:"provisioningState,omitempty"`
-	// CreateTime - Time the factory was created in ISO8601 format.
+	// CreateTime - READ-ONLY; Time the factory was created in ISO8601 format.
 	CreateTime *date.Time `json:"createTime,omitempty"`
-	// Version - Version of the factory.
+	// Version - READ-ONLY; Version of the factory.
 	Version *string `json:"version,omitempty"`
 	// VstsConfiguration - VSTS repo information of the factory.
 	VstsConfiguration *FactoryVSTSConfiguration `json:"vstsConfiguration,omitempty"`
@@ -38142,8 +37811,8 @@ func (fsdtp *FileShareDatasetTypeProperties) UnmarshalJSON(body []byte) error {
 
 // FileSystemSink a copy activity file system sink.
 type FileSystemSink struct {
-	// CopyBehavior - The type of copy behavior for copy sink. Possible values include: 'PreserveHierarchy', 'FlattenHierarchy', 'MergeFiles'
-	CopyBehavior CopyBehaviorType `json:"copyBehavior,omitempty"`
+	// CopyBehavior - The type of copy behavior for copy sink.
+	CopyBehavior interface{} `json:"copyBehavior,omitempty"`
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
 	// WriteBatchSize - Write batch size. Type: integer (or Expression with resultType integer), minimum: 0.
@@ -38162,7 +37831,7 @@ type FileSystemSink struct {
 func (fss FileSystemSink) MarshalJSON() ([]byte, error) {
 	fss.Type = TypeFileSystemSink
 	objectMap := make(map[string]interface{})
-	if fss.CopyBehavior != "" {
+	if fss.CopyBehavior != nil {
 		objectMap["copyBehavior"] = fss.CopyBehavior
 	}
 	if fss.WriteBatchSize != nil {
@@ -38277,7 +37946,7 @@ func (fss *FileSystemSink) UnmarshalJSON(body []byte) error {
 		switch k {
 		case "copyBehavior":
 			if v != nil {
-				var copyBehavior CopyBehaviorType
+				var copyBehavior interface{}
 				err = json.Unmarshal(*v, &copyBehavior)
 				if err != nil {
 					return err
@@ -54411,41 +54080,23 @@ type IntegrationRuntimeConnectionInfo struct {
 	autorest.Response `json:"-"`
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
-	// ServiceToken - The token generated in service. Callers use this token to authenticate to integration runtime.
+	// ServiceToken - READ-ONLY; The token generated in service. Callers use this token to authenticate to integration runtime.
 	ServiceToken *string `json:"serviceToken,omitempty"`
-	// IdentityCertThumbprint - The integration runtime SSL certificate thumbprint. Click-Once application uses it to do server validation.
+	// IdentityCertThumbprint - READ-ONLY; The integration runtime SSL certificate thumbprint. Click-Once application uses it to do server validation.
 	IdentityCertThumbprint *string `json:"identityCertThumbprint,omitempty"`
-	// HostServiceURI - The on-premises integration runtime host URL.
+	// HostServiceURI - READ-ONLY; The on-premises integration runtime host URL.
 	HostServiceURI *string `json:"hostServiceUri,omitempty"`
-	// Version - The integration runtime version.
+	// Version - READ-ONLY; The integration runtime version.
 	Version *string `json:"version,omitempty"`
-	// PublicKey - The public key for encrypting a credential when transferring the credential to the integration runtime.
+	// PublicKey - READ-ONLY; The public key for encrypting a credential when transferring the credential to the integration runtime.
 	PublicKey *string `json:"publicKey,omitempty"`
-	// IsIdentityCertExprired - Whether the identity certificate is expired.
+	// IsIdentityCertExprired - READ-ONLY; Whether the identity certificate is expired.
 	IsIdentityCertExprired *bool `json:"isIdentityCertExprired,omitempty"`
 }
 
 // MarshalJSON is the custom marshaler for IntegrationRuntimeConnectionInfo.
 func (irci IntegrationRuntimeConnectionInfo) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
-	if irci.ServiceToken != nil {
-		objectMap["serviceToken"] = irci.ServiceToken
-	}
-	if irci.IdentityCertThumbprint != nil {
-		objectMap["identityCertThumbprint"] = irci.IdentityCertThumbprint
-	}
-	if irci.HostServiceURI != nil {
-		objectMap["hostServiceUri"] = irci.HostServiceURI
-	}
-	if irci.Version != nil {
-		objectMap["version"] = irci.Version
-	}
-	if irci.PublicKey != nil {
-		objectMap["publicKey"] = irci.PublicKey
-	}
-	if irci.IsIdentityCertExprired != nil {
-		objectMap["isIdentityCertExprired"] = irci.IsIdentityCertExprired
-	}
 	for k, v := range irci.AdditionalProperties {
 		objectMap[k] = v
 	}
@@ -54540,6 +54191,16 @@ type IntegrationRuntimeCustomSetupScriptProperties struct {
 	BlobContainerURI *string `json:"blobContainerUri,omitempty"`
 	// SasToken - The SAS token of the Azure blob container.
 	SasToken *SecureString `json:"sasToken,omitempty"`
+}
+
+// IntegrationRuntimeDataProxyProperties data proxy properties for a managed dedicated integration runtime.
+type IntegrationRuntimeDataProxyProperties struct {
+	// ConnectVia - The self-hosted integration runtime reference.
+	ConnectVia *EntityReference `json:"connectVia,omitempty"`
+	// StagingLinkedService - The staging linked service reference.
+	StagingLinkedService *EntityReference `json:"stagingLinkedService,omitempty"`
+	// Path - The path to contain the staged data in the Blob storage.
+	Path *string `json:"path,omitempty"`
 }
 
 // IntegrationRuntimeListResponse a list of integration runtime resources.
@@ -54701,7 +54362,7 @@ type IntegrationRuntimeMonitoringData struct {
 // IntegrationRuntimeNodeIPAddress the IP address of self-hosted integration runtime node.
 type IntegrationRuntimeNodeIPAddress struct {
 	autorest.Response `json:"-"`
-	// IPAddress - The IP address of self-hosted integration runtime node.
+	// IPAddress - READ-ONLY; The IP address of self-hosted integration runtime node.
 	IPAddress *string `json:"ipAddress,omitempty"`
 }
 
@@ -54709,51 +54370,27 @@ type IntegrationRuntimeNodeIPAddress struct {
 type IntegrationRuntimeNodeMonitoringData struct {
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
-	// NodeName - Name of the integration runtime node.
+	// NodeName - READ-ONLY; Name of the integration runtime node.
 	NodeName *string `json:"nodeName,omitempty"`
-	// AvailableMemoryInMB - Available memory (MB) on the integration runtime node.
+	// AvailableMemoryInMB - READ-ONLY; Available memory (MB) on the integration runtime node.
 	AvailableMemoryInMB *int32 `json:"availableMemoryInMB,omitempty"`
-	// CPUUtilization - CPU percentage on the integration runtime node.
+	// CPUUtilization - READ-ONLY; CPU percentage on the integration runtime node.
 	CPUUtilization *float64 `json:"cpuUtilization,omitempty"`
-	// ConcurrentJobsLimit - Maximum concurrent jobs on the integration runtime node.
+	// ConcurrentJobsLimit - READ-ONLY; Maximum concurrent jobs on the integration runtime node.
 	ConcurrentJobsLimit *int32 `json:"concurrentJobsLimit,omitempty"`
-	// ConcurrentJobsRunning - The number of jobs currently running on the integration runtime node.
+	// ConcurrentJobsRunning - READ-ONLY; The number of jobs currently running on the integration runtime node.
 	ConcurrentJobsRunning *int32 `json:"concurrentJobsRunning,omitempty"`
-	// MaxConcurrentJobs - The maximum concurrent jobs in this integration runtime.
+	// MaxConcurrentJobs - READ-ONLY; The maximum concurrent jobs in this integration runtime.
 	MaxConcurrentJobs *int32 `json:"maxConcurrentJobs,omitempty"`
-	// SentBytes - Sent bytes on the integration runtime node.
+	// SentBytes - READ-ONLY; Sent bytes on the integration runtime node.
 	SentBytes *float64 `json:"sentBytes,omitempty"`
-	// ReceivedBytes - Received bytes on the integration runtime node.
+	// ReceivedBytes - READ-ONLY; Received bytes on the integration runtime node.
 	ReceivedBytes *float64 `json:"receivedBytes,omitempty"`
 }
 
 // MarshalJSON is the custom marshaler for IntegrationRuntimeNodeMonitoringData.
 func (irnmd IntegrationRuntimeNodeMonitoringData) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
-	if irnmd.NodeName != nil {
-		objectMap["nodeName"] = irnmd.NodeName
-	}
-	if irnmd.AvailableMemoryInMB != nil {
-		objectMap["availableMemoryInMB"] = irnmd.AvailableMemoryInMB
-	}
-	if irnmd.CPUUtilization != nil {
-		objectMap["cpuUtilization"] = irnmd.CPUUtilization
-	}
-	if irnmd.ConcurrentJobsLimit != nil {
-		objectMap["concurrentJobsLimit"] = irnmd.ConcurrentJobsLimit
-	}
-	if irnmd.ConcurrentJobsRunning != nil {
-		objectMap["concurrentJobsRunning"] = irnmd.ConcurrentJobsRunning
-	}
-	if irnmd.MaxConcurrentJobs != nil {
-		objectMap["maxConcurrentJobs"] = irnmd.MaxConcurrentJobs
-	}
-	if irnmd.SentBytes != nil {
-		objectMap["sentBytes"] = irnmd.SentBytes
-	}
-	if irnmd.ReceivedBytes != nil {
-		objectMap["receivedBytes"] = irnmd.ReceivedBytes
-	}
 	for k, v := range irnmd.AdditionalProperties {
 		objectMap[k] = v
 	}
@@ -54951,13 +54588,13 @@ type IntegrationRuntimeResource struct {
 	autorest.Response `json:"-"`
 	// Properties - Integration runtime properties.
 	Properties BasicIntegrationRuntime `json:"properties,omitempty"`
-	// ID - The resource identifier.
+	// ID - READ-ONLY; The resource identifier.
 	ID *string `json:"id,omitempty"`
-	// Name - The resource name.
+	// Name - READ-ONLY; The resource name.
 	Name *string `json:"name,omitempty"`
-	// Type - The resource type.
+	// Type - READ-ONLY; The resource type.
 	Type *string `json:"type,omitempty"`
-	// Etag - Etag identifies change in the resource.
+	// Etag - READ-ONLY; Etag identifies change in the resource.
 	Etag *string `json:"etag,omitempty"`
 }
 
@@ -55030,8 +54667,8 @@ type IntegrationRuntimeSsisCatalogInfo struct {
 	CatalogAdminUserName *string `json:"catalogAdminUserName,omitempty"`
 	// CatalogAdminPassword - The password of the administrator user account of the catalog database.
 	CatalogAdminPassword *SecureString `json:"catalogAdminPassword,omitempty"`
-	// CatalogPricingTier - The pricing tier for the catalog database. The valid values could be found in https://azure.microsoft.com/en-us/pricing/details/sql-database/. Possible values include: 'IntegrationRuntimeSsisCatalogPricingTierBasic', 'IntegrationRuntimeSsisCatalogPricingTierStandard', 'IntegrationRuntimeSsisCatalogPricingTierPremium', 'IntegrationRuntimeSsisCatalogPricingTierPremiumRS'
-	CatalogPricingTier IntegrationRuntimeSsisCatalogPricingTier `json:"catalogPricingTier,omitempty"`
+	// CatalogPricingTier - The pricing tier for the catalog database. The valid values could be found in https://azure.microsoft.com/en-us/pricing/details/sql-database/
+	CatalogPricingTier *string `json:"catalogPricingTier,omitempty"`
 }
 
 // MarshalJSON is the custom marshaler for IntegrationRuntimeSsisCatalogInfo.
@@ -55046,7 +54683,7 @@ func (irsci IntegrationRuntimeSsisCatalogInfo) MarshalJSON() ([]byte, error) {
 	if irsci.CatalogAdminPassword != nil {
 		objectMap["catalogAdminPassword"] = irsci.CatalogAdminPassword
 	}
-	if irsci.CatalogPricingTier != "" {
+	if irsci.CatalogPricingTier != nil {
 		objectMap["catalogPricingTier"] = irsci.CatalogPricingTier
 	}
 	for k, v := range irsci.AdditionalProperties {
@@ -55105,12 +54742,12 @@ func (irsci *IntegrationRuntimeSsisCatalogInfo) UnmarshalJSON(body []byte) error
 			}
 		case "catalogPricingTier":
 			if v != nil {
-				var catalogPricingTier IntegrationRuntimeSsisCatalogPricingTier
+				var catalogPricingTier string
 				err = json.Unmarshal(*v, &catalogPricingTier)
 				if err != nil {
 					return err
 				}
-				irsci.CatalogPricingTier = catalogPricingTier
+				irsci.CatalogPricingTier = &catalogPricingTier
 			}
 		}
 	}
@@ -55128,6 +54765,8 @@ type IntegrationRuntimeSsisProperties struct {
 	LicenseType IntegrationRuntimeLicenseType `json:"licenseType,omitempty"`
 	// CustomSetupScriptProperties - Custom setup script properties for a managed dedicated integration runtime.
 	CustomSetupScriptProperties *IntegrationRuntimeCustomSetupScriptProperties `json:"customSetupScriptProperties,omitempty"`
+	// DataProxyProperties - Data proxy properties for a managed dedicated integration runtime.
+	DataProxyProperties *IntegrationRuntimeDataProxyProperties `json:"dataProxyProperties,omitempty"`
 	// Edition - The edition for the SSIS Integration Runtime. Possible values include: 'Standard', 'Enterprise'
 	Edition IntegrationRuntimeEdition `json:"edition,omitempty"`
 }
@@ -55143,6 +54782,9 @@ func (irsp IntegrationRuntimeSsisProperties) MarshalJSON() ([]byte, error) {
 	}
 	if irsp.CustomSetupScriptProperties != nil {
 		objectMap["customSetupScriptProperties"] = irsp.CustomSetupScriptProperties
+	}
+	if irsp.DataProxyProperties != nil {
+		objectMap["dataProxyProperties"] = irsp.DataProxyProperties
 	}
 	if irsp.Edition != "" {
 		objectMap["edition"] = irsp.Edition
@@ -55201,6 +54843,15 @@ func (irsp *IntegrationRuntimeSsisProperties) UnmarshalJSON(body []byte) error {
 				}
 				irsp.CustomSetupScriptProperties = &customSetupScriptProperties
 			}
+		case "dataProxyProperties":
+			if v != nil {
+				var dataProxyProperties IntegrationRuntimeDataProxyProperties
+				err = json.Unmarshal(*v, &dataProxyProperties)
+				if err != nil {
+					return err
+				}
+				irsp.DataProxyProperties = &dataProxyProperties
+			}
 		case "edition":
 			if v != nil {
 				var edition IntegrationRuntimeEdition
@@ -55226,7 +54877,7 @@ type IntegrationRuntimesStartFuture struct {
 // If the operation has not completed it will return an error.
 func (future *IntegrationRuntimesStartFuture) Result(client IntegrationRuntimesClient) (irsr IntegrationRuntimeStatusResponse, err error) {
 	var done bool
-	done, err = future.Done(client)
+	done, err = future.DoneWithContext(context.Background(), client)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "datafactory.IntegrationRuntimesStartFuture", "Result", future.Response(), "Polling failure")
 		return
@@ -55255,7 +54906,7 @@ type IntegrationRuntimesStopFuture struct {
 // If the operation has not completed it will return an error.
 func (future *IntegrationRuntimesStopFuture) Result(client IntegrationRuntimesClient) (ar autorest.Response, err error) {
 	var done bool
-	done, err = future.Done(client)
+	done, err = future.DoneWithContext(context.Background(), client)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "datafactory.IntegrationRuntimesStopFuture", "Result", future.Response(), "Polling failure")
 		return
@@ -55279,9 +54930,9 @@ type BasicIntegrationRuntimeStatus interface {
 type IntegrationRuntimeStatus struct {
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
-	// DataFactoryName - The data factory name which the integration runtime belong to.
+	// DataFactoryName - READ-ONLY; The data factory name which the integration runtime belong to.
 	DataFactoryName *string `json:"dataFactoryName,omitempty"`
-	// State - The state of integration runtime. Possible values include: 'Initial', 'Stopped', 'Started', 'Starting', 'Stopping', 'NeedRegistration', 'Online', 'Limited', 'Offline'
+	// State - READ-ONLY; The state of integration runtime. Possible values include: 'Initial', 'Stopped', 'Started', 'Starting', 'Stopping', 'NeedRegistration', 'Online', 'Limited', 'Offline'
 	State IntegrationRuntimeState `json:"state,omitempty"`
 	// Type - Possible values include: 'TypeBasicIntegrationRuntimeStatusTypeIntegrationRuntimeStatus', 'TypeBasicIntegrationRuntimeStatusTypeSelfHosted', 'TypeBasicIntegrationRuntimeStatusTypeManaged'
 	Type TypeBasicIntegrationRuntimeStatus `json:"type,omitempty"`
@@ -55332,12 +54983,6 @@ func unmarshalBasicIntegrationRuntimeStatusArray(body []byte) ([]BasicIntegratio
 func (irs IntegrationRuntimeStatus) MarshalJSON() ([]byte, error) {
 	irs.Type = TypeBasicIntegrationRuntimeStatusTypeIntegrationRuntimeStatus
 	objectMap := make(map[string]interface{})
-	if irs.DataFactoryName != nil {
-		objectMap["dataFactoryName"] = irs.DataFactoryName
-	}
-	if irs.State != "" {
-		objectMap["state"] = irs.State
-	}
 	if irs.Type != "" {
 		objectMap["type"] = irs.Type
 	}
@@ -55432,7 +55077,7 @@ type IntegrationRuntimeStatusListResponse struct {
 // IntegrationRuntimeStatusResponse integration runtime status response.
 type IntegrationRuntimeStatusResponse struct {
 	autorest.Response `json:"-"`
-	// Name - The integration runtime name.
+	// Name - READ-ONLY; The integration runtime name.
 	Name *string `json:"name,omitempty"`
 	// Properties - Integration runtime properties.
 	Properties BasicIntegrationRuntimeStatus `json:"properties,omitempty"`
@@ -57086,15 +56731,15 @@ func (jf *JSONFormat) UnmarshalJSON(body []byte) error {
 
 // LinkedIntegrationRuntime the linked integration runtime information.
 type LinkedIntegrationRuntime struct {
-	// Name - The name of the linked integration runtime.
+	// Name - READ-ONLY; The name of the linked integration runtime.
 	Name *string `json:"name,omitempty"`
-	// SubscriptionID - The subscription ID for which the linked integration runtime belong to.
+	// SubscriptionID - READ-ONLY; The subscription ID for which the linked integration runtime belong to.
 	SubscriptionID *string `json:"subscriptionId,omitempty"`
-	// DataFactoryName - The name of the data factory for which the linked integration runtime belong to.
+	// DataFactoryName - READ-ONLY; The name of the data factory for which the linked integration runtime belong to.
 	DataFactoryName *string `json:"dataFactoryName,omitempty"`
-	// DataFactoryLocation - The location of the data factory for which the linked integration runtime belong to.
+	// DataFactoryLocation - READ-ONLY; The location of the data factory for which the linked integration runtime belong to.
 	DataFactoryLocation *string `json:"dataFactoryLocation,omitempty"`
-	// CreateTime - The creating time of the linked integration runtime.
+	// CreateTime - READ-ONLY; The creating time of the linked integration runtime.
 	CreateTime *date.Time `json:"createTime,omitempty"`
 }
 
@@ -58331,13 +57976,13 @@ type LinkedServiceResource struct {
 	autorest.Response `json:"-"`
 	// Properties - Properties of linked service.
 	Properties BasicLinkedService `json:"properties,omitempty"`
-	// ID - The resource identifier.
+	// ID - READ-ONLY; The resource identifier.
 	ID *string `json:"id,omitempty"`
-	// Name - The resource name.
+	// Name - READ-ONLY; The resource name.
 	Name *string `json:"name,omitempty"`
-	// Type - The resource type.
+	// Type - READ-ONLY; The resource type.
 	Type *string `json:"type,omitempty"`
-	// Etag - Etag identifies change in the resource.
+	// Etag - READ-ONLY; Etag identifies change in the resource.
 	Etag *string `json:"etag,omitempty"`
 }
 
@@ -60067,7 +59712,7 @@ func (ms *MagentoSource) UnmarshalJSON(body []byte) error {
 // ManagedIntegrationRuntime managed integration runtime, including managed elastic and managed dedicated
 // integration runtimes.
 type ManagedIntegrationRuntime struct {
-	// State - Integration runtime state, only valid for managed dedicated integration runtime. Possible values include: 'Initial', 'Stopped', 'Started', 'Starting', 'Stopping', 'NeedRegistration', 'Online', 'Limited', 'Offline'
+	// State - READ-ONLY; Integration runtime state, only valid for managed dedicated integration runtime. Possible values include: 'Initial', 'Stopped', 'Started', 'Starting', 'Stopping', 'NeedRegistration', 'Online', 'Limited', 'Offline'
 	State IntegrationRuntimeState `json:"state,omitempty"`
 	// ManagedIntegrationRuntimeTypeProperties - Managed integration runtime properties.
 	*ManagedIntegrationRuntimeTypeProperties `json:"typeProperties,omitempty"`
@@ -60083,9 +59728,6 @@ type ManagedIntegrationRuntime struct {
 func (mir ManagedIntegrationRuntime) MarshalJSON() ([]byte, error) {
 	mir.Type = TypeManaged
 	objectMap := make(map[string]interface{})
-	if mir.State != "" {
-		objectMap["state"] = mir.State
-	}
 	if mir.ManagedIntegrationRuntimeTypeProperties != nil {
 		objectMap["typeProperties"] = mir.ManagedIntegrationRuntimeTypeProperties
 	}
@@ -60186,21 +59828,21 @@ func (mir *ManagedIntegrationRuntime) UnmarshalJSON(body []byte) error {
 
 // ManagedIntegrationRuntimeError error definition for managed integration runtime.
 type ManagedIntegrationRuntimeError struct {
-	// Time - The time when the error occurred.
+	// Time - READ-ONLY; The time when the error occurred.
 	Time *date.Time `json:"time,omitempty"`
-	// Code - Error code.
+	// Code - READ-ONLY; Error code.
 	Code *string `json:"code,omitempty"`
-	// Parameters - Managed integration runtime error parameters.
+	// Parameters - READ-ONLY; Managed integration runtime error parameters.
 	Parameters *[]string `json:"parameters,omitempty"`
-	// Message - Error message.
+	// Message - READ-ONLY; Error message.
 	Message *string `json:"message,omitempty"`
 }
 
 // ManagedIntegrationRuntimeNode properties of integration runtime node.
 type ManagedIntegrationRuntimeNode struct {
-	// NodeID - The managed integration runtime node id.
+	// NodeID - READ-ONLY; The managed integration runtime node id.
 	NodeID *string `json:"nodeId,omitempty"`
-	// Status - The managed integration runtime node status. Possible values include: 'ManagedIntegrationRuntimeNodeStatusStarting', 'ManagedIntegrationRuntimeNodeStatusAvailable', 'ManagedIntegrationRuntimeNodeStatusRecycling', 'ManagedIntegrationRuntimeNodeStatusUnavailable'
+	// Status - READ-ONLY; The managed integration runtime node status. Possible values include: 'ManagedIntegrationRuntimeNodeStatusStarting', 'ManagedIntegrationRuntimeNodeStatusAvailable', 'ManagedIntegrationRuntimeNodeStatusRecycling', 'ManagedIntegrationRuntimeNodeStatusUnavailable'
 	Status ManagedIntegrationRuntimeNodeStatus `json:"status,omitempty"`
 	// Errors - The errors that occurred on this integration runtime node.
 	Errors *[]ManagedIntegrationRuntimeError `json:"errors,omitempty"`
@@ -60208,17 +59850,17 @@ type ManagedIntegrationRuntimeNode struct {
 
 // ManagedIntegrationRuntimeOperationResult properties of managed integration runtime operation result.
 type ManagedIntegrationRuntimeOperationResult struct {
-	// Type - The operation type. Could be start or stop.
+	// Type - READ-ONLY; The operation type. Could be start or stop.
 	Type *string `json:"type,omitempty"`
-	// StartTime - The start time of the operation.
+	// StartTime - READ-ONLY; The start time of the operation.
 	StartTime *date.Time `json:"startTime,omitempty"`
-	// Result - The operation result.
+	// Result - READ-ONLY; The operation result.
 	Result *string `json:"result,omitempty"`
-	// ErrorCode - The error code.
+	// ErrorCode - READ-ONLY; The error code.
 	ErrorCode *string `json:"errorCode,omitempty"`
-	// Parameters - Managed integration runtime error parameters.
+	// Parameters - READ-ONLY; Managed integration runtime error parameters.
 	Parameters *[]string `json:"parameters,omitempty"`
-	// ActivityID - The activity id for the operation request.
+	// ActivityID - READ-ONLY; The activity id for the operation request.
 	ActivityID *string `json:"activityId,omitempty"`
 }
 
@@ -60228,9 +59870,9 @@ type ManagedIntegrationRuntimeStatus struct {
 	*ManagedIntegrationRuntimeStatusTypeProperties `json:"typeProperties,omitempty"`
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
-	// DataFactoryName - The data factory name which the integration runtime belong to.
+	// DataFactoryName - READ-ONLY; The data factory name which the integration runtime belong to.
 	DataFactoryName *string `json:"dataFactoryName,omitempty"`
-	// State - The state of integration runtime. Possible values include: 'Initial', 'Stopped', 'Started', 'Starting', 'Stopping', 'NeedRegistration', 'Online', 'Limited', 'Offline'
+	// State - READ-ONLY; The state of integration runtime. Possible values include: 'Initial', 'Stopped', 'Started', 'Starting', 'Stopping', 'NeedRegistration', 'Online', 'Limited', 'Offline'
 	State IntegrationRuntimeState `json:"state,omitempty"`
 	// Type - Possible values include: 'TypeBasicIntegrationRuntimeStatusTypeIntegrationRuntimeStatus', 'TypeBasicIntegrationRuntimeStatusTypeSelfHosted', 'TypeBasicIntegrationRuntimeStatusTypeManaged'
 	Type TypeBasicIntegrationRuntimeStatus `json:"type,omitempty"`
@@ -60242,12 +59884,6 @@ func (mirs ManagedIntegrationRuntimeStatus) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if mirs.ManagedIntegrationRuntimeStatusTypeProperties != nil {
 		objectMap["typeProperties"] = mirs.ManagedIntegrationRuntimeStatusTypeProperties
-	}
-	if mirs.DataFactoryName != nil {
-		objectMap["dataFactoryName"] = mirs.DataFactoryName
-	}
-	if mirs.State != "" {
-		objectMap["state"] = mirs.State
 	}
 	if mirs.Type != "" {
 		objectMap["type"] = mirs.Type
@@ -60343,13 +59979,13 @@ func (mirs *ManagedIntegrationRuntimeStatus) UnmarshalJSON(body []byte) error {
 
 // ManagedIntegrationRuntimeStatusTypeProperties managed integration runtime status type properties.
 type ManagedIntegrationRuntimeStatusTypeProperties struct {
-	// CreateTime - The time at which the integration runtime was created, in ISO8601 format.
+	// CreateTime - READ-ONLY; The time at which the integration runtime was created, in ISO8601 format.
 	CreateTime *date.Time `json:"createTime,omitempty"`
-	// Nodes - The list of nodes for managed integration runtime.
+	// Nodes - READ-ONLY; The list of nodes for managed integration runtime.
 	Nodes *[]ManagedIntegrationRuntimeNode `json:"nodes,omitempty"`
-	// OtherErrors - The errors that occurred on this integration runtime.
+	// OtherErrors - READ-ONLY; The errors that occurred on this integration runtime.
 	OtherErrors *[]ManagedIntegrationRuntimeError `json:"otherErrors,omitempty"`
-	// LastOperation - The last operation result that occurred on this integration runtime.
+	// LastOperation - READ-ONLY; The last operation result that occurred on this integration runtime.
 	LastOperation *ManagedIntegrationRuntimeOperationResult `json:"lastOperation,omitempty"`
 }
 
@@ -64372,7 +64008,7 @@ type MultiplePipelineTrigger struct {
 	AdditionalProperties map[string]interface{} `json:""`
 	// Description - Trigger description.
 	Description *string `json:"description,omitempty"`
-	// RuntimeState - Indicates if trigger is running or not. Updated when Start/Stop APIs are called on the Trigger. Possible values include: 'TriggerRuntimeStateStarted', 'TriggerRuntimeStateStopped', 'TriggerRuntimeStateDisabled'
+	// RuntimeState - READ-ONLY; Indicates if trigger is running or not. Updated when Start/Stop APIs are called on the Trigger. Possible values include: 'TriggerRuntimeStateStarted', 'TriggerRuntimeStateStopped', 'TriggerRuntimeStateDisabled'
 	RuntimeState TriggerRuntimeState `json:"runtimeState,omitempty"`
 	// Type - Possible values include: 'TypeTrigger', 'TypeTumblingWindowTrigger', 'TypeBlobEventsTrigger', 'TypeBlobTrigger', 'TypeScheduleTrigger', 'TypeMultiplePipelineTrigger'
 	Type TypeBasicTrigger `json:"type,omitempty"`
@@ -64432,9 +64068,6 @@ func (mpt MultiplePipelineTrigger) MarshalJSON() ([]byte, error) {
 	}
 	if mpt.Description != nil {
 		objectMap["description"] = mpt.Description
-	}
-	if mpt.RuntimeState != "" {
-		objectMap["runtimeState"] = mpt.RuntimeState
 	}
 	if mpt.Type != "" {
 		objectMap["type"] = mpt.Type
@@ -72989,13 +72622,13 @@ type PipelineResource struct {
 	AdditionalProperties map[string]interface{} `json:""`
 	// Pipeline - Properties of the pipeline.
 	*Pipeline `json:"properties,omitempty"`
-	// ID - The resource identifier.
+	// ID - READ-ONLY; The resource identifier.
 	ID *string `json:"id,omitempty"`
-	// Name - The resource name.
+	// Name - READ-ONLY; The resource name.
 	Name *string `json:"name,omitempty"`
-	// Type - The resource type.
+	// Type - READ-ONLY; The resource type.
 	Type *string `json:"type,omitempty"`
-	// Etag - Etag identifies change in the resource.
+	// Etag - READ-ONLY; Etag identifies change in the resource.
 	Etag *string `json:"etag,omitempty"`
 }
 
@@ -73004,18 +72637,6 @@ func (pr PipelineResource) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if pr.Pipeline != nil {
 		objectMap["properties"] = pr.Pipeline
-	}
-	if pr.ID != nil {
-		objectMap["id"] = pr.ID
-	}
-	if pr.Name != nil {
-		objectMap["name"] = pr.Name
-	}
-	if pr.Type != nil {
-		objectMap["type"] = pr.Type
-	}
-	if pr.Etag != nil {
-		objectMap["etag"] = pr.Etag
 	}
 	for k, v := range pr.AdditionalProperties {
 		objectMap[k] = v
@@ -73100,61 +72721,31 @@ type PipelineRun struct {
 	autorest.Response `json:"-"`
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
-	// RunID - Identifier of a run.
+	// RunID - READ-ONLY; Identifier of a run.
 	RunID *string `json:"runId,omitempty"`
-	// PipelineName - The pipeline name.
+	// PipelineName - READ-ONLY; The pipeline name.
 	PipelineName *string `json:"pipelineName,omitempty"`
-	// Parameters - The full or partial list of parameter name, value pair used in the pipeline run.
+	// Parameters - READ-ONLY; The full or partial list of parameter name, value pair used in the pipeline run.
 	Parameters map[string]*string `json:"parameters"`
-	// InvokedBy - Entity that started the pipeline run.
+	// InvokedBy - READ-ONLY; Entity that started the pipeline run.
 	InvokedBy *PipelineRunInvokedBy `json:"invokedBy,omitempty"`
-	// LastUpdated - The last updated timestamp for the pipeline run event in ISO8601 format.
+	// LastUpdated - READ-ONLY; The last updated timestamp for the pipeline run event in ISO8601 format.
 	LastUpdated *date.Time `json:"lastUpdated,omitempty"`
-	// RunStart - The start time of a pipeline run in ISO8601 format.
+	// RunStart - READ-ONLY; The start time of a pipeline run in ISO8601 format.
 	RunStart *date.Time `json:"runStart,omitempty"`
-	// RunEnd - The end time of a pipeline run in ISO8601 format.
+	// RunEnd - READ-ONLY; The end time of a pipeline run in ISO8601 format.
 	RunEnd *date.Time `json:"runEnd,omitempty"`
-	// DurationInMs - The duration of a pipeline run.
+	// DurationInMs - READ-ONLY; The duration of a pipeline run.
 	DurationInMs *int32 `json:"durationInMs,omitempty"`
-	// Status - The status of a pipeline run.
+	// Status - READ-ONLY; The status of a pipeline run.
 	Status *string `json:"status,omitempty"`
-	// Message - The message from a pipeline run.
+	// Message - READ-ONLY; The message from a pipeline run.
 	Message *string `json:"message,omitempty"`
 }
 
 // MarshalJSON is the custom marshaler for PipelineRun.
 func (pr PipelineRun) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
-	if pr.RunID != nil {
-		objectMap["runId"] = pr.RunID
-	}
-	if pr.PipelineName != nil {
-		objectMap["pipelineName"] = pr.PipelineName
-	}
-	if pr.Parameters != nil {
-		objectMap["parameters"] = pr.Parameters
-	}
-	if pr.InvokedBy != nil {
-		objectMap["invokedBy"] = pr.InvokedBy
-	}
-	if pr.LastUpdated != nil {
-		objectMap["lastUpdated"] = pr.LastUpdated
-	}
-	if pr.RunStart != nil {
-		objectMap["runStart"] = pr.RunStart
-	}
-	if pr.RunEnd != nil {
-		objectMap["runEnd"] = pr.RunEnd
-	}
-	if pr.DurationInMs != nil {
-		objectMap["durationInMs"] = pr.DurationInMs
-	}
-	if pr.Status != nil {
-		objectMap["status"] = pr.Status
-	}
-	if pr.Message != nil {
-		objectMap["message"] = pr.Message
-	}
 	for k, v := range pr.AdditionalProperties {
 		objectMap[k] = v
 	}
@@ -73294,9 +72885,9 @@ type PipelineRunFilterParameters struct {
 
 // PipelineRunInvokedBy provides entity name and id that started the pipeline run.
 type PipelineRunInvokedBy struct {
-	// Name - Name of the entity that started the pipeline run.
+	// Name - READ-ONLY; Name of the entity that started the pipeline run.
 	Name *string `json:"name,omitempty"`
-	// ID - The ID of the entity that started the run.
+	// ID - READ-ONLY; The ID of the entity that started the run.
 	ID *string `json:"id,omitempty"`
 }
 
@@ -73331,8 +72922,8 @@ type PipelineRunQueryResponse struct {
 type PolybaseSettings struct {
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
-	// RejectType - Reject type. Possible values include: 'Value', 'Percentage'
-	RejectType PolybaseSettingsRejectType `json:"rejectType,omitempty"`
+	// RejectType - Reject type.
+	RejectType interface{} `json:"rejectType,omitempty"`
 	// RejectValue - Specifies the value or the percentage of rows that can be rejected before the query fails. Type: number (or Expression with resultType number), minimum: 0.
 	RejectValue interface{} `json:"rejectValue,omitempty"`
 	// RejectSampleValue - Determines the number of rows to attempt to retrieve before the PolyBase recalculates the percentage of rejected rows. Type: integer (or Expression with resultType integer), minimum: 0.
@@ -73344,7 +72935,7 @@ type PolybaseSettings struct {
 // MarshalJSON is the custom marshaler for PolybaseSettings.
 func (ps PolybaseSettings) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
-	if ps.RejectType != "" {
+	if ps.RejectType != nil {
 		objectMap["rejectType"] = ps.RejectType
 	}
 	if ps.RejectValue != nil {
@@ -73385,7 +72976,7 @@ func (ps *PolybaseSettings) UnmarshalJSON(body []byte) error {
 			}
 		case "rejectType":
 			if v != nil {
-				var rejectType PolybaseSettingsRejectType
+				var rejectType interface{}
 				err = json.Unmarshal(*v, &rejectType)
 				if err != nil {
 					return err
@@ -77769,11 +77360,11 @@ type RelationalTableDatasetTypeProperties struct {
 
 // Resource azure Data Factory top-level resource.
 type Resource struct {
-	// ID - The resource identifier.
+	// ID - READ-ONLY; The resource identifier.
 	ID *string `json:"id,omitempty"`
-	// Name - The resource name.
+	// Name - READ-ONLY; The resource name.
 	Name *string `json:"name,omitempty"`
-	// Type - The resource type.
+	// Type - READ-ONLY; The resource type.
 	Type *string `json:"type,omitempty"`
 	// Location - The resource location.
 	Location *string `json:"location,omitempty"`
@@ -77784,15 +77375,6 @@ type Resource struct {
 // MarshalJSON is the custom marshaler for Resource.
 func (r Resource) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
-	if r.ID != nil {
-		objectMap["id"] = r.ID
-	}
-	if r.Name != nil {
-		objectMap["name"] = r.Name
-	}
-	if r.Type != nil {
-		objectMap["type"] = r.Type
-	}
 	if r.Location != nil {
 		objectMap["location"] = r.Location
 	}
@@ -81469,8 +81051,8 @@ type SalesforceObjectDatasetTypeProperties struct {
 
 // SalesforceSink a copy activity Salesforce sink.
 type SalesforceSink struct {
-	// WriteBehavior - The write behavior for the operation. Default is Insert. Possible values include: 'Insert', 'Upsert'
-	WriteBehavior SalesforceSinkWriteBehavior `json:"writeBehavior,omitempty"`
+	// WriteBehavior - The write behavior for the operation. Default is Insert.
+	WriteBehavior interface{} `json:"writeBehavior,omitempty"`
 	// ExternalIDFieldName - The name of the external ID field for upsert operation. Default value is 'Id' column. Type: string (or Expression with resultType string).
 	ExternalIDFieldName interface{} `json:"externalIdFieldName,omitempty"`
 	// IgnoreNullValues - The flag indicating whether or not to ignore null values from input dataset (except key fields) during write operation. Default value is false. If set it to true, it means ADF will leave the data in the destination object unchanged when doing upsert/update operation and insert defined default value when doing insert operation, versus ADF will update the data in the destination object to NULL when doing upsert/update operation and insert NULL value when doing insert operation. Type: boolean (or Expression with resultType boolean).
@@ -81493,7 +81075,7 @@ type SalesforceSink struct {
 func (ss SalesforceSink) MarshalJSON() ([]byte, error) {
 	ss.Type = TypeSalesforceSink
 	objectMap := make(map[string]interface{})
-	if ss.WriteBehavior != "" {
+	if ss.WriteBehavior != nil {
 		objectMap["writeBehavior"] = ss.WriteBehavior
 	}
 	if ss.ExternalIDFieldName != nil {
@@ -81614,7 +81196,7 @@ func (ss *SalesforceSink) UnmarshalJSON(body []byte) error {
 		switch k {
 		case "writeBehavior":
 			if v != nil {
-				var writeBehavior SalesforceSinkWriteBehavior
+				var writeBehavior interface{}
 				err = json.Unmarshal(*v, &writeBehavior)
 				if err != nil {
 					return err
@@ -81706,8 +81288,8 @@ func (ss *SalesforceSink) UnmarshalJSON(body []byte) error {
 type SalesforceSource struct {
 	// Query - Database query. Type: string (or Expression with resultType string).
 	Query interface{} `json:"query,omitempty"`
-	// ReadBehavior - The read behavior for the operation. Default is Query. Possible values include: 'Query', 'QueryAll'
-	ReadBehavior SalesforceSourceReadBehavior `json:"readBehavior,omitempty"`
+	// ReadBehavior - The read behavior for the operation. Default is Query.
+	ReadBehavior interface{} `json:"readBehavior,omitempty"`
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
 	// SourceRetryCount - Source retry count. Type: integer (or Expression with resultType integer).
@@ -81725,7 +81307,7 @@ func (ss SalesforceSource) MarshalJSON() ([]byte, error) {
 	if ss.Query != nil {
 		objectMap["query"] = ss.Query
 	}
-	if ss.ReadBehavior != "" {
+	if ss.ReadBehavior != nil {
 		objectMap["readBehavior"] = ss.ReadBehavior
 	}
 	if ss.SourceRetryCount != nil {
@@ -82023,7 +81605,7 @@ func (ss *SalesforceSource) UnmarshalJSON(body []byte) error {
 			}
 		case "readBehavior":
 			if v != nil {
-				var readBehavior SalesforceSourceReadBehavior
+				var readBehavior interface{}
 				err = json.Unmarshal(*v, &readBehavior)
 				if err != nil {
 					return err
@@ -83620,8 +83202,8 @@ type SapCloudForCustomerResourceDatasetTypeProperties struct {
 
 // SapCloudForCustomerSink a copy activity SAP Cloud for Customer sink.
 type SapCloudForCustomerSink struct {
-	// WriteBehavior - The write behavior for the operation. Default is 'Insert'. Possible values include: 'SapCloudForCustomerSinkWriteBehaviorInsert', 'SapCloudForCustomerSinkWriteBehaviorUpdate'
-	WriteBehavior SapCloudForCustomerSinkWriteBehavior `json:"writeBehavior,omitempty"`
+	// WriteBehavior - The write behavior for the operation. Default is 'Insert'.
+	WriteBehavior interface{} `json:"writeBehavior,omitempty"`
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
 	// WriteBatchSize - Write batch size. Type: integer (or Expression with resultType integer), minimum: 0.
@@ -83640,7 +83222,7 @@ type SapCloudForCustomerSink struct {
 func (scfcs SapCloudForCustomerSink) MarshalJSON() ([]byte, error) {
 	scfcs.Type = TypeSapCloudForCustomerSink
 	objectMap := make(map[string]interface{})
-	if scfcs.WriteBehavior != "" {
+	if scfcs.WriteBehavior != nil {
 		objectMap["writeBehavior"] = scfcs.WriteBehavior
 	}
 	if scfcs.WriteBatchSize != nil {
@@ -83755,7 +83337,7 @@ func (scfcs *SapCloudForCustomerSink) UnmarshalJSON(body []byte) error {
 		switch k {
 		case "writeBehavior":
 			if v != nil {
-				var writeBehavior SapCloudForCustomerSinkWriteBehavior
+				var writeBehavior interface{}
 				err = json.Unmarshal(*v, &writeBehavior)
 				if err != nil {
 					return err
@@ -85152,13 +84734,13 @@ func (serd *SapEccResourceDataset) UnmarshalJSON(body []byte) error {
 // SapEccResourceDatasetTypeProperties sap ECC OData resource dataset properties.
 type SapEccResourceDatasetTypeProperties struct {
 	// Path - The path of the SAP ECC OData entity. Type: string (or Expression with resultType string).
-	Path *string `json:"path,omitempty"`
+	Path interface{} `json:"path,omitempty"`
 }
 
 // SapEccSource a copy activity source for SAP ECC source.
 type SapEccSource struct {
 	// Query - SAP ECC OData query. For example, "$top=1". Type: string (or Expression with resultType string).
-	Query *string `json:"query,omitempty"`
+	Query interface{} `json:"query,omitempty"`
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
 	// SourceRetryCount - Source retry count. Type: integer (or Expression with resultType integer).
@@ -85462,12 +85044,12 @@ func (ses *SapEccSource) UnmarshalJSON(body []byte) error {
 		switch k {
 		case "query":
 			if v != nil {
-				var query string
+				var query interface{}
 				err = json.Unmarshal(*v, &query)
 				if err != nil {
 					return err
 				}
-				ses.Query = &query
+				ses.Query = query
 			}
 		default:
 			if v != nil {
@@ -86084,7 +85666,7 @@ type ScheduleTrigger struct {
 	AdditionalProperties map[string]interface{} `json:""`
 	// Description - Trigger description.
 	Description *string `json:"description,omitempty"`
-	// RuntimeState - Indicates if trigger is running or not. Updated when Start/Stop APIs are called on the Trigger. Possible values include: 'TriggerRuntimeStateStarted', 'TriggerRuntimeStateStopped', 'TriggerRuntimeStateDisabled'
+	// RuntimeState - READ-ONLY; Indicates if trigger is running or not. Updated when Start/Stop APIs are called on the Trigger. Possible values include: 'TriggerRuntimeStateStarted', 'TriggerRuntimeStateStopped', 'TriggerRuntimeStateDisabled'
 	RuntimeState TriggerRuntimeState `json:"runtimeState,omitempty"`
 	// Type - Possible values include: 'TypeTrigger', 'TypeTumblingWindowTrigger', 'TypeBlobEventsTrigger', 'TypeBlobTrigger', 'TypeScheduleTrigger', 'TypeMultiplePipelineTrigger'
 	Type TypeBasicTrigger `json:"type,omitempty"`
@@ -86102,9 +85684,6 @@ func (st ScheduleTrigger) MarshalJSON() ([]byte, error) {
 	}
 	if st.Description != nil {
 		objectMap["description"] = st.Description
-	}
-	if st.RuntimeState != "" {
-		objectMap["runtimeState"] = st.RuntimeState
 	}
 	if st.Type != "" {
 		objectMap["type"] = st.Type
@@ -86593,101 +86172,47 @@ func (shir *SelfHostedIntegrationRuntime) UnmarshalJSON(body []byte) error {
 // SelfHostedIntegrationRuntimeNode properties of Self-hosted integration runtime node.
 type SelfHostedIntegrationRuntimeNode struct {
 	autorest.Response `json:"-"`
-	// NodeName - Name of the integration runtime node.
+	// NodeName - READ-ONLY; Name of the integration runtime node.
 	NodeName *string `json:"nodeName,omitempty"`
-	// MachineName - Machine name of the integration runtime node.
+	// MachineName - READ-ONLY; Machine name of the integration runtime node.
 	MachineName *string `json:"machineName,omitempty"`
-	// HostServiceURI - URI for the host machine of the integration runtime.
+	// HostServiceURI - READ-ONLY; URI for the host machine of the integration runtime.
 	HostServiceURI *string `json:"hostServiceUri,omitempty"`
-	// Status - Status of the integration runtime node. Possible values include: 'SelfHostedIntegrationRuntimeNodeStatusNeedRegistration', 'SelfHostedIntegrationRuntimeNodeStatusOnline', 'SelfHostedIntegrationRuntimeNodeStatusLimited', 'SelfHostedIntegrationRuntimeNodeStatusOffline', 'SelfHostedIntegrationRuntimeNodeStatusUpgrading', 'SelfHostedIntegrationRuntimeNodeStatusInitializing', 'SelfHostedIntegrationRuntimeNodeStatusInitializeFailed'
+	// Status - READ-ONLY; Status of the integration runtime node. Possible values include: 'SelfHostedIntegrationRuntimeNodeStatusNeedRegistration', 'SelfHostedIntegrationRuntimeNodeStatusOnline', 'SelfHostedIntegrationRuntimeNodeStatusLimited', 'SelfHostedIntegrationRuntimeNodeStatusOffline', 'SelfHostedIntegrationRuntimeNodeStatusUpgrading', 'SelfHostedIntegrationRuntimeNodeStatusInitializing', 'SelfHostedIntegrationRuntimeNodeStatusInitializeFailed'
 	Status SelfHostedIntegrationRuntimeNodeStatus `json:"status,omitempty"`
-	// Capabilities - The integration runtime capabilities dictionary
+	// Capabilities - READ-ONLY; The integration runtime capabilities dictionary
 	Capabilities map[string]*string `json:"capabilities"`
-	// VersionStatus - Status of the integration runtime node version.
+	// VersionStatus - READ-ONLY; Status of the integration runtime node version.
 	VersionStatus *string `json:"versionStatus,omitempty"`
-	// Version - Version of the integration runtime node.
+	// Version - READ-ONLY; Version of the integration runtime node.
 	Version *string `json:"version,omitempty"`
-	// RegisterTime - The time at which the integration runtime node was registered in ISO8601 format.
+	// RegisterTime - READ-ONLY; The time at which the integration runtime node was registered in ISO8601 format.
 	RegisterTime *date.Time `json:"registerTime,omitempty"`
-	// LastConnectTime - The most recent time at which the integration runtime was connected in ISO8601 format.
+	// LastConnectTime - READ-ONLY; The most recent time at which the integration runtime was connected in ISO8601 format.
 	LastConnectTime *date.Time `json:"lastConnectTime,omitempty"`
-	// ExpiryTime - The time at which the integration runtime will expire in ISO8601 format.
+	// ExpiryTime - READ-ONLY; The time at which the integration runtime will expire in ISO8601 format.
 	ExpiryTime *date.Time `json:"expiryTime,omitempty"`
-	// LastStartTime - The time the node last started up.
+	// LastStartTime - READ-ONLY; The time the node last started up.
 	LastStartTime *date.Time `json:"lastStartTime,omitempty"`
-	// LastStopTime - The integration runtime node last stop time.
+	// LastStopTime - READ-ONLY; The integration runtime node last stop time.
 	LastStopTime *date.Time `json:"lastStopTime,omitempty"`
-	// LastUpdateResult - The result of the last integration runtime node update. Possible values include: 'Succeed', 'Fail'
+	// LastUpdateResult - READ-ONLY; The result of the last integration runtime node update. Possible values include: 'Succeed', 'Fail'
 	LastUpdateResult IntegrationRuntimeUpdateResult `json:"lastUpdateResult,omitempty"`
-	// LastStartUpdateTime - The last time for the integration runtime node update start.
+	// LastStartUpdateTime - READ-ONLY; The last time for the integration runtime node update start.
 	LastStartUpdateTime *date.Time `json:"lastStartUpdateTime,omitempty"`
-	// LastEndUpdateTime - The last time for the integration runtime node update end.
+	// LastEndUpdateTime - READ-ONLY; The last time for the integration runtime node update end.
 	LastEndUpdateTime *date.Time `json:"lastEndUpdateTime,omitempty"`
-	// IsActiveDispatcher - Indicates whether this node is the active dispatcher for integration runtime requests.
+	// IsActiveDispatcher - READ-ONLY; Indicates whether this node is the active dispatcher for integration runtime requests.
 	IsActiveDispatcher *bool `json:"isActiveDispatcher,omitempty"`
-	// ConcurrentJobsLimit - Maximum concurrent jobs on the integration runtime node.
+	// ConcurrentJobsLimit - READ-ONLY; Maximum concurrent jobs on the integration runtime node.
 	ConcurrentJobsLimit *int32 `json:"concurrentJobsLimit,omitempty"`
-	// MaxConcurrentJobs - The maximum concurrent jobs in this integration runtime.
+	// MaxConcurrentJobs - READ-ONLY; The maximum concurrent jobs in this integration runtime.
 	MaxConcurrentJobs *int32 `json:"maxConcurrentJobs,omitempty"`
 }
 
 // MarshalJSON is the custom marshaler for SelfHostedIntegrationRuntimeNode.
 func (shirn SelfHostedIntegrationRuntimeNode) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
-	if shirn.NodeName != nil {
-		objectMap["nodeName"] = shirn.NodeName
-	}
-	if shirn.MachineName != nil {
-		objectMap["machineName"] = shirn.MachineName
-	}
-	if shirn.HostServiceURI != nil {
-		objectMap["hostServiceUri"] = shirn.HostServiceURI
-	}
-	if shirn.Status != "" {
-		objectMap["status"] = shirn.Status
-	}
-	if shirn.Capabilities != nil {
-		objectMap["capabilities"] = shirn.Capabilities
-	}
-	if shirn.VersionStatus != nil {
-		objectMap["versionStatus"] = shirn.VersionStatus
-	}
-	if shirn.Version != nil {
-		objectMap["version"] = shirn.Version
-	}
-	if shirn.RegisterTime != nil {
-		objectMap["registerTime"] = shirn.RegisterTime
-	}
-	if shirn.LastConnectTime != nil {
-		objectMap["lastConnectTime"] = shirn.LastConnectTime
-	}
-	if shirn.ExpiryTime != nil {
-		objectMap["expiryTime"] = shirn.ExpiryTime
-	}
-	if shirn.LastStartTime != nil {
-		objectMap["lastStartTime"] = shirn.LastStartTime
-	}
-	if shirn.LastStopTime != nil {
-		objectMap["lastStopTime"] = shirn.LastStopTime
-	}
-	if shirn.LastUpdateResult != "" {
-		objectMap["lastUpdateResult"] = shirn.LastUpdateResult
-	}
-	if shirn.LastStartUpdateTime != nil {
-		objectMap["lastStartUpdateTime"] = shirn.LastStartUpdateTime
-	}
-	if shirn.LastEndUpdateTime != nil {
-		objectMap["lastEndUpdateTime"] = shirn.LastEndUpdateTime
-	}
-	if shirn.IsActiveDispatcher != nil {
-		objectMap["isActiveDispatcher"] = shirn.IsActiveDispatcher
-	}
-	if shirn.ConcurrentJobsLimit != nil {
-		objectMap["concurrentJobsLimit"] = shirn.ConcurrentJobsLimit
-	}
-	if shirn.MaxConcurrentJobs != nil {
-		objectMap["maxConcurrentJobs"] = shirn.MaxConcurrentJobs
-	}
 	return json.Marshal(objectMap)
 }
 
@@ -86697,9 +86222,9 @@ type SelfHostedIntegrationRuntimeStatus struct {
 	*SelfHostedIntegrationRuntimeStatusTypeProperties `json:"typeProperties,omitempty"`
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
-	// DataFactoryName - The data factory name which the integration runtime belong to.
+	// DataFactoryName - READ-ONLY; The data factory name which the integration runtime belong to.
 	DataFactoryName *string `json:"dataFactoryName,omitempty"`
-	// State - The state of integration runtime. Possible values include: 'Initial', 'Stopped', 'Started', 'Starting', 'Stopping', 'NeedRegistration', 'Online', 'Limited', 'Offline'
+	// State - READ-ONLY; The state of integration runtime. Possible values include: 'Initial', 'Stopped', 'Started', 'Starting', 'Stopping', 'NeedRegistration', 'Online', 'Limited', 'Offline'
 	State IntegrationRuntimeState `json:"state,omitempty"`
 	// Type - Possible values include: 'TypeBasicIntegrationRuntimeStatusTypeIntegrationRuntimeStatus', 'TypeBasicIntegrationRuntimeStatusTypeSelfHosted', 'TypeBasicIntegrationRuntimeStatusTypeManaged'
 	Type TypeBasicIntegrationRuntimeStatus `json:"type,omitempty"`
@@ -86711,12 +86236,6 @@ func (shirs SelfHostedIntegrationRuntimeStatus) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if shirs.SelfHostedIntegrationRuntimeStatusTypeProperties != nil {
 		objectMap["typeProperties"] = shirs.SelfHostedIntegrationRuntimeStatusTypeProperties
-	}
-	if shirs.DataFactoryName != nil {
-		objectMap["dataFactoryName"] = shirs.DataFactoryName
-	}
-	if shirs.State != "" {
-		objectMap["state"] = shirs.State
 	}
 	if shirs.Type != "" {
 		objectMap["type"] = shirs.Type
@@ -86812,29 +86331,29 @@ func (shirs *SelfHostedIntegrationRuntimeStatus) UnmarshalJSON(body []byte) erro
 
 // SelfHostedIntegrationRuntimeStatusTypeProperties self-hosted integration runtime status type properties.
 type SelfHostedIntegrationRuntimeStatusTypeProperties struct {
-	// CreateTime - The time at which the integration runtime was created, in ISO8601 format.
+	// CreateTime - READ-ONLY; The time at which the integration runtime was created, in ISO8601 format.
 	CreateTime *date.Time `json:"createTime,omitempty"`
-	// TaskQueueID - The task queue id of the integration runtime.
+	// TaskQueueID - READ-ONLY; The task queue id of the integration runtime.
 	TaskQueueID *string `json:"taskQueueId,omitempty"`
-	// InternalChannelEncryption - It is used to set the encryption mode for node-node communication channel (when more than 2 self-hosted integration runtime nodes exist). Possible values include: 'NotSet', 'SslEncrypted', 'NotEncrypted'
+	// InternalChannelEncryption - READ-ONLY; It is used to set the encryption mode for node-node communication channel (when more than 2 self-hosted integration runtime nodes exist). Possible values include: 'NotSet', 'SslEncrypted', 'NotEncrypted'
 	InternalChannelEncryption IntegrationRuntimeInternalChannelEncryptionMode `json:"internalChannelEncryption,omitempty"`
-	// Version - Version of the integration runtime.
+	// Version - READ-ONLY; Version of the integration runtime.
 	Version *string `json:"version,omitempty"`
 	// Nodes - The list of nodes for this integration runtime.
 	Nodes *[]SelfHostedIntegrationRuntimeNode `json:"nodes,omitempty"`
-	// ScheduledUpdateDate - The date at which the integration runtime will be scheduled to update, in ISO8601 format.
+	// ScheduledUpdateDate - READ-ONLY; The date at which the integration runtime will be scheduled to update, in ISO8601 format.
 	ScheduledUpdateDate *date.Time `json:"scheduledUpdateDate,omitempty"`
-	// UpdateDelayOffset - The time in the date scheduled by service to update the integration runtime, e.g., PT03H is 3 hours
+	// UpdateDelayOffset - READ-ONLY; The time in the date scheduled by service to update the integration runtime, e.g., PT03H is 3 hours
 	UpdateDelayOffset *string `json:"updateDelayOffset,omitempty"`
-	// LocalTimeZoneOffset - The local time zone offset in hours.
+	// LocalTimeZoneOffset - READ-ONLY; The local time zone offset in hours.
 	LocalTimeZoneOffset *string `json:"localTimeZoneOffset,omitempty"`
-	// Capabilities - Object with additional information about integration runtime capabilities.
+	// Capabilities - READ-ONLY; Object with additional information about integration runtime capabilities.
 	Capabilities map[string]*string `json:"capabilities"`
-	// ServiceUrls - The URLs for the services used in integration runtime backend service.
+	// ServiceUrls - READ-ONLY; The URLs for the services used in integration runtime backend service.
 	ServiceUrls *[]string `json:"serviceUrls,omitempty"`
-	// AutoUpdate - Whether Self-hosted integration runtime auto update has been turned on. Possible values include: 'On', 'Off'
+	// AutoUpdate - READ-ONLY; Whether Self-hosted integration runtime auto update has been turned on. Possible values include: 'On', 'Off'
 	AutoUpdate IntegrationRuntimeAutoUpdate `json:"autoUpdate,omitempty"`
-	// VersionStatus - Status of the integration runtime version.
+	// VersionStatus - READ-ONLY; Status of the integration runtime version.
 	VersionStatus *string `json:"versionStatus,omitempty"`
 	// Links - The list of linked integration runtimes that are created to share with this integration runtime.
 	Links *[]LinkedIntegrationRuntime `json:"links,omitempty"`
@@ -86843,41 +86362,8 @@ type SelfHostedIntegrationRuntimeStatusTypeProperties struct {
 // MarshalJSON is the custom marshaler for SelfHostedIntegrationRuntimeStatusTypeProperties.
 func (shirstp SelfHostedIntegrationRuntimeStatusTypeProperties) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
-	if shirstp.CreateTime != nil {
-		objectMap["createTime"] = shirstp.CreateTime
-	}
-	if shirstp.TaskQueueID != nil {
-		objectMap["taskQueueId"] = shirstp.TaskQueueID
-	}
-	if shirstp.InternalChannelEncryption != "" {
-		objectMap["internalChannelEncryption"] = shirstp.InternalChannelEncryption
-	}
-	if shirstp.Version != nil {
-		objectMap["version"] = shirstp.Version
-	}
 	if shirstp.Nodes != nil {
 		objectMap["nodes"] = shirstp.Nodes
-	}
-	if shirstp.ScheduledUpdateDate != nil {
-		objectMap["scheduledUpdateDate"] = shirstp.ScheduledUpdateDate
-	}
-	if shirstp.UpdateDelayOffset != nil {
-		objectMap["updateDelayOffset"] = shirstp.UpdateDelayOffset
-	}
-	if shirstp.LocalTimeZoneOffset != nil {
-		objectMap["localTimeZoneOffset"] = shirstp.LocalTimeZoneOffset
-	}
-	if shirstp.Capabilities != nil {
-		objectMap["capabilities"] = shirstp.Capabilities
-	}
-	if shirstp.ServiceUrls != nil {
-		objectMap["serviceUrls"] = shirstp.ServiceUrls
-	}
-	if shirstp.AutoUpdate != "" {
-		objectMap["autoUpdate"] = shirstp.AutoUpdate
-	}
-	if shirstp.VersionStatus != nil {
-		objectMap["versionStatus"] = shirstp.VersionStatus
 	}
 	if shirstp.Links != nil {
 		objectMap["links"] = shirstp.Links
@@ -95520,16 +95006,264 @@ func (ss *SquareSource) UnmarshalJSON(body []byte) error {
 	return nil
 }
 
+// SSISAccessCredential SSIS access credential.
+type SSISAccessCredential struct {
+	// Domain - Domain for windows authentication.
+	Domain interface{} `json:"domain,omitempty"`
+	// UserName - UseName for windows authentication.
+	UserName interface{} `json:"userName,omitempty"`
+	// Password - Password for windows authentication.
+	Password BasicSecretBase `json:"password,omitempty"`
+}
+
+// UnmarshalJSON is the custom unmarshaler for SSISAccessCredential struct.
+func (sac *SSISAccessCredential) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "domain":
+			if v != nil {
+				var domain interface{}
+				err = json.Unmarshal(*v, &domain)
+				if err != nil {
+					return err
+				}
+				sac.Domain = domain
+			}
+		case "userName":
+			if v != nil {
+				var userName interface{}
+				err = json.Unmarshal(*v, &userName)
+				if err != nil {
+					return err
+				}
+				sac.UserName = userName
+			}
+		case "password":
+			if v != nil {
+				password, err := unmarshalBasicSecretBase(*v)
+				if err != nil {
+					return err
+				}
+				sac.Password = password
+			}
+		}
+	}
+
+	return nil
+}
+
+// SSISExecutionCredential SSIS package execution credential.
+type SSISExecutionCredential struct {
+	// Domain - Domain for windows authentication.
+	Domain interface{} `json:"domain,omitempty"`
+	// UserName - UseName for windows authentication.
+	UserName interface{} `json:"userName,omitempty"`
+	// Password - Password for windows authentication.
+	Password *SecureString `json:"password,omitempty"`
+}
+
 // SSISExecutionParameter SSIS execution parameter.
 type SSISExecutionParameter struct {
 	// Value - SSIS package execution parameter value. Type: string (or Expression with resultType string).
 	Value interface{} `json:"value,omitempty"`
 }
 
+// SSISLogLocation SSIS package execution log location
+type SSISLogLocation struct {
+	// LogPath - The SSIS package execution log path. Type: string (or Expression with resultType string).
+	LogPath interface{} `json:"logPath,omitempty"`
+	// Type - The type of SSIS log location.
+	Type *string `json:"type,omitempty"`
+	// SSISLogLocationTypeProperties - SSIS package execution log location properties.
+	*SSISLogLocationTypeProperties `json:"typeProperties,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for SSISLogLocation.
+func (sll SSISLogLocation) MarshalJSON() ([]byte, error) {
+	objectMap := make(map[string]interface{})
+	if sll.LogPath != nil {
+		objectMap["logPath"] = sll.LogPath
+	}
+	if sll.Type != nil {
+		objectMap["type"] = sll.Type
+	}
+	if sll.SSISLogLocationTypeProperties != nil {
+		objectMap["typeProperties"] = sll.SSISLogLocationTypeProperties
+	}
+	return json.Marshal(objectMap)
+}
+
+// UnmarshalJSON is the custom unmarshaler for SSISLogLocation struct.
+func (sll *SSISLogLocation) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "logPath":
+			if v != nil {
+				var logPath interface{}
+				err = json.Unmarshal(*v, &logPath)
+				if err != nil {
+					return err
+				}
+				sll.LogPath = logPath
+			}
+		case "type":
+			if v != nil {
+				var typeVar string
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				sll.Type = &typeVar
+			}
+		case "typeProperties":
+			if v != nil {
+				var sSISLogLocationTypeProperties SSISLogLocationTypeProperties
+				err = json.Unmarshal(*v, &sSISLogLocationTypeProperties)
+				if err != nil {
+					return err
+				}
+				sll.SSISLogLocationTypeProperties = &sSISLogLocationTypeProperties
+			}
+		}
+	}
+
+	return nil
+}
+
+// SSISLogLocationTypeProperties SSIS package execution log location properties.
+type SSISLogLocationTypeProperties struct {
+	// AccessCredential - The package execution log access credential.
+	AccessCredential *SSISAccessCredential `json:"accessCredential,omitempty"`
+	// LogRefreshInterval - Specifies the interval to refresh log. The default interval is 5 minutes. Type: string (or Expression with resultType string), pattern: ((\d+)\.)?(\d\d):(60|([0-5][0-9])):(60|([0-5][0-9])).
+	LogRefreshInterval interface{} `json:"logRefreshInterval,omitempty"`
+}
+
 // SSISPackageLocation SSIS package location.
 type SSISPackageLocation struct {
-	// PackagePath - The SSIS package path.
-	PackagePath *string `json:"packagePath,omitempty"`
+	// PackagePath - The SSIS package path. Type: string (or Expression with resultType string).
+	PackagePath interface{} `json:"packagePath,omitempty"`
+	// Type - The type of SSIS package location. Possible values include: 'SSISDB', 'File'
+	Type SsisPackageLocationType `json:"type,omitempty"`
+	// SSISPackageLocationTypeProperties - SSIS package location properties.
+	*SSISPackageLocationTypeProperties `json:"typeProperties,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for SSISPackageLocation.
+func (spl SSISPackageLocation) MarshalJSON() ([]byte, error) {
+	objectMap := make(map[string]interface{})
+	if spl.PackagePath != nil {
+		objectMap["packagePath"] = spl.PackagePath
+	}
+	if spl.Type != "" {
+		objectMap["type"] = spl.Type
+	}
+	if spl.SSISPackageLocationTypeProperties != nil {
+		objectMap["typeProperties"] = spl.SSISPackageLocationTypeProperties
+	}
+	return json.Marshal(objectMap)
+}
+
+// UnmarshalJSON is the custom unmarshaler for SSISPackageLocation struct.
+func (spl *SSISPackageLocation) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "packagePath":
+			if v != nil {
+				var packagePath interface{}
+				err = json.Unmarshal(*v, &packagePath)
+				if err != nil {
+					return err
+				}
+				spl.PackagePath = packagePath
+			}
+		case "type":
+			if v != nil {
+				var typeVar SsisPackageLocationType
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				spl.Type = typeVar
+			}
+		case "typeProperties":
+			if v != nil {
+				var sSISPackageLocationTypeProperties SSISPackageLocationTypeProperties
+				err = json.Unmarshal(*v, &sSISPackageLocationTypeProperties)
+				if err != nil {
+					return err
+				}
+				spl.SSISPackageLocationTypeProperties = &sSISPackageLocationTypeProperties
+			}
+		}
+	}
+
+	return nil
+}
+
+// SSISPackageLocationTypeProperties SSIS package location properties.
+type SSISPackageLocationTypeProperties struct {
+	// PackagePassword - Password of the package.
+	PackagePassword BasicSecretBase `json:"packagePassword,omitempty"`
+	// AccessCredential - The package access credential.
+	AccessCredential *SSISAccessCredential `json:"accessCredential,omitempty"`
+	// ConfigurationPath - The configuration file of the package execution. Type: string (or Expression with resultType string).
+	ConfigurationPath interface{} `json:"configurationPath,omitempty"`
+}
+
+// UnmarshalJSON is the custom unmarshaler for SSISPackageLocationTypeProperties struct.
+func (spltp *SSISPackageLocationTypeProperties) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "packagePassword":
+			if v != nil {
+				packagePassword, err := unmarshalBasicSecretBase(*v)
+				if err != nil {
+					return err
+				}
+				spltp.PackagePassword = packagePassword
+			}
+		case "accessCredential":
+			if v != nil {
+				var accessCredential SSISAccessCredential
+				err = json.Unmarshal(*v, &accessCredential)
+				if err != nil {
+					return err
+				}
+				spltp.AccessCredential = &accessCredential
+			}
+		case "configurationPath":
+			if v != nil {
+				var configurationPath interface{}
+				err = json.Unmarshal(*v, &configurationPath)
+				if err != nil {
+					return err
+				}
+				spltp.ConfigurationPath = configurationPath
+			}
+		}
+	}
+
+	return nil
 }
 
 // SSISPropertyOverride SSIS property override.
@@ -95628,19 +95362,19 @@ func (ss *StagingSettings) UnmarshalJSON(body []byte) error {
 type StoredProcedureParameter struct {
 	// Value - Stored procedure parameter value. Type: string (or Expression with resultType string).
 	Value interface{} `json:"value,omitempty"`
-	// Type - Stored procedure parameter type. Possible values include: 'String', 'Int', 'Decimal', 'GUID', 'Boolean', 'Date'
-	Type StoredProcedureParameterType `json:"type,omitempty"`
+	// Type - Stored procedure parameter type.
+	Type interface{} `json:"type,omitempty"`
 }
 
 // SubResource azure Data Factory nested resource, which belongs to a factory.
 type SubResource struct {
-	// ID - The resource identifier.
+	// ID - READ-ONLY; The resource identifier.
 	ID *string `json:"id,omitempty"`
-	// Name - The resource name.
+	// Name - READ-ONLY; The resource name.
 	Name *string `json:"name,omitempty"`
-	// Type - The resource type.
+	// Type - READ-ONLY; The resource type.
 	Type *string `json:"type,omitempty"`
-	// Etag - Etag identifies change in the resource.
+	// Etag - READ-ONLY; Etag identifies change in the resource.
 	Etag *string `json:"etag,omitempty"`
 }
 
@@ -96219,106 +95953,6 @@ func (slstp *SybaseLinkedServiceTypeProperties) UnmarshalJSON(body []byte) error
 					return err
 				}
 				slstp.EncryptedCredential = encryptedCredential
-			}
-		}
-	}
-
-	return nil
-}
-
-// TabularTranslator a copy activity tabular translator.
-type TabularTranslator struct {
-	// ColumnMappings - Column mappings. Example: "UserId: MyUserId, Group: MyGroup, Name: MyName" Type: string (or Expression with resultType string).
-	ColumnMappings interface{} `json:"columnMappings,omitempty"`
-	// SchemaMapping - The schema mapping to map between tabular data and hierarchical data. Example: {"Column1": "$.Column1", "Column2": "$.Column2.Property1", "Column3": "$.Column2.Property2"}. Type: object (or Expression with resultType object).
-	SchemaMapping interface{} `json:"schemaMapping,omitempty"`
-	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
-	AdditionalProperties map[string]interface{} `json:""`
-	// Type - Possible values include: 'TypeCopyTranslator', 'TypeTabularTranslator'
-	Type TypeBasicCopyTranslator `json:"type,omitempty"`
-}
-
-// MarshalJSON is the custom marshaler for TabularTranslator.
-func (tt TabularTranslator) MarshalJSON() ([]byte, error) {
-	tt.Type = TypeTabularTranslator
-	objectMap := make(map[string]interface{})
-	if tt.ColumnMappings != nil {
-		objectMap["columnMappings"] = tt.ColumnMappings
-	}
-	if tt.SchemaMapping != nil {
-		objectMap["schemaMapping"] = tt.SchemaMapping
-	}
-	if tt.Type != "" {
-		objectMap["type"] = tt.Type
-	}
-	for k, v := range tt.AdditionalProperties {
-		objectMap[k] = v
-	}
-	return json.Marshal(objectMap)
-}
-
-// AsTabularTranslator is the BasicCopyTranslator implementation for TabularTranslator.
-func (tt TabularTranslator) AsTabularTranslator() (*TabularTranslator, bool) {
-	return &tt, true
-}
-
-// AsCopyTranslator is the BasicCopyTranslator implementation for TabularTranslator.
-func (tt TabularTranslator) AsCopyTranslator() (*CopyTranslator, bool) {
-	return nil, false
-}
-
-// AsBasicCopyTranslator is the BasicCopyTranslator implementation for TabularTranslator.
-func (tt TabularTranslator) AsBasicCopyTranslator() (BasicCopyTranslator, bool) {
-	return &tt, true
-}
-
-// UnmarshalJSON is the custom unmarshaler for TabularTranslator struct.
-func (tt *TabularTranslator) UnmarshalJSON(body []byte) error {
-	var m map[string]*json.RawMessage
-	err := json.Unmarshal(body, &m)
-	if err != nil {
-		return err
-	}
-	for k, v := range m {
-		switch k {
-		case "columnMappings":
-			if v != nil {
-				var columnMappings interface{}
-				err = json.Unmarshal(*v, &columnMappings)
-				if err != nil {
-					return err
-				}
-				tt.ColumnMappings = columnMappings
-			}
-		case "schemaMapping":
-			if v != nil {
-				var schemaMapping interface{}
-				err = json.Unmarshal(*v, &schemaMapping)
-				if err != nil {
-					return err
-				}
-				tt.SchemaMapping = schemaMapping
-			}
-		default:
-			if v != nil {
-				var additionalProperties interface{}
-				err = json.Unmarshal(*v, &additionalProperties)
-				if err != nil {
-					return err
-				}
-				if tt.AdditionalProperties == nil {
-					tt.AdditionalProperties = make(map[string]interface{})
-				}
-				tt.AdditionalProperties[k] = additionalProperties
-			}
-		case "type":
-			if v != nil {
-				var typeVar TypeBasicCopyTranslator
-				err = json.Unmarshal(*v, &typeVar)
-				if err != nil {
-					return err
-				}
-				tt.Type = typeVar
 			}
 		}
 	}
@@ -97149,7 +96783,7 @@ type Trigger struct {
 	AdditionalProperties map[string]interface{} `json:""`
 	// Description - Trigger description.
 	Description *string `json:"description,omitempty"`
-	// RuntimeState - Indicates if trigger is running or not. Updated when Start/Stop APIs are called on the Trigger. Possible values include: 'TriggerRuntimeStateStarted', 'TriggerRuntimeStateStopped', 'TriggerRuntimeStateDisabled'
+	// RuntimeState - READ-ONLY; Indicates if trigger is running or not. Updated when Start/Stop APIs are called on the Trigger. Possible values include: 'TriggerRuntimeStateStarted', 'TriggerRuntimeStateStopped', 'TriggerRuntimeStateDisabled'
 	RuntimeState TriggerRuntimeState `json:"runtimeState,omitempty"`
 	// Type - Possible values include: 'TypeTrigger', 'TypeTumblingWindowTrigger', 'TypeBlobEventsTrigger', 'TypeBlobTrigger', 'TypeScheduleTrigger', 'TypeMultiplePipelineTrigger'
 	Type TypeBasicTrigger `json:"type,omitempty"`
@@ -97214,9 +96848,6 @@ func (t Trigger) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if t.Description != nil {
 		objectMap["description"] = t.Description
-	}
-	if t.RuntimeState != "" {
-		objectMap["runtimeState"] = t.RuntimeState
 	}
 	if t.Type != "" {
 		objectMap["type"] = t.Type
@@ -97492,13 +97123,13 @@ type TriggerResource struct {
 	autorest.Response `json:"-"`
 	// Properties - Properties of the trigger.
 	Properties BasicTrigger `json:"properties,omitempty"`
-	// ID - The resource identifier.
+	// ID - READ-ONLY; The resource identifier.
 	ID *string `json:"id,omitempty"`
-	// Name - The resource name.
+	// Name - READ-ONLY; The resource name.
 	Name *string `json:"name,omitempty"`
-	// Type - The resource type.
+	// Type - READ-ONLY; The resource type.
 	Type *string `json:"type,omitempty"`
-	// Etag - Etag identifies change in the resource.
+	// Etag - READ-ONLY; Etag identifies change in the resource.
 	Etag *string `json:"etag,omitempty"`
 }
 
@@ -97565,51 +97196,27 @@ func (tr *TriggerResource) UnmarshalJSON(body []byte) error {
 type TriggerRun struct {
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
-	// TriggerRunID - Trigger run id.
+	// TriggerRunID - READ-ONLY; Trigger run id.
 	TriggerRunID *string `json:"triggerRunId,omitempty"`
-	// TriggerName - Trigger name.
+	// TriggerName - READ-ONLY; Trigger name.
 	TriggerName *string `json:"triggerName,omitempty"`
-	// TriggerType - Trigger type.
+	// TriggerType - READ-ONLY; Trigger type.
 	TriggerType *string `json:"triggerType,omitempty"`
-	// TriggerRunTimestamp - Trigger run start time.
+	// TriggerRunTimestamp - READ-ONLY; Trigger run start time.
 	TriggerRunTimestamp *date.Time `json:"triggerRunTimestamp,omitempty"`
-	// Status - Trigger run status. Possible values include: 'TriggerRunStatusSucceeded', 'TriggerRunStatusFailed', 'TriggerRunStatusInprogress'
+	// Status - READ-ONLY; Trigger run status. Possible values include: 'TriggerRunStatusSucceeded', 'TriggerRunStatusFailed', 'TriggerRunStatusInprogress'
 	Status TriggerRunStatus `json:"status,omitempty"`
-	// Message - Trigger error message.
+	// Message - READ-ONLY; Trigger error message.
 	Message *string `json:"message,omitempty"`
-	// Properties - List of property name and value related to trigger run. Name, value pair depends on type of trigger.
+	// Properties - READ-ONLY; List of property name and value related to trigger run. Name, value pair depends on type of trigger.
 	Properties map[string]*string `json:"properties"`
-	// TriggeredPipelines - List of pipeline name and run Id triggered by the trigger run.
+	// TriggeredPipelines - READ-ONLY; List of pipeline name and run Id triggered by the trigger run.
 	TriggeredPipelines map[string]*string `json:"triggeredPipelines"`
 }
 
 // MarshalJSON is the custom marshaler for TriggerRun.
 func (tr TriggerRun) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
-	if tr.TriggerRunID != nil {
-		objectMap["triggerRunId"] = tr.TriggerRunID
-	}
-	if tr.TriggerName != nil {
-		objectMap["triggerName"] = tr.TriggerName
-	}
-	if tr.TriggerType != nil {
-		objectMap["triggerType"] = tr.TriggerType
-	}
-	if tr.TriggerRunTimestamp != nil {
-		objectMap["triggerRunTimestamp"] = tr.TriggerRunTimestamp
-	}
-	if tr.Status != "" {
-		objectMap["status"] = tr.Status
-	}
-	if tr.Message != nil {
-		objectMap["message"] = tr.Message
-	}
-	if tr.Properties != nil {
-		objectMap["properties"] = tr.Properties
-	}
-	if tr.TriggeredPipelines != nil {
-		objectMap["triggeredPipelines"] = tr.TriggeredPipelines
-	}
 	for k, v := range tr.AdditionalProperties {
 		objectMap[k] = v
 	}
@@ -97871,7 +97478,7 @@ type TriggersStartFuture struct {
 // If the operation has not completed it will return an error.
 func (future *TriggersStartFuture) Result(client TriggersClient) (ar autorest.Response, err error) {
 	var done bool
-	done, err = future.Done(client)
+	done, err = future.DoneWithContext(context.Background(), client)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "datafactory.TriggersStartFuture", "Result", future.Response(), "Polling failure")
 		return
@@ -97893,7 +97500,7 @@ type TriggersStopFuture struct {
 // If the operation has not completed it will return an error.
 func (future *TriggersStopFuture) Result(client TriggersClient) (ar autorest.Response, err error) {
 	var done bool
-	done, err = future.Done(client)
+	done, err = future.DoneWithContext(context.Background(), client)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "datafactory.TriggersStopFuture", "Result", future.Response(), "Polling failure")
 		return
@@ -97917,7 +97524,7 @@ type TumblingWindowTrigger struct {
 	AdditionalProperties map[string]interface{} `json:""`
 	// Description - Trigger description.
 	Description *string `json:"description,omitempty"`
-	// RuntimeState - Indicates if trigger is running or not. Updated when Start/Stop APIs are called on the Trigger. Possible values include: 'TriggerRuntimeStateStarted', 'TriggerRuntimeStateStopped', 'TriggerRuntimeStateDisabled'
+	// RuntimeState - READ-ONLY; Indicates if trigger is running or not. Updated when Start/Stop APIs are called on the Trigger. Possible values include: 'TriggerRuntimeStateStarted', 'TriggerRuntimeStateStopped', 'TriggerRuntimeStateDisabled'
 	RuntimeState TriggerRuntimeState `json:"runtimeState,omitempty"`
 	// Type - Possible values include: 'TypeTrigger', 'TypeTumblingWindowTrigger', 'TypeBlobEventsTrigger', 'TypeBlobTrigger', 'TypeScheduleTrigger', 'TypeMultiplePipelineTrigger'
 	Type TypeBasicTrigger `json:"type,omitempty"`
@@ -97935,9 +97542,6 @@ func (twt TumblingWindowTrigger) MarshalJSON() ([]byte, error) {
 	}
 	if twt.Description != nil {
 		objectMap["description"] = twt.Description
-	}
-	if twt.RuntimeState != "" {
-		objectMap["runtimeState"] = twt.RuntimeState
 	}
 	if twt.Type != "" {
 		objectMap["type"] = twt.Type

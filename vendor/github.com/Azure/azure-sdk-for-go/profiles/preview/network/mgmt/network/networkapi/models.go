@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,18 +19,21 @@
 
 package networkapi
 
-import original "github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-10-01/network/networkapi"
+import original "github.com/Azure/azure-sdk-for-go/services/network/mgmt/2019-06-01/network/networkapi"
 
 type ApplicationGatewaysClientAPI = original.ApplicationGatewaysClientAPI
 type ApplicationSecurityGroupsClientAPI = original.ApplicationSecurityGroupsClientAPI
 type AvailableDelegationsClientAPI = original.AvailableDelegationsClientAPI
 type AvailableEndpointServicesClientAPI = original.AvailableEndpointServicesClientAPI
+type AvailablePrivateEndpointTypesClientAPI = original.AvailablePrivateEndpointTypesClientAPI
 type AvailableResourceGroupDelegationsClientAPI = original.AvailableResourceGroupDelegationsClientAPI
 type AzureFirewallFqdnTagsClientAPI = original.AzureFirewallFqdnTagsClientAPI
 type AzureFirewallsClientAPI = original.AzureFirewallsClientAPI
 type BaseClientAPI = original.BaseClientAPI
+type BastionHostsClientAPI = original.BastionHostsClientAPI
 type BgpServiceCommunitiesClientAPI = original.BgpServiceCommunitiesClientAPI
 type ConnectionMonitorsClientAPI = original.ConnectionMonitorsClientAPI
+type DdosCustomPoliciesClientAPI = original.DdosCustomPoliciesClientAPI
 type DdosProtectionPlansClientAPI = original.DdosProtectionPlansClientAPI
 type DefaultSecurityRulesClientAPI = original.DefaultSecurityRulesClientAPI
 type ExpressRouteCircuitAuthorizationsClientAPI = original.ExpressRouteCircuitAuthorizationsClientAPI
@@ -45,9 +48,10 @@ type ExpressRouteLinksClientAPI = original.ExpressRouteLinksClientAPI
 type ExpressRoutePortsClientAPI = original.ExpressRoutePortsClientAPI
 type ExpressRoutePortsLocationsClientAPI = original.ExpressRoutePortsLocationsClientAPI
 type ExpressRouteServiceProvidersClientAPI = original.ExpressRouteServiceProvidersClientAPI
+type FirewallPoliciesClientAPI = original.FirewallPoliciesClientAPI
+type FirewallPolicyRuleGroupsClientAPI = original.FirewallPolicyRuleGroupsClientAPI
 type HubVirtualNetworkConnectionsClientAPI = original.HubVirtualNetworkConnectionsClientAPI
 type InboundNatRulesClientAPI = original.InboundNatRulesClientAPI
-type InterfaceEndpointsClientAPI = original.InterfaceEndpointsClientAPI
 type InterfaceIPConfigurationsClientAPI = original.InterfaceIPConfigurationsClientAPI
 type InterfaceLoadBalancersClientAPI = original.InterfaceLoadBalancersClientAPI
 type InterfaceTapConfigurationsClientAPI = original.InterfaceTapConfigurationsClientAPI
@@ -60,21 +64,28 @@ type LoadBalancerOutboundRulesClientAPI = original.LoadBalancerOutboundRulesClie
 type LoadBalancerProbesClientAPI = original.LoadBalancerProbesClientAPI
 type LoadBalancersClientAPI = original.LoadBalancersClientAPI
 type LocalNetworkGatewaysClientAPI = original.LocalNetworkGatewaysClientAPI
+type NatGatewaysClientAPI = original.NatGatewaysClientAPI
 type OperationsClientAPI = original.OperationsClientAPI
 type P2sVpnGatewaysClientAPI = original.P2sVpnGatewaysClientAPI
 type P2sVpnServerConfigurationsClientAPI = original.P2sVpnServerConfigurationsClientAPI
 type PacketCapturesClientAPI = original.PacketCapturesClientAPI
+type PeerExpressRouteCircuitConnectionsClientAPI = original.PeerExpressRouteCircuitConnectionsClientAPI
+type PrivateEndpointsClientAPI = original.PrivateEndpointsClientAPI
+type PrivateLinkServicesClientAPI = original.PrivateLinkServicesClientAPI
 type ProfilesClientAPI = original.ProfilesClientAPI
 type PublicIPAddressesClientAPI = original.PublicIPAddressesClientAPI
 type PublicIPPrefixesClientAPI = original.PublicIPPrefixesClientAPI
+type ResourceNavigationLinksClientAPI = original.ResourceNavigationLinksClientAPI
 type RouteFilterRulesClientAPI = original.RouteFilterRulesClientAPI
 type RouteFiltersClientAPI = original.RouteFiltersClientAPI
 type RouteTablesClientAPI = original.RouteTablesClientAPI
 type RoutesClientAPI = original.RoutesClientAPI
 type SecurityGroupsClientAPI = original.SecurityGroupsClientAPI
 type SecurityRulesClientAPI = original.SecurityRulesClientAPI
+type ServiceAssociationLinksClientAPI = original.ServiceAssociationLinksClientAPI
 type ServiceEndpointPoliciesClientAPI = original.ServiceEndpointPoliciesClientAPI
 type ServiceEndpointPolicyDefinitionsClientAPI = original.ServiceEndpointPolicyDefinitionsClientAPI
+type ServiceTagsClientAPI = original.ServiceTagsClientAPI
 type SubnetsClientAPI = original.SubnetsClientAPI
 type UsagesClientAPI = original.UsagesClientAPI
 type VirtualHubsClientAPI = original.VirtualHubsClientAPI
@@ -86,6 +97,10 @@ type VirtualNetworksClientAPI = original.VirtualNetworksClientAPI
 type VirtualWansClientAPI = original.VirtualWansClientAPI
 type VpnConnectionsClientAPI = original.VpnConnectionsClientAPI
 type VpnGatewaysClientAPI = original.VpnGatewaysClientAPI
+type VpnLinkConnectionsClientAPI = original.VpnLinkConnectionsClientAPI
+type VpnSiteLinkConnectionsClientAPI = original.VpnSiteLinkConnectionsClientAPI
+type VpnSiteLinksClientAPI = original.VpnSiteLinksClientAPI
 type VpnSitesClientAPI = original.VpnSitesClientAPI
 type VpnSitesConfigurationClientAPI = original.VpnSitesConfigurationClientAPI
 type WatchersClientAPI = original.WatchersClientAPI
+type WebApplicationFirewallPoliciesClientAPI = original.WebApplicationFirewallPoliciesClientAPI

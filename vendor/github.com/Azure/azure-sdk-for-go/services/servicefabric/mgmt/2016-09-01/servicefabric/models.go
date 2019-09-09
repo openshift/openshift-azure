@@ -28,7 +28,7 @@ import (
 )
 
 // The package's fully qualified name.
-const fqdn = "github.com/Azure/azure-sdk-for-go//services/servicefabric/mgmt/2016-09-01/servicefabric"
+const fqdn = "github.com/Azure/azure-sdk-for-go/services/servicefabric/mgmt/2016-09-01/servicefabric"
 
 // ClusterState enumerates the values for cluster state.
 type ClusterState string
@@ -241,7 +241,7 @@ type CertificateDescription struct {
 type ClientCertificateCommonName struct {
 	// IsAdmin - Is this certificate used for admin access from the client, if false , it is used or query only access
 	IsAdmin *bool `json:"isAdmin,omitempty"`
-	// CertificateCommonName - Certificate common name to be granted access; be carefull using wild card common names
+	// CertificateCommonName - Certificate common name to be granted access; be careful using wild card common names
 	CertificateCommonName *string `json:"certificateCommonName,omitempty"`
 	// CertificateIssuerThumbprint - Certificate issuer thumbprint
 	CertificateIssuerThumbprint *string `json:"certificateIssuerThumbprint,omitempty"`
@@ -259,11 +259,11 @@ type ClientCertificateThumbprint struct {
 type Cluster struct {
 	autorest.Response  `json:"-"`
 	*ClusterProperties `json:"properties,omitempty"`
-	// ID - Resource ID.
+	// ID - READ-ONLY; Resource ID.
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name.
+	// Name - READ-ONLY; Resource name.
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type.
+	// Type - READ-ONLY; Resource type.
 	Type *string `json:"type,omitempty"`
 	// Location - Resource location.
 	Location *string `json:"location,omitempty"`
@@ -276,15 +276,6 @@ func (c Cluster) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if c.ClusterProperties != nil {
 		objectMap["properties"] = c.ClusterProperties
-	}
-	if c.ID != nil {
-		objectMap["id"] = c.ID
-	}
-	if c.Name != nil {
-		objectMap["name"] = c.Name
-	}
-	if c.Type != nil {
-		objectMap["type"] = c.Type
 	}
 	if c.Location != nil {
 		objectMap["location"] = c.Location
@@ -431,6 +422,11 @@ func (iter ClusterCodeVersionsListResultIterator) Value() ClusterCodeVersionsRes
 	return iter.page.Values()[iter.i]
 }
 
+// Creates a new instance of the ClusterCodeVersionsListResultIterator type.
+func NewClusterCodeVersionsListResultIterator(page ClusterCodeVersionsListResultPage) ClusterCodeVersionsListResultIterator {
+	return ClusterCodeVersionsListResultIterator{page: page}
+}
+
 // IsEmpty returns true if the ListResult contains no values.
 func (ccvlr ClusterCodeVersionsListResult) IsEmpty() bool {
 	return ccvlr.Value == nil || len(*ccvlr.Value) == 0
@@ -498,6 +494,11 @@ func (page ClusterCodeVersionsListResultPage) Values() []ClusterCodeVersionsResu
 		return nil
 	}
 	return *page.ccvlr.Value
+}
+
+// Creates a new instance of the ClusterCodeVersionsListResultPage type.
+func NewClusterCodeVersionsListResultPage(getNextPage func(context.Context, ClusterCodeVersionsListResult) (ClusterCodeVersionsListResult, error)) ClusterCodeVersionsListResultPage {
+	return ClusterCodeVersionsListResultPage{fn: getNextPage}
 }
 
 // ClusterCodeVersionsResult the result of the ServiceFabric runtime versions
@@ -656,6 +657,11 @@ func (iter ClusterListResultIterator) Value() Cluster {
 	return iter.page.Values()[iter.i]
 }
 
+// Creates a new instance of the ClusterListResultIterator type.
+func NewClusterListResultIterator(page ClusterListResultPage) ClusterListResultIterator {
+	return ClusterListResultIterator{page: page}
+}
+
 // IsEmpty returns true if the ListResult contains no values.
 func (clr ClusterListResult) IsEmpty() bool {
 	return clr.Value == nil || len(*clr.Value) == 0
@@ -725,19 +731,24 @@ func (page ClusterListResultPage) Values() []Cluster {
 	return *page.clr.Value
 }
 
+// Creates a new instance of the ClusterListResultPage type.
+func NewClusterListResultPage(getNextPage func(context.Context, ClusterListResult) (ClusterListResult, error)) ClusterListResultPage {
+	return ClusterListResultPage{fn: getNextPage}
+}
+
 // ClusterProperties the cluster resource properties
 type ClusterProperties struct {
-	// AvailableClusterVersions - The available cluster code version which the cluster can upgrade to, note that you must choose upgradeMode to manual to upgrade to
+	// AvailableClusterVersions - READ-ONLY; The available cluster code version which the cluster can upgrade to, note that you must choose upgradeMode to manual to upgrade to
 	AvailableClusterVersions *[]ClusterVersionDetails `json:"availableClusterVersions,omitempty"`
-	// ClusterID - The unique identifier for the cluster resource
+	// ClusterID - READ-ONLY; The unique identifier for the cluster resource
 	ClusterID *string `json:"clusterId,omitempty"`
-	// ClusterState - The state for the cluster. Possible values include: 'WaitingForNodes', 'Deploying', 'BaselineUpgrade', 'UpdatingUserConfiguration', 'UpdatingUserCertificate', 'UpdatingInfrastructure', 'EnforcingClusterVersion', 'UpgradeServiceUnreachable', 'AutoScale', 'Ready'
+	// ClusterState - READ-ONLY; The state for the cluster. Possible values include: 'WaitingForNodes', 'Deploying', 'BaselineUpgrade', 'UpdatingUserConfiguration', 'UpdatingUserCertificate', 'UpdatingInfrastructure', 'EnforcingClusterVersion', 'UpgradeServiceUnreachable', 'AutoScale', 'Ready'
 	ClusterState ClusterState `json:"clusterState,omitempty"`
-	// ClusterEndpoint - The endpoint for the cluster connecting to servicefabric resource provider
+	// ClusterEndpoint - READ-ONLY; The endpoint for the cluster connecting to servicefabric resource provider
 	ClusterEndpoint *string `json:"clusterEndpoint,omitempty"`
 	// ClusterCodeVersion - The ServiceFabric code version running in your cluster
 	ClusterCodeVersion *string `json:"clusterCodeVersion,omitempty"`
-	// Certificate - This primay certificate will be used as cluster node to node security, SSL certificate for cluster management endpoint and default admin client
+	// Certificate - This primary certificate will be used as cluster node to node security, SSL certificate for cluster management endpoint and default admin client
 	Certificate *CertificateDescription `json:"certificate,omitempty"`
 	// ReliabilityLevel - Cluster reliability level indicates replica set size of system service. Possible values include: 'ReliabilityLevel1Bronze', 'ReliabilityLevel1Silver', 'ReliabilityLevel1Gold', 'ReliabilityLevel1Platinum'
 	ReliabilityLevel ReliabilityLevel1 `json:"reliabilityLevel,omitempty"`
@@ -753,11 +764,11 @@ type ClusterProperties struct {
 	ReverseProxyCertificate *CertificateDescription `json:"reverseProxyCertificate,omitempty"`
 	// ManagementEndpoint - The http management endpoint of the cluster
 	ManagementEndpoint *string `json:"managementEndpoint,omitempty"`
-	// NodeTypes - The list of nodetypes that make up the cluster
+	// NodeTypes - The list of node types that make up the cluster
 	NodeTypes *[]NodeTypeDescription `json:"nodeTypes,omitempty"`
 	// AzureActiveDirectory - The settings to enable AAD authentication on the cluster
 	AzureActiveDirectory *AzureActiveDirectory `json:"azureActiveDirectory,omitempty"`
-	// ProvisioningState - The provisioning state of the cluster resource. Possible values include: 'Updating', 'Succeeded', 'Failed', 'Canceled'
+	// ProvisioningState - READ-ONLY; The provisioning state of the cluster resource. Possible values include: 'Updating', 'Succeeded', 'Failed', 'Canceled'
 	ProvisioningState ProvisioningState `json:"provisioningState,omitempty"`
 	// VMImage - The name of VM image VMSS has been configured with. Generic names such as Windows or Linux can be used.
 	VMImage *string `json:"vmImage,omitempty"`
@@ -775,7 +786,7 @@ type ClusterPropertiesUpdateParameters struct {
 	UpgradeMode UpgradeMode `json:"upgradeMode,omitempty"`
 	// ClusterCodeVersion - The ServiceFabric code version, if set it, please make sure you have set upgradeMode to Manual, otherwise ,it will fail, if you are using PUT new cluster, you can get the version by using ClusterVersions_List, if you are updating existing cluster, you can get the availableClusterVersions from Clusters_Get
 	ClusterCodeVersion *string `json:"clusterCodeVersion,omitempty"`
-	// Certificate - This primay certificate will be used as cluster node to node security, SSL certificate for cluster management endpoint and default admin client, the certificate should exist in the virtual machine scale sets or Azure key vault, before you add it. It will override original value
+	// Certificate - This primary certificate will be used as cluster node to node security, SSL certificate for cluster management endpoint and default admin client, the certificate should exist in the virtual machine scale sets or Azure key vault, before you add it. It will override original value
 	Certificate *CertificateDescription `json:"certificate,omitempty"`
 	// ClientCertificateThumbprints - The client thumbprint details, it is used for client access for cluster operation, it will override existing collection
 	ClientCertificateThumbprints *[]ClientCertificateThumbprint `json:"clientCertificateThumbprints,omitempty"`
@@ -785,7 +796,7 @@ type ClusterPropertiesUpdateParameters struct {
 	FabricSettings *[]SettingsSectionDescription `json:"fabricSettings,omitempty"`
 	// ReverseProxyCertificate - Certificate for the reverse proxy
 	ReverseProxyCertificate *CertificateDescription `json:"reverseProxyCertificate,omitempty"`
-	// NodeTypes - The list of nodetypes that make up the cluster, it will override
+	// NodeTypes - The list of node types that make up the cluster, it will override
 	NodeTypes *[]NodeTypeDescription `json:"nodeTypes,omitempty"`
 	// UpgradeDescription - The policy to use when upgrading the cluster.
 	UpgradeDescription *ClusterUpgradePolicy `json:"upgradeDescription,omitempty"`
@@ -801,7 +812,7 @@ type ClustersCreateFuture struct {
 // If the operation has not completed it will return an error.
 func (future *ClustersCreateFuture) Result(client ClustersClient) (c Cluster, err error) {
 	var done bool
-	done, err = future.Done(client)
+	done, err = future.DoneWithContext(context.Background(), client)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "servicefabric.ClustersCreateFuture", "Result", future.Response(), "Polling failure")
 		return
@@ -830,7 +841,7 @@ type ClustersUpdateFuture struct {
 // If the operation has not completed it will return an error.
 func (future *ClustersUpdateFuture) Result(client ClustersClient) (c Cluster, err error) {
 	var done bool
-	done, err = future.Done(client)
+	done, err = future.DoneWithContext(context.Background(), client)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "servicefabric.ClustersUpdateFuture", "Result", future.Response(), "Polling failure")
 		return
@@ -994,11 +1005,11 @@ type NodeTypeDescription struct {
 	ClientConnectionEndpointPort *int32 `json:"clientConnectionEndpointPort,omitempty"`
 	// HTTPGatewayEndpointPort - The HTTP cluster management endpoint port
 	HTTPGatewayEndpointPort *int32 `json:"httpGatewayEndpointPort,omitempty"`
-	// DurabilityLevel - Nodetype durability Level. Possible values include: 'Bronze', 'Silver', 'Gold'
+	// DurabilityLevel - Node type durability Level. Possible values include: 'Bronze', 'Silver', 'Gold'
 	DurabilityLevel DurabilityLevel `json:"durabilityLevel,omitempty"`
 	// ApplicationPorts - Ports used by applications
 	ApplicationPorts *EndpointRangeDescription `json:"applicationPorts,omitempty"`
-	// EphemeralPorts - System assgined application ports
+	// EphemeralPorts - System assigned application ports
 	EphemeralPorts *EndpointRangeDescription `json:"ephemeralPorts,omitempty"`
 	// IsPrimary - Mark this as the primary node type
 	IsPrimary *bool `json:"isPrimary,omitempty"`
@@ -1051,9 +1062,9 @@ func (ntd NodeTypeDescription) MarshalJSON() ([]byte, error) {
 // operations and a URL link to get the next set of results.
 type OperationListResult struct {
 	autorest.Response `json:"-"`
-	// Value - List of ServiceFabric operations supported by the Microsoft.ServiceFabric resource provider.
+	// Value - READ-ONLY; List of ServiceFabric operations supported by the Microsoft.ServiceFabric resource provider.
 	Value *[]OperationResult `json:"value,omitempty"`
-	// NextLink - URL to get the next set of operation list results if there are any.
+	// NextLink - READ-ONLY; URL to get the next set of operation list results if there are any.
 	NextLink *string `json:"nextLink,omitempty"`
 }
 
@@ -1113,6 +1124,11 @@ func (iter OperationListResultIterator) Value() OperationResult {
 		return OperationResult{}
 	}
 	return iter.page.Values()[iter.i]
+}
+
+// Creates a new instance of the OperationListResultIterator type.
+func NewOperationListResultIterator(page OperationListResultPage) OperationListResultIterator {
+	return OperationListResultIterator{page: page}
 }
 
 // IsEmpty returns true if the ListResult contains no values.
@@ -1184,11 +1200,16 @@ func (page OperationListResultPage) Values() []OperationResult {
 	return *page.olr.Value
 }
 
+// Creates a new instance of the OperationListResultPage type.
+func NewOperationListResultPage(getNextPage func(context.Context, OperationListResult) (OperationListResult, error)) OperationListResultPage {
+	return OperationListResultPage{fn: getNextPage}
+}
+
 // OperationResult available operation list result
 type OperationResult struct {
 	// Name - Result name
 	Name *string `json:"name,omitempty"`
-	// Display - Dispaly of the result
+	// Display - Display of the result
 	Display *AvailableOperationDisplay `json:"display,omitempty"`
 	// Origin - Origin result
 	Origin *string `json:"origin,omitempty"`
@@ -1198,11 +1219,11 @@ type OperationResult struct {
 
 // Resource the resource model definition.
 type Resource struct {
-	// ID - Resource ID.
+	// ID - READ-ONLY; Resource ID.
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name.
+	// Name - READ-ONLY; Resource name.
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type.
+	// Type - READ-ONLY; Resource type.
 	Type *string `json:"type,omitempty"`
 	// Location - Resource location.
 	Location *string `json:"location,omitempty"`
@@ -1213,15 +1234,6 @@ type Resource struct {
 // MarshalJSON is the custom marshaler for Resource.
 func (r Resource) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
-	if r.ID != nil {
-		objectMap["id"] = r.ID
-	}
-	if r.Name != nil {
-		objectMap["name"] = r.Name
-	}
-	if r.Type != nil {
-		objectMap["type"] = r.Type
-	}
 	if r.Location != nil {
 		objectMap["location"] = r.Location
 	}

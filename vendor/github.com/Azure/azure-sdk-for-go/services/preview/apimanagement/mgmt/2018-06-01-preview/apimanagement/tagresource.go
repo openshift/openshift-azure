@@ -45,21 +45,22 @@ func NewTagResourceClientWithBaseURI(baseURI string, subscriptionID string) TagR
 // Parameters:
 // resourceGroupName - the name of the resource group.
 // serviceName - the name of the API Management service.
-// filter - | Field       | Supported operators    | Supported functions                         |
-// |-------------|------------------------|---------------------------------------------|
-// | id          | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
-// | name        | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
-// | aid         | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
-// | apiName     | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
-// | apiRevision | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
-// | path        | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
-// | description | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
-// | serviceUrl  | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
-// | method      | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
-// | urlTemplate | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
-// | terms       | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
-// | state       | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
-// | isCurrent   | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
+// filter - | Field       | Supported operators    | Supported functions               |
+// |-------------|------------------------|-----------------------------------|
+//
+// |aid | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith|
+// |name | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith|
+// |displayName | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith|
+// |apiName | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith|
+// |apiRevision | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith|
+// |path | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith|
+// |description | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith|
+// |serviceUrl | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith|
+// |method | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith|
+// |urlTemplate | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith|
+// |terms | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith|
+// |state | eq |    |
+// |isCurrent | eq |    |
 // top - number of records to return.
 // skip - number of records to skip.
 func (client TagResourceClient) ListByService(ctx context.Context, resourceGroupName string, serviceName string, filter string, top *int32, skip *int32) (result TagResourceCollectionPage, err error) {
@@ -142,8 +143,8 @@ func (client TagResourceClient) ListByServicePreparer(ctx context.Context, resou
 // ListByServiceSender sends the ListByService request. The method will close the
 // http.Response Body if it receives an error.
 func (client TagResourceClient) ListByServiceSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListByServiceResponder handles the response to the ListByService request. The method always

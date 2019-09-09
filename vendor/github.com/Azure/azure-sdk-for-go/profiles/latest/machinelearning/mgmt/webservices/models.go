@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -153,6 +153,8 @@ type PaginatedWebServicesListIterator = original.PaginatedWebServicesListIterato
 type PaginatedWebServicesListPage = original.PaginatedWebServicesListPage
 type Parameter = original.Parameter
 type PatchFuture = original.PatchFuture
+type PatchedResource = original.PatchedResource
+type PatchedWebService = original.PatchedWebService
 type Properties = original.Properties
 type PropertiesForGraph = original.PropertiesForGraph
 type RealtimeConfiguration = original.RealtimeConfiguration

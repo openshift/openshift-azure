@@ -164,6 +164,15 @@ type ManagedInstanceEncryptionProtectorsClientAPI interface {
 	CreateOrUpdate(ctx context.Context, resourceGroupName string, managedInstanceName string, parameters sql.ManagedInstanceEncryptionProtector) (result sql.ManagedInstanceEncryptionProtectorsCreateOrUpdateFuture, err error)
 	Get(ctx context.Context, resourceGroupName string, managedInstanceName string) (result sql.ManagedInstanceEncryptionProtector, err error)
 	ListByInstance(ctx context.Context, resourceGroupName string, managedInstanceName string) (result sql.ManagedInstanceEncryptionProtectorListResultPage, err error)
+	Revalidate(ctx context.Context, resourceGroupName string, managedInstanceName string) (result sql.ManagedInstanceEncryptionProtectorsRevalidateFuture, err error)
 }
 
 var _ ManagedInstanceEncryptionProtectorsClientAPI = (*sql.ManagedInstanceEncryptionProtectorsClient)(nil)
+
+// RecoverableManagedDatabasesClientAPI contains the set of methods on the RecoverableManagedDatabasesClient type.
+type RecoverableManagedDatabasesClientAPI interface {
+	Get(ctx context.Context, resourceGroupName string, managedInstanceName string, recoverableDatabaseName string) (result sql.RecoverableManagedDatabase, err error)
+	ListByInstance(ctx context.Context, resourceGroupName string, managedInstanceName string) (result sql.RecoverableManagedDatabaseListResultPage, err error)
+}
+
+var _ RecoverableManagedDatabasesClientAPI = (*sql.RecoverableManagedDatabasesClient)(nil)

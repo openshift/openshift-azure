@@ -92,6 +92,8 @@ func (client WorkflowAccessKeysClient) CreateOrUpdatePreparer(ctx context.Contex
 		"api-version": APIVersion,
 	}
 
+	workflowAccesskey.Name = nil
+	workflowAccesskey.Type = nil
 	preparer := autorest.CreatePreparer(
 		autorest.AsContentType("application/json; charset=utf-8"),
 		autorest.AsPut(),
@@ -105,8 +107,8 @@ func (client WorkflowAccessKeysClient) CreateOrUpdatePreparer(ctx context.Contex
 // CreateOrUpdateSender sends the CreateOrUpdate request. The method will close the
 // http.Response Body if it receives an error.
 func (client WorkflowAccessKeysClient) CreateOrUpdateSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // CreateOrUpdateResponder handles the response to the CreateOrUpdate request. The method always
@@ -184,8 +186,8 @@ func (client WorkflowAccessKeysClient) DeletePreparer(ctx context.Context, resou
 // DeleteSender sends the Delete request. The method will close the
 // http.Response Body if it receives an error.
 func (client WorkflowAccessKeysClient) DeleteSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // DeleteResponder handles the response to the Delete request. The method always
@@ -262,8 +264,8 @@ func (client WorkflowAccessKeysClient) GetPreparer(ctx context.Context, resource
 // GetSender sends the Get request. The method will close the
 // http.Response Body if it receives an error.
 func (client WorkflowAccessKeysClient) GetSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetResponder handles the response to the Get request. The method always
@@ -344,8 +346,8 @@ func (client WorkflowAccessKeysClient) ListPreparer(ctx context.Context, resourc
 // ListSender sends the List request. The method will close the
 // http.Response Body if it receives an error.
 func (client WorkflowAccessKeysClient) ListSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListResponder handles the response to the List request. The method always
@@ -460,8 +462,8 @@ func (client WorkflowAccessKeysClient) ListSecretKeysPreparer(ctx context.Contex
 // ListSecretKeysSender sends the ListSecretKeys request. The method will close the
 // http.Response Body if it receives an error.
 func (client WorkflowAccessKeysClient) ListSecretKeysSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListSecretKeysResponder handles the response to the ListSecretKeys request. The method always
@@ -542,8 +544,8 @@ func (client WorkflowAccessKeysClient) RegenerateSecretKeyPreparer(ctx context.C
 // RegenerateSecretKeySender sends the RegenerateSecretKey request. The method will close the
 // http.Response Body if it receives an error.
 func (client WorkflowAccessKeysClient) RegenerateSecretKeySender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // RegenerateSecretKeyResponder handles the response to the RegenerateSecretKey request. The method always

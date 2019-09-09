@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,6 @@
 
 package predictionapi
 
-import original "github.com/Azure/azure-sdk-for-go/services/cognitiveservices/v1.1/customvision/prediction/predictionapi"
+import original "github.com/Azure/azure-sdk-for-go/services/cognitiveservices/v3.0/customvision/prediction/predictionapi"
 
 type BaseClientAPI = original.BaseClientAPI

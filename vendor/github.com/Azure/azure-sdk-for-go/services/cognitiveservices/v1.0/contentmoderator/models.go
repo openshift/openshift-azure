@@ -95,12 +95,6 @@ func (b Body) MarshalJSON() ([]byte, error) {
 	return json.Marshal(objectMap)
 }
 
-// BodyModel ...
-type BodyModel struct {
-	DataRepresentation *string `json:"DataRepresentation,omitempty"`
-	Value              *string `json:"Value,omitempty"`
-}
-
 // Candidate OCR candidate text.
 type Candidate struct {
 	// Text - The text found.
@@ -407,6 +401,12 @@ func (il ImageList) MarshalJSON() ([]byte, error) {
 	return json.Marshal(objectMap)
 }
 
+// ImageURL ...
+type ImageURL struct {
+	DataRepresentation *string `json:"DataRepresentation,omitempty"`
+	Value              *string `json:"Value,omitempty"`
+}
+
 // IPA IP Address details.
 type IPA struct {
 	// SubType - Subtype of the detected IP Address.
@@ -616,12 +616,6 @@ type Screen struct {
 	Terms    *[]DetectedTerms `json:"Terms,omitempty"`
 	// TrackingID - Unique Content Moderator transaction Id.
 	TrackingID *string `json:"TrackingId,omitempty"`
-}
-
-// SetObject ...
-type SetObject struct {
-	autorest.Response `json:"-"`
-	Value             interface{} `json:"value,omitempty"`
 }
 
 // SSN detected SSN details.

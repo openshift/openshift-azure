@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -240,6 +240,7 @@ type ScheduleFrequency = original.ScheduleFrequency
 const (
 	Day     ScheduleFrequency = original.Day
 	Hour    ScheduleFrequency = original.Hour
+	Minute  ScheduleFrequency = original.Minute
 	Month   ScheduleFrequency = original.Month
 	OneTime ScheduleFrequency = original.OneTime
 	Week    ScheduleFrequency = original.Week

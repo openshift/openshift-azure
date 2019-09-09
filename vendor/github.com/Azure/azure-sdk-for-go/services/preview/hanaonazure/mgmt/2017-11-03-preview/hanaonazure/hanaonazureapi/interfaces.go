@@ -20,7 +20,6 @@ package hanaonazureapi
 import (
 	"context"
 	"github.com/Azure/azure-sdk-for-go/services/preview/hanaonazure/mgmt/2017-11-03-preview/hanaonazure"
-	"github.com/Azure/go-autorest/autorest"
 )
 
 // OperationsClientAPI contains the set of methods on the OperationsClient type.
@@ -32,10 +31,26 @@ var _ OperationsClientAPI = (*hanaonazure.OperationsClient)(nil)
 
 // HanaInstancesClientAPI contains the set of methods on the HanaInstancesClient type.
 type HanaInstancesClientAPI interface {
+	Create(ctx context.Context, resourceGroupName string, hanaInstanceName string, hanaInstanceParameter hanaonazure.HanaInstance) (result hanaonazure.HanaInstancesCreateFuture, err error)
+	Delete(ctx context.Context, resourceGroupName string, hanaInstanceName string) (result hanaonazure.HanaInstancesDeleteFuture, err error)
 	Get(ctx context.Context, resourceGroupName string, hanaInstanceName string) (result hanaonazure.HanaInstance, err error)
 	List(ctx context.Context) (result hanaonazure.HanaInstancesListResultPage, err error)
 	ListByResourceGroup(ctx context.Context, resourceGroupName string) (result hanaonazure.HanaInstancesListResultPage, err error)
-	Restart(ctx context.Context, resourceGroupName string, hanaInstanceName string) (result autorest.Response, err error)
+	Restart(ctx context.Context, resourceGroupName string, hanaInstanceName string) (result hanaonazure.HanaInstancesRestartFuture, err error)
+	Shutdown(ctx context.Context, resourceGroupName string, hanaInstanceName string) (result hanaonazure.HanaInstancesShutdownFuture, err error)
+	Start(ctx context.Context, resourceGroupName string, hanaInstanceName string) (result hanaonazure.HanaInstancesStartFuture, err error)
+	Update(ctx context.Context, resourceGroupName string, hanaInstanceName string, tagsParameter hanaonazure.Tags) (result hanaonazure.HanaInstance, err error)
 }
 
 var _ HanaInstancesClientAPI = (*hanaonazure.HanaInstancesClient)(nil)
+
+// SapMonitorsClientAPI contains the set of methods on the SapMonitorsClient type.
+type SapMonitorsClientAPI interface {
+	Create(ctx context.Context, resourceGroupName string, sapMonitorName string, sapMonitorParameter hanaonazure.SapMonitor) (result hanaonazure.SapMonitorsCreateFuture, err error)
+	Delete(ctx context.Context, resourceGroupName string, sapMonitorName string) (result hanaonazure.SapMonitorsDeleteFuture, err error)
+	Get(ctx context.Context, resourceGroupName string, sapMonitorName string) (result hanaonazure.SapMonitor, err error)
+	List(ctx context.Context) (result hanaonazure.SapMonitorListResultPage, err error)
+	Update(ctx context.Context, resourceGroupName string, sapMonitorName string, tagsParameter hanaonazure.Tags) (result hanaonazure.SapMonitor, err error)
+}
+
+var _ SapMonitorsClientAPI = (*hanaonazure.SapMonitorsClient)(nil)

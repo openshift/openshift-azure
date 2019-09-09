@@ -1,34 +1,31 @@
-hash: 0e94f8fae85c523e148deebd141a4e3de1f6e6267636254c4bdb00a410135b39
-updated: 2019-07-23T12:03:39.824691057+02:00
+hash: 210ae2420e21d476efbc38891e47d70628a2b38fb25e49fdb59e092b5df8ea4f
+updated: 2019-09-09T13:50:03.661001+01:00
 imports:
 - name: code.cloudfoundry.org/clock
   version: 02e53af36e6c978af692887ed449b74026d76fec
-- name: contrib.go.opencensus.io/exporter/ocagent
-  version: 8110e6c0236bb231b19119275a6be6ec666d05c8
 - name: github.com/alecthomas/units
   version: c3de453c63f4bdb4dadffab9805ec00426c505f7
 - name: github.com/Azure/azure-sdk-for-go
-  version: 1951233eb944a49aa5f7278cba8e3e32a8c958af
+  version: 98353253a537e7e94652d100d7d78b30a4a7ee21
   subpackages:
   - profiles/latest/compute/mgmt/compute
-  - profiles/preview/resources/mgmt/managedapplications
   - services/authorization/mgmt/2015-07-01/authorization
   - services/compute/mgmt/2018-10-01/compute
+  - services/compute/mgmt/2019-07-01/compute
   - services/dns/mgmt/2017-10-01/dns
   - services/graphrbac/1.6/graphrbac
   - services/keyvault/2016-10-01/keyvault
   - services/keyvault/mgmt/2016-10-01/keyvault
-  - services/marketplaceordering/mgmt/2015-06-01/marketplaceordering
   - services/network/mgmt/2018-06-01/network
   - services/network/mgmt/2018-07-01/network
   - services/preview/monitor/mgmt/2018-09-01/insights
+  - services/preview/operationalinsights/mgmt/2015-11-01-preview/operationalinsights
   - services/resources/mgmt/2018-05-01/resources
-  - services/resources/mgmt/2018-06-01/managedapplications
   - services/storage/mgmt/2018-02-01/storage
   - storage
   - version
 - name: github.com/Azure/go-autorest
-  version: 528b76fd0ebec0682f3e3da7c808cd472b999615
+  version: 69b4126ece6b5257e2f9b0017007d2334153655f
   subpackages:
   - autorest
   - autorest/adal
@@ -40,20 +37,10 @@ imports:
   - autorest/validation
   - logger
   - tracing
-  - version
 - name: github.com/beorn7/perks
   version: 4b2b341e8d7715fae06375aa633dbb6e91b3fb46
   subpackages:
   - quantile
-- name: github.com/census-instrumentation/opencensus-proto
-  version: 97194d1225539f817404bac07e965fd6d8f2a289
-  subpackages:
-  - gen-go/agent/common/v1
-  - gen-go/agent/metrics/v1
-  - gen-go/agent/trace/v1
-  - gen-go/metrics/v1
-  - gen-go/resource/v1
-  - gen-go/trace/v1
 - name: github.com/cespare/xxhash
   version: 32f3a100fff237d14029d34ec8579ef02aaaf87c
 - name: github.com/coreos/etcd
@@ -112,18 +99,12 @@ imports:
 - name: github.com/golang/protobuf
   version: 6c65a5562fc06764971b7c5d05c76c75e84bdbf7
   subpackages:
-  - jsonpb
   - proto
   - protoc-gen-go/descriptor
-  - protoc-gen-go/generator
-  - protoc-gen-go/generator/internal/remap
-  - protoc-gen-go/plugin
   - ptypes
   - ptypes/any
   - ptypes/duration
-  - ptypes/struct
   - ptypes/timestamp
-  - ptypes/wrappers
 - name: github.com/google/go-cmp
   version: 6f77996f0c42f7b84e5a2b252227263f93432e9b
   subpackages:
@@ -151,11 +132,7 @@ imports:
   - compiler
   - extensions
 - name: github.com/grpc-ecosystem/grpc-gateway
-  version: ad529a448ba494a88058f9e5be0988713174ac86
-  subpackages:
-  - internal
-  - runtime
-  - utilities
+  version: 471f45a5a99a578de7a8638dc7ed29e245bde097
 - name: github.com/hashicorp/golang-lru
   version: a0d98a5f288019575c6d1f4bb1573fef2d1fcdc4
   subpackages:
@@ -350,26 +327,6 @@ imports:
   version: ef82de70bb3f60c65fb8eebacbb2d122ef517385
 - name: github.com/spf13/pflag
   version: 583c0c0531f06d5278b7d917446061adc344b5cd
-- name: go.opencensus.io
-  version: b4a14686f0a98096416fe1b4cb848e384fb2b22b
-  subpackages:
-  - internal
-  - internal/tagencoding
-  - metric/metricdata
-  - metric/metricproducer
-  - plugin/ocgrpc
-  - plugin/ochttp
-  - plugin/ochttp/propagation/b3
-  - plugin/ochttp/propagation/tracecontext
-  - resource
-  - stats
-  - stats/internal
-  - stats/view
-  - tag
-  - trace
-  - trace/internal
-  - trace/propagation
-  - trace/tracestate
 - name: go.uber.org/atomic
   version: df976f2515e274675050de7b3f42545de80594fd
 - name: go.uber.org/multierr
@@ -385,9 +342,16 @@ imports:
 - name: golang.org/x/crypto
   version: 81e90905daefcd6fd217b62423c0908922eadb30
   subpackages:
+  - cast5
   - curve25519
   - ed25519
   - ed25519/internal/edwards25519
+  - openpgp
+  - openpgp/armor
+  - openpgp/elgamal
+  - openpgp/errors
+  - openpgp/packet
+  - openpgp/s2k
   - pkcs12
   - pkcs12/internal/rc2
   - ssh
@@ -414,7 +378,6 @@ imports:
   version: 112230192c580c3556b8cee6403af37a4fc5f28c
   subpackages:
   - errgroup
-  - semaphore
 - name: golang.org/x/sys
   version: d69651ed3497faee15a5363a89578e9991f6d5e2
   subpackages:
@@ -445,10 +408,6 @@ imports:
   version: f51c12702a4d776e4c1fa9b0fabab841babae631
   subpackages:
   - rate
-- name: google.golang.org/api
-  version: 069bea57b1be6ad0671a49ea7a1128025a22b73f
-  subpackages:
-  - support/bundler
 - name: google.golang.org/appengine
   version: b2f4a3cf3c67576a2ee09e1fe62656a5086ce880
   subpackages:
@@ -463,9 +422,7 @@ imports:
   version: 09f6ed296fc66555a25fe4ce95173148778dfa85
   subpackages:
   - googleapis/api/annotations
-  - googleapis/api/httpbody
   - googleapis/rpc/status
-  - protobuf/field_mask
 - name: google.golang.org/grpc
   version: 2e463a05d100327ca47ac218281906921038fd95
   subpackages:

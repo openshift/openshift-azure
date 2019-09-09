@@ -83,7 +83,7 @@ func PossibleStateValues() []State {
 	return []State{Deleted, Disabled, Enabled, PastDue, Warned}
 }
 
-// AdPrincipal active Directory Principal for subscription creation delegated permission
+// AdPrincipal active Directory Principal who’ll get owner access on the new subscription.
 type AdPrincipal struct {
 	// ObjectID - Object id of the Principal
 	ObjectID *string `json:"objectId,omitempty"`
@@ -122,7 +122,7 @@ func (cp CreationParameters) MarshalJSON() ([]byte, error) {
 // CreationResult the created subscription object.
 type CreationResult struct {
 	autorest.Response `json:"-"`
-	// SubscriptionLink - The link to the new subscription.
+	// SubscriptionLink - The link to the new subscription. Use this link to check the status of subscription creation operation.
 	SubscriptionLink *string `json:"subscriptionLink,omitempty"`
 }
 
@@ -144,7 +144,7 @@ type FactoryCreateSubscriptionInEnrollmentAccountFuture struct {
 // If the operation has not completed it will return an error.
 func (future *FactoryCreateSubscriptionInEnrollmentAccountFuture) Result(client FactoryClient) (cr CreationResult, err error) {
 	var done bool
-	done, err = future.Done(client)
+	done, err = future.DoneWithContext(context.Background(), client)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "subscription.FactoryCreateSubscriptionInEnrollmentAccountFuture", "Result", future.Response(), "Polling failure")
 		return
@@ -311,17 +311,17 @@ func NewListResultPage(getNextPage func(context.Context, ListResult) (ListResult
 
 // Location location information.
 type Location struct {
-	// ID - The fully qualified ID of the location. For example, /subscriptions/00000000-0000-0000-0000-000000000000/locations/westus.
+	// ID - READ-ONLY; The fully qualified ID of the location. For example, /subscriptions/00000000-0000-0000-0000-000000000000/locations/westus.
 	ID *string `json:"id,omitempty"`
-	// SubscriptionID - The subscription ID.
+	// SubscriptionID - READ-ONLY; The subscription ID.
 	SubscriptionID *string `json:"subscriptionId,omitempty"`
-	// Name - The location name.
+	// Name - READ-ONLY; The location name.
 	Name *string `json:"name,omitempty"`
-	// DisplayName - The display name of the location.
+	// DisplayName - READ-ONLY; The display name of the location.
 	DisplayName *string `json:"displayName,omitempty"`
-	// Latitude - The latitude of the location.
+	// Latitude - READ-ONLY; The latitude of the location.
 	Latitude *string `json:"latitude,omitempty"`
-	// Longitude - The longitude of the location.
+	// Longitude - READ-ONLY; The longitude of the location.
 	Longitude *string `json:"longitude,omitempty"`
 }
 
@@ -335,13 +335,13 @@ type LocationListResult struct {
 // Model subscription information.
 type Model struct {
 	autorest.Response `json:"-"`
-	// ID - The fully qualified ID for the subscription. For example, /subscriptions/00000000-0000-0000-0000-000000000000.
+	// ID - READ-ONLY; The fully qualified ID for the subscription. For example, /subscriptions/00000000-0000-0000-0000-000000000000.
 	ID *string `json:"id,omitempty"`
-	// SubscriptionID - The subscription ID.
+	// SubscriptionID - READ-ONLY; The subscription ID.
 	SubscriptionID *string `json:"subscriptionId,omitempty"`
-	// DisplayName - The subscription display name.
+	// DisplayName - READ-ONLY; The subscription display name.
 	DisplayName *string `json:"displayName,omitempty"`
-	// State - The subscription state. Possible values are Enabled, Warned, PastDue, Disabled, and Deleted. Possible values include: 'Enabled', 'Warned', 'PastDue', 'Disabled', 'Deleted'
+	// State - READ-ONLY; The subscription state. Possible values are Enabled, Warned, PastDue, Disabled, and Deleted. Possible values include: 'Enabled', 'Warned', 'PastDue', 'Disabled', 'Deleted'
 	State State `json:"state,omitempty"`
 	// SubscriptionPolicies - The subscription policies.
 	SubscriptionPolicies *Policies `json:"subscriptionPolicies,omitempty"`
@@ -349,44 +349,9 @@ type Model struct {
 	AuthorizationSource *string `json:"authorizationSource,omitempty"`
 }
 
-// Operation REST API operation
+// Operation status of the subscription POST operation.
 type Operation struct {
-	// Name - Operation name: {provider}/{resource}/{operation}
-	Name *string `json:"name,omitempty"`
-	// Display - The object that represents the operation.
-	Display *OperationDisplay `json:"display,omitempty"`
-}
-
-// OperationDisplay the object that represents the operation.
-type OperationDisplay struct {
-	// Provider - Service provider: Microsoft.Subscription
-	Provider *string `json:"provider,omitempty"`
-	// Resource - Resource on which the operation is performed: Profile, endpoint, etc.
-	Resource *string `json:"resource,omitempty"`
-	// Operation - Operation type: Read, write, delete, etc.
-	Operation *string `json:"operation,omitempty"`
-}
-
-// OperationListResult result of the request to list operations. It contains a list of operations and a URL
-// link to get the next set of results.
-type OperationListResult struct {
-	autorest.Response `json:"-"`
-	// Value - List of operations.
-	Value *[]Operation `json:"value,omitempty"`
-	// NextLink - URL to get the next set of operation list results if there are any.
-	NextLink *string `json:"nextLink,omitempty"`
-}
-
-// OperationListResultType a list of pending subscription operations.
-type OperationListResultType struct {
-	autorest.Response `json:"-"`
-	// Value - A list of pending SubscriptionOperations
-	Value *[]OperationType `json:"value,omitempty"`
-}
-
-// OperationType status of the subscription POST operation.
-type OperationType struct {
-	// ID - The operation Id.
+	// ID - READ-ONLY; The operation Id.
 	ID *string `json:"id,omitempty"`
 	// Status - Status of the pending subscription
 	Status *string `json:"status,omitempty"`
@@ -394,21 +359,28 @@ type OperationType struct {
 	StatusDetail *string `json:"statusDetail,omitempty"`
 }
 
+// OperationListResult a list of pending subscription operations.
+type OperationListResult struct {
+	autorest.Response `json:"-"`
+	// Value - A list of pending SubscriptionOperations
+	Value *[]Operation `json:"value,omitempty"`
+}
+
 // Policies subscription policies.
 type Policies struct {
-	// LocationPlacementID - The subscription location placement ID. The ID indicates which regions are visible for a subscription. For example, a subscription with a location placement Id of Public_2014-09-01 has access to Azure public regions.
+	// LocationPlacementID - READ-ONLY; The subscription location placement ID. The ID indicates which regions are visible for a subscription. For example, a subscription with a location placement Id of Public_2014-09-01 has access to Azure public regions.
 	LocationPlacementID *string `json:"locationPlacementId,omitempty"`
-	// QuotaID - The subscription quota ID.
+	// QuotaID - READ-ONLY; The subscription quota ID.
 	QuotaID *string `json:"quotaId,omitempty"`
-	// SpendingLimit - The subscription spending limit. Possible values include: 'On', 'Off', 'CurrentPeriodOff'
+	// SpendingLimit - READ-ONLY; The subscription spending limit. Possible values include: 'On', 'Off', 'CurrentPeriodOff'
 	SpendingLimit SpendingLimit `json:"spendingLimit,omitempty"`
 }
 
 // TenantIDDescription tenant Id information.
 type TenantIDDescription struct {
-	// ID - The fully qualified ID of the tenant. For example, /tenants/00000000-0000-0000-0000-000000000000.
+	// ID - READ-ONLY; The fully qualified ID of the tenant. For example, /tenants/00000000-0000-0000-0000-000000000000.
 	ID *string `json:"id,omitempty"`
-	// TenantID - The tenant ID. For example, 00000000-0000-0000-0000-000000000000.
+	// TenantID - READ-ONLY; The tenant ID. For example, 00000000-0000-0000-0000-000000000000.
 	TenantID *string `json:"tenantId,omitempty"`
 }
 

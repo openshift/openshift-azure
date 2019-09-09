@@ -97,9 +97,9 @@ func (client ExpressRouteCircuitsClient) CreateOrUpdatePreparer(ctx context.Cont
 // CreateOrUpdateSender sends the CreateOrUpdate request. The method will close the
 // http.Response Body if it receives an error.
 func (client ExpressRouteCircuitsClient) CreateOrUpdateSender(req *http.Request) (future ExpressRouteCircuitsCreateOrUpdateFuture, err error) {
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
 	var resp *http.Response
-	resp, err = autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	resp, err = autorest.SendWithSender(client, req, sd...)
 	if err != nil {
 		return
 	}
@@ -174,9 +174,9 @@ func (client ExpressRouteCircuitsClient) DeletePreparer(ctx context.Context, res
 // DeleteSender sends the Delete request. The method will close the
 // http.Response Body if it receives an error.
 func (client ExpressRouteCircuitsClient) DeleteSender(req *http.Request) (future ExpressRouteCircuitsDeleteFuture, err error) {
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
 	var resp *http.Response
-	resp, err = autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	resp, err = autorest.SendWithSender(client, req, sd...)
 	if err != nil {
 		return
 	}
@@ -196,7 +196,7 @@ func (client ExpressRouteCircuitsClient) DeleteResponder(resp *http.Response) (r
 	return
 }
 
-// Get the Get ExpressRouteCircuit operation retreives information about the specified ExpressRouteCircuit.
+// Get the Get ExpressRouteCircuit operation retrieves information about the specified ExpressRouteCircuit.
 // Parameters:
 // resourceGroupName - the name of the resource group.
 // circuitName - the name of the circuit.
@@ -256,8 +256,8 @@ func (client ExpressRouteCircuitsClient) GetPreparer(ctx context.Context, resour
 // GetSender sends the Get request. The method will close the
 // http.Response Body if it receives an error.
 func (client ExpressRouteCircuitsClient) GetSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetResponder handles the response to the Get request. The method always
@@ -273,8 +273,8 @@ func (client ExpressRouteCircuitsClient) GetResponder(resp *http.Response) (resu
 	return
 }
 
-// GetPeeringStats the Liststats ExpressRouteCircuit opertion retrieves all the stats from a ExpressRouteCircuits in a
-// resource group.
+// GetPeeringStats the GetPeeringStats ExpressRouteCircuit operation retrieves all the stats from a
+// ExpressRouteCircuits in a resource group.
 // Parameters:
 // resourceGroupName - the name of the resource group.
 // circuitName - the name of the circuit.
@@ -336,8 +336,8 @@ func (client ExpressRouteCircuitsClient) GetPeeringStatsPreparer(ctx context.Con
 // GetPeeringStatsSender sends the GetPeeringStats request. The method will close the
 // http.Response Body if it receives an error.
 func (client ExpressRouteCircuitsClient) GetPeeringStatsSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetPeeringStatsResponder handles the response to the GetPeeringStats request. The method always
@@ -353,7 +353,7 @@ func (client ExpressRouteCircuitsClient) GetPeeringStatsResponder(resp *http.Res
 	return
 }
 
-// GetStats the Liststats ExpressRouteCircuit opertion retrieves all the stats from a ExpressRouteCircuits in a
+// GetStats the GetStats ExpressRouteCircuit operation retrieves all the stats from a ExpressRouteCircuits in a
 // resource group.
 // Parameters:
 // resourceGroupName - the name of the resource group.
@@ -414,8 +414,8 @@ func (client ExpressRouteCircuitsClient) GetStatsPreparer(ctx context.Context, r
 // GetStatsSender sends the GetStats request. The method will close the
 // http.Response Body if it receives an error.
 func (client ExpressRouteCircuitsClient) GetStatsSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetStatsResponder handles the response to the GetStats request. The method always
@@ -431,7 +431,7 @@ func (client ExpressRouteCircuitsClient) GetStatsResponder(resp *http.Response) 
 	return
 }
 
-// List the List ExpressRouteCircuit opertion retrieves all the ExpressRouteCircuits in a resource group.
+// List the List ExpressRouteCircuit operation retrieves all the ExpressRouteCircuits in a resource group.
 // Parameters:
 // resourceGroupName - the name of the resource group.
 func (client ExpressRouteCircuitsClient) List(ctx context.Context, resourceGroupName string) (result ExpressRouteCircuitListResultPage, err error) {
@@ -490,8 +490,8 @@ func (client ExpressRouteCircuitsClient) ListPreparer(ctx context.Context, resou
 // ListSender sends the List request. The method will close the
 // http.Response Body if it receives an error.
 func (client ExpressRouteCircuitsClient) ListSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListResponder handles the response to the List request. The method always
@@ -544,7 +544,7 @@ func (client ExpressRouteCircuitsClient) ListComplete(ctx context.Context, resou
 	return
 }
 
-// ListAll the List ExpressRouteCircuit opertion retrieves all the ExpressRouteCircuits in a subscription.
+// ListAll the List ExpressRouteCircuit operation retrieves all the ExpressRouteCircuits in a subscription.
 func (client ExpressRouteCircuitsClient) ListAll(ctx context.Context) (result ExpressRouteCircuitListResultPage, err error) {
 	if tracing.IsEnabled() {
 		ctx = tracing.StartSpan(ctx, fqdn+"/ExpressRouteCircuitsClient.ListAll")
@@ -600,8 +600,8 @@ func (client ExpressRouteCircuitsClient) ListAllPreparer(ctx context.Context) (*
 // ListAllSender sends the ListAll request. The method will close the
 // http.Response Body if it receives an error.
 func (client ExpressRouteCircuitsClient) ListAllSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListAllResponder handles the response to the ListAll request. The method always
@@ -654,7 +654,7 @@ func (client ExpressRouteCircuitsClient) ListAllComplete(ctx context.Context) (r
 	return
 }
 
-// ListArpTable the ListArpTable from ExpressRouteCircuit opertion retrieves the currently advertised arp table
+// ListArpTable the ListArpTable from ExpressRouteCircuit operation retrieves the currently advertised arp table
 // associated with the ExpressRouteCircuits in a resource group.
 // Parameters:
 // resourceGroupName - the name of the resource group.
@@ -713,9 +713,9 @@ func (client ExpressRouteCircuitsClient) ListArpTablePreparer(ctx context.Contex
 // ListArpTableSender sends the ListArpTable request. The method will close the
 // http.Response Body if it receives an error.
 func (client ExpressRouteCircuitsClient) ListArpTableSender(req *http.Request) (future ExpressRouteCircuitsListArpTableFuture, err error) {
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
 	var resp *http.Response
-	resp, err = autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	resp, err = autorest.SendWithSender(client, req, sd...)
 	if err != nil {
 		return
 	}
@@ -736,7 +736,7 @@ func (client ExpressRouteCircuitsClient) ListArpTableResponder(resp *http.Respon
 	return
 }
 
-// ListRoutesTable the ListRoutesTable from ExpressRouteCircuit opertion retrieves the currently advertised routes
+// ListRoutesTable the ListRoutesTable from ExpressRouteCircuit operation retrieves the currently advertised routes
 // table associated with the ExpressRouteCircuits in a resource group.
 // Parameters:
 // resourceGroupName - the name of the resource group.
@@ -795,9 +795,9 @@ func (client ExpressRouteCircuitsClient) ListRoutesTablePreparer(ctx context.Con
 // ListRoutesTableSender sends the ListRoutesTable request. The method will close the
 // http.Response Body if it receives an error.
 func (client ExpressRouteCircuitsClient) ListRoutesTableSender(req *http.Request) (future ExpressRouteCircuitsListRoutesTableFuture, err error) {
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
 	var resp *http.Response
-	resp, err = autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	resp, err = autorest.SendWithSender(client, req, sd...)
 	if err != nil {
 		return
 	}
@@ -818,7 +818,7 @@ func (client ExpressRouteCircuitsClient) ListRoutesTableResponder(resp *http.Res
 	return
 }
 
-// ListRoutesTableSummary the ListRoutesTable from ExpressRouteCircuit opertion retrieves the currently advertised
+// ListRoutesTableSummary the ListRoutesTable from ExpressRouteCircuit operation retrieves the currently advertised
 // routes table associated with the ExpressRouteCircuits in a resource group.
 // Parameters:
 // resourceGroupName - the name of the resource group.
@@ -877,9 +877,9 @@ func (client ExpressRouteCircuitsClient) ListRoutesTableSummaryPreparer(ctx cont
 // ListRoutesTableSummarySender sends the ListRoutesTableSummary request. The method will close the
 // http.Response Body if it receives an error.
 func (client ExpressRouteCircuitsClient) ListRoutesTableSummarySender(req *http.Request) (future ExpressRouteCircuitsListRoutesTableSummaryFuture, err error) {
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
 	var resp *http.Response
-	resp, err = autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	resp, err = autorest.SendWithSender(client, req, sd...)
 	if err != nil {
 		return
 	}

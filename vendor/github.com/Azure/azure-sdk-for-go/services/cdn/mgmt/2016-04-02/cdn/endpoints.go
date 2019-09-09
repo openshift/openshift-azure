@@ -26,9 +26,7 @@ import (
 	"net/http"
 )
 
-// EndpointsClient is the use these APIs to manage Azure CDN resources through the Azure Resource Manager. You must
-// make sure that requests made to these resources are secure. For more information, see
-// https://msdn.microsoft.com/en-us/library/azure/dn790557.aspx.
+// EndpointsClient is the cdn Management Client
 type EndpointsClient struct {
 	BaseClient
 }
@@ -110,9 +108,9 @@ func (client EndpointsClient) CreatePreparer(ctx context.Context, endpointName s
 // CreateSender sends the Create request. The method will close the
 // http.Response Body if it receives an error.
 func (client EndpointsClient) CreateSender(req *http.Request) (future EndpointsCreateFuture, err error) {
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
 	var resp *http.Response
-	resp, err = autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	resp, err = autorest.SendWithSender(client, req, sd...)
 	if err != nil {
 		return
 	}
@@ -189,9 +187,9 @@ func (client EndpointsClient) DeleteIfExistsPreparer(ctx context.Context, endpoi
 // DeleteIfExistsSender sends the DeleteIfExists request. The method will close the
 // http.Response Body if it receives an error.
 func (client EndpointsClient) DeleteIfExistsSender(req *http.Request) (future EndpointsDeleteIfExistsFuture, err error) {
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
 	var resp *http.Response
-	resp, err = autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	resp, err = autorest.SendWithSender(client, req, sd...)
 	if err != nil {
 		return
 	}
@@ -273,8 +271,8 @@ func (client EndpointsClient) GetPreparer(ctx context.Context, endpointName stri
 // GetSender sends the Get request. The method will close the
 // http.Response Body if it receives an error.
 func (client EndpointsClient) GetSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetResponder handles the response to the Get request. The method always
@@ -350,8 +348,8 @@ func (client EndpointsClient) ListByProfilePreparer(ctx context.Context, profile
 // ListByProfileSender sends the ListByProfile request. The method will close the
 // http.Response Body if it receives an error.
 func (client EndpointsClient) ListByProfileSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListByProfileResponder handles the response to the ListByProfile request. The method always
@@ -432,9 +430,9 @@ func (client EndpointsClient) LoadContentPreparer(ctx context.Context, endpointN
 // LoadContentSender sends the LoadContent request. The method will close the
 // http.Response Body if it receives an error.
 func (client EndpointsClient) LoadContentSender(req *http.Request) (future EndpointsLoadContentFuture, err error) {
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
 	var resp *http.Response
-	resp, err = autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	resp, err = autorest.SendWithSender(client, req, sd...)
 	if err != nil {
 		return
 	}
@@ -519,9 +517,9 @@ func (client EndpointsClient) PurgeContentPreparer(ctx context.Context, endpoint
 // PurgeContentSender sends the PurgeContent request. The method will close the
 // http.Response Body if it receives an error.
 func (client EndpointsClient) PurgeContentSender(req *http.Request) (future EndpointsPurgeContentFuture, err error) {
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
 	var resp *http.Response
-	resp, err = autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	resp, err = autorest.SendWithSender(client, req, sd...)
 	if err != nil {
 		return
 	}
@@ -597,9 +595,9 @@ func (client EndpointsClient) StartPreparer(ctx context.Context, endpointName st
 // StartSender sends the Start request. The method will close the
 // http.Response Body if it receives an error.
 func (client EndpointsClient) StartSender(req *http.Request) (future EndpointsStartFuture, err error) {
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
 	var resp *http.Response
-	resp, err = autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	resp, err = autorest.SendWithSender(client, req, sd...)
 	if err != nil {
 		return
 	}
@@ -676,9 +674,9 @@ func (client EndpointsClient) StopPreparer(ctx context.Context, endpointName str
 // StopSender sends the Stop request. The method will close the
 // http.Response Body if it receives an error.
 func (client EndpointsClient) StopSender(req *http.Request) (future EndpointsStopFuture, err error) {
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
 	var resp *http.Response
-	resp, err = autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	resp, err = autorest.SendWithSender(client, req, sd...)
 	if err != nil {
 		return
 	}
@@ -758,9 +756,9 @@ func (client EndpointsClient) UpdatePreparer(ctx context.Context, endpointName s
 // UpdateSender sends the Update request. The method will close the
 // http.Response Body if it receives an error.
 func (client EndpointsClient) UpdateSender(req *http.Request) (future EndpointsUpdateFuture, err error) {
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
 	var resp *http.Response
-	resp, err = autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	resp, err = autorest.SendWithSender(client, req, sd...)
 	if err != nil {
 		return
 	}
@@ -852,8 +850,8 @@ func (client EndpointsClient) ValidateCustomDomainPreparer(ctx context.Context, 
 // ValidateCustomDomainSender sends the ValidateCustomDomain request. The method will close the
 // http.Response Body if it receives an error.
 func (client EndpointsClient) ValidateCustomDomainSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ValidateCustomDomainResponder handles the response to the ValidateCustomDomain request. The method always

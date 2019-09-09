@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package reservations
 import (
 	"context"
 
-	original "github.com/Azure/azure-sdk-for-go/services/preview/reservations/mgmt/2018-06-01/reservations"
+	original "github.com/Azure/azure-sdk-for-go/services/preview/reservations/mgmt/2019-04-01/reservations"
 )
 
 const (
@@ -99,9 +99,8 @@ const (
 type InstanceFlexibility = original.InstanceFlexibility
 
 const (
-	NotSupported InstanceFlexibility = original.NotSupported
-	Off          InstanceFlexibility = original.Off
-	On           InstanceFlexibility = original.On
+	Off InstanceFlexibility = original.Off
+	On  InstanceFlexibility = original.On
 )
 
 type ReservationTerm = original.ReservationTerm
@@ -114,11 +113,14 @@ const (
 type ReservedResourceType = original.ReservedResourceType
 
 const (
-	CosmosDb        ReservedResourceType = original.CosmosDb
-	RedHat          ReservedResourceType = original.RedHat
-	SQLDatabases    ReservedResourceType = original.SQLDatabases
-	SuseLinux       ReservedResourceType = original.SuseLinux
-	VirtualMachines ReservedResourceType = original.VirtualMachines
+	CosmosDb          ReservedResourceType = original.CosmosDb
+	RedHat            ReservedResourceType = original.RedHat
+	RedHatOsa         ReservedResourceType = original.RedHatOsa
+	SQLDatabases      ReservedResourceType = original.SQLDatabases
+	SQLDataWarehouse  ReservedResourceType = original.SQLDataWarehouse
+	SuseLinux         ReservedResourceType = original.SuseLinux
+	VirtualMachines   ReservedResourceType = original.VirtualMachines
+	VMwareCloudSimple ReservedResourceType = original.VMwareCloudSimple
 )
 
 type StatusCode = original.StatusCode
@@ -139,6 +141,10 @@ type AppliedReservationList = original.AppliedReservationList
 type AppliedReservations = original.AppliedReservations
 type AppliedReservationsProperties = original.AppliedReservationsProperties
 type BaseClient = original.BaseClient
+type CalculatePriceResponse = original.CalculatePriceResponse
+type CalculatePriceResponseProperties = original.CalculatePriceResponseProperties
+type CalculatePriceResponsePropertiesBillingCurrencyTotal = original.CalculatePriceResponsePropertiesBillingCurrencyTotal
+type CalculatePriceResponsePropertiesPricingCurrencyTotal = original.CalculatePriceResponsePropertiesPricingCurrencyTotal
 type Catalog = original.Catalog
 type Client = original.Client
 type Error = original.Error
@@ -163,13 +169,24 @@ type OrderList = original.OrderList
 type OrderListIterator = original.OrderListIterator
 type OrderListPage = original.OrderListPage
 type OrderProperties = original.OrderProperties
+type OrderPurchaseFuture = original.OrderPurchaseFuture
 type OrderResponse = original.OrderResponse
 type Patch = original.Patch
 type PatchProperties = original.PatchProperties
+type PatchPropertiesRenewProperties = original.PatchPropertiesRenewProperties
 type Properties = original.Properties
+type PropertiesType = original.PropertiesType
+type PurchaseRequest = original.PurchaseRequest
+type PurchaseRequestProperties = original.PurchaseRequestProperties
+type PurchaseRequestPropertiesReservedResourceProperties = original.PurchaseRequestPropertiesReservedResourceProperties
+type RenewPropertiesResponse = original.RenewPropertiesResponse
+type RenewPropertiesResponseBillingCurrencyTotal = original.RenewPropertiesResponseBillingCurrencyTotal
+type RenewPropertiesResponsePricingCurrencyTotal = original.RenewPropertiesResponsePricingCurrencyTotal
+type ReservationAvailableScopesFuture = original.ReservationAvailableScopesFuture
 type ReservationMergeFuture = original.ReservationMergeFuture
 type ReservationUpdateFuture = original.ReservationUpdateFuture
 type Response = original.Response
+type ScopeProperties = original.ScopeProperties
 type SkuName = original.SkuName
 type SkuProperty = original.SkuProperty
 type SkuRestriction = original.SkuRestriction
@@ -177,6 +194,7 @@ type SplitFuture = original.SplitFuture
 type SplitProperties = original.SplitProperties
 type SplitPropertiesType = original.SplitPropertiesType
 type SplitRequest = original.SplitRequest
+type SubscriptionScopeProperties = original.SubscriptionScopeProperties
 
 func New() BaseClient {
 	return original.New()

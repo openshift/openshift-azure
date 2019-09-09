@@ -30,6 +30,29 @@ import (
 // The package's fully qualified name.
 const fqdn = "github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2017-05-01-preview/insights"
 
+// AggregationType enumerates the values for aggregation type.
+type AggregationType string
+
+const (
+	// Average ...
+	Average AggregationType = "Average"
+	// Count ...
+	Count AggregationType = "Count"
+	// Maximum ...
+	Maximum AggregationType = "Maximum"
+	// Minimum ...
+	Minimum AggregationType = "Minimum"
+	// None ...
+	None AggregationType = "None"
+	// Total ...
+	Total AggregationType = "Total"
+)
+
+// PossibleAggregationTypeValues returns an array of possible values for the AggregationType const type.
+func PossibleAggregationTypeValues() []AggregationType {
+	return []AggregationType{Average, Count, Maximum, Minimum, None, Total}
+}
+
 // CategoryType enumerates the values for category type.
 type CategoryType string
 
@@ -87,23 +110,44 @@ func PossibleConditionOperatorValues() []ConditionOperator {
 	return []ConditionOperator{ConditionOperatorGreaterThan, ConditionOperatorGreaterThanOrEqual, ConditionOperatorLessThan, ConditionOperatorLessThanOrEqual}
 }
 
+// EventLevel enumerates the values for event level.
+type EventLevel string
+
+const (
+	// Critical ...
+	Critical EventLevel = "Critical"
+	// Error ...
+	Error EventLevel = "Error"
+	// Informational ...
+	Informational EventLevel = "Informational"
+	// Verbose ...
+	Verbose EventLevel = "Verbose"
+	// Warning ...
+	Warning EventLevel = "Warning"
+)
+
+// PossibleEventLevelValues returns an array of possible values for the EventLevel const type.
+func PossibleEventLevelValues() []EventLevel {
+	return []EventLevel{Critical, Error, Informational, Verbose, Warning}
+}
+
 // MetricStatisticType enumerates the values for metric statistic type.
 type MetricStatisticType string
 
 const (
-	// Average ...
-	Average MetricStatisticType = "Average"
-	// Max ...
-	Max MetricStatisticType = "Max"
-	// Min ...
-	Min MetricStatisticType = "Min"
-	// Sum ...
-	Sum MetricStatisticType = "Sum"
+	// MetricStatisticTypeAverage ...
+	MetricStatisticTypeAverage MetricStatisticType = "Average"
+	// MetricStatisticTypeMax ...
+	MetricStatisticTypeMax MetricStatisticType = "Max"
+	// MetricStatisticTypeMin ...
+	MetricStatisticTypeMin MetricStatisticType = "Min"
+	// MetricStatisticTypeSum ...
+	MetricStatisticTypeSum MetricStatisticType = "Sum"
 )
 
 // PossibleMetricStatisticTypeValues returns an array of possible values for the MetricStatisticType const type.
 func PossibleMetricStatisticTypeValues() []MetricStatisticType {
-	return []MetricStatisticType{Average, Max, Min, Sum}
+	return []MetricStatisticType{MetricStatisticTypeAverage, MetricStatisticTypeMax, MetricStatisticTypeMin, MetricStatisticTypeSum}
 }
 
 // OdataType enumerates the values for odata type.
@@ -180,27 +224,42 @@ func PossibleReceiverStatusValues() []ReceiverStatus {
 type RecurrenceFrequency string
 
 const (
-	// Day ...
-	Day RecurrenceFrequency = "Day"
-	// Hour ...
-	Hour RecurrenceFrequency = "Hour"
-	// Minute ...
-	Minute RecurrenceFrequency = "Minute"
-	// Month ...
-	Month RecurrenceFrequency = "Month"
-	// None ...
-	None RecurrenceFrequency = "None"
-	// Second ...
-	Second RecurrenceFrequency = "Second"
-	// Week ...
-	Week RecurrenceFrequency = "Week"
-	// Year ...
-	Year RecurrenceFrequency = "Year"
+	// RecurrenceFrequencyDay ...
+	RecurrenceFrequencyDay RecurrenceFrequency = "Day"
+	// RecurrenceFrequencyHour ...
+	RecurrenceFrequencyHour RecurrenceFrequency = "Hour"
+	// RecurrenceFrequencyMinute ...
+	RecurrenceFrequencyMinute RecurrenceFrequency = "Minute"
+	// RecurrenceFrequencyMonth ...
+	RecurrenceFrequencyMonth RecurrenceFrequency = "Month"
+	// RecurrenceFrequencyNone ...
+	RecurrenceFrequencyNone RecurrenceFrequency = "None"
+	// RecurrenceFrequencySecond ...
+	RecurrenceFrequencySecond RecurrenceFrequency = "Second"
+	// RecurrenceFrequencyWeek ...
+	RecurrenceFrequencyWeek RecurrenceFrequency = "Week"
+	// RecurrenceFrequencyYear ...
+	RecurrenceFrequencyYear RecurrenceFrequency = "Year"
 )
 
 // PossibleRecurrenceFrequencyValues returns an array of possible values for the RecurrenceFrequency const type.
 func PossibleRecurrenceFrequencyValues() []RecurrenceFrequency {
-	return []RecurrenceFrequency{Day, Hour, Minute, Month, None, Second, Week, Year}
+	return []RecurrenceFrequency{RecurrenceFrequencyDay, RecurrenceFrequencyHour, RecurrenceFrequencyMinute, RecurrenceFrequencyMonth, RecurrenceFrequencyNone, RecurrenceFrequencySecond, RecurrenceFrequencyWeek, RecurrenceFrequencyYear}
+}
+
+// ResultType enumerates the values for result type.
+type ResultType string
+
+const (
+	// Data ...
+	Data ResultType = "Data"
+	// Metadata ...
+	Metadata ResultType = "Metadata"
+)
+
+// PossibleResultTypeValues returns an array of possible values for the ResultType const type.
+func PossibleResultTypeValues() []ResultType {
+	return []ResultType{Data, Metadata}
 }
 
 // ScaleDirection enumerates the values for scale direction.
@@ -235,6 +294,23 @@ const (
 // PossibleScaleTypeValues returns an array of possible values for the ScaleType const type.
 func PossibleScaleTypeValues() []ScaleType {
 	return []ScaleType{ChangeCount, ExactCount, PercentChangeCount}
+}
+
+// Sensitivity enumerates the values for sensitivity.
+type Sensitivity string
+
+const (
+	// High ...
+	High Sensitivity = "High"
+	// Low ...
+	Low Sensitivity = "Low"
+	// Medium ...
+	Medium Sensitivity = "Medium"
+)
+
+// PossibleSensitivityValues returns an array of possible values for the Sensitivity const type.
+func PossibleSensitivityValues() []Sensitivity {
+	return []Sensitivity{High, Low, Medium}
 }
 
 // TimeAggregationOperator enumerates the values for time aggregation operator.
@@ -279,6 +355,35 @@ const (
 // PossibleTimeAggregationTypeValues returns an array of possible values for the TimeAggregationType const type.
 func PossibleTimeAggregationTypeValues() []TimeAggregationType {
 	return []TimeAggregationType{TimeAggregationTypeAverage, TimeAggregationTypeCount, TimeAggregationTypeLast, TimeAggregationTypeMaximum, TimeAggregationTypeMinimum, TimeAggregationTypeTotal}
+}
+
+// Unit enumerates the values for unit.
+type Unit string
+
+const (
+	// UnitBytes ...
+	UnitBytes Unit = "Bytes"
+	// UnitByteSeconds ...
+	UnitByteSeconds Unit = "ByteSeconds"
+	// UnitBytesPerSecond ...
+	UnitBytesPerSecond Unit = "BytesPerSecond"
+	// UnitCount ...
+	UnitCount Unit = "Count"
+	// UnitCountPerSecond ...
+	UnitCountPerSecond Unit = "CountPerSecond"
+	// UnitMilliSeconds ...
+	UnitMilliSeconds Unit = "MilliSeconds"
+	// UnitPercent ...
+	UnitPercent Unit = "Percent"
+	// UnitSeconds ...
+	UnitSeconds Unit = "Seconds"
+	// UnitUnspecified ...
+	UnitUnspecified Unit = "Unspecified"
+)
+
+// PossibleUnitValues returns an array of possible values for the Unit const type.
+func PossibleUnitValues() []Unit {
+	return []Unit{UnitBytes, UnitByteSeconds, UnitBytesPerSecond, UnitCount, UnitCountPerSecond, UnitMilliSeconds, UnitPercent, UnitSeconds, UnitUnspecified}
 }
 
 // ActionGroup an Azure action group.
@@ -382,11 +487,11 @@ type ActionGroupResource struct {
 	autorest.Response `json:"-"`
 	// ActionGroup - The action groups properties of the resource.
 	*ActionGroup `json:"properties,omitempty"`
-	// ID - Azure resource Id
+	// ID - READ-ONLY; Azure resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Azure resource name
+	// Name - READ-ONLY; Azure resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Azure resource type
+	// Type - READ-ONLY; Azure resource type
 	Type *string `json:"type,omitempty"`
 	// Location - Resource location
 	Location *string `json:"location,omitempty"`
@@ -399,15 +504,6 @@ func (agr ActionGroupResource) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if agr.ActionGroup != nil {
 		objectMap["properties"] = agr.ActionGroup
-	}
-	if agr.ID != nil {
-		objectMap["id"] = agr.ID
-	}
-	if agr.Name != nil {
-		objectMap["name"] = agr.Name
-	}
-	if agr.Type != nil {
-		objectMap["type"] = agr.Type
 	}
 	if agr.Location != nil {
 		objectMap["location"] = agr.Location
@@ -616,11 +712,11 @@ type ActivityLogAlertResource struct {
 	autorest.Response `json:"-"`
 	// ActivityLogAlert - The activity log alert properties of the resource.
 	*ActivityLogAlert `json:"properties,omitempty"`
-	// ID - Azure resource Id
+	// ID - READ-ONLY; Azure resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Azure resource name
+	// Name - READ-ONLY; Azure resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Azure resource type
+	// Type - READ-ONLY; Azure resource type
 	Type *string `json:"type,omitempty"`
 	// Location - Resource location
 	Location *string `json:"location,omitempty"`
@@ -633,15 +729,6 @@ func (alar ActivityLogAlertResource) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if alar.ActivityLogAlert != nil {
 		objectMap["properties"] = alar.ActivityLogAlert
-	}
-	if alar.ID != nil {
-		objectMap["id"] = alar.ID
-	}
-	if alar.Name != nil {
-		objectMap["name"] = alar.Name
-	}
-	if alar.Type != nil {
-		objectMap["type"] = alar.Type
 	}
 	if alar.Location != nil {
 		objectMap["location"] = alar.Location
@@ -733,7 +820,7 @@ type AlertRule struct {
 	Condition BasicRuleCondition `json:"condition,omitempty"`
 	// Actions - the array of actions that are performed when the alert rule becomes active, and when an alert condition is resolved.
 	Actions *[]BasicRuleAction `json:"actions,omitempty"`
-	// LastUpdatedTime - Last time the rule was updated in ISO8601 format.
+	// LastUpdatedTime - READ-ONLY; Last time the rule was updated in ISO8601 format.
 	LastUpdatedTime *date.Time `json:"lastUpdatedTime,omitempty"`
 }
 
@@ -809,11 +896,11 @@ type AlertRuleResource struct {
 	autorest.Response `json:"-"`
 	// AlertRule - The alert rule properties of the resource.
 	*AlertRule `json:"properties,omitempty"`
-	// ID - Azure resource Id
+	// ID - READ-ONLY; Azure resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Azure resource name
+	// Name - READ-ONLY; Azure resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Azure resource type
+	// Type - READ-ONLY; Azure resource type
 	Type *string `json:"type,omitempty"`
 	// Location - Resource location
 	Location *string `json:"location,omitempty"`
@@ -826,15 +913,6 @@ func (arr AlertRuleResource) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if arr.AlertRule != nil {
 		objectMap["properties"] = arr.AlertRule
-	}
-	if arr.ID != nil {
-		objectMap["id"] = arr.ID
-	}
-	if arr.Name != nil {
-		objectMap["name"] = arr.Name
-	}
-	if arr.Type != nil {
-		objectMap["type"] = arr.Type
 	}
 	if arr.Location != nil {
 		objectMap["location"] = arr.Location
@@ -1042,11 +1120,11 @@ type AutoscaleSettingResource struct {
 	autorest.Response `json:"-"`
 	// AutoscaleSetting - The autoscale setting of the resource.
 	*AutoscaleSetting `json:"properties,omitempty"`
-	// ID - Azure resource Id
+	// ID - READ-ONLY; Azure resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Azure resource name
+	// Name - READ-ONLY; Azure resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Azure resource type
+	// Type - READ-ONLY; Azure resource type
 	Type *string `json:"type,omitempty"`
 	// Location - Resource location
 	Location *string `json:"location,omitempty"`
@@ -1059,15 +1137,6 @@ func (asr AutoscaleSettingResource) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if asr.AutoscaleSetting != nil {
 		objectMap["properties"] = asr.AutoscaleSetting
-	}
-	if asr.ID != nil {
-		objectMap["id"] = asr.ID
-	}
-	if asr.Name != nil {
-		objectMap["name"] = asr.Name
-	}
-	if asr.Type != nil {
-		objectMap["type"] = asr.Type
 	}
 	if asr.Location != nil {
 		objectMap["location"] = asr.Location
@@ -1367,6 +1436,124 @@ type AzureFunctionReceiver struct {
 	HTTPTriggerURL *string `json:"httpTriggerUrl,omitempty"`
 }
 
+// Baseline the baseline values for a single sensitivity value.
+type Baseline struct {
+	// Sensitivity - the sensitivity of the baseline. Possible values include: 'Low', 'Medium', 'High'
+	Sensitivity Sensitivity `json:"sensitivity,omitempty"`
+	// LowThresholds - The low thresholds of the baseline.
+	LowThresholds *[]float64 `json:"lowThresholds,omitempty"`
+	// HighThresholds - The high thresholds of the baseline.
+	HighThresholds *[]float64 `json:"highThresholds,omitempty"`
+}
+
+// BaselineMetadataValue represents a baseline metadata value.
+type BaselineMetadataValue struct {
+	// Name - the name of the metadata.
+	Name *LocalizableString `json:"name,omitempty"`
+	// Value - the value of the metadata.
+	Value *string `json:"value,omitempty"`
+}
+
+// BaselineProperties the baseline properties class.
+type BaselineProperties struct {
+	// Timespan - The timespan for which the data was retrieved. Its value consists of two datetimes concatenated, separated by '/'.  This may be adjusted in the future and returned back from what was originally requested.
+	Timespan *string `json:"timespan,omitempty"`
+	// Interval - The interval (window size) for which the metric data was returned in.  This may be adjusted in the future and returned back from what was originally requested.  This is not present if a metadata request was made.
+	Interval *string `json:"interval,omitempty"`
+	// Aggregation - The aggregation type of the metric.
+	Aggregation *string `json:"aggregation,omitempty"`
+	// Timestamps - the array of timestamps of the baselines.
+	Timestamps *[]date.Time `json:"timestamps,omitempty"`
+	// Baseline - the baseline values for each sensitivity.
+	Baseline *[]Baseline `json:"baseline,omitempty"`
+	// Metadata - the baseline metadata values.
+	Metadata *[]BaselineMetadataValue `json:"metadata,omitempty"`
+}
+
+// BaselineResponse the response to a baseline query.
+type BaselineResponse struct {
+	autorest.Response `json:"-"`
+	// ID - READ-ONLY; the metric baseline Id.
+	ID *string `json:"id,omitempty"`
+	// Type - READ-ONLY; the resource type of the baseline resource.
+	Type *string `json:"type,omitempty"`
+	// Name - READ-ONLY; the name and the display name of the metric, i.e. it is localizable string.
+	Name *LocalizableString `json:"name,omitempty"`
+	// BaselineProperties - the properties of the baseline.
+	*BaselineProperties `json:"properties,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for BaselineResponse.
+func (br BaselineResponse) MarshalJSON() ([]byte, error) {
+	objectMap := make(map[string]interface{})
+	if br.BaselineProperties != nil {
+		objectMap["properties"] = br.BaselineProperties
+	}
+	return json.Marshal(objectMap)
+}
+
+// UnmarshalJSON is the custom unmarshaler for BaselineResponse struct.
+func (br *BaselineResponse) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "id":
+			if v != nil {
+				var ID string
+				err = json.Unmarshal(*v, &ID)
+				if err != nil {
+					return err
+				}
+				br.ID = &ID
+			}
+		case "type":
+			if v != nil {
+				var typeVar string
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				br.Type = &typeVar
+			}
+		case "name":
+			if v != nil {
+				var name LocalizableString
+				err = json.Unmarshal(*v, &name)
+				if err != nil {
+					return err
+				}
+				br.Name = &name
+			}
+		case "properties":
+			if v != nil {
+				var baselineProperties BaselineProperties
+				err = json.Unmarshal(*v, &baselineProperties)
+				if err != nil {
+					return err
+				}
+				br.BaselineProperties = &baselineProperties
+			}
+		}
+	}
+
+	return nil
+}
+
+// CalculateBaselineResponse the response to a calculate baseline call.
+type CalculateBaselineResponse struct {
+	autorest.Response `json:"-"`
+	// Type - the resource type of the baseline resource.
+	Type *string `json:"type,omitempty"`
+	// Timestamps - the array of timestamps of the baselines.
+	Timestamps *[]date.Time `json:"timestamps,omitempty"`
+	// Baseline - the baseline values for each sensitivity.
+	Baseline *[]Baseline `json:"baseline,omitempty"`
+}
+
 // DiagnosticSettings the diagnostic settings.
 type DiagnosticSettings struct {
 	// StorageAccountID - The resource ID of the storage account to which you would like to send Diagnostic Logs.
@@ -1377,12 +1564,14 @@ type DiagnosticSettings struct {
 	EventHubAuthorizationRuleID *string `json:"eventHubAuthorizationRuleId,omitempty"`
 	// EventHubName - The name of the event hub. If none is specified, the default event hub will be selected.
 	EventHubName *string `json:"eventHubName,omitempty"`
-	// Metrics - the list of metric settings.
+	// Metrics - The list of metric settings.
 	Metrics *[]MetricSettings `json:"metrics,omitempty"`
-	// Logs - the list of logs settings.
+	// Logs - The list of logs settings.
 	Logs *[]LogSettings `json:"logs,omitempty"`
-	// WorkspaceID - The workspace ID (resource ID of a Log Analytics workspace) for a Log Analytics workspace to which you would like to send Diagnostic Logs. Example: /subscriptions/4b9e8510-67ab-4e9a-95a9-e2f1e570ea9c/resourceGroups/insights-integration/providers/Microsoft.OperationalInsights/workspaces/viruela2
+	// WorkspaceID - The full ARM resource ID of the Log Analytics workspace to which you would like to send Diagnostic Logs. Example: /subscriptions/4b9e8510-67ab-4e9a-95a9-e2f1e570ea9c/resourceGroups/insights-integration/providers/Microsoft.OperationalInsights/workspaces/viruela2
 	WorkspaceID *string `json:"workspaceId,omitempty"`
+	// LogAnalyticsDestinationType - A string indicating whether the export to Log Analytics should use the default destination type, i.e. AzureDiagnostics, or use a destination type constructed as follows: <normalized service identity>_<normalized category name>. Possible values are: Dedicated and null (null is default.)
+	LogAnalyticsDestinationType *string `json:"logAnalyticsDestinationType,omitempty"`
 }
 
 // DiagnosticSettingsCategory the diagnostic settings Category.
@@ -1396,11 +1585,11 @@ type DiagnosticSettingsCategoryResource struct {
 	autorest.Response `json:"-"`
 	// DiagnosticSettingsCategory - The properties of a Diagnostic Settings Category.
 	*DiagnosticSettingsCategory `json:"properties,omitempty"`
-	// ID - Azure resource Id
+	// ID - READ-ONLY; Azure resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Azure resource name
+	// Name - READ-ONLY; Azure resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Azure resource type
+	// Type - READ-ONLY; Azure resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -1409,15 +1598,6 @@ func (dscr DiagnosticSettingsCategoryResource) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if dscr.DiagnosticSettingsCategory != nil {
 		objectMap["properties"] = dscr.DiagnosticSettingsCategory
-	}
-	if dscr.ID != nil {
-		objectMap["id"] = dscr.ID
-	}
-	if dscr.Name != nil {
-		objectMap["name"] = dscr.Name
-	}
-	if dscr.Type != nil {
-		objectMap["type"] = dscr.Type
 	}
 	return json.Marshal(objectMap)
 }
@@ -1486,11 +1666,11 @@ type DiagnosticSettingsResource struct {
 	autorest.Response `json:"-"`
 	// DiagnosticSettings - Properties of a Diagnostic Settings Resource.
 	*DiagnosticSettings `json:"properties,omitempty"`
-	// ID - Azure resource Id
+	// ID - READ-ONLY; Azure resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Azure resource name
+	// Name - READ-ONLY; Azure resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Azure resource type
+	// Type - READ-ONLY; Azure resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -1499,15 +1679,6 @@ func (dsr DiagnosticSettingsResource) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if dsr.DiagnosticSettings != nil {
 		objectMap["properties"] = dsr.DiagnosticSettings
-	}
-	if dsr.ID != nil {
-		objectMap["id"] = dsr.ID
-	}
-	if dsr.Name != nil {
-		objectMap["name"] = dsr.Name
-	}
-	if dsr.Type != nil {
-		objectMap["type"] = dsr.Type
 	}
 	return json.Marshal(objectMap)
 }
@@ -1586,7 +1757,7 @@ type EmailReceiver struct {
 	Name *string `json:"name,omitempty"`
 	// EmailAddress - The email address of this receiver.
 	EmailAddress *string `json:"emailAddress,omitempty"`
-	// Status - The receiver status of the e-mail. Possible values include: 'NotSpecified', 'Enabled', 'Disabled'
+	// Status - READ-ONLY; The receiver status of the e-mail. Possible values include: 'NotSpecified', 'Enabled', 'Disabled'
 	Status ReceiverStatus `json:"status,omitempty"`
 }
 
@@ -1604,18 +1775,242 @@ type ErrorResponse struct {
 	Message *string `json:"message,omitempty"`
 }
 
+// EventCategoryCollection a collection of event categories. Currently possible values are: Administrative,
+// Security, ServiceHealth, Alert, Recommendation, Policy.
+type EventCategoryCollection struct {
+	autorest.Response `json:"-"`
+	// Value - the list that includes the Azure event categories.
+	Value *[]LocalizableString `json:"value,omitempty"`
+}
+
+// EventData the Azure event log entries are of type EventData
+type EventData struct {
+	// Authorization - READ-ONLY; The sender authorization information.
+	Authorization *SenderAuthorization `json:"authorization,omitempty"`
+	// Claims - READ-ONLY; key value pairs to identify ARM permissions.
+	Claims map[string]*string `json:"claims"`
+	// Caller - READ-ONLY; the email address of the user who has performed the operation, the UPN claim or SPN claim based on availability.
+	Caller *string `json:"caller,omitempty"`
+	// Description - READ-ONLY; the description of the event.
+	Description *string `json:"description,omitempty"`
+	// ID - READ-ONLY; the Id of this event as required by ARM for RBAC. It contains the EventDataID and a timestamp information.
+	ID *string `json:"id,omitempty"`
+	// EventDataID - READ-ONLY; the event data Id. This is a unique identifier for an event.
+	EventDataID *string `json:"eventDataId,omitempty"`
+	// CorrelationID - READ-ONLY; the correlation Id, usually a GUID in the string format. The correlation Id is shared among the events that belong to the same uber operation.
+	CorrelationID *string `json:"correlationId,omitempty"`
+	// EventName - READ-ONLY; the event name. This value should not be confused with OperationName. For practical purposes, OperationName might be more appealing to end users.
+	EventName *LocalizableString `json:"eventName,omitempty"`
+	// Category - READ-ONLY; the event category.
+	Category *LocalizableString `json:"category,omitempty"`
+	// HTTPRequest - READ-ONLY; the HTTP request info. Usually includes the 'clientRequestId', 'clientIpAddress' (IP address of the user who initiated the event) and 'method' (HTTP method e.g. PUT).
+	HTTPRequest *HTTPRequestInfo `json:"httpRequest,omitempty"`
+	// Level - READ-ONLY; the event level. Possible values include: 'Critical', 'Error', 'Warning', 'Informational', 'Verbose'
+	Level EventLevel `json:"level,omitempty"`
+	// ResourceGroupName - READ-ONLY; the resource group name of the impacted resource.
+	ResourceGroupName *string `json:"resourceGroupName,omitempty"`
+	// ResourceProviderName - READ-ONLY; the resource provider name of the impacted resource.
+	ResourceProviderName *LocalizableString `json:"resourceProviderName,omitempty"`
+	// ResourceID - READ-ONLY; the resource uri that uniquely identifies the resource that caused this event.
+	ResourceID *string `json:"resourceId,omitempty"`
+	// ResourceType - READ-ONLY; the resource type
+	ResourceType *LocalizableString `json:"resourceType,omitempty"`
+	// OperationID - READ-ONLY; It is usually a GUID shared among the events corresponding to single operation. This value should not be confused with EventName.
+	OperationID *string `json:"operationId,omitempty"`
+	// OperationName - READ-ONLY; the operation name.
+	OperationName *LocalizableString `json:"operationName,omitempty"`
+	// Properties - READ-ONLY; the set of <Key, Value> pairs (usually a Dictionary<String, String>) that includes details about the event.
+	Properties map[string]*string `json:"properties"`
+	// Status - READ-ONLY; a string describing the status of the operation. Some typical values are: Started, In progress, Succeeded, Failed, Resolved.
+	Status *LocalizableString `json:"status,omitempty"`
+	// SubStatus - READ-ONLY; the event sub status. Most of the time, when included, this captures the HTTP status code of the REST call. Common values are: OK (HTTP Status Code: 200), Created (HTTP Status Code: 201), Accepted (HTTP Status Code: 202), No Content (HTTP Status Code: 204), Bad Request(HTTP Status Code: 400), Not Found (HTTP Status Code: 404), Conflict (HTTP Status Code: 409), Internal Server Error (HTTP Status Code: 500), Service Unavailable (HTTP Status Code:503), Gateway Timeout (HTTP Status Code: 504)
+	SubStatus *LocalizableString `json:"subStatus,omitempty"`
+	// EventTimestamp - READ-ONLY; the timestamp of when the event was generated by the Azure service processing the request corresponding the event. It in ISO 8601 format.
+	EventTimestamp *date.Time `json:"eventTimestamp,omitempty"`
+	// SubmissionTimestamp - READ-ONLY; the timestamp of when the event became available for querying via this API. It is in ISO 8601 format. This value should not be confused eventTimestamp. As there might be a delay between the occurrence time of the event, and the time that the event is submitted to the Azure logging infrastructure.
+	SubmissionTimestamp *date.Time `json:"submissionTimestamp,omitempty"`
+	// SubscriptionID - READ-ONLY; the Azure subscription Id usually a GUID.
+	SubscriptionID *string `json:"subscriptionId,omitempty"`
+	// TenantID - READ-ONLY; the Azure tenant Id
+	TenantID *string `json:"tenantId,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for EventData.
+func (ed EventData) MarshalJSON() ([]byte, error) {
+	objectMap := make(map[string]interface{})
+	return json.Marshal(objectMap)
+}
+
+// EventDataCollection represents collection of events.
+type EventDataCollection struct {
+	autorest.Response `json:"-"`
+	// Value - this list that includes the Azure audit logs.
+	Value *[]EventData `json:"value,omitempty"`
+	// NextLink - Provides the link to retrieve the next set of events.
+	NextLink *string `json:"nextLink,omitempty"`
+}
+
+// EventDataCollectionIterator provides access to a complete listing of EventData values.
+type EventDataCollectionIterator struct {
+	i    int
+	page EventDataCollectionPage
+}
+
+// NextWithContext advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+func (iter *EventDataCollectionIterator) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/EventDataCollectionIterator.NextWithContext")
+		defer func() {
+			sc := -1
+			if iter.Response().Response.Response != nil {
+				sc = iter.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	iter.i++
+	if iter.i < len(iter.page.Values()) {
+		return nil
+	}
+	err = iter.page.NextWithContext(ctx)
+	if err != nil {
+		iter.i--
+		return err
+	}
+	iter.i = 0
+	return nil
+}
+
+// Next advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (iter *EventDataCollectionIterator) Next() error {
+	return iter.NextWithContext(context.Background())
+}
+
+// NotDone returns true if the enumeration should be started or is not yet complete.
+func (iter EventDataCollectionIterator) NotDone() bool {
+	return iter.page.NotDone() && iter.i < len(iter.page.Values())
+}
+
+// Response returns the raw server response from the last page request.
+func (iter EventDataCollectionIterator) Response() EventDataCollection {
+	return iter.page.Response()
+}
+
+// Value returns the current value or a zero-initialized value if the
+// iterator has advanced beyond the end of the collection.
+func (iter EventDataCollectionIterator) Value() EventData {
+	if !iter.page.NotDone() {
+		return EventData{}
+	}
+	return iter.page.Values()[iter.i]
+}
+
+// Creates a new instance of the EventDataCollectionIterator type.
+func NewEventDataCollectionIterator(page EventDataCollectionPage) EventDataCollectionIterator {
+	return EventDataCollectionIterator{page: page}
+}
+
+// IsEmpty returns true if the ListResult contains no values.
+func (edc EventDataCollection) IsEmpty() bool {
+	return edc.Value == nil || len(*edc.Value) == 0
+}
+
+// eventDataCollectionPreparer prepares a request to retrieve the next set of results.
+// It returns nil if no more results exist.
+func (edc EventDataCollection) eventDataCollectionPreparer(ctx context.Context) (*http.Request, error) {
+	if edc.NextLink == nil || len(to.String(edc.NextLink)) < 1 {
+		return nil, nil
+	}
+	return autorest.Prepare((&http.Request{}).WithContext(ctx),
+		autorest.AsJSON(),
+		autorest.AsGet(),
+		autorest.WithBaseURL(to.String(edc.NextLink)))
+}
+
+// EventDataCollectionPage contains a page of EventData values.
+type EventDataCollectionPage struct {
+	fn  func(context.Context, EventDataCollection) (EventDataCollection, error)
+	edc EventDataCollection
+}
+
+// NextWithContext advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+func (page *EventDataCollectionPage) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/EventDataCollectionPage.NextWithContext")
+		defer func() {
+			sc := -1
+			if page.Response().Response.Response != nil {
+				sc = page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	next, err := page.fn(ctx, page.edc)
+	if err != nil {
+		return err
+	}
+	page.edc = next
+	return nil
+}
+
+// Next advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (page *EventDataCollectionPage) Next() error {
+	return page.NextWithContext(context.Background())
+}
+
+// NotDone returns true if the page enumeration should be started or is not yet complete.
+func (page EventDataCollectionPage) NotDone() bool {
+	return !page.edc.IsEmpty()
+}
+
+// Response returns the raw server response from the last page request.
+func (page EventDataCollectionPage) Response() EventDataCollection {
+	return page.edc
+}
+
+// Values returns the slice of values for the current page or nil if there are no values.
+func (page EventDataCollectionPage) Values() []EventData {
+	if page.edc.IsEmpty() {
+		return nil
+	}
+	return *page.edc.Value
+}
+
+// Creates a new instance of the EventDataCollectionPage type.
+func NewEventDataCollectionPage(getNextPage func(context.Context, EventDataCollection) (EventDataCollection, error)) EventDataCollectionPage {
+	return EventDataCollectionPage{fn: getNextPage}
+}
+
+// HTTPRequestInfo the Http request info.
+type HTTPRequestInfo struct {
+	// ClientRequestID - the client request id.
+	ClientRequestID *string `json:"clientRequestId,omitempty"`
+	// ClientIPAddress - the client Ip Address
+	ClientIPAddress *string `json:"clientIpAddress,omitempty"`
+	// Method - the Http request method.
+	Method *string `json:"method,omitempty"`
+	// URI - the Uri.
+	URI *string `json:"uri,omitempty"`
+}
+
 // Incident an alert incident indicates the activation status of an alert rule.
 type Incident struct {
 	autorest.Response `json:"-"`
-	// Name - Incident name.
+	// Name - READ-ONLY; Incident name.
 	Name *string `json:"name,omitempty"`
-	// RuleName - Rule name that is associated with the incident.
+	// RuleName - READ-ONLY; Rule name that is associated with the incident.
 	RuleName *string `json:"ruleName,omitempty"`
-	// IsActive - A boolean to indicate whether the incident is active or resolved.
+	// IsActive - READ-ONLY; A boolean to indicate whether the incident is active or resolved.
 	IsActive *bool `json:"isActive,omitempty"`
-	// ActivatedTime - The time at which the incident was activated in ISO8601 format.
+	// ActivatedTime - READ-ONLY; The time at which the incident was activated in ISO8601 format.
 	ActivatedTime *date.Time `json:"activatedTime,omitempty"`
-	// ResolvedTime - The time at which the incident was resolved in ISO8601 format. If null, it means the incident is still active.
+	// ResolvedTime - READ-ONLY; The time at which the incident was resolved in ISO8601 format. If null, it means the incident is still active.
 	ResolvedTime *date.Time `json:"resolvedTime,omitempty"`
 }
 
@@ -1638,6 +2033,14 @@ type ItsmReceiver struct {
 	TicketConfiguration *string `json:"ticketConfiguration,omitempty"`
 	// Region - Region in which workspace resides. Supported values:'centralindia','japaneast','southeastasia','australiasoutheast','uksouth','westcentralus','canadacentral','eastus','westeurope'
 	Region *string `json:"region,omitempty"`
+}
+
+// LocalizableString the localizable string class.
+type LocalizableString struct {
+	// Value - the invariant value.
+	Value *string `json:"value,omitempty"`
+	// LocalizedValue - the locale specific value.
+	LocalizedValue *string `json:"localizedValue,omitempty"`
 }
 
 // LocationThresholdRuleCondition a rule condition based on a certain number of locations failing.
@@ -1780,11 +2183,11 @@ type LogProfileResource struct {
 	autorest.Response `json:"-"`
 	// LogProfileProperties - The log profile properties of the resource.
 	*LogProfileProperties `json:"properties,omitempty"`
-	// ID - Azure resource Id
+	// ID - READ-ONLY; Azure resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Azure resource name
+	// Name - READ-ONLY; Azure resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Azure resource type
+	// Type - READ-ONLY; Azure resource type
 	Type *string `json:"type,omitempty"`
 	// Location - Resource location
 	Location *string `json:"location,omitempty"`
@@ -1797,15 +2200,6 @@ func (lpr LogProfileResource) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if lpr.LogProfileProperties != nil {
 		objectMap["properties"] = lpr.LogProfileProperties
-	}
-	if lpr.ID != nil {
-		objectMap["id"] = lpr.ID
-	}
-	if lpr.Name != nil {
-		objectMap["name"] = lpr.Name
-	}
-	if lpr.Type != nil {
-		objectMap["type"] = lpr.Type
 	}
 	if lpr.Location != nil {
 		objectMap["location"] = lpr.Location
@@ -2048,6 +2442,64 @@ func (merc *ManagementEventRuleCondition) UnmarshalJSON(body []byte) error {
 	return nil
 }
 
+// MetadataValue represents a metric metadata value.
+type MetadataValue struct {
+	// Name - the name of the metadata.
+	Name *LocalizableString `json:"name,omitempty"`
+	// Value - the value of the metadata.
+	Value *string `json:"value,omitempty"`
+}
+
+// Metric the result data of a query.
+type Metric struct {
+	// ID - the metric Id.
+	ID *string `json:"id,omitempty"`
+	// Type - the resource type of the metric resource.
+	Type *string `json:"type,omitempty"`
+	// Name - the name and the display name of the metric, i.e. it is localizable string.
+	Name *LocalizableString `json:"name,omitempty"`
+	// Unit - the unit of the metric. Possible values include: 'UnitCount', 'UnitBytes', 'UnitSeconds', 'UnitCountPerSecond', 'UnitBytesPerSecond', 'UnitPercent', 'UnitMilliSeconds', 'UnitByteSeconds', 'UnitUnspecified'
+	Unit Unit `json:"unit,omitempty"`
+	// Timeseries - the time series returned when a data query is performed.
+	Timeseries *[]TimeSeriesElement `json:"timeseries,omitempty"`
+}
+
+// MetricAvailability metric availability specifies the time grain (aggregation interval or frequency) and
+// the retention period for that time grain.
+type MetricAvailability struct {
+	// TimeGrain - the time grain specifies the aggregation interval for the metric. Expressed as a duration 'PT1M', 'P1D', etc.
+	TimeGrain *string `json:"timeGrain,omitempty"`
+	// Retention - the retention period for the metric at the specified timegrain.  Expressed as a duration 'PT1M', 'P1D', etc.
+	Retention *string `json:"retention,omitempty"`
+}
+
+// MetricDefinition metric definition class specifies the metadata for a metric.
+type MetricDefinition struct {
+	// IsDimensionRequired - Flag to indicate whether the dimension is required.
+	IsDimensionRequired *bool `json:"isDimensionRequired,omitempty"`
+	// ResourceID - the resource identifier of the resource that emitted the metric.
+	ResourceID *string `json:"resourceId,omitempty"`
+	// Name - the name and the display name of the metric, i.e. it is a localizable string.
+	Name *LocalizableString `json:"name,omitempty"`
+	// Unit - the unit of the metric. Possible values include: 'UnitCount', 'UnitBytes', 'UnitSeconds', 'UnitCountPerSecond', 'UnitBytesPerSecond', 'UnitPercent', 'UnitMilliSeconds', 'UnitByteSeconds', 'UnitUnspecified'
+	Unit Unit `json:"unit,omitempty"`
+	// PrimaryAggregationType - the primary aggregation type value defining how to use the values for display. Possible values include: 'None', 'Average', 'Count', 'Minimum', 'Maximum', 'Total'
+	PrimaryAggregationType AggregationType `json:"primaryAggregationType,omitempty"`
+	// MetricAvailabilities - the collection of what aggregation intervals are available to be queried.
+	MetricAvailabilities *[]MetricAvailability `json:"metricAvailabilities,omitempty"`
+	// ID - the resource identifier of the metric definition.
+	ID *string `json:"id,omitempty"`
+	// Dimensions - the name and the display name of the dimension, i.e. it is a localizable string.
+	Dimensions *[]LocalizableString `json:"dimensions,omitempty"`
+}
+
+// MetricDefinitionCollection represents collection of metric definitions.
+type MetricDefinitionCollection struct {
+	autorest.Response `json:"-"`
+	// Value - the values for the metric definitions.
+	Value *[]MetricDefinition `json:"value,omitempty"`
+}
+
 // MetricSettings part of MultiTenantDiagnosticSettings. Specifies the settings for a particular metric.
 type MetricSettings struct {
 	// TimeGrain - the timegrain of the metric in ISO8601 format.
@@ -2068,7 +2520,7 @@ type MetricTrigger struct {
 	MetricResourceURI *string `json:"metricResourceUri,omitempty"`
 	// TimeGrain - the granularity of metrics the rule monitors. Must be one of the predefined values returned from metric definitions for the metric. Must be between 12 hours and 1 minute.
 	TimeGrain *string `json:"timeGrain,omitempty"`
-	// Statistic - the metric statistic type. How the metrics from multiple instances are combined. Possible values include: 'Average', 'Min', 'Max', 'Sum'
+	// Statistic - the metric statistic type. How the metrics from multiple instances are combined. Possible values include: 'MetricStatisticTypeAverage', 'MetricStatisticTypeMin', 'MetricStatisticTypeMax', 'MetricStatisticTypeSum'
 	Statistic MetricStatisticType `json:"statistic,omitempty"`
 	// TimeWindow - the range of time in which instance data is collected. This value must be greater than the delay in metric collection, which can vary from resource-to-resource. Must be between 12 hours and 5 minutes.
 	TimeWindow *string `json:"timeWindow,omitempty"`
@@ -2078,6 +2530,22 @@ type MetricTrigger struct {
 	Operator ComparisonOperationType `json:"operator,omitempty"`
 	// Threshold - the threshold of the metric that triggers the scale action.
 	Threshold *float64 `json:"threshold,omitempty"`
+}
+
+// MetricValue represents a metric value.
+type MetricValue struct {
+	// TimeStamp - the timestamp for the metric value in ISO 8601 format.
+	TimeStamp *date.Time `json:"timeStamp,omitempty"`
+	// Average - the average value in the time range.
+	Average *float64 `json:"average,omitempty"`
+	// Minimum - the least value in the time range.
+	Minimum *float64 `json:"minimum,omitempty"`
+	// Maximum - the greatest value in the time range.
+	Maximum *float64 `json:"maximum,omitempty"`
+	// Total - the sum of all of the values in the time range.
+	Total *float64 `json:"total,omitempty"`
+	// Count - the number of samples in the time range. Can be used to determine the number of values that contributed to the average value.
+	Count *int64 `json:"count,omitempty"`
 }
 
 // Operation microsoft Insights API operation definition.
@@ -2110,18 +2578,18 @@ type OperationListResult struct {
 
 // ProxyOnlyResource a proxy only azure resource object
 type ProxyOnlyResource struct {
-	// ID - Azure resource Id
+	// ID - READ-ONLY; Azure resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Azure resource name
+	// Name - READ-ONLY; Azure resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Azure resource type
+	// Type - READ-ONLY; Azure resource type
 	Type *string `json:"type,omitempty"`
 }
 
 // Recurrence the repeating times at which this profile begins. This element is not used if the FixedDate
 // element is used.
 type Recurrence struct {
-	// Frequency - the recurrence frequency. How often the schedule profile should take effect. This value must be Week, meaning each week will have the same set of profiles. For example, to set a daily schedule, set **schedule** to every day of the week. The frequency property specifies that the schedule is repeated weekly. Possible values include: 'None', 'Second', 'Minute', 'Hour', 'Day', 'Week', 'Month', 'Year'
+	// Frequency - the recurrence frequency. How often the schedule profile should take effect. This value must be Week, meaning each week will have the same set of profiles. For example, to set a daily schedule, set **schedule** to every day of the week. The frequency property specifies that the schedule is repeated weekly. Possible values include: 'RecurrenceFrequencyNone', 'RecurrenceFrequencySecond', 'RecurrenceFrequencyMinute', 'RecurrenceFrequencyHour', 'RecurrenceFrequencyDay', 'RecurrenceFrequencyWeek', 'RecurrenceFrequencyMonth', 'RecurrenceFrequencyYear'
 	Frequency RecurrenceFrequency `json:"frequency,omitempty"`
 	// Schedule - the scheduling constraints for when the profile begins.
 	Schedule *RecurrentSchedule `json:"schedule,omitempty"`
@@ -2141,11 +2609,11 @@ type RecurrentSchedule struct {
 
 // Resource an azure resource object
 type Resource struct {
-	// ID - Azure resource Id
+	// ID - READ-ONLY; Azure resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Azure resource name
+	// Name - READ-ONLY; Azure resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Azure resource type
+	// Type - READ-ONLY; Azure resource type
 	Type *string `json:"type,omitempty"`
 	// Location - Resource location
 	Location *string `json:"location,omitempty"`
@@ -2156,15 +2624,6 @@ type Resource struct {
 // MarshalJSON is the custom marshaler for Resource.
 func (r Resource) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
-	if r.ID != nil {
-		objectMap["id"] = r.ID
-	}
-	if r.Name != nil {
-		objectMap["name"] = r.Name
-	}
-	if r.Type != nil {
-		objectMap["type"] = r.Type
-	}
 	if r.Location != nil {
 		objectMap["location"] = r.Location
 	}
@@ -2172,6 +2631,19 @@ func (r Resource) MarshalJSON() ([]byte, error) {
 		objectMap["tags"] = r.Tags
 	}
 	return json.Marshal(objectMap)
+}
+
+// Response the response to a metrics query.
+type Response struct {
+	autorest.Response `json:"-"`
+	// Cost - The integer value representing the cost of the query, for data case.
+	Cost *float64 `json:"cost,omitempty"`
+	// Timespan - The timespan for which the data was retrieved. Its value consists of two datetimes concatenated, separated by '/'.  This may be adjusted in the future and returned back from what was originally requested.
+	Timespan *string `json:"timespan,omitempty"`
+	// Interval - The interval (window size) for which the metric data was returned in.  This may be adjusted in the future and returned back from what was originally requested.  This is not present if a metadata request was made.
+	Interval *string `json:"interval,omitempty"`
+	// Value - the value of the collection.
+	Value *[]Metric `json:"value,omitempty"`
 }
 
 // RetentionPolicy specifies the retention policy for the log.
@@ -2750,6 +3222,18 @@ type ScaleRule struct {
 	ScaleAction *ScaleAction `json:"scaleAction,omitempty"`
 }
 
+// SenderAuthorization the authorization used by the user who has performed the operation that led to this
+// event. This captures the RBAC properties of the event. These usually include the 'action', 'role' and
+// the 'scope'
+type SenderAuthorization struct {
+	// Action - the permissible actions. For instance: microsoft.support/supporttickets/write
+	Action *string `json:"action,omitempty"`
+	// Role - the role of the user. For instance: Subscription Admin
+	Role *string `json:"role,omitempty"`
+	// Scope - the scope.
+	Scope *string `json:"scope,omitempty"`
+}
+
 // SmsReceiver an SMS receiver.
 type SmsReceiver struct {
 	// Name - The name of the SMS receiver. Names must be unique across all receivers within an action group.
@@ -2758,7 +3242,7 @@ type SmsReceiver struct {
 	CountryCode *string `json:"countryCode,omitempty"`
 	// PhoneNumber - The phone number of the SMS receiver.
 	PhoneNumber *string `json:"phoneNumber,omitempty"`
-	// Status - The status of the receiver. Possible values include: 'NotSpecified', 'Enabled', 'Disabled'
+	// Status - READ-ONLY; The status of the receiver. Possible values include: 'NotSpecified', 'Enabled', 'Disabled'
 	Status ReceiverStatus `json:"status,omitempty"`
 }
 
@@ -2892,6 +3376,24 @@ func (trc *ThresholdRuleCondition) UnmarshalJSON(body []byte) error {
 	}
 
 	return nil
+}
+
+// TimeSeriesElement a time series result type. The discriminator value is always TimeSeries in this case.
+type TimeSeriesElement struct {
+	// Metadatavalues - the metadata values returned if $filter was specified in the call.
+	Metadatavalues *[]MetadataValue `json:"metadatavalues,omitempty"`
+	// Data - An array of data points representing the metric values.  This is only returned if a result type of data is specified.
+	Data *[]MetricValue `json:"data,omitempty"`
+}
+
+// TimeSeriesInformation the time series info needed for calculating the baseline.
+type TimeSeriesInformation struct {
+	// Sensitivities - the list of sensitivities for calculating the baseline.
+	Sensitivities *[]string `json:"sensitivities,omitempty"`
+	// Values - The metric values to calculate the baseline.
+	Values *[]float64 `json:"values,omitempty"`
+	// Timestamps - the array of timestamps of the baselines.
+	Timestamps *[]date.Time `json:"timestamps,omitempty"`
 }
 
 // TimeWindow a specific date-time for the profile.

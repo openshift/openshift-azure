@@ -1,5 +1,198 @@
 # CHANGELOG
 
+## v13.0.1
+
+## Bug Fixes
+
+- Fixed `autorest.WithQueryParameters()` so that it properly encodes multi-value query parameters.
+
+## v13.0.0
+
+## Breaking Changes
+
+The `tracing` package has been rewritten to provide a common interface for consumers to wire in the tracing package of their choice.
+What this means is that by default no tracing provider will be compiled into your program and setting the `AZURE_SDK_TRACING_ENABLED`
+environment variable will have no effect.  To enable this previous behavior you must now add the following include to your source file.
+```go
+  include _ "github.com/Azure/go-autorest/tracing/opencensus"
+```
+The APIs required by autorest-generated code have remained but some APIs have been removed and new ones added.
+The following APIs and variables have been removed (the majority of them were moved to the `opencensus` package).
+- tracing.Transport
+- tracing.Enable()
+- tracing.EnableWithAIForwarding()
+- tracing.Disable()
+
+The following APIs and types have been added
+- tracing.Tracer
+- tracing.Register()
+
+To hook up a tracer simply call `tracing.Register()` passing in a type that satisfies the `tracing.Tracer` interface.
+
+## v12.4.3
+
+### Bug Fixes
+
+- `autorest.MultiTenantServicePrincipalTokenAuthorizer` will now properly add its auxiliary bearer tokens.
+
+## v12.4.2
+
+### Bug Fixes
+
+- Improvements to the fixes made in v12.4.1.
+  - Remove `override` stanza from Gopkg.toml and `replace` directive from go.mod as they don't apply when being consumed as a dependency.
+  - Switched to latest version of `ocagent` that still depends on protobuf v1.2.
+  - Add indirect dependencies to the `required` clause with matching `constraint` stanzas so that `dep` dependencies match go.sum.
+
+## v12.4.1
+
+### Bug Fixes
+
+- Updated OpenCensus and OCAgent versions to versions that don't depend on v1.3+ of protobuf as it was breaking kubernetes.
+- Pinned opencensus-proto to a version that's compatible with our versions of OpenCensus and OCAgent.
+
+## v12.4.0
+
+### New Features
+
+- Added `autorest.WithPrepareDecorators` and `autorest.GetPrepareDecorators` for adding and retrieving a custom chain of PrepareDecorators to the provided context.
+
+## v12.3.0
+
+### New Features
+
+- Support for multi-tenant via x-ms-authorization-auxiliary header has been added for client credentials with
+  secret scenario; this basically bundles multiple OAuthConfig and ServicePrincipalToken types into corresponding
+  MultiTenant* types along with a new authorizer that adds the primary and auxiliary token headers to the reqest.
+  The authenticaion helpers have been updated to support this scenario; if environment var AZURE_AUXILIARY_TENANT_IDS
+  is set with a semicolon delimited list of tenants the multi-tenant codepath will kick in to create the appropriate authorizer.
+  See `adal.NewMultiTenantOAuthConfig`, `adal.NewMultiTenantServicePrincipalToken` and `autorest.NewMultiTenantServicePrincipalTokenAuthorizer`
+  along with their supporting types and methods.
+- Added `autorest.WithSendDecorators` and `autorest.GetSendDecorators` for adding and retrieving a custom chain of SendDecorators to the provided context.
+- Added `autorest.DoRetryForStatusCodesWithCap` and `autorest.DelayForBackoffWithCap` to enforce an upper bound on the duration between retries.
+
+## v12.2.0
+
+### New Features
+
+- Added `autorest.WithXML`, `autorest.AsMerge`, `autorest.WithBytes` preparer decorators.
+- Added `autorest.ByUnmarshallingBytes` response decorator.
+- Added `Response.IsHTTPStatus` and `Response.HasHTTPStatus` helper methods for inspecting HTTP status code in `autorest.Response` types.
+
+### Bug Fixes
+
+- `autorest.DelayWithRetryAfter` now supports HTTP-Dates in the `Retry-After` header and is not limited to just 429 status codes.
+
+## v12.1.0
+
+### New Features
+
+- Added `to.ByteSlicePtr()`.
+- Added blob/queue storage resource ID to `azure.ResourceIdentifier`.
+
+## v12.0.0
+
+### Breaking Changes
+
+In preparation for modules the following deprecated content has been removed.
+
+  - async.NewFuture()
+  - async.Future.Done()
+  - async.Future.WaitForCompletion()
+  - async.DoPollForAsynchronous()
+  - The `utils` package
+  - validation.NewErrorWithValidationError()
+  - The `version` package
+
+## v11.9.0
+
+### New Features
+
+- Add `ResourceIdentifiers` field to `azure.Environment` containing resource IDs for public and sovereign clouds.
+
+## v11.8.0
+
+### New Features
+
+- Added `autorest.NewClientWithOptions()` to support endpoints that require free renegotiation.
+
+## v11.7.1
+
+### Bug Fixes
+
+- Fix missing support for http(s) proxy when using the default sender.
+
+## v11.7.0
+
+### New Features
+
+- Added methods to obtain a ServicePrincipalToken on the various credential configuration types in the `auth` package.
+
+## v11.6.1
+
+### Bug Fixes
+
+- Fix ACR DNS endpoint for government clouds.
+- Add Cosmos DB DNS endpoints.
+- Update dependencies to resolve build breaks in OpenCensus.
+
+## v11.6.0
+
+### New Features
+
+- Added type `autorest.BasicAuthorizer` to support Basic authentication.
+
+## v11.5.2
+
+### Bug Fixes
+
+- Fixed `GetTokenFromCLI` did not work with zsh.
+
+## v11.5.1
+
+### Bug Fixes
+
+- In `Client.sender()` set the minimum TLS version on HTTP clients to 1.2.
+
+## v11.5.0
+
+### New Features
+
+- The `auth` package has been refactored so that the environment and file settings are now available.
+- The methods used in `auth.NewAuthorizerFromEnvironment()` are now exported so that custom authorization chains can be created.
+- Added support for certificate authorization for file-based config.
+
+## v11.4.0
+
+### New Features
+
+- Added `adal.AddToUserAgent()` so callers can append custom data to the user-agent header used for ADAL requests.
+- Exported `adal.UserAgent()` for parity with `autorest.Client`.
+
+## v11.3.2
+
+### Bug Fixes
+
+- In `Future.WaitForCompletionRef()` if the provided context has a deadline don't add the default deadline.
+
+## v11.3.1
+
+### Bug Fixes
+
+- For an LRO PUT operation the final GET URL was incorrectly set to the Location polling header in some cases.
+
+## v11.3.0
+
+### New Features
+
+- Added method `ServicePrincipalToken()` to `DeviceFlowConfig` type.
+
+## v11.2.8
+
+### Bug Fixes
+
+- Deprecate content in the `version` package. The functionality has been superseded by content in the `autorest` package.
+
 ## v11.2.7
 
 ### Bug Fixes

@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package batch
 import (
 	"context"
 
-	original "github.com/Azure/azure-sdk-for-go/services/batch/mgmt/2018-12-01/batch"
+	original "github.com/Azure/azure-sdk-for-go/services/batch/mgmt/2019-08-01/batch"
 )
 
 const (
@@ -103,6 +103,13 @@ type ComputeNodeFillType = original.ComputeNodeFillType
 const (
 	Pack   ComputeNodeFillType = original.Pack
 	Spread ComputeNodeFillType = original.Spread
+)
+
+type ContainerWorkingDirectory = original.ContainerWorkingDirectory
+
+const (
+	ContainerImageDefault ContainerWorkingDirectory = original.ContainerImageDefault
+	TaskWorkingDirectory  ContainerWorkingDirectory = original.TaskWorkingDirectory
 )
 
 type ElevationLevel = original.ElevationLevel
@@ -214,7 +221,10 @@ type AutoScaleSettings = original.AutoScaleSettings
 type AutoStorageBaseProperties = original.AutoStorageBaseProperties
 type AutoStorageProperties = original.AutoStorageProperties
 type AutoUserSpecification = original.AutoUserSpecification
+type AzureBlobFileSystemConfiguration = original.AzureBlobFileSystemConfiguration
+type AzureFileShareConfiguration = original.AzureFileShareConfiguration
 type BaseClient = original.BaseClient
+type CIFSMountConfiguration = original.CIFSMountConfiguration
 type Certificate = original.Certificate
 type CertificateBaseProperties = original.CertificateBaseProperties
 type CertificateClient = original.CertificateClient
@@ -255,6 +265,8 @@ type ListPoolsResultPage = original.ListPoolsResultPage
 type LocationClient = original.LocationClient
 type LocationQuota = original.LocationQuota
 type MetadataItem = original.MetadataItem
+type MountConfiguration = original.MountConfiguration
+type NFSMountConfiguration = original.NFSMountConfiguration
 type NetworkConfiguration = original.NetworkConfiguration
 type NetworkSecurityGroupRule = original.NetworkSecurityGroupRule
 type Operation = original.Operation
@@ -281,6 +293,7 @@ type TaskSchedulingPolicy = original.TaskSchedulingPolicy
 type UserAccount = original.UserAccount
 type UserIdentity = original.UserIdentity
 type VirtualMachineConfiguration = original.VirtualMachineConfiguration
+type VirtualMachineFamilyCoreQuota = original.VirtualMachineFamilyCoreQuota
 type WindowsConfiguration = original.WindowsConfiguration
 type WindowsUserConfiguration = original.WindowsUserConfiguration
 
@@ -397,6 +410,9 @@ func PossibleComputeNodeDeallocationOptionValues() []ComputeNodeDeallocationOpti
 }
 func PossibleComputeNodeFillTypeValues() []ComputeNodeFillType {
 	return original.PossibleComputeNodeFillTypeValues()
+}
+func PossibleContainerWorkingDirectoryValues() []ContainerWorkingDirectory {
+	return original.PossibleContainerWorkingDirectoryValues()
 }
 func PossibleElevationLevelValues() []ElevationLevel {
 	return original.PossibleElevationLevelValues()

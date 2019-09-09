@@ -32,13 +32,13 @@ type LinkedWorkspaceClient struct {
 }
 
 // NewLinkedWorkspaceClient creates an instance of the LinkedWorkspaceClient client.
-func NewLinkedWorkspaceClient(subscriptionID string, countType1 CountType) LinkedWorkspaceClient {
-	return NewLinkedWorkspaceClientWithBaseURI(DefaultBaseURI, subscriptionID, countType1)
+func NewLinkedWorkspaceClient(subscriptionID string) LinkedWorkspaceClient {
+	return NewLinkedWorkspaceClientWithBaseURI(DefaultBaseURI, subscriptionID)
 }
 
 // NewLinkedWorkspaceClientWithBaseURI creates an instance of the LinkedWorkspaceClient client.
-func NewLinkedWorkspaceClientWithBaseURI(baseURI string, subscriptionID string, countType1 CountType) LinkedWorkspaceClient {
-	return LinkedWorkspaceClient{NewWithBaseURI(baseURI, subscriptionID, countType1)}
+func NewLinkedWorkspaceClientWithBaseURI(baseURI string, subscriptionID string) LinkedWorkspaceClient {
+	return LinkedWorkspaceClient{NewWithBaseURI(baseURI, subscriptionID)}
 }
 
 // Get retrieve the linked workspace for the account id.
@@ -109,8 +109,8 @@ func (client LinkedWorkspaceClient) GetPreparer(ctx context.Context, resourceGro
 // GetSender sends the Get request. The method will close the
 // http.Response Body if it receives an error.
 func (client LinkedWorkspaceClient) GetSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetResponder handles the response to the Get request. The method always

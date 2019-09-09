@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,6 +29,19 @@ const (
 	DefaultBaseURI = original.DefaultBaseURI
 )
 
+type ApplicationHTTPSEndpointAccessMode = original.ApplicationHTTPSEndpointAccessMode
+
+const (
+	WebPage ApplicationHTTPSEndpointAccessMode = original.WebPage
+)
+
+type ApplicationType = original.ApplicationType
+
+const (
+	CustomApplication ApplicationType = original.CustomApplication
+	RServer           ApplicationType = original.RServer
+)
+
 type AsyncOperationState = original.AsyncOperationState
 
 const (
@@ -47,10 +60,29 @@ const (
 	ClusterProvisioningStateSucceeded  ClusterProvisioningState = original.ClusterProvisioningStateSucceeded
 )
 
+type DaysOfWeek = original.DaysOfWeek
+
+const (
+	Friday    DaysOfWeek = original.Friday
+	Monday    DaysOfWeek = original.Monday
+	Saturday  DaysOfWeek = original.Saturday
+	Sunday    DaysOfWeek = original.Sunday
+	Thursday  DaysOfWeek = original.Thursday
+	Tuesday   DaysOfWeek = original.Tuesday
+	Wednesday DaysOfWeek = original.Wednesday
+)
+
 type DirectoryType = original.DirectoryType
 
 const (
 	ActiveDirectory DirectoryType = original.ActiveDirectory
+)
+
+type FilterMode = original.FilterMode
+
+const (
+	Exclude FilterMode = original.Exclude
+	Include FilterMode = original.Include
 )
 
 type JSONWebKeyEncryptionAlgorithm = original.JSONWebKeyEncryptionAlgorithm
@@ -94,8 +126,18 @@ type ApplicationProperties = original.ApplicationProperties
 type ApplicationsClient = original.ApplicationsClient
 type ApplicationsCreateFuture = original.ApplicationsCreateFuture
 type ApplicationsDeleteFuture = original.ApplicationsDeleteFuture
+type Autoscale = original.Autoscale
+type AutoscaleCapacity = original.AutoscaleCapacity
+type AutoscaleRecurrence = original.AutoscaleRecurrence
+type AutoscaleSchedule = original.AutoscaleSchedule
+type AutoscaleTimeAndCapacity = original.AutoscaleTimeAndCapacity
 type BaseClient = original.BaseClient
+type BillingMeters = original.BillingMeters
+type BillingResources = original.BillingResources
+type BillingResponseListResult = original.BillingResponseListResult
+type CapabilitiesResult = original.CapabilitiesResult
 type Cluster = original.Cluster
+type ClusterConfigurations = original.ClusterConfigurations
 type ClusterCreateParametersExtended = original.ClusterCreateParametersExtended
 type ClusterCreateProperties = original.ClusterCreateProperties
 type ClusterDefinition = original.ClusterDefinition
@@ -118,11 +160,13 @@ type ClustersDeleteFuture = original.ClustersDeleteFuture
 type ClustersExecuteScriptActionsFuture = original.ClustersExecuteScriptActionsFuture
 type ClustersResizeFuture = original.ClustersResizeFuture
 type ClustersRotateDiskEncryptionKeyFuture = original.ClustersRotateDiskEncryptionKeyFuture
+type ClustersUpdateGatewaySettingsFuture = original.ClustersUpdateGatewaySettingsFuture
 type ComputeProfile = original.ComputeProfile
 type ConfigurationsClient = original.ConfigurationsClient
 type ConfigurationsUpdateFuture = original.ConfigurationsUpdateFuture
 type ConnectivityEndpoint = original.ConnectivityEndpoint
 type DataDisksGroups = original.DataDisksGroups
+type DiskBillingMeters = original.DiskBillingMeters
 type DiskEncryptionProperties = original.DiskEncryptionProperties
 type ErrorResponse = original.ErrorResponse
 type Errors = original.Errors
@@ -133,6 +177,7 @@ type ExtensionsCreateFuture = original.ExtensionsCreateFuture
 type ExtensionsDeleteFuture = original.ExtensionsDeleteFuture
 type ExtensionsDisableMonitoringFuture = original.ExtensionsDisableMonitoringFuture
 type ExtensionsEnableMonitoringFuture = original.ExtensionsEnableMonitoringFuture
+type GatewaySettings = original.GatewaySettings
 type HardwareProfile = original.HardwareProfile
 type LinuxOperatingSystemProfile = original.LinuxOperatingSystemProfile
 type LocalizedName = original.LocalizedName
@@ -146,7 +191,10 @@ type OperationResource = original.OperationResource
 type OperationsClient = original.OperationsClient
 type OsProfile = original.OsProfile
 type ProxyResource = original.ProxyResource
+type QuotaCapability = original.QuotaCapability
 type QuotaInfo = original.QuotaInfo
+type RegionalQuotaCapability = original.RegionalQuotaCapability
+type RegionsCapability = original.RegionsCapability
 type Resource = original.Resource
 type Role = original.Role
 type RuntimeScriptAction = original.RuntimeScriptAction
@@ -169,8 +217,14 @@ type SetString = original.SetString
 type StorageAccount = original.StorageAccount
 type StorageProfile = original.StorageProfile
 type TrackedResource = original.TrackedResource
+type UpdateGatewaySettingsParameters = original.UpdateGatewaySettingsParameters
 type Usage = original.Usage
 type UsagesListResult = original.UsagesListResult
+type VMSizeCompatibilityFilter = original.VMSizeCompatibilityFilter
+type VMSizeCompatibilityFilterV2 = original.VMSizeCompatibilityFilterV2
+type VMSizesCapability = original.VMSizesCapability
+type VersionSpec = original.VersionSpec
+type VersionsCapability = original.VersionsCapability
 type VirtualNetworkProfile = original.VirtualNetworkProfile
 
 func New(subscriptionID string) BaseClient {
@@ -257,14 +311,26 @@ func NewScriptExecutionHistoryClientWithBaseURI(baseURI string, subscriptionID s
 func NewWithBaseURI(baseURI string, subscriptionID string) BaseClient {
 	return original.NewWithBaseURI(baseURI, subscriptionID)
 }
+func PossibleApplicationHTTPSEndpointAccessModeValues() []ApplicationHTTPSEndpointAccessMode {
+	return original.PossibleApplicationHTTPSEndpointAccessModeValues()
+}
+func PossibleApplicationTypeValues() []ApplicationType {
+	return original.PossibleApplicationTypeValues()
+}
 func PossibleAsyncOperationStateValues() []AsyncOperationState {
 	return original.PossibleAsyncOperationStateValues()
 }
 func PossibleClusterProvisioningStateValues() []ClusterProvisioningState {
 	return original.PossibleClusterProvisioningStateValues()
 }
+func PossibleDaysOfWeekValues() []DaysOfWeek {
+	return original.PossibleDaysOfWeekValues()
+}
 func PossibleDirectoryTypeValues() []DirectoryType {
 	return original.PossibleDirectoryTypeValues()
+}
+func PossibleFilterModeValues() []FilterMode {
+	return original.PossibleFilterModeValues()
 }
 func PossibleJSONWebKeyEncryptionAlgorithmValues() []JSONWebKeyEncryptionAlgorithm {
 	return original.PossibleJSONWebKeyEncryptionAlgorithmValues()

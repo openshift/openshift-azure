@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -56,6 +56,7 @@ type OperationResponse = original.OperationResponse
 type PartnerClient = original.PartnerClient
 type PartnerProperties = original.PartnerProperties
 type PartnerResponse = original.PartnerResponse
+type PartnersClient = original.PartnersClient
 
 func New() BaseClient {
 	return original.New()
@@ -77,6 +78,12 @@ func NewPartnerClient() PartnerClient {
 }
 func NewPartnerClientWithBaseURI(baseURI string) PartnerClient {
 	return original.NewPartnerClientWithBaseURI(baseURI)
+}
+func NewPartnersClient() PartnersClient {
+	return original.NewPartnersClient()
+}
+func NewPartnersClientWithBaseURI(baseURI string) PartnersClient {
+	return original.NewPartnersClientWithBaseURI(baseURI)
 }
 func NewWithBaseURI(baseURI string) BaseClient {
 	return original.NewWithBaseURI(baseURI)

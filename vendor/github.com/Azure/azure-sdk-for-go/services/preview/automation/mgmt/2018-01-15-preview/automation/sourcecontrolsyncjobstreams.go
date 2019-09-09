@@ -33,13 +33,13 @@ type SourceControlSyncJobStreamsClient struct {
 }
 
 // NewSourceControlSyncJobStreamsClient creates an instance of the SourceControlSyncJobStreamsClient client.
-func NewSourceControlSyncJobStreamsClient(subscriptionID string, countType1 CountType) SourceControlSyncJobStreamsClient {
-	return NewSourceControlSyncJobStreamsClientWithBaseURI(DefaultBaseURI, subscriptionID, countType1)
+func NewSourceControlSyncJobStreamsClient(subscriptionID string) SourceControlSyncJobStreamsClient {
+	return NewSourceControlSyncJobStreamsClientWithBaseURI(DefaultBaseURI, subscriptionID)
 }
 
 // NewSourceControlSyncJobStreamsClientWithBaseURI creates an instance of the SourceControlSyncJobStreamsClient client.
-func NewSourceControlSyncJobStreamsClientWithBaseURI(baseURI string, subscriptionID string, countType1 CountType) SourceControlSyncJobStreamsClient {
-	return SourceControlSyncJobStreamsClient{NewWithBaseURI(baseURI, subscriptionID, countType1)}
+func NewSourceControlSyncJobStreamsClientWithBaseURI(baseURI string, subscriptionID string) SourceControlSyncJobStreamsClient {
+	return SourceControlSyncJobStreamsClient{NewWithBaseURI(baseURI, subscriptionID)}
 }
 
 // Get retrieve a sync job stream identified by stream id.
@@ -116,8 +116,8 @@ func (client SourceControlSyncJobStreamsClient) GetPreparer(ctx context.Context,
 // GetSender sends the Get request. The method will close the
 // http.Response Body if it receives an error.
 func (client SourceControlSyncJobStreamsClient) GetSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetResponder handles the response to the Get request. The method always
@@ -210,8 +210,8 @@ func (client SourceControlSyncJobStreamsClient) ListBySyncJobPreparer(ctx contex
 // ListBySyncJobSender sends the ListBySyncJob request. The method will close the
 // http.Response Body if it receives an error.
 func (client SourceControlSyncJobStreamsClient) ListBySyncJobSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListBySyncJobResponder handles the response to the ListBySyncJob request. The method always

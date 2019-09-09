@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,3 +23,4 @@ import original "github.com/Azure/azure-sdk-for-go/services/domainservices/mgmt/
 
 type DomainServiceOperationsClientAPI = original.DomainServiceOperationsClientAPI
 type DomainServicesClientAPI = original.DomainServicesClientAPI
+type ReplicaSetsClientAPI = original.ReplicaSetsClientAPI

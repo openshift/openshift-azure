@@ -290,11 +290,11 @@ func PossibleTimeRangeValues() []TimeRange {
 type Alert struct {
 	autorest.Response `json:"-"`
 	Properties        *AlertProperties `json:"properties,omitempty"`
-	// ID - Azure resource Id
+	// ID - READ-ONLY; Azure resource Id
 	ID *string `json:"id,omitempty"`
-	// Type - Azure resource type
+	// Type - READ-ONLY; Azure resource type
 	Type *string `json:"type,omitempty"`
-	// Name - Azure resource name
+	// Name - READ-ONLY; Azure resource name
 	Name *string `json:"name,omitempty"`
 }
 
@@ -302,11 +302,11 @@ type Alert struct {
 type AlertModification struct {
 	autorest.Response `json:"-"`
 	Properties        *AlertModificationProperties `json:"properties,omitempty"`
-	// ID - Azure resource Id
+	// ID - READ-ONLY; Azure resource Id
 	ID *string `json:"id,omitempty"`
-	// Type - Azure resource type
+	// Type - READ-ONLY; Azure resource type
 	Type *string `json:"type,omitempty"`
-	// Name - Azure resource name
+	// Name - READ-ONLY; Azure resource name
 	Name *string `json:"name,omitempty"`
 }
 
@@ -330,7 +330,7 @@ type AlertModificationItem struct {
 
 // AlertModificationProperties properties of the alert modification item.
 type AlertModificationProperties struct {
-	// AlertID - Unique Id of the alert for which the history is being retrieved
+	// AlertID - READ-ONLY; Unique Id of the alert for which the history is being retrieved
 	AlertID *string `json:"alertId,omitempty"`
 	// Modifications - Modification details
 	Modifications *[]AlertModificationItem `json:"modifications,omitempty"`
@@ -493,11 +493,11 @@ func NewAlertsListPage(getNextPage func(context.Context, AlertsList) (AlertsList
 type AlertsSummary struct {
 	autorest.Response `json:"-"`
 	Properties        *AlertsSummaryGroup `json:"properties,omitempty"`
-	// ID - Azure resource Id
+	// ID - READ-ONLY; Azure resource Id
 	ID *string `json:"id,omitempty"`
-	// Type - Azure resource type
+	// Type - READ-ONLY; Azure resource type
 	Type *string `json:"type,omitempty"`
-	// Name - Azure resource name
+	// Name - READ-ONLY; Azure resource name
 	Name *string `json:"name,omitempty"`
 }
 
@@ -544,13 +544,13 @@ type ErrorResponseBody struct {
 
 // Essentials this object contains consistent fields across different monitor services.
 type Essentials struct {
-	// Severity - Severity of alert Sev0 being highest and Sev4 being lowest. Possible values include: 'Sev0', 'Sev1', 'Sev2', 'Sev3', 'Sev4'
+	// Severity - READ-ONLY; Severity of alert Sev0 being highest and Sev4 being lowest. Possible values include: 'Sev0', 'Sev1', 'Sev2', 'Sev3', 'Sev4'
 	Severity Severity `json:"severity,omitempty"`
-	// SignalType - The type of signal the alert is based on, which could be metrics, logs or activity logs. Possible values include: 'Metric', 'Log', 'Unknown'
+	// SignalType - READ-ONLY; The type of signal the alert is based on, which could be metrics, logs or activity logs. Possible values include: 'Metric', 'Log', 'Unknown'
 	SignalType SignalType `json:"signalType,omitempty"`
-	// AlertState - Alert object state, which can be modified by the user. Possible values include: 'AlertStateNew', 'AlertStateAcknowledged', 'AlertStateClosed'
+	// AlertState - READ-ONLY; Alert object state, which can be modified by the user. Possible values include: 'AlertStateNew', 'AlertStateAcknowledged', 'AlertStateClosed'
 	AlertState AlertState `json:"alertState,omitempty"`
-	// MonitorCondition - Can be 'Fired' or 'Resolved', which represents whether the underlying conditions have crossed the defined alert rule thresholds. Possible values include: 'Fired', 'Resolved'
+	// MonitorCondition - READ-ONLY; Can be 'Fired' or 'Resolved', which represents whether the underlying conditions have crossed the defined alert rule thresholds. Possible values include: 'Fired', 'Resolved'
 	MonitorCondition MonitorCondition `json:"monitorCondition,omitempty"`
 	// TargetResource - Target ARM resource, on which alert got created.
 	TargetResource *string `json:"targetResource,omitempty"`
@@ -560,23 +560,23 @@ type Essentials struct {
 	TargetResourceGroup *string `json:"targetResourceGroup,omitempty"`
 	// TargetResourceType - Resource type of target ARM resource, on which alert got created.
 	TargetResourceType *string `json:"targetResourceType,omitempty"`
-	// MonitorService - Monitor service on which the rule(monitor) is set. Possible values include: 'ApplicationInsights', 'ActivityLogAdministrative', 'ActivityLogSecurity', 'ActivityLogRecommendation', 'ActivityLogPolicy', 'ActivityLogAutoscale', 'LogAnalytics', 'Nagios', 'Platform', 'SCOM', 'ServiceHealth', 'SmartDetector', 'VMInsights', 'Zabbix'
+	// MonitorService - READ-ONLY; Monitor service on which the rule(monitor) is set. Possible values include: 'ApplicationInsights', 'ActivityLogAdministrative', 'ActivityLogSecurity', 'ActivityLogRecommendation', 'ActivityLogPolicy', 'ActivityLogAutoscale', 'LogAnalytics', 'Nagios', 'Platform', 'SCOM', 'ServiceHealth', 'SmartDetector', 'VMInsights', 'Zabbix'
 	MonitorService MonitorService `json:"monitorService,omitempty"`
-	// AlertRule - Rule(monitor) which fired alert instance. Depending on the monitor service,  this would be ARM id or name of the rule.
+	// AlertRule - READ-ONLY; Rule(monitor) which fired alert instance. Depending on the monitor service,  this would be ARM id or name of the rule.
 	AlertRule *string `json:"alertRule,omitempty"`
-	// SourceCreatedID - Unique Id created by monitor service for each alert instance. This could be used to track the issue at the monitor service, in case of Nagios, Zabbix, SCOM etc.
+	// SourceCreatedID - READ-ONLY; Unique Id created by monitor service for each alert instance. This could be used to track the issue at the monitor service, in case of Nagios, Zabbix, SCOM etc.
 	SourceCreatedID *string `json:"sourceCreatedId,omitempty"`
-	// SmartGroupID - Unique Id of the smart group
+	// SmartGroupID - READ-ONLY; Unique Id of the smart group
 	SmartGroupID *string `json:"smartGroupId,omitempty"`
-	// SmartGroupingReason - Verbose reason describing the reason why this alert instance is added to a smart group
+	// SmartGroupingReason - READ-ONLY; Verbose reason describing the reason why this alert instance is added to a smart group
 	SmartGroupingReason *string `json:"smartGroupingReason,omitempty"`
-	// StartDateTime - Creation time(ISO-8601 format) of alert instance.
+	// StartDateTime - READ-ONLY; Creation time(ISO-8601 format) of alert instance.
 	StartDateTime *date.Time `json:"startDateTime,omitempty"`
-	// LastModifiedDateTime - Last modification time(ISO-8601 format) of alert instance.
+	// LastModifiedDateTime - READ-ONLY; Last modification time(ISO-8601 format) of alert instance.
 	LastModifiedDateTime *date.Time `json:"lastModifiedDateTime,omitempty"`
-	// MonitorConditionResolvedDateTime - Resolved time(ISO-8601 format) of alert instance. This will be updated when monitor service resolves the alert instance because the rule condition is no longer met.
+	// MonitorConditionResolvedDateTime - READ-ONLY; Resolved time(ISO-8601 format) of alert instance. This will be updated when monitor service resolves the alert instance because the rule condition is no longer met.
 	MonitorConditionResolvedDateTime *date.Time `json:"monitorConditionResolvedDateTime,omitempty"`
-	// LastModifiedUserName - User who last modified the alert, in case of monitor service updates user would be 'system', otherwise name of the user.
+	// LastModifiedUserName - READ-ONLY; User who last modified the alert, in case of monitor service updates user would be 'system', otherwise name of the user.
 	LastModifiedUserName *string `json:"lastModifiedUserName,omitempty"`
 }
 
@@ -748,11 +748,11 @@ func NewOperationsListPage(getNextPage func(context.Context, OperationsList) (Op
 
 // Resource an azure resource object
 type Resource struct {
-	// ID - Azure resource Id
+	// ID - READ-ONLY; Azure resource Id
 	ID *string `json:"id,omitempty"`
-	// Type - Azure resource type
+	// Type - READ-ONLY; Azure resource type
 	Type *string `json:"type,omitempty"`
-	// Name - Azure resource name
+	// Name - READ-ONLY; Azure resource name
 	Name *string `json:"name,omitempty"`
 }
 
@@ -760,11 +760,11 @@ type Resource struct {
 type SmartGroup struct {
 	autorest.Response     `json:"-"`
 	*SmartGroupProperties `json:"properties,omitempty"`
-	// ID - Azure resource Id
+	// ID - READ-ONLY; Azure resource Id
 	ID *string `json:"id,omitempty"`
-	// Type - Azure resource type
+	// Type - READ-ONLY; Azure resource type
 	Type *string `json:"type,omitempty"`
-	// Name - Azure resource name
+	// Name - READ-ONLY; Azure resource name
 	Name *string `json:"name,omitempty"`
 }
 
@@ -773,15 +773,6 @@ func (sg SmartGroup) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if sg.SmartGroupProperties != nil {
 		objectMap["properties"] = sg.SmartGroupProperties
-	}
-	if sg.ID != nil {
-		objectMap["id"] = sg.ID
-	}
-	if sg.Type != nil {
-		objectMap["type"] = sg.Type
-	}
-	if sg.Name != nil {
-		objectMap["name"] = sg.Name
 	}
 	return json.Marshal(objectMap)
 }
@@ -849,11 +840,11 @@ type SmartGroupAggregatedProperty struct {
 type SmartGroupModification struct {
 	autorest.Response `json:"-"`
 	Properties        *SmartGroupModificationProperties `json:"properties,omitempty"`
-	// ID - Azure resource Id
+	// ID - READ-ONLY; Azure resource Id
 	ID *string `json:"id,omitempty"`
-	// Type - Azure resource type
+	// Type - READ-ONLY; Azure resource type
 	Type *string `json:"type,omitempty"`
-	// Name - Azure resource name
+	// Name - READ-ONLY; Azure resource name
 	Name *string `json:"name,omitempty"`
 }
 
@@ -877,7 +868,7 @@ type SmartGroupModificationItem struct {
 
 // SmartGroupModificationProperties properties of the smartGroup modification item.
 type SmartGroupModificationProperties struct {
-	// SmartGroupID - Unique Id of the smartGroup for which the history is being retrieved
+	// SmartGroupID - READ-ONLY; Unique Id of the smartGroup for which the history is being retrieved
 	SmartGroupID *string `json:"smartGroupId,omitempty"`
 	// Modifications - Modification details
 	Modifications *[]SmartGroupModificationItem `json:"modifications,omitempty"`
@@ -889,15 +880,15 @@ type SmartGroupModificationProperties struct {
 type SmartGroupProperties struct {
 	// AlertsCount - Total number of alerts in smart group
 	AlertsCount *int32 `json:"alertsCount,omitempty"`
-	// SmartGroupState - Smart group state. Possible values include: 'StateNew', 'StateAcknowledged', 'StateClosed'
+	// SmartGroupState - READ-ONLY; Smart group state. Possible values include: 'StateNew', 'StateAcknowledged', 'StateClosed'
 	SmartGroupState State `json:"smartGroupState,omitempty"`
-	// Severity - Severity of smart group is the highest(Sev0 >... > Sev4) severity of all the alerts in the group. Possible values include: 'Sev0', 'Sev1', 'Sev2', 'Sev3', 'Sev4'
+	// Severity - READ-ONLY; Severity of smart group is the highest(Sev0 >... > Sev4) severity of all the alerts in the group. Possible values include: 'Sev0', 'Sev1', 'Sev2', 'Sev3', 'Sev4'
 	Severity Severity `json:"severity,omitempty"`
-	// StartDateTime - Creation time of smart group. Date-Time in ISO-8601 format.
+	// StartDateTime - READ-ONLY; Creation time of smart group. Date-Time in ISO-8601 format.
 	StartDateTime *date.Time `json:"startDateTime,omitempty"`
-	// LastModifiedDateTime - Last updated time of smart group. Date-Time in ISO-8601 format.
+	// LastModifiedDateTime - READ-ONLY; Last updated time of smart group. Date-Time in ISO-8601 format.
 	LastModifiedDateTime *date.Time `json:"lastModifiedDateTime,omitempty"`
-	// LastModifiedUserName - Last modified by user name.
+	// LastModifiedUserName - READ-ONLY; Last modified by user name.
 	LastModifiedUserName *string `json:"lastModifiedUserName,omitempty"`
 	// Resources - Summary of target resources in the smart group
 	Resources *[]SmartGroupAggregatedProperty `json:"resources,omitempty"`
@@ -924,4 +915,141 @@ type SmartGroupsList struct {
 	NextLink *string `json:"nextLink,omitempty"`
 	// Value - List of alerts
 	Value *[]SmartGroup `json:"value,omitempty"`
+}
+
+// SmartGroupsListIterator provides access to a complete listing of SmartGroup values.
+type SmartGroupsListIterator struct {
+	i    int
+	page SmartGroupsListPage
+}
+
+// NextWithContext advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+func (iter *SmartGroupsListIterator) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/SmartGroupsListIterator.NextWithContext")
+		defer func() {
+			sc := -1
+			if iter.Response().Response.Response != nil {
+				sc = iter.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	iter.i++
+	if iter.i < len(iter.page.Values()) {
+		return nil
+	}
+	err = iter.page.NextWithContext(ctx)
+	if err != nil {
+		iter.i--
+		return err
+	}
+	iter.i = 0
+	return nil
+}
+
+// Next advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (iter *SmartGroupsListIterator) Next() error {
+	return iter.NextWithContext(context.Background())
+}
+
+// NotDone returns true if the enumeration should be started or is not yet complete.
+func (iter SmartGroupsListIterator) NotDone() bool {
+	return iter.page.NotDone() && iter.i < len(iter.page.Values())
+}
+
+// Response returns the raw server response from the last page request.
+func (iter SmartGroupsListIterator) Response() SmartGroupsList {
+	return iter.page.Response()
+}
+
+// Value returns the current value or a zero-initialized value if the
+// iterator has advanced beyond the end of the collection.
+func (iter SmartGroupsListIterator) Value() SmartGroup {
+	if !iter.page.NotDone() {
+		return SmartGroup{}
+	}
+	return iter.page.Values()[iter.i]
+}
+
+// Creates a new instance of the SmartGroupsListIterator type.
+func NewSmartGroupsListIterator(page SmartGroupsListPage) SmartGroupsListIterator {
+	return SmartGroupsListIterator{page: page}
+}
+
+// IsEmpty returns true if the ListResult contains no values.
+func (sgl SmartGroupsList) IsEmpty() bool {
+	return sgl.Value == nil || len(*sgl.Value) == 0
+}
+
+// smartGroupsListPreparer prepares a request to retrieve the next set of results.
+// It returns nil if no more results exist.
+func (sgl SmartGroupsList) smartGroupsListPreparer(ctx context.Context) (*http.Request, error) {
+	if sgl.NextLink == nil || len(to.String(sgl.NextLink)) < 1 {
+		return nil, nil
+	}
+	return autorest.Prepare((&http.Request{}).WithContext(ctx),
+		autorest.AsJSON(),
+		autorest.AsGet(),
+		autorest.WithBaseURL(to.String(sgl.NextLink)))
+}
+
+// SmartGroupsListPage contains a page of SmartGroup values.
+type SmartGroupsListPage struct {
+	fn  func(context.Context, SmartGroupsList) (SmartGroupsList, error)
+	sgl SmartGroupsList
+}
+
+// NextWithContext advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+func (page *SmartGroupsListPage) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/SmartGroupsListPage.NextWithContext")
+		defer func() {
+			sc := -1
+			if page.Response().Response.Response != nil {
+				sc = page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	next, err := page.fn(ctx, page.sgl)
+	if err != nil {
+		return err
+	}
+	page.sgl = next
+	return nil
+}
+
+// Next advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (page *SmartGroupsListPage) Next() error {
+	return page.NextWithContext(context.Background())
+}
+
+// NotDone returns true if the page enumeration should be started or is not yet complete.
+func (page SmartGroupsListPage) NotDone() bool {
+	return !page.sgl.IsEmpty()
+}
+
+// Response returns the raw server response from the last page request.
+func (page SmartGroupsListPage) Response() SmartGroupsList {
+	return page.sgl
+}
+
+// Values returns the slice of values for the current page or nil if there are no values.
+func (page SmartGroupsListPage) Values() []SmartGroup {
+	if page.sgl.IsEmpty() {
+		return nil
+	}
+	return *page.sgl.Value
+}
+
+// Creates a new instance of the SmartGroupsListPage type.
+func NewSmartGroupsListPage(getNextPage func(context.Context, SmartGroupsList) (SmartGroupsList, error)) SmartGroupsListPage {
+	return SmartGroupsListPage{fn: getNextPage}
 }

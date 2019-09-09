@@ -45,6 +45,14 @@ type FactoriesClientAPI interface {
 
 var _ FactoriesClientAPI = (*datafactory.FactoriesClient)(nil)
 
+// ExposureControlClientAPI contains the set of methods on the ExposureControlClient type.
+type ExposureControlClientAPI interface {
+	GetFeatureValue(ctx context.Context, locationID string, exposureControlRequest datafactory.ExposureControlRequest) (result datafactory.ExposureControlResponse, err error)
+	GetFeatureValueByFactory(ctx context.Context, resourceGroupName string, factoryName string, exposureControlRequest datafactory.ExposureControlRequest) (result datafactory.ExposureControlResponse, err error)
+}
+
+var _ ExposureControlClientAPI = (*datafactory.ExposureControlClient)(nil)
+
 // IntegrationRuntimesClientAPI contains the set of methods on the IntegrationRuntimesClient type.
 type IntegrationRuntimesClientAPI interface {
 	CreateLinkedIntegrationRuntime(ctx context.Context, resourceGroupName string, factoryName string, integrationRuntimeName string, createLinkedIntegrationRuntimeRequest datafactory.CreateLinkedIntegrationRuntimeRequest) (result datafactory.IntegrationRuntimeStatusResponse, err error)
@@ -108,7 +116,7 @@ var _ DatasetsClientAPI = (*datafactory.DatasetsClient)(nil)
 // PipelinesClientAPI contains the set of methods on the PipelinesClient type.
 type PipelinesClientAPI interface {
 	CreateOrUpdate(ctx context.Context, resourceGroupName string, factoryName string, pipelineName string, pipeline datafactory.PipelineResource, ifMatch string) (result datafactory.PipelineResource, err error)
-	CreateRun(ctx context.Context, resourceGroupName string, factoryName string, pipelineName string, referencePipelineRunID string, parameters map[string]interface{}) (result datafactory.CreateRunResponse, err error)
+	CreateRun(ctx context.Context, resourceGroupName string, factoryName string, pipelineName string, referencePipelineRunID string, isRecovery *bool, startActivityName string, parameters map[string]interface{}) (result datafactory.CreateRunResponse, err error)
 	Delete(ctx context.Context, resourceGroupName string, factoryName string, pipelineName string) (result autorest.Response, err error)
 	Get(ctx context.Context, resourceGroupName string, factoryName string, pipelineName string, ifNoneMatch string) (result datafactory.PipelineResource, err error)
 	ListByFactory(ctx context.Context, resourceGroupName string, factoryName string) (result datafactory.PipelineListResponsePage, err error)
@@ -137,12 +145,23 @@ type TriggersClientAPI interface {
 	CreateOrUpdate(ctx context.Context, resourceGroupName string, factoryName string, triggerName string, trigger datafactory.TriggerResource, ifMatch string) (result datafactory.TriggerResource, err error)
 	Delete(ctx context.Context, resourceGroupName string, factoryName string, triggerName string) (result autorest.Response, err error)
 	Get(ctx context.Context, resourceGroupName string, factoryName string, triggerName string, ifNoneMatch string) (result datafactory.TriggerResource, err error)
+	GetEventSubscriptionStatus(ctx context.Context, resourceGroupName string, factoryName string, triggerName string) (result datafactory.TriggerSubscriptionOperationStatus, err error)
 	ListByFactory(ctx context.Context, resourceGroupName string, factoryName string) (result datafactory.TriggerListResponsePage, err error)
 	Start(ctx context.Context, resourceGroupName string, factoryName string, triggerName string) (result datafactory.TriggersStartFuture, err error)
 	Stop(ctx context.Context, resourceGroupName string, factoryName string, triggerName string) (result datafactory.TriggersStopFuture, err error)
+	SubscribeToEvents(ctx context.Context, resourceGroupName string, factoryName string, triggerName string) (result datafactory.TriggersSubscribeToEventsFuture, err error)
+	UnsubscribeFromEvents(ctx context.Context, resourceGroupName string, factoryName string, triggerName string) (result datafactory.TriggersUnsubscribeFromEventsFuture, err error)
 }
 
 var _ TriggersClientAPI = (*datafactory.TriggersClient)(nil)
+
+// TriggerRunsClientAPI contains the set of methods on the TriggerRunsClient type.
+type TriggerRunsClientAPI interface {
+	QueryByFactory(ctx context.Context, resourceGroupName string, factoryName string, filterParameters datafactory.RunFilterParameters) (result datafactory.TriggerRunsQueryResponse, err error)
+	Rerun(ctx context.Context, resourceGroupName string, factoryName string, triggerName string, runID string) (result autorest.Response, err error)
+}
+
+var _ TriggerRunsClientAPI = (*datafactory.TriggerRunsClient)(nil)
 
 // RerunTriggersClientAPI contains the set of methods on the RerunTriggersClient type.
 type RerunTriggersClientAPI interface {
@@ -154,10 +173,3 @@ type RerunTriggersClientAPI interface {
 }
 
 var _ RerunTriggersClientAPI = (*datafactory.RerunTriggersClient)(nil)
-
-// TriggerRunsClientAPI contains the set of methods on the TriggerRunsClient type.
-type TriggerRunsClientAPI interface {
-	QueryByFactory(ctx context.Context, resourceGroupName string, factoryName string, filterParameters datafactory.RunFilterParameters) (result datafactory.TriggerRunsQueryResponse, err error)
-}
-
-var _ TriggerRunsClientAPI = (*datafactory.TriggerRunsClient)(nil)

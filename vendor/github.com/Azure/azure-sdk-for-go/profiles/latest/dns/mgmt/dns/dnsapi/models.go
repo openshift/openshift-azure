@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@
 
 package dnsapi
 
-import original "github.com/Azure/azure-sdk-for-go/services/dns/mgmt/2017-10-01/dns/dnsapi"
+import original "github.com/Azure/azure-sdk-for-go/services/dns/mgmt/2018-05-01/dns/dnsapi"
 
 type RecordSetsClientAPI = original.RecordSetsClientAPI
+type ResourceReferenceClientAPI = original.ResourceReferenceClientAPI
 type ZonesClientAPI = original.ZonesClientAPI

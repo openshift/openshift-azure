@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ package recoveryservicesapi
 
 import original "github.com/Azure/azure-sdk-for-go/services/recoveryservices/mgmt/2016-06-01/recoveryservices/recoveryservicesapi"
 
+type ClientAPI = original.ClientAPI
 type OperationsClientAPI = original.OperationsClientAPI
 type RegisteredIdentitiesClientAPI = original.RegisteredIdentitiesClientAPI
 type ReplicationUsagesClientAPI = original.ReplicationUsagesClientAPI

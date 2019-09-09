@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ type AgreementTerms = original.AgreementTerms
 type BaseClient = original.BaseClient
 type ErrorResponse = original.ErrorResponse
 type ErrorResponseError = original.ErrorResponseError
+type ListAgreementTerms = original.ListAgreementTerms
 type MarketplaceAgreementsClient = original.MarketplaceAgreementsClient
 type Operation = original.Operation
 type OperationDisplay = original.OperationDisplay

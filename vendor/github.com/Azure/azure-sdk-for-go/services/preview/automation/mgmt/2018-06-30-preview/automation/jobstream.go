@@ -32,13 +32,13 @@ type JobStreamClient struct {
 }
 
 // NewJobStreamClient creates an instance of the JobStreamClient client.
-func NewJobStreamClient(subscriptionID string, countType1 CountType) JobStreamClient {
-	return NewJobStreamClientWithBaseURI(DefaultBaseURI, subscriptionID, countType1)
+func NewJobStreamClient(subscriptionID string) JobStreamClient {
+	return NewJobStreamClientWithBaseURI(DefaultBaseURI, subscriptionID)
 }
 
 // NewJobStreamClientWithBaseURI creates an instance of the JobStreamClient client.
-func NewJobStreamClientWithBaseURI(baseURI string, subscriptionID string, countType1 CountType) JobStreamClient {
-	return JobStreamClient{NewWithBaseURI(baseURI, subscriptionID, countType1)}
+func NewJobStreamClientWithBaseURI(baseURI string, subscriptionID string) JobStreamClient {
+	return JobStreamClient{NewWithBaseURI(baseURI, subscriptionID)}
 }
 
 // Get retrieve the job stream identified by job stream id.
@@ -118,8 +118,8 @@ func (client JobStreamClient) GetPreparer(ctx context.Context, resourceGroupName
 // GetSender sends the Get request. The method will close the
 // http.Response Body if it receives an error.
 func (client JobStreamClient) GetSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetResponder handles the response to the Get request. The method always
@@ -215,8 +215,8 @@ func (client JobStreamClient) ListByJobPreparer(ctx context.Context, resourceGro
 // ListByJobSender sends the ListByJob request. The method will close the
 // http.Response Body if it receives an error.
 func (client JobStreamClient) ListByJobSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListByJobResponder handles the response to the ListByJob request. The method always

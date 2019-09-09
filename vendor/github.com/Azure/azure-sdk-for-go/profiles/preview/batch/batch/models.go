@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package batch
 import (
 	"context"
 
-	original "github.com/Azure/azure-sdk-for-go/services/batch/2018-12-01.8.0/batch"
+	original "github.com/Azure/azure-sdk-for-go/services/batch/2019-08-01.10.0/batch"
 )
 
 type AccessScope = original.AccessScope
@@ -134,6 +134,13 @@ const (
 	Unknown             ComputeNodeState = original.Unknown
 	Unusable            ComputeNodeState = original.Unusable
 	WaitingForStartTask ComputeNodeState = original.WaitingForStartTask
+)
+
+type ContainerWorkingDirectory = original.ContainerWorkingDirectory
+
+const (
+	ContainerImageDefault ContainerWorkingDirectory = original.ContainerImageDefault
+	TaskWorkingDirectory  ContainerWorkingDirectory = original.TaskWorkingDirectory
 )
 
 type DependencyAction = original.DependencyAction
@@ -341,10 +348,17 @@ const (
 	TaskStateRunning   TaskState = original.TaskStateRunning
 )
 
+type VerificationType = original.VerificationType
+
+const (
+	Unverified VerificationType = original.Unverified
+	Verified   VerificationType = original.Verified
+)
+
 type AccountClient = original.AccountClient
-type AccountListNodeAgentSkusResult = original.AccountListNodeAgentSkusResult
-type AccountListNodeAgentSkusResultIterator = original.AccountListNodeAgentSkusResultIterator
-type AccountListNodeAgentSkusResultPage = original.AccountListNodeAgentSkusResultPage
+type AccountListSupportedImagesResult = original.AccountListSupportedImagesResult
+type AccountListSupportedImagesResultIterator = original.AccountListSupportedImagesResultIterator
+type AccountListSupportedImagesResultPage = original.AccountListSupportedImagesResultPage
 type AffinityInformation = original.AffinityInformation
 type ApplicationClient = original.ApplicationClient
 type ApplicationListResult = original.ApplicationListResult
@@ -357,7 +371,10 @@ type AutoPoolSpecification = original.AutoPoolSpecification
 type AutoScaleRun = original.AutoScaleRun
 type AutoScaleRunError = original.AutoScaleRunError
 type AutoUserSpecification = original.AutoUserSpecification
+type AzureBlobFileSystemConfiguration = original.AzureBlobFileSystemConfiguration
+type AzureFileShareConfiguration = original.AzureFileShareConfiguration
 type BaseClient = original.BaseClient
+type CIFSMountConfiguration = original.CIFSMountConfiguration
 type Certificate = original.Certificate
 type CertificateAddParameter = original.CertificateAddParameter
 type CertificateClient = original.CertificateClient
@@ -410,6 +427,7 @@ type ExitConditions = original.ExitConditions
 type ExitOptions = original.ExitOptions
 type FileClient = original.FileClient
 type FileProperties = original.FileProperties
+type ImageInformation = original.ImageInformation
 type ImageReference = original.ImageReference
 type InboundEndpoint = original.InboundEndpoint
 type InboundNATPool = original.InboundNATPool
@@ -439,12 +457,13 @@ type JobTerminateParameter = original.JobTerminateParameter
 type JobUpdateParameter = original.JobUpdateParameter
 type LinuxUserConfiguration = original.LinuxUserConfiguration
 type MetadataItem = original.MetadataItem
+type MountConfiguration = original.MountConfiguration
 type MultiInstanceSettings = original.MultiInstanceSettings
+type NFSMountConfiguration = original.NFSMountConfiguration
 type NameValuePair = original.NameValuePair
 type NetworkConfiguration = original.NetworkConfiguration
 type NetworkSecurityGroupRule = original.NetworkSecurityGroupRule
 type NodeAgentInformation = original.NodeAgentInformation
-type NodeAgentSku = original.NodeAgentSku
 type NodeCounts = original.NodeCounts
 type NodeDisableSchedulingParameter = original.NodeDisableSchedulingParameter
 type NodeFile = original.NodeFile
@@ -519,11 +538,11 @@ func New(batchURL string) BaseClient {
 func NewAccountClient(batchURL string) AccountClient {
 	return original.NewAccountClient(batchURL)
 }
-func NewAccountListNodeAgentSkusResultIterator(page AccountListNodeAgentSkusResultPage) AccountListNodeAgentSkusResultIterator {
-	return original.NewAccountListNodeAgentSkusResultIterator(page)
+func NewAccountListSupportedImagesResultIterator(page AccountListSupportedImagesResultPage) AccountListSupportedImagesResultIterator {
+	return original.NewAccountListSupportedImagesResultIterator(page)
 }
-func NewAccountListNodeAgentSkusResultPage(getNextPage func(context.Context, AccountListNodeAgentSkusResult) (AccountListNodeAgentSkusResult, error)) AccountListNodeAgentSkusResultPage {
-	return original.NewAccountListNodeAgentSkusResultPage(getNextPage)
+func NewAccountListSupportedImagesResultPage(getNextPage func(context.Context, AccountListSupportedImagesResult) (AccountListSupportedImagesResult, error)) AccountListSupportedImagesResultPage {
+	return original.NewAccountListSupportedImagesResultPage(getNextPage)
 }
 func NewApplicationClient(batchURL string) ApplicationClient {
 	return original.NewApplicationClient(batchURL)
@@ -657,6 +676,9 @@ func PossibleComputeNodeReimageOptionValues() []ComputeNodeReimageOption {
 func PossibleComputeNodeStateValues() []ComputeNodeState {
 	return original.PossibleComputeNodeStateValues()
 }
+func PossibleContainerWorkingDirectoryValues() []ContainerWorkingDirectory {
+	return original.PossibleContainerWorkingDirectoryValues()
+}
 func PossibleDependencyActionValues() []DependencyAction {
 	return original.PossibleDependencyActionValues()
 }
@@ -737,6 +759,9 @@ func PossibleTaskExecutionResultValues() []TaskExecutionResult {
 }
 func PossibleTaskStateValues() []TaskState {
 	return original.PossibleTaskStateValues()
+}
+func PossibleVerificationTypeValues() []VerificationType {
+	return original.PossibleVerificationTypeValues()
 }
 func UserAgent() string {
 	return original.UserAgent() + " profiles/preview"

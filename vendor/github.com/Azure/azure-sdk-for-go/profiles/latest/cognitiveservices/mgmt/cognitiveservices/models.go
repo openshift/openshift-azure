@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,6 +34,20 @@ type KeyName = original.KeyName
 const (
 	Key1 KeyName = original.Key1
 	Key2 KeyName = original.Key2
+)
+
+type NetworkRuleAction = original.NetworkRuleAction
+
+const (
+	Allow NetworkRuleAction = original.Allow
+	Deny  NetworkRuleAction = original.Deny
+)
+
+type NetworkRuleBypassOptions = original.NetworkRuleBypassOptions
+
+const (
+	AzureServices NetworkRuleBypassOptions = original.AzureServices
+	None          NetworkRuleBypassOptions = original.None
 )
 
 type ProvisioningState = original.ProvisioningState
@@ -101,13 +115,17 @@ type AccountProperties = original.AccountProperties
 type AccountUpdateParameters = original.AccountUpdateParameters
 type AccountsClient = original.AccountsClient
 type BaseClient = original.BaseClient
+type CheckDomainAvailabilityParameter = original.CheckDomainAvailabilityParameter
+type CheckDomainAvailabilityResult = original.CheckDomainAvailabilityResult
 type CheckSkuAvailabilityClient = original.CheckSkuAvailabilityClient
 type CheckSkuAvailabilityParameter = original.CheckSkuAvailabilityParameter
 type CheckSkuAvailabilityResult = original.CheckSkuAvailabilityResult
 type CheckSkuAvailabilityResultList = original.CheckSkuAvailabilityResultList
 type Error = original.Error
 type ErrorBody = original.ErrorBody
+type IPRule = original.IPRule
 type MetricName = original.MetricName
+type NetworkRuleSet = original.NetworkRuleSet
 type OperationDisplayInfo = original.OperationDisplayInfo
 type OperationEntity = original.OperationEntity
 type OperationEntityListResult = original.OperationEntityListResult
@@ -126,6 +144,7 @@ type ResourceSkusResultPage = original.ResourceSkusResultPage
 type Sku = original.Sku
 type Usage = original.Usage
 type UsagesResult = original.UsagesResult
+type VirtualNetworkRule = original.VirtualNetworkRule
 
 func New(subscriptionID string) BaseClient {
 	return original.New(subscriptionID)
@@ -177,6 +196,12 @@ func NewWithBaseURI(baseURI string, subscriptionID string) BaseClient {
 }
 func PossibleKeyNameValues() []KeyName {
 	return original.PossibleKeyNameValues()
+}
+func PossibleNetworkRuleActionValues() []NetworkRuleAction {
+	return original.PossibleNetworkRuleActionValues()
+}
+func PossibleNetworkRuleBypassOptionsValues() []NetworkRuleBypassOptions {
+	return original.PossibleNetworkRuleBypassOptionsValues()
 }
 func PossibleProvisioningStateValues() []ProvisioningState {
 	return original.PossibleProvisioningStateValues()

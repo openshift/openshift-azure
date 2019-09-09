@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -85,24 +85,26 @@ const (
 type DatabaseStatus = original.DatabaseStatus
 
 const (
-	AutoClosed       DatabaseStatus = original.AutoClosed
-	Copying          DatabaseStatus = original.Copying
-	Creating         DatabaseStatus = original.Creating
-	EmergencyMode    DatabaseStatus = original.EmergencyMode
-	Inaccessible     DatabaseStatus = original.Inaccessible
-	Offline          DatabaseStatus = original.Offline
-	OfflineSecondary DatabaseStatus = original.OfflineSecondary
-	Online           DatabaseStatus = original.Online
-	Paused           DatabaseStatus = original.Paused
-	Pausing          DatabaseStatus = original.Pausing
-	Recovering       DatabaseStatus = original.Recovering
-	RecoveryPending  DatabaseStatus = original.RecoveryPending
-	Restoring        DatabaseStatus = original.Restoring
-	Resuming         DatabaseStatus = original.Resuming
-	Scaling          DatabaseStatus = original.Scaling
-	Shutdown         DatabaseStatus = original.Shutdown
-	Standby          DatabaseStatus = original.Standby
-	Suspect          DatabaseStatus = original.Suspect
+	AutoClosed                        DatabaseStatus = original.AutoClosed
+	Copying                           DatabaseStatus = original.Copying
+	Creating                          DatabaseStatus = original.Creating
+	EmergencyMode                     DatabaseStatus = original.EmergencyMode
+	Inaccessible                      DatabaseStatus = original.Inaccessible
+	Offline                           DatabaseStatus = original.Offline
+	OfflineChangingDwPerformanceTiers DatabaseStatus = original.OfflineChangingDwPerformanceTiers
+	OfflineSecondary                  DatabaseStatus = original.OfflineSecondary
+	Online                            DatabaseStatus = original.Online
+	OnlineChangingDwPerformanceTiers  DatabaseStatus = original.OnlineChangingDwPerformanceTiers
+	Paused                            DatabaseStatus = original.Paused
+	Pausing                           DatabaseStatus = original.Pausing
+	Recovering                        DatabaseStatus = original.Recovering
+	RecoveryPending                   DatabaseStatus = original.RecoveryPending
+	Restoring                         DatabaseStatus = original.Restoring
+	Resuming                          DatabaseStatus = original.Resuming
+	Scaling                           DatabaseStatus = original.Scaling
+	Shutdown                          DatabaseStatus = original.Shutdown
+	Standby                           DatabaseStatus = original.Standby
+	Suspect                           DatabaseStatus = original.Suspect
 )
 
 type ElasticPoolLicenseType = original.ElasticPoolLicenseType
@@ -307,6 +309,7 @@ type ManagedInstanceEncryptionProtectorListResultPage = original.ManagedInstance
 type ManagedInstanceEncryptionProtectorProperties = original.ManagedInstanceEncryptionProtectorProperties
 type ManagedInstanceEncryptionProtectorsClient = original.ManagedInstanceEncryptionProtectorsClient
 type ManagedInstanceEncryptionProtectorsCreateOrUpdateFuture = original.ManagedInstanceEncryptionProtectorsCreateOrUpdateFuture
+type ManagedInstanceEncryptionProtectorsRevalidateFuture = original.ManagedInstanceEncryptionProtectorsRevalidateFuture
 type ManagedInstanceFamilyCapability = original.ManagedInstanceFamilyCapability
 type ManagedInstanceKey = original.ManagedInstanceKey
 type ManagedInstanceKeyListResult = original.ManagedInstanceKeyListResult
@@ -326,6 +329,12 @@ type MaxSizeRangeCapability = original.MaxSizeRangeCapability
 type PartnerRegionInfo = original.PartnerRegionInfo
 type PerformanceLevelCapability = original.PerformanceLevelCapability
 type ProxyResource = original.ProxyResource
+type RecoverableManagedDatabase = original.RecoverableManagedDatabase
+type RecoverableManagedDatabaseListResult = original.RecoverableManagedDatabaseListResult
+type RecoverableManagedDatabaseListResultIterator = original.RecoverableManagedDatabaseListResultIterator
+type RecoverableManagedDatabaseListResultPage = original.RecoverableManagedDatabaseListResultPage
+type RecoverableManagedDatabaseProperties = original.RecoverableManagedDatabaseProperties
+type RecoverableManagedDatabasesClient = original.RecoverableManagedDatabasesClient
 type Resource = original.Resource
 type ResourceMoveDefinition = original.ResourceMoveDefinition
 type ServerVersionCapability = original.ServerVersionCapability
@@ -484,6 +493,18 @@ func NewManagedInstanceTdeCertificatesClient(subscriptionID string) ManagedInsta
 }
 func NewManagedInstanceTdeCertificatesClientWithBaseURI(baseURI string, subscriptionID string) ManagedInstanceTdeCertificatesClient {
 	return original.NewManagedInstanceTdeCertificatesClientWithBaseURI(baseURI, subscriptionID)
+}
+func NewRecoverableManagedDatabaseListResultIterator(page RecoverableManagedDatabaseListResultPage) RecoverableManagedDatabaseListResultIterator {
+	return original.NewRecoverableManagedDatabaseListResultIterator(page)
+}
+func NewRecoverableManagedDatabaseListResultPage(getNextPage func(context.Context, RecoverableManagedDatabaseListResult) (RecoverableManagedDatabaseListResult, error)) RecoverableManagedDatabaseListResultPage {
+	return original.NewRecoverableManagedDatabaseListResultPage(getNextPage)
+}
+func NewRecoverableManagedDatabasesClient(subscriptionID string) RecoverableManagedDatabasesClient {
+	return original.NewRecoverableManagedDatabasesClient(subscriptionID)
+}
+func NewRecoverableManagedDatabasesClientWithBaseURI(baseURI string, subscriptionID string) RecoverableManagedDatabasesClient {
+	return original.NewRecoverableManagedDatabasesClientWithBaseURI(baseURI, subscriptionID)
 }
 func NewTdeCertificatesClient(subscriptionID string) TdeCertificatesClient {
 	return original.NewTdeCertificatesClient(subscriptionID)

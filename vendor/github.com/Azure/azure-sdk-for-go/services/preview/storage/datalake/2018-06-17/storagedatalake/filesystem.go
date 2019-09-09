@@ -62,7 +62,8 @@ func (client FilesystemClient) Create(ctx context.Context, filesystem string, xM
 	}
 	if err := validation.Validate([]validation.Validation{
 		{TargetValue: xMsClientRequestID,
-			Constraints: []validation.Constraint{{Target: "xMsClientRequestID", Name: validation.Pattern, Rule: `^[{(]?[0-9a-f]{8}[-]?([0-9a-f]{4}[-]?){3}[0-9a-f]{12}[)}]?$`, Chain: nil}}},
+			Constraints: []validation.Constraint{{Target: "xMsClientRequestID", Name: validation.Empty, Rule: false,
+				Chain: []validation.Constraint{{Target: "xMsClientRequestID", Name: validation.Pattern, Rule: `^[{(]?[0-9a-f]{8}[-]?([0-9a-f]{4}[-]?){3}[0-9a-f]{12}[)}]?$`, Chain: nil}}}}},
 		{TargetValue: timeout,
 			Constraints: []validation.Constraint{{Target: "timeout", Name: validation.Null, Rule: false,
 				Chain: []validation.Constraint{{Target: "timeout", Name: validation.InclusiveMinimum, Rule: 1, Chain: nil}}}}}}); err != nil {
@@ -110,7 +111,7 @@ func (client FilesystemClient) CreatePreparer(ctx context.Context, filesystem st
 
 	preparer := autorest.CreatePreparer(
 		autorest.AsPut(),
-		autorest.WithCustomBaseURL("http://{accountName}.{dnsSuffix}", urlParameters),
+		autorest.WithCustomBaseURL("https://{accountName}.{dnsSuffix}", urlParameters),
 		autorest.WithPathParameters("/{filesystem}", pathParameters),
 		autorest.WithQueryParameters(queryParameters))
 	if len(xMsProperties) > 0 {
@@ -135,8 +136,8 @@ func (client FilesystemClient) CreatePreparer(ctx context.Context, filesystem st
 // CreateSender sends the Create request. The method will close the
 // http.Response Body if it receives an error.
 func (client FilesystemClient) CreateSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // CreateResponder handles the response to the Create request. The method always
@@ -185,7 +186,8 @@ func (client FilesystemClient) Delete(ctx context.Context, filesystem string, if
 	}
 	if err := validation.Validate([]validation.Validation{
 		{TargetValue: xMsClientRequestID,
-			Constraints: []validation.Constraint{{Target: "xMsClientRequestID", Name: validation.Pattern, Rule: `^[{(]?[0-9a-f]{8}[-]?([0-9a-f]{4}[-]?){3}[0-9a-f]{12}[)}]?$`, Chain: nil}}},
+			Constraints: []validation.Constraint{{Target: "xMsClientRequestID", Name: validation.Empty, Rule: false,
+				Chain: []validation.Constraint{{Target: "xMsClientRequestID", Name: validation.Pattern, Rule: `^[{(]?[0-9a-f]{8}[-]?([0-9a-f]{4}[-]?){3}[0-9a-f]{12}[)}]?$`, Chain: nil}}}}},
 		{TargetValue: timeout,
 			Constraints: []validation.Constraint{{Target: "timeout", Name: validation.Null, Rule: false,
 				Chain: []validation.Constraint{{Target: "timeout", Name: validation.InclusiveMinimum, Rule: 1, Chain: nil}}}}}}); err != nil {
@@ -233,7 +235,7 @@ func (client FilesystemClient) DeletePreparer(ctx context.Context, filesystem st
 
 	preparer := autorest.CreatePreparer(
 		autorest.AsDelete(),
-		autorest.WithCustomBaseURL("http://{accountName}.{dnsSuffix}", urlParameters),
+		autorest.WithCustomBaseURL("https://{accountName}.{dnsSuffix}", urlParameters),
 		autorest.WithPathParameters("/{filesystem}", pathParameters),
 		autorest.WithQueryParameters(queryParameters))
 	if len(ifModifiedSince) > 0 {
@@ -262,8 +264,8 @@ func (client FilesystemClient) DeletePreparer(ctx context.Context, filesystem st
 // DeleteSender sends the Delete request. The method will close the
 // http.Response Body if it receives an error.
 func (client FilesystemClient) DeleteSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // DeleteResponder handles the response to the Delete request. The method always
@@ -301,7 +303,8 @@ func (client FilesystemClient) GetProperties(ctx context.Context, filesystem str
 	}
 	if err := validation.Validate([]validation.Validation{
 		{TargetValue: xMsClientRequestID,
-			Constraints: []validation.Constraint{{Target: "xMsClientRequestID", Name: validation.Pattern, Rule: `^[{(]?[0-9a-f]{8}[-]?([0-9a-f]{4}[-]?){3}[0-9a-f]{12}[)}]?$`, Chain: nil}}},
+			Constraints: []validation.Constraint{{Target: "xMsClientRequestID", Name: validation.Empty, Rule: false,
+				Chain: []validation.Constraint{{Target: "xMsClientRequestID", Name: validation.Pattern, Rule: `^[{(]?[0-9a-f]{8}[-]?([0-9a-f]{4}[-]?){3}[0-9a-f]{12}[)}]?$`, Chain: nil}}}}},
 		{TargetValue: timeout,
 			Constraints: []validation.Constraint{{Target: "timeout", Name: validation.Null, Rule: false,
 				Chain: []validation.Constraint{{Target: "timeout", Name: validation.InclusiveMinimum, Rule: 1, Chain: nil}}}}}}); err != nil {
@@ -349,7 +352,7 @@ func (client FilesystemClient) GetPropertiesPreparer(ctx context.Context, filesy
 
 	preparer := autorest.CreatePreparer(
 		autorest.AsHead(),
-		autorest.WithCustomBaseURL("http://{accountName}.{dnsSuffix}", urlParameters),
+		autorest.WithCustomBaseURL("https://{accountName}.{dnsSuffix}", urlParameters),
 		autorest.WithPathParameters("/{filesystem}", pathParameters),
 		autorest.WithQueryParameters(queryParameters))
 	if len(xMsClientRequestID) > 0 {
@@ -370,8 +373,8 @@ func (client FilesystemClient) GetPropertiesPreparer(ctx context.Context, filesy
 // GetPropertiesSender sends the GetProperties request. The method will close the
 // http.Response Body if it receives an error.
 func (client FilesystemClient) GetPropertiesSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetPropertiesResponder handles the response to the GetProperties request. The method always
@@ -416,7 +419,8 @@ func (client FilesystemClient) List(ctx context.Context, prefix string, continua
 			Constraints: []validation.Constraint{{Target: "maxResults", Name: validation.Null, Rule: false,
 				Chain: []validation.Constraint{{Target: "maxResults", Name: validation.InclusiveMinimum, Rule: 1, Chain: nil}}}}},
 		{TargetValue: xMsClientRequestID,
-			Constraints: []validation.Constraint{{Target: "xMsClientRequestID", Name: validation.Pattern, Rule: `^[{(]?[0-9a-f]{8}[-]?([0-9a-f]{4}[-]?){3}[0-9a-f]{12}[)}]?$`, Chain: nil}}},
+			Constraints: []validation.Constraint{{Target: "xMsClientRequestID", Name: validation.Empty, Rule: false,
+				Chain: []validation.Constraint{{Target: "xMsClientRequestID", Name: validation.Pattern, Rule: `^[{(]?[0-9a-f]{8}[-]?([0-9a-f]{4}[-]?){3}[0-9a-f]{12}[)}]?$`, Chain: nil}}}}},
 		{TargetValue: timeout,
 			Constraints: []validation.Constraint{{Target: "timeout", Name: validation.Null, Rule: false,
 				Chain: []validation.Constraint{{Target: "timeout", Name: validation.InclusiveMinimum, Rule: 1, Chain: nil}}}}}}); err != nil {
@@ -469,7 +473,7 @@ func (client FilesystemClient) ListPreparer(ctx context.Context, prefix string, 
 
 	preparer := autorest.CreatePreparer(
 		autorest.AsGet(),
-		autorest.WithCustomBaseURL("http://{accountName}.{dnsSuffix}", urlParameters),
+		autorest.WithCustomBaseURL("https://{accountName}.{dnsSuffix}", urlParameters),
 		autorest.WithPath("/"),
 		autorest.WithQueryParameters(queryParameters))
 	if len(xMsClientRequestID) > 0 {
@@ -490,8 +494,8 @@ func (client FilesystemClient) ListPreparer(ctx context.Context, prefix string, 
 // ListSender sends the List request. The method will close the
 // http.Response Body if it receives an error.
 func (client FilesystemClient) ListSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListResponder handles the response to the List request. The method always
@@ -541,7 +545,8 @@ func (client FilesystemClient) SetProperties(ctx context.Context, filesystem str
 	}
 	if err := validation.Validate([]validation.Validation{
 		{TargetValue: xMsClientRequestID,
-			Constraints: []validation.Constraint{{Target: "xMsClientRequestID", Name: validation.Pattern, Rule: `^[{(]?[0-9a-f]{8}[-]?([0-9a-f]{4}[-]?){3}[0-9a-f]{12}[)}]?$`, Chain: nil}}},
+			Constraints: []validation.Constraint{{Target: "xMsClientRequestID", Name: validation.Empty, Rule: false,
+				Chain: []validation.Constraint{{Target: "xMsClientRequestID", Name: validation.Pattern, Rule: `^[{(]?[0-9a-f]{8}[-]?([0-9a-f]{4}[-]?){3}[0-9a-f]{12}[)}]?$`, Chain: nil}}}}},
 		{TargetValue: timeout,
 			Constraints: []validation.Constraint{{Target: "timeout", Name: validation.Null, Rule: false,
 				Chain: []validation.Constraint{{Target: "timeout", Name: validation.InclusiveMinimum, Rule: 1, Chain: nil}}}}}}); err != nil {
@@ -589,7 +594,7 @@ func (client FilesystemClient) SetPropertiesPreparer(ctx context.Context, filesy
 
 	preparer := autorest.CreatePreparer(
 		autorest.AsPatch(),
-		autorest.WithCustomBaseURL("http://{accountName}.{dnsSuffix}", urlParameters),
+		autorest.WithCustomBaseURL("https://{accountName}.{dnsSuffix}", urlParameters),
 		autorest.WithPathParameters("/{filesystem}", pathParameters),
 		autorest.WithQueryParameters(queryParameters))
 	if len(xMsProperties) > 0 {
@@ -622,8 +627,8 @@ func (client FilesystemClient) SetPropertiesPreparer(ctx context.Context, filesy
 // SetPropertiesSender sends the SetProperties request. The method will close the
 // http.Response Body if it receives an error.
 func (client FilesystemClient) SetPropertiesSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // SetPropertiesResponder handles the response to the SetProperties request. The method always

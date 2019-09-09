@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 package cdnapi
 
-import original "github.com/Azure/azure-sdk-for-go/services/cdn/mgmt/2017-10-12/cdn/cdnapi"
+import original "github.com/Azure/azure-sdk-for-go/services/cdn/mgmt/2019-04-15/cdn/cdnapi"
 
 type BaseClientAPI = original.BaseClientAPI
 type CustomDomainsClientAPI = original.CustomDomainsClientAPI

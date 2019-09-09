@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -104,6 +104,14 @@ const (
 	Express    SQLImageSku = original.Express
 	Standard   SQLImageSku = original.Standard
 	Web        SQLImageSku = original.Web
+)
+
+type SQLManagementMode = original.SQLManagementMode
+
+const (
+	Full        SQLManagementMode = original.Full
+	LightWeight SQLManagementMode = original.LightWeight
+	NoAgent     SQLManagementMode = original.NoAgent
 )
 
 type SQLServerLicenseType = original.SQLServerLicenseType
@@ -269,6 +277,9 @@ func PossibleOperationOriginValues() []OperationOrigin {
 }
 func PossibleSQLImageSkuValues() []SQLImageSku {
 	return original.PossibleSQLImageSkuValues()
+}
+func PossibleSQLManagementModeValues() []SQLManagementMode {
+	return original.PossibleSQLManagementModeValues()
 }
 func PossibleSQLServerLicenseTypeValues() []SQLServerLicenseType {
 	return original.PossibleSQLServerLicenseTypeValues()

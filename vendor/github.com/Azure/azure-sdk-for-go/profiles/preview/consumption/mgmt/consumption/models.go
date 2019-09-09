@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package consumption
 import (
 	"context"
 
-	original "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2018-10-01/consumption"
+	original "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
 )
 
 const (
@@ -84,9 +84,12 @@ const (
 type TimeGrainType = original.TimeGrainType
 
 const (
-	TimeGrainTypeAnnually  TimeGrainType = original.TimeGrainTypeAnnually
-	TimeGrainTypeMonthly   TimeGrainType = original.TimeGrainTypeMonthly
-	TimeGrainTypeQuarterly TimeGrainType = original.TimeGrainTypeQuarterly
+	TimeGrainTypeAnnually       TimeGrainType = original.TimeGrainTypeAnnually
+	TimeGrainTypeBillingAnnual  TimeGrainType = original.TimeGrainTypeBillingAnnual
+	TimeGrainTypeBillingMonth   TimeGrainType = original.TimeGrainTypeBillingMonth
+	TimeGrainTypeBillingQuarter TimeGrainType = original.TimeGrainTypeBillingQuarter
+	TimeGrainTypeMonthly        TimeGrainType = original.TimeGrainTypeMonthly
+	TimeGrainTypeQuarterly      TimeGrainType = original.TimeGrainTypeQuarterly
 )
 
 type AggregatedCostClient = original.AggregatedCostClient

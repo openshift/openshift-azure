@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -59,6 +59,7 @@ type DenyAssignmentListResultPage = original.DenyAssignmentListResultPage
 type DenyAssignmentPermission = original.DenyAssignmentPermission
 type DenyAssignmentProperties = original.DenyAssignmentProperties
 type DenyAssignmentsClient = original.DenyAssignmentsClient
+type GlobalAdministratorClient = original.GlobalAdministratorClient
 type Permission = original.Permission
 type PermissionGetResult = original.PermissionGetResult
 type PermissionGetResultIterator = original.PermissionGetResultIterator
@@ -115,6 +116,12 @@ func NewDenyAssignmentsClient(subscriptionID string) DenyAssignmentsClient {
 }
 func NewDenyAssignmentsClientWithBaseURI(baseURI string, subscriptionID string) DenyAssignmentsClient {
 	return original.NewDenyAssignmentsClientWithBaseURI(baseURI, subscriptionID)
+}
+func NewGlobalAdministratorClient(subscriptionID string) GlobalAdministratorClient {
+	return original.NewGlobalAdministratorClient(subscriptionID)
+}
+func NewGlobalAdministratorClientWithBaseURI(baseURI string, subscriptionID string) GlobalAdministratorClient {
+	return original.NewGlobalAdministratorClientWithBaseURI(baseURI, subscriptionID)
 }
 func NewPermissionGetResultIterator(page PermissionGetResultPage) PermissionGetResultIterator {
 	return original.NewPermissionGetResultIterator(page)

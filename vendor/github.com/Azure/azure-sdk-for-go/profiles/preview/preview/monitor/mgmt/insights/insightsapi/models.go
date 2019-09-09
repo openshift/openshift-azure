@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 package insightsapi
 
-import original "github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2018-09-01/insights/insightsapi"
+import original "github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights/insightsapi"
 
 type ActionGroupsClientAPI = original.ActionGroupsClientAPI
 type ActivityLogAlertsClientAPI = original.ActivityLogAlertsClientAPI
@@ -27,6 +27,7 @@ type ActivityLogsClientAPI = original.ActivityLogsClientAPI
 type AlertRuleIncidentsClientAPI = original.AlertRuleIncidentsClientAPI
 type AlertRulesClientAPI = original.AlertRulesClientAPI
 type AutoscaleSettingsClientAPI = original.AutoscaleSettingsClientAPI
+type BaselinesClientAPI = original.BaselinesClientAPI
 type DiagnosticSettingsCategoryClientAPI = original.DiagnosticSettingsCategoryClientAPI
 type DiagnosticSettingsClientAPI = original.DiagnosticSettingsClientAPI
 type EventCategoriesClientAPI = original.EventCategoriesClientAPI
@@ -40,3 +41,4 @@ type MetricsClientAPI = original.MetricsClientAPI
 type OperationsClientAPI = original.OperationsClientAPI
 type ScheduledQueryRulesClientAPI = original.ScheduledQueryRulesClientAPI
 type TenantActivityLogsClientAPI = original.TenantActivityLogsClientAPI
+type VMInsightsClientAPI = original.VMInsightsClientAPI

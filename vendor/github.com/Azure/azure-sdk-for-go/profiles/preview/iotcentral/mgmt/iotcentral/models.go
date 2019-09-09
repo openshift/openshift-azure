@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,6 +44,10 @@ type AppListResultPage = original.AppListResultPage
 type AppPatch = original.AppPatch
 type AppProperties = original.AppProperties
 type AppSkuInfo = original.AppSkuInfo
+type AppTemplate = original.AppTemplate
+type AppTemplatesResult = original.AppTemplatesResult
+type AppTemplatesResultIterator = original.AppTemplatesResultIterator
+type AppTemplatesResultPage = original.AppTemplatesResultPage
 type AppsClient = original.AppsClient
 type AppsCreateOrUpdateFuture = original.AppsCreateOrUpdateFuture
 type AppsDeleteFuture = original.AppsDeleteFuture
@@ -68,6 +72,12 @@ func NewAppListResultIterator(page AppListResultPage) AppListResultIterator {
 }
 func NewAppListResultPage(getNextPage func(context.Context, AppListResult) (AppListResult, error)) AppListResultPage {
 	return original.NewAppListResultPage(getNextPage)
+}
+func NewAppTemplatesResultIterator(page AppTemplatesResultPage) AppTemplatesResultIterator {
+	return original.NewAppTemplatesResultIterator(page)
+}
+func NewAppTemplatesResultPage(getNextPage func(context.Context, AppTemplatesResult) (AppTemplatesResult, error)) AppTemplatesResultPage {
+	return original.NewAppTemplatesResultPage(getNextPage)
 }
 func NewAppsClient(subscriptionID string) AppsClient {
 	return original.NewAppsClient(subscriptionID)

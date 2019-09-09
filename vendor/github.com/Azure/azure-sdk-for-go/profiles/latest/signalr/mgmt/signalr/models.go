@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -61,11 +61,13 @@ const (
 
 type BaseClient = original.BaseClient
 type Client = original.Client
+type CorsSettings = original.CorsSettings
 type CreateOrUpdateFuture = original.CreateOrUpdateFuture
 type CreateOrUpdateProperties = original.CreateOrUpdateProperties
 type CreateParameters = original.CreateParameters
 type DeleteFuture = original.DeleteFuture
 type Dimension = original.Dimension
+type Feature = original.Feature
 type Keys = original.Keys
 type MetricSpecification = original.MetricSpecification
 type NameAvailability = original.NameAvailability
@@ -86,6 +88,7 @@ type ResourceListIterator = original.ResourceListIterator
 type ResourceListPage = original.ResourceListPage
 type ResourceSku = original.ResourceSku
 type ResourceType = original.ResourceType
+type RestartFuture = original.RestartFuture
 type ServiceSpecification = original.ServiceSpecification
 type TrackedResource = original.TrackedResource
 type UpdateFuture = original.UpdateFuture

@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,13 +47,6 @@ const (
 	ValidationFailure ErrorCodeType = original.ValidationFailure
 )
 
-type KnowledgebaseEnvironmentType = original.KnowledgebaseEnvironmentType
-
-const (
-	KnowledgebaseEnvironmentTypeProd KnowledgebaseEnvironmentType = original.KnowledgebaseEnvironmentTypeProd
-	KnowledgebaseEnvironmentTypeTest KnowledgebaseEnvironmentType = original.KnowledgebaseEnvironmentTypeTest
-)
-
 type OperationStateType = original.OperationStateType
 
 const (
@@ -63,14 +56,19 @@ const (
 	Succeeded  OperationStateType = original.Succeeded
 )
 
+type ActiveLearningSettingsDTO = original.ActiveLearningSettingsDTO
 type AlterationsClient = original.AlterationsClient
 type AlterationsDTO = original.AlterationsDTO
 type BaseClient = original.BaseClient
+type ContextDTO = original.ContextDTO
 type CreateKbDTO = original.CreateKbDTO
 type CreateKbInputDTO = original.CreateKbInputDTO
 type DeleteKbContentsDTO = original.DeleteKbContentsDTO
 type EndpointKeysClient = original.EndpointKeysClient
 type EndpointKeysDTO = original.EndpointKeysDTO
+type EndpointSettingsClient = original.EndpointSettingsClient
+type EndpointSettingsDTO = original.EndpointSettingsDTO
+type EndpointSettingsDTOActiveLearning = original.EndpointSettingsDTOActiveLearning
 type Error = original.Error
 type ErrorResponse = original.ErrorResponse
 type ErrorResponseError = original.ErrorResponseError
@@ -82,9 +80,14 @@ type KnowledgebasesDTO = original.KnowledgebasesDTO
 type MetadataDTO = original.MetadataDTO
 type Operation = original.Operation
 type OperationsClient = original.OperationsClient
+type PromptDTO = original.PromptDTO
+type PromptDTOQna = original.PromptDTOQna
 type QnADTO = original.QnADTO
+type QnADTOContext = original.QnADTOContext
 type QnADocumentsDTO = original.QnADocumentsDTO
 type ReplaceKbDTO = original.ReplaceKbDTO
+type String = original.String
+type UpdateContextDTO = original.UpdateContextDTO
 type UpdateKbContentsDTO = original.UpdateKbContentsDTO
 type UpdateKbOperationDTO = original.UpdateKbOperationDTO
 type UpdateKbOperationDTOAdd = original.UpdateKbOperationDTOAdd
@@ -92,6 +95,7 @@ type UpdateKbOperationDTODelete = original.UpdateKbOperationDTODelete
 type UpdateKbOperationDTOUpdate = original.UpdateKbOperationDTOUpdate
 type UpdateMetadataDTO = original.UpdateMetadataDTO
 type UpdateQnaDTO = original.UpdateQnaDTO
+type UpdateQnaDTOContext = original.UpdateQnaDTOContext
 type UpdateQnaDTOMetadata = original.UpdateQnaDTOMetadata
 type UpdateQnaDTOQuestions = original.UpdateQnaDTOQuestions
 type UpdateQuestionsDTO = original.UpdateQuestionsDTO
@@ -105,6 +109,9 @@ func NewAlterationsClient(endpoint string) AlterationsClient {
 }
 func NewEndpointKeysClient(endpoint string) EndpointKeysClient {
 	return original.NewEndpointKeysClient(endpoint)
+}
+func NewEndpointSettingsClient(endpoint string) EndpointSettingsClient {
+	return original.NewEndpointSettingsClient(endpoint)
 }
 func NewKnowledgebaseClient(endpoint string) KnowledgebaseClient {
 	return original.NewKnowledgebaseClient(endpoint)
@@ -120,9 +127,6 @@ func PossibleEnvironmentTypeValues() []EnvironmentType {
 }
 func PossibleErrorCodeTypeValues() []ErrorCodeType {
 	return original.PossibleErrorCodeTypeValues()
-}
-func PossibleKnowledgebaseEnvironmentTypeValues() []KnowledgebaseEnvironmentType {
-	return original.PossibleKnowledgebaseEnvironmentTypeValues()
 }
 func PossibleOperationStateTypeValues() []OperationStateType {
 	return original.PossibleOperationStateTypeValues()
