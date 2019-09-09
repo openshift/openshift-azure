@@ -151,16 +151,6 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 		return nil, err
 	}
 
-	var errs []error
-	if isAdmin {
-		errs = p.ValidateAdmin(ctx, cs, oldCs)
-	} else {
-		errs = p.Validate(ctx, cs, oldCs, true)
-	}
-	if len(errs) > 0 {
-		return nil, kerrors.NewAggregate(errs)
-	}
-
 	// the real RP is responsible for validating ClusterVersion and twiddling
 	// PluginVersion; this is our fake equivalent
 	switch {
@@ -175,6 +165,16 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 		}
 		cs.Properties.ClusterVersion = ""
 		cs.Config.PluginVersion = "latest"
+	}
+
+	var errs []error
+	if isAdmin {
+		errs = p.ValidateAdmin(ctx, cs, oldCs)
+	} else {
+		errs = p.Validate(ctx, cs, oldCs, true)
+	}
+	if len(errs) > 0 {
+		return nil, kerrors.NewAggregate(errs)
 	}
 
 	log.Info("setting up DNS")
