@@ -27,7 +27,7 @@ type Interface interface {
 
 func New(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (Interface, error) {
 	switch cs.Config.PluginVersion {
-	case "v5.1", "v5.2":
+	case "v5.1", "v5.2", "v4.4", "v4.3":
 		return v5.New(ctx, log, cs, testConfig), nil
 	case "v6.0":
 		return v6.New(ctx, log, cs, testConfig), nil
