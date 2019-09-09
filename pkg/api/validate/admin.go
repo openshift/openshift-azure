@@ -70,6 +70,7 @@ func (v *AdminAPIValidator) validateUpdateContainerService(cs, oldCs *api.OpenSh
 	old.Properties.ClusterVersion = cs.Properties.ClusterVersion
 
 	old.Config.ComponentLogLevel = cs.Config.ComponentLogLevel
+	old.Config.PluginVersion = cs.Config.PluginVersion
 
 	old.Config.ImageOffer = cs.Config.ImageOffer
 	old.Config.ImagePublisher = cs.Config.ImagePublisher

@@ -55,7 +55,7 @@ func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedClu
 
 	// if this is an update and not an upgrade, check if we can service it, and
 	// if not, fail early
-	if old != nil && new.Config.PluginVersion != "latest" {
+	if old != nil && new.Properties.ClusterVersion != "latest" {
 		_, err := p.configInterfaceFactory(new)
 		if err != nil {
 			errs = append(errs, fmt.Errorf(`cluster with version %q cannot be updated by resource provider with version %q`, new.Config.PluginVersion, p.pluginConfig.PluginVersion))
