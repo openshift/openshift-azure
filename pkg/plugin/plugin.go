@@ -75,7 +75,7 @@ func (p *plugin) ValidateAdmin(ctx context.Context, new, old *api.OpenShiftManag
 
 	// if this is an update and not an upgrade, check if we can service it, and
 	// if not, fail early
-	if old != nil && new.Config.PluginVersion != "latest" {
+	if old != nil && new.Properties.ClusterVersion != "latest" {
 		_, err := p.configInterfaceFactory(new)
 		if err != nil {
 			errs = append(errs, fmt.Errorf(`cluster with version %q cannot be updated by resource provider with version %q`, new.Config.PluginVersion, p.pluginConfig.PluginVersion))
@@ -213,6 +213,12 @@ func (p *plugin) createOrUpdateExt(ctx context.Context, cs *api.OpenShiftManaged
 	isUpdate := true
 	if updateType == updateTypeCreate {
 		isUpdate = false
+	}
+
+	switch cs.Config.PluginVersion {
+	case "v4.4", "v4.3":
+		backupEtcd = false
+	default:
 	}
 
 	if backupEtcd && isUpdate {
