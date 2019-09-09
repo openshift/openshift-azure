@@ -3,6 +3,7 @@ package kubeclient
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Azure/go-autorest/autorest/to"
@@ -29,10 +30,18 @@ func (u *Kubeclientset) BackupCluster(ctx context.Context, backupName string) er
 	}
 
 	job.Spec.BackoffLimit = to.Int32Ptr(0)
-	job.Spec.Template.Spec.Containers[0].Args = []string{
-		"etcdbackup",
-		fmt.Sprintf("--blobName=%s", backupName),
-		"--action=save",
+
+	// Special code to make etcd backup work for v4+ branches
+	// if image is etcdbackup - old cluster
+	// else - new
+	if strings.Contains(cronjob.Spec.JobTemplate.Spec.Template.Spec.Containers[0].Image, "etcdbackup") {
+		job.Spec.Template.Spec.Containers[0].Args = []string{fmt.Sprintf("-blobname=%s", backupName), "save"}
+	} else {
+		job.Spec.Template.Spec.Containers[0].Args = []string{
+			"etcdbackup",
+			fmt.Sprintf("--blobName=%s", backupName),
+			"--action=save",
+		}
 	}
 
 	job, err = u.Client.BatchV1().Jobs(job.Namespace).Create(job)
