@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Azure/go-autorest/autorest/azure"
+
 	"github.com/openshift/openshift-azure/pkg/api"
 	derivedpkg "github.com/openshift/openshift-azure/pkg/util/derived"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
