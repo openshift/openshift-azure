@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 
+	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/ghodss/yaml"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -246,7 +247,10 @@ var translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.resourceGroupName"),
-			Template:   "{{ .ContainerService.Properties.AzProfile.ResourceGroup }}",
+			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
+				res, err := azure.ParseResourceID(cs.ID)
+				return res.ResourceGroup, err
+			},
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
