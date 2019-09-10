@@ -104,17 +104,17 @@ func TestHashScaleSetStability(t *testing.T) {
 			{
 				role: api.AgentPoolProfileRoleMaster,
 				// this value should not change
-				expectedHash: "97f2df6ea4f06fdc97a9d51b20dc99d6ccccef6066598cd7a84e81e2c1023a5a",
+				expectedHash: "d487b62136a4f5e0d603ec2c0e0074366850fc16b04f1181d7dab9a53707c916",
 			},
 			{
 				role: api.AgentPoolProfileRoleInfra,
 				// this value should not change
-				expectedHash: "d394d36d1877d19543005c576555ecd21f870d561d7335ac0b3b6c359ade3068",
+				expectedHash: "e36358c9f1a05cc7d9cd7dd58d1a5ef0145b15c710979817dcfe1c4edd911878",
 			},
 			{
 				role: api.AgentPoolProfileRoleCompute,
 				// this value should not change
-				expectedHash: "65dd51765052c68af16813eba697a6ec40206aacb7151a6e986caf2ca8b11ae7",
+				expectedHash: "b02af291c3fe22fb1e289493959a17d42d5bcd69af1166d1dbb24bf80c69da93",
 			},
 		},
 	}
@@ -138,6 +138,7 @@ func TestHashScaleSetStability(t *testing.T) {
 	}
 
 	cs := &api.OpenShiftManagedCluster{
+		ID: "subscriptions/foo/resourceGroups/bar/providers/baz/qux/quz",
 		Properties: api.Properties{
 			RouterProfiles: []api.RouterProfile{
 				{},
@@ -219,7 +220,7 @@ func TestHashSyncPodStability(t *testing.T) {
 		},
 		"v7.1": {
 			// this value should not change
-			expectedHash: "6b4f70f02dda1f464fb88f45faa5650c95f5a6cb9584ab34e470bb473af278b5",
+			expectedHash: "13606ac122bf615190ff88d5c358709aaba9228c9e8cab031c058184bd016444",
 		},
 	}
 
@@ -242,6 +243,7 @@ func TestHashSyncPodStability(t *testing.T) {
 	}
 
 	cs := &api.OpenShiftManagedCluster{
+		ID: "subscriptions/foo/resourceGroups/bar/providers/baz/qux/quz",
 		Properties: api.Properties{
 			RouterProfiles: []api.RouterProfile{
 				{},
