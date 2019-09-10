@@ -61,7 +61,7 @@ versions:
     imageSku: osa_311
     imageVersion: 311.129.20190810
     images:
-     alertManager: registry.access.redhat.com/openshift3/prometheus-alertmanager:v3.11.129
+      alertManager: registry.access.redhat.com/openshift3/prometheus-alertmanager:v3.11.129
       ansibleServiceBroker: registry.access.redhat.com/openshift3/ose-ansible-service-broker:v3.11.129
       clusterMonitoringOperator: registry.access.redhat.com/openshift3/ose-cluster-monitoring-operator:v3.11.129
       configReloader: registry.access.redhat.com/openshift3/ose-configmap-reloader:v3.11.129
