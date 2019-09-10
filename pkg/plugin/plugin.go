@@ -54,7 +54,13 @@ func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedClu
 	errs = validator.Validate(new, old, externalOnly)
 
 	// if this is an update and not an upgrade, check if we can service it, and
-	// if not, fail early
+	// if not, fail early. Validation runs before RP defines internal cs.Config.PluginVersion
+	// so we doing checks on external values cs.Properties.ClusterVersion.
+	// Flow is:
+	// run Validate() - validate will check cs.Properties.ClusterVersion
+	// RP sets cs.Properties.ClusterVersion = ""
+	// RP sets cs.Config.PluginVersion = "latest"
+	// run CreateOrUpdate()
 	if old != nil && new.Properties.ClusterVersion != "latest" {
 		_, err := p.configInterfaceFactory(new)
 		if err != nil {

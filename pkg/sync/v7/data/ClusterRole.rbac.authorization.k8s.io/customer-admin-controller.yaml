@@ -28,9 +28,7 @@ rules:
   - user.openshift.io
   resources:
   - groups
-  - users
   verbs:
   - create
   - get
   - update
-  - list

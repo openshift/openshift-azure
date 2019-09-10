@@ -107,13 +107,50 @@ func (s *startup) writeFiles(role api.AgentPoolProfileRole, w writers.Writer, ho
 
 	// load all files into a map, common/ will be first (as it is sorted) and later
 	// role-specific files will overwrite the common ones
-	for _, assetPath := range assetNames {
-		filepath, fileContent, err := s.realFilePathAndContents(assetPath, role)
-		if err != nil {
-			return err
-		}
-		if filepath != "" {
-			filesToWrite[filepath] = fileContent
+	for _, filepath := range assetNames {
+		var tmpl string
+
+		if strings.HasPrefix(filepath, "common/") {
+			b, err := Asset(filepath)
+			if err != nil {
+				return err
+			}
+
+			filepath = strings.TrimPrefix(filepath, "common")
+
+			filesToWrite[filepath] = string(b)
+
+		} else {
+
+			switch role {
+			case api.AgentPoolProfileRoleMaster:
+				if !strings.HasPrefix(filepath, "master/") {
+					continue
+				}
+
+				b, err := Asset(filepath)
+				if err != nil {
+					return err
+				}
+				tmpl = string(b)
+
+				filepath = strings.TrimPrefix(filepath, "master")
+
+			default:
+				if !strings.HasPrefix(filepath, "worker/") {
+					continue
+				}
+
+				b, err := Asset(filepath)
+				if err != nil {
+					return err
+				}
+				tmpl = string(b)
+
+				filepath = strings.TrimPrefix(filepath, "worker")
+			}
+
+			filesToWrite[filepath] = tmpl
 			fileKeys = append(fileKeys, filepath)
 		}
 	}
@@ -136,7 +173,20 @@ func (s *startup) writeFiles(role api.AgentPoolProfileRole, w writers.Writer, ho
 			return err
 		}
 
-		perm := s.filePermissions(filepath)
+		var perm os.FileMode
+		switch {
+		case strings.HasSuffix(filepath, ".key"),
+			strings.HasSuffix(filepath, ".kubeconfig"),
+			filepath == "/etc/origin/cloudprovider/azure.conf",
+			filepath == "/etc/origin/master/client.secret",
+			filepath == "/etc/origin/master/session-secrets.yaml",
+			filepath == "/var/lib/origin/.docker/config.json",
+			filepath == "/root/.kube/config":
+			perm = 0600
+		default:
+			perm = 0644
+		}
+
 		filepath = "/host" + filepath
 
 		parentDir := path.Dir(filepath)
@@ -152,42 +202,4 @@ func (s *startup) writeFiles(role api.AgentPoolProfileRole, w writers.Writer, ho
 	}
 
 	return w.Close()
-}
-
-func (s *startup) realFilePathAndContents(assetPath string, role api.AgentPoolProfileRole) (string, string, error) {
-	prefix := strings.Split(assetPath, "/")[0]
-	if prefix != "common" {
-		switch role {
-		case api.AgentPoolProfileRoleMaster:
-			if prefix != "master" {
-				return "", "", nil // skip
-			}
-		default:
-			if prefix != "worker" {
-				return "", "", nil // skip
-			}
-		}
-	}
-	b, err := Asset(assetPath)
-	if err != nil {
-		return "", "", err
-	}
-	return strings.TrimPrefix(assetPath, prefix), string(b), nil
-}
-
-func (s *startup) filePermissions(filepath string) os.FileMode {
-	var perm os.FileMode
-	switch {
-	case strings.HasSuffix(filepath, ".key"),
-		strings.HasSuffix(filepath, ".kubeconfig"),
-		filepath == "/etc/origin/cloudprovider/azure.conf",
-		filepath == "/etc/origin/master/client.secret",
-		filepath == "/etc/origin/master/session-secrets.yaml",
-		filepath == "/var/lib/origin/.docker/config.json",
-		filepath == "/root/.kube/config":
-		perm = 0600
-	default:
-		perm = 0644
-	}
-	return perm
 }
