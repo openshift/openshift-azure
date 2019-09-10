@@ -59,6 +59,7 @@ func (u *Upgrade) WriteStartupBlobs() error {
 	}
 
 	workerCS := &api.OpenShiftManagedCluster{
+		ID:   u.Cs.ID,
 		Name: u.Cs.Name,
 		Properties: api.Properties{
 			WorkerServicePrincipalProfile: api.ServicePrincipalProfile{
