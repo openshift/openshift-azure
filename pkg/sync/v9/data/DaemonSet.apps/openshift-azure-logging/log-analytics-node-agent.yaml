@@ -26,9 +26,7 @@ spec:
           value: '*** GENERATED ***'
         - name: KEY
           value: '*** GENERATED ***'
-        - name: AKS_RESOURCE_ID
-          value: '*** GENERATED ***'
-        - name: AKS_REGION
+        - name: ACS_RESOURCE_NAME
           value: '*** GENERATED ***'
         - name: CONTROLLER_TYPE
           value: DaemonSet

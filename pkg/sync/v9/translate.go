@@ -348,14 +348,6 @@ var translations = map[string][]struct {
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='ACS_RESOURCE_NAME')].value"),
 			Template: "{{ .ContainerService.Name }}",
 		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='AKS_RESOURCE_ID')].value"),
-			Template: "{{ .ContainerService.ID }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='AKS_REGION')].value"),
-			Template: "{{ .ContainerService.Location }}",
-		},
 	},
 	"DaemonSet.apps/openshift-template-service-broker/apiserver": {
 		{
@@ -410,14 +402,6 @@ var translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='ACS_RESOURCE_NAME')].value"),
 			Template: "{{ .ContainerService.Name }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='AKS_RESOURCE_ID')].value"),
-			Template: "{{ .ContainerService.ID }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='AKS_REGION')].value"),
-			Template: "{{ .ContainerService.Location }}",
 		},
 	},
 	"Deployment.apps/default/registry-console": {
