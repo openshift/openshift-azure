@@ -25,7 +25,7 @@ func ensureRoleDefinitions(ctx context.Context, log *logrus.Entry) error {
 
 	_, err = cli.CreateOrUpdate(ctx, "/subscriptions/"+os.Getenv("AZURE_SUBSCRIPTION_ID"), fakerp.OSAMasterRoleDefinitionID, azauthorization.RoleDefinition{
 		Name: to.StringPtr(fakerp.OSAMasterRoleDefinitionID),
-		Properties: &azauthorization.RoleDefinitionProperties{
+		RoleDefinitionProperties: &azauthorization.RoleDefinitionProperties{
 			RoleName: to.StringPtr("OSA Master"),
 			Permissions: &[]azauthorization.Permission{
 				{
@@ -65,7 +65,7 @@ func ensureRoleDefinitions(ctx context.Context, log *logrus.Entry) error {
 
 	_, err = cli.CreateOrUpdate(ctx, "/subscriptions/"+os.Getenv("AZURE_SUBSCRIPTION_ID"), fakerp.OSAWorkerRoleDefinitionID, azauthorization.RoleDefinition{
 		Name: to.StringPtr(fakerp.OSAMasterRoleDefinitionID),
-		Properties: &azauthorization.RoleDefinitionProperties{
+		RoleDefinitionProperties: &azauthorization.RoleDefinitionProperties{
 			RoleName: to.StringPtr("OSA Worker"),
 			Permissions: &[]azauthorization.Permission{
 				{

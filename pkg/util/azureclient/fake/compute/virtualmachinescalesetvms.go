@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Azure/azure-sdk-for-go/profiles/latest/compute/mgmt/compute"
 	azcompute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/sirupsen/logrus"
@@ -57,7 +56,7 @@ func (v *FakeVirtualMachineScaleSetVMsClient) List(ctx context.Context, resource
 }
 
 // Reimage Fakes base method
-func (v *FakeVirtualMachineScaleSetVMsClient) Reimage(ctx context.Context, resourceGroupName, VMScaleSetName, instanceID string, VMScaleSetVMReimageInput *compute.VirtualMachineScaleSetVMReimageParameters) error {
+func (v *FakeVirtualMachineScaleSetVMsClient) Reimage(ctx context.Context, resourceGroupName, VMScaleSetName, instanceID string, VMScaleSetVMReimageInput *azcompute.VirtualMachineScaleSetVMReimageParameters) error {
 	v.rp.Calls = append(v.rp.Calls, "VirtualMachineScaleSetVMsClient:Reimage:"+VMScaleSetName+":"+instanceID)
 	for _, vm := range v.rp.Vms[VMScaleSetName] {
 		if *vm.InstanceID == instanceID {

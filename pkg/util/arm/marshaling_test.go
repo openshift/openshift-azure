@@ -6,6 +6,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
 	"github.com/Azure/go-autorest/autorest/to"
+
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 )
 
