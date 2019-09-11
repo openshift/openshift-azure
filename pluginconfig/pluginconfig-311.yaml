@@ -55,6 +55,7 @@ versions:
       startup: quay.io/openshift-on-azure/azure:v7.0
       sync: quay.io/openshift-on-azure/azure:v7.0
       tlsProxy: quay.io/openshift-on-azure/azure:v7.0
+      logAnalyticsAgent: mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod07092019
   v7.1:
     imageOffer: osa
     imagePublisher: redhat
@@ -94,8 +95,9 @@ versions:
       metricsBridge: quay.io/openshift-on-azure/azure:v7.1
       startup: quay.io/openshift-on-azure/azure:v7.1
       sync: quay.io/openshift-on-azure/azure:v7.1
-      tlsProxy: quay.io/openshift-on-azure/azure:v7.1  
-  v8.0:
+      tlsProxy: quay.io/openshift-on-azure/azure:v7.1
+      logAnalyticsAgent: mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod07092019
+  v9.0:
     imageOffer: osa
     imagePublisher: redhat
     imageSku: osa_311

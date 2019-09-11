@@ -4,6 +4,8 @@ import (
 	"crypto/x509"
 	"fmt"
 
+	"github.com/Azure/go-autorest/autorest/azure"
+
 	"github.com/openshift/openshift-azure/pkg/api"
 	derivedpkg "github.com/openshift/openshift-azure/pkg/util/derived"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
@@ -62,11 +64,16 @@ func (derivedType) KubeReserved(cs *api.OpenShiftManagedCluster, role api.AgentP
 }
 
 func (derivedType) MasterCloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
-	return derivedpkg.MasterCloudProviderConf(cs, true)
+	return derivedpkg.MasterCloudProviderConf(cs, false)
 }
 
 func (derivedType) WorkerCloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
-	return derivedpkg.WorkerCloudProviderConf(cs, true)
+	return derivedpkg.WorkerCloudProviderConf(cs, false)
+}
+
+func (derivedType) CustomerResourceGroup(ID string) (string, error) {
+	res, err := azure.ParseResourceID(ID)
+	return res.ResourceGroup, err
 }
 
 // MaxDataDisksPerVM is a stopgap until k8s 1.12.  It requires that a cluster

@@ -214,7 +214,7 @@ func TestHashSyncPodStability(t *testing.T) {
 	for version, tt := range tests {
 		cs.Config.PluginVersion = version
 		switch cs.Config.PluginVersion {
-		case "v7.0":
+		case "v7.0", "v7.1":
 			cs.Config.Images.Console = ""
 		default:
 			// needed by derived.OpenShiftClientVersion()
