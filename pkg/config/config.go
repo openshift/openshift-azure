@@ -14,6 +14,7 @@ import (
 	v5 "github.com/openshift/openshift-azure/pkg/config/v5"
 	v6 "github.com/openshift/openshift-azure/pkg/config/v6"
 	v7 "github.com/openshift/openshift-azure/pkg/config/v7"
+	v71 "github.com/openshift/openshift-azure/pkg/config/v71"
 )
 
 type Interface interface {
@@ -30,6 +31,8 @@ func New(cs *api.OpenShiftManagedCluster) (Interface, error) {
 		return v6.New(cs), nil
 	case "v7.0":
 		return v7.New(cs), nil
+	case "v7.1":
+		return v71.New(cs), nil
 	}
 
 	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)

@@ -1,0 +1,49 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    authorization.openshift.io/system-only: "true"
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  name: system:openshift:controller:deployer-controller
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - replicationcontrollers
+  verbs:
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - replicationcontrollers
+  verbs:
+  - get
+  - list
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - replicationcontrollers/scale
+  verbs:
+  - get
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
