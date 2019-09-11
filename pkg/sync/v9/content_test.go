@@ -239,6 +239,10 @@ func handleTemplates(index index) error {
 			if file == "project-request.yaml" {
 				continue
 			}
+			// strimzi templates are retrieved from a different source (access.redhat.com)
+			if strings.Contains(file, "strimzi-") {
+				continue
+			}
 			err = os.Remove("data/Template.template.openshift.io/openshift/" + file)
 			if err != nil {
 				return err
