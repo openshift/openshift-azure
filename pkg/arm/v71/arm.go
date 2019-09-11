@@ -55,7 +55,7 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 	}
 	for _, app := range g.cs.Properties.AgentPoolProfiles {
 		if app.Role == api.AgentPoolProfileRoleMaster || !isUpdate {
-			vmss, err := g.Vmss(&app, backupBlob, suffix)
+			vmss, err := vmss(g.cs, &app, backupBlob, suffix, g.testConfig)
 			if err != nil {
 				return nil, err
 			}

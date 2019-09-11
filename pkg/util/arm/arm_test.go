@@ -24,7 +24,7 @@ func TestFixupDepends(t *testing.T) {
 		{
 			name: "have deps, but missing resources",
 			resources: []interface{}{
-				&network.LoadBalancer{
+				&LoadBalancer{
 					LoadBalancerPropertiesFormat: &network.LoadBalancerPropertiesFormat{
 						FrontendIPConfigurations: &[]network.FrontendIPConfiguration{
 							{
@@ -50,11 +50,11 @@ func TestFixupDepends(t *testing.T) {
 		{
 			name: "have deps and dependent resources",
 			resources: []interface{}{
-				&network.PublicIPAddress{
+				&PublicIPAddress{
 					Name: to.StringPtr("ip-apiserver"),
 					Type: to.StringPtr("Microsoft.Network/publicIPAddresses"),
 				},
-				&network.LoadBalancer{
+				&LoadBalancer{
 					LoadBalancerPropertiesFormat: &network.LoadBalancerPropertiesFormat{
 						FrontendIPConfigurations: &[]network.FrontendIPConfiguration{
 							{
