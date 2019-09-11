@@ -7,7 +7,7 @@
         <Identity tenantNameAlias="ResourceName">
             <IdentityComponent name="Region">{{ .ContainerService.Location | XMLEscape }}</IdentityComponent>
             <IdentityComponent name="SubscriptionId">{{ .ContainerService.Properties.AzProfile.SubscriptionID | XMLEscape }}</IdentityComponent>
-            <IdentityComponent name="ResourceGroupName">{{ .ContainerService.Properties.AzProfile.ResourceGroup | XMLEscape }}</IdentityComponent>
+            <IdentityComponent name="ResourceGroupName">{{ .Derived.CustomerResourceGroup .ContainerService.ID | XMLEscape }}</IdentityComponent>
             <IdentityComponent name="ResourceName">{{ .ContainerService.Name | XMLEscape }}</IdentityComponent>
             <IdentityComponent name="Role">{{ .Role }}</IdentityComponent>
             <IdentityComponent name="RoleInstance" useComputerName="true"/>

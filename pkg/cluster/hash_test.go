@@ -70,6 +70,7 @@ func TestHashScaleSetStability(t *testing.T) {
 	}
 
 	cs := &api.OpenShiftManagedCluster{
+		ID: "subscriptions/foo/resourceGroups/bar/providers/baz/qux/quz",
 		Properties: api.Properties{
 			RouterProfiles: []api.RouterProfile{
 				{},
@@ -158,6 +159,7 @@ func TestHashSyncPodStability(t *testing.T) {
 	}
 
 	cs := &api.OpenShiftManagedCluster{
+		ID: "subscriptions/foo/resourceGroups/bar/providers/baz/qux/quz",
 		Properties: api.Properties{
 			RouterProfiles: []api.RouterProfile{
 				{},
