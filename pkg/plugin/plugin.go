@@ -224,12 +224,6 @@ func (p *plugin) createOrUpdateExt(ctx context.Context, cs *api.OpenShiftManaged
 		isUpdate = false
 	}
 
-	switch cs.Config.PluginVersion {
-	case "v4.4", "v4.3":
-		backupEtcd = false
-	default:
-	}
-
 	if backupEtcd && isUpdate {
 		path := fmt.Sprintf("pre-update-%s", time.Now().UTC().Format("2006-01-02T15-04-05"))
 		err := p.BackupEtcdCluster(ctx, cs, path)
