@@ -49,6 +49,23 @@ func TestHashScaleSetStability(t *testing.T) {
 				expectedHash: "78dd1e1c4d1c80cb1aa20d448daebe9cc378c50c8c65c300814eb2a944046362",
 			},
 		},
+		"v7.1": {
+			{
+				role: api.AgentPoolProfileRoleMaster,
+				// this value should not change
+				expectedHash: "d487b62136a4f5e0d603ec2c0e0074366850fc16b04f1181d7dab9a53707c916",
+			},
+			{
+				role: api.AgentPoolProfileRoleInfra,
+				// this value should not change
+				expectedHash: "e36358c9f1a05cc7d9cd7dd58d1a5ef0145b15c710979817dcfe1c4edd911878",
+			},
+			{
+				role: api.AgentPoolProfileRoleCompute,
+				// this value should not change
+				expectedHash: "b02af291c3fe22fb1e289493959a17d42d5bcd69af1166d1dbb24bf80c69da93",
+			},
+		},
 	}
 
 	// check we're testing all versions in our pluginconfig
@@ -138,6 +155,10 @@ func TestHashSyncPodStability(t *testing.T) {
 			// this value should not change
 			expectedHash: "40f9a51d8328ad65e4cdda62e460b53a6b2a5b71908f43220f4a17685c49d562",
 		},
+		"v7.1": {
+			// this value should not change
+			expectedHash: "13606ac122bf615190ff88d5c358709aaba9228c9e8cab031c058184bd016444",
+		},
 	}
 
 	// check we're testing all versions in our pluginconfig
@@ -193,7 +214,7 @@ func TestHashSyncPodStability(t *testing.T) {
 	for version, tt := range tests {
 		cs.Config.PluginVersion = version
 		switch cs.Config.PluginVersion {
-		case "v7.0":
+		case "v7.0", "v7.1":
 			cs.Config.Images.Console = ""
 		default:
 			// needed by derived.OpenShiftClientVersion()

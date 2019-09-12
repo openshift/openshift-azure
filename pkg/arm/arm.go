@@ -15,6 +15,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	v7 "github.com/openshift/openshift-azure/pkg/arm/v7"
+	v71 "github.com/openshift/openshift-azure/pkg/arm/v71"
 	v9 "github.com/openshift/openshift-azure/pkg/arm/v9"
 )
 
@@ -28,6 +29,8 @@ func New(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster
 	switch cs.Config.PluginVersion {
 	case "v7.0":
 		return v7.New(ctx, log, cs, testConfig), nil
+	case "v7.1":
+		return v71.New(ctx, log, cs, testConfig), nil
 	case "v9.0":
 		return v9.New(ctx, log, cs, testConfig), nil
 	}

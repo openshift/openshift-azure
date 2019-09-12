@@ -57,8 +57,17 @@ func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedClu
 	errs = validator.Validate(new, old, externalOnly)
 
 	// if this is an update and not an upgrade, check if we can service it, and
-	// if not, fail early
-	if old != nil && new.Config.PluginVersion != "latest" {
+	// if not, fail early.  Validation runs on the front end before RP cascades
+	// ClusterVersion "latest" to PluginVersion "latest", *and* on the back end
+	// after the cascade but before GenerateConfig.
+	// Flow is:
+	// run Validate() - test can fire on cs.Properties.ClusterVersion
+	// RP sets cs.Properties.ClusterVersion = "aro.123"
+	// RP sets cs.Config.PluginVersion = "latest"
+	// run Validate() - test can fire on cs.Properties.PluginVersion
+	// run GenerateConfig()
+	// run CreateOrUpdate()
+	if old != nil && new.Properties.ClusterVersion != "latest" && new.Config.PluginVersion != "latest" {
 		_, err := p.configInterfaceFactory(new)
 		if err != nil {
 			errs = append(errs, fmt.Errorf(`cluster with version %q cannot be updated by resource provider with version %q`, new.Config.PluginVersion, p.pluginConfig.PluginVersion))
@@ -74,8 +83,8 @@ func (p *plugin) ValidateAdmin(ctx context.Context, new, old *api.OpenShiftManag
 	errs = validator.Validate(new, old)
 
 	// if this is an update and not an upgrade, check if we can service it, and
-	// if not, fail early
-	if old != nil && new.Config.PluginVersion != "latest" {
+	// if not, fail early.  See comments above in Validate().
+	if old != nil && new.Properties.ClusterVersion != "latest" && new.Config.PluginVersion != "latest" {
 		_, err := p.configInterfaceFactory(new)
 		if err != nil {
 			errs = append(errs, fmt.Errorf(`cluster with version %q cannot be updated by resource provider with version %q`, new.Config.PluginVersion, p.pluginConfig.PluginVersion))

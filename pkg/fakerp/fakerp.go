@@ -207,8 +207,20 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 		}
 	}
 
-	if !isAdmin {
-		errs = p.Validate(ctx, cs, oldCs, false)
+	if isAdmin {
+		// This usage is incorrect and is effectively almost but not quite a
+		// no-op, but it mirrors what the real RP actually does.  In reality we
+		// would expect the real RP not to call ValidateAdmin() again, or to set
+		// the third argument here (oldCs) to nil (since it doesn't have access
+		// to oldCs any more), but as our admin validation code doesn't support
+		// a nil oldCs on ValidateAdmin, the RP sets it to cs.
+		errs = p.ValidateAdmin(ctx, cs, cs)
+	} else {
+		// This call is not a no-op: it additionally validates all the fields
+		// dynamically created by the RP (azmosa.io dns, etc.).  To be true to
+		// the real RP, we pass nil here instead of oldCs, because the real RP
+		// doesn't have access to oldCs on the backend.
+		errs = p.Validate(ctx, cs, nil, false)
 	}
 	if len(errs) > 0 {
 		return nil, kerrors.NewAggregate(errs)
