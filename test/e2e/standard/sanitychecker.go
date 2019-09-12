@@ -73,7 +73,7 @@ func NewSanityChecker(ctx context.Context, log *logrus.Entry, cs *internalapi.Op
 func (sc *SanityChecker) CreateTestApp(ctx context.Context) (interface{}, []*TestError) {
 	var errs []*TestError
 	sc.Log.Debugf("creating openshift project for test apps")
-	namespace, err := sc.createProject(ctx)
+	namespace, err := sc.CreateProject(ctx)
 	if err != nil {
 		sc.Log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "createProject"})
@@ -216,15 +216,15 @@ func (sc *SanityChecker) ValidateCluster(ctx context.Context) (errs []*TestError
 func (sc *SanityChecker) DeleteTestApp(ctx context.Context, cookie interface{}) []*TestError {
 	var errs []*TestError
 	sc.Log.Debugf("deleting openshift project for test apps")
-	err := sc.deleteProject(ctx, cookie.(string))
+	err := sc.DeleteProject(ctx, cookie.(string))
 	if err != nil {
 		sc.Log.Error(err)
-		errs = append(errs, &TestError{Err: err, Bucket: "deleteProject"})
+		errs = append(errs, &TestError{Err: err, Bucket: "DeleteProject"})
 	}
 	return errs
 }
 
-func (sc *SanityChecker) createProject(ctx context.Context) (string, error) {
+func (sc *SanityChecker) CreateProject(ctx context.Context) (string, error) {
 	template, err := random.LowerCaseAlphanumericString(5)
 	if err != nil {
 		return "", err
@@ -237,7 +237,7 @@ func (sc *SanityChecker) createProject(ctx context.Context) (string, error) {
 	return namespace, nil
 }
 
-func (sc *SanityChecker) deleteProject(ctx context.Context, namespace string) error {
+func (sc *SanityChecker) DeleteProject(ctx context.Context, namespace string) error {
 	err := sc.Client.EndUser.CleanupProject(namespace)
 	if err != nil {
 		return err

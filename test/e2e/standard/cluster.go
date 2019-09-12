@@ -96,11 +96,11 @@ func (sc *SanityChecker) checkNodesLabelledCorrectly(ctx context.Context) error 
 }
 
 func (sc *SanityChecker) checkDisallowsPdbMutations(ctx context.Context) error {
-	namespace, err := sc.createProject(ctx)
+	namespace, err := sc.CreateProject(ctx)
 	if err != nil {
 		return err
 	}
-	defer sc.deleteProject(ctx, namespace)
+	defer sc.DeleteProject(ctx, namespace)
 
 	maxUnavailable := intstr.FromInt(1)
 	selector, err := metav1.ParseToLabelSelector("key=value")
@@ -186,11 +186,11 @@ func (sc *SanityChecker) checkCannotAccessInfraResources(ctx context.Context) er
 }
 
 func (sc *SanityChecker) checkCanDeployRedhatIoImages(ctx context.Context) error {
-	namespace, err := sc.createProject(ctx)
+	namespace, err := sc.CreateProject(ctx)
 	if err != nil {
 		return err
 	}
-	defer sc.deleteProject(ctx, namespace)
+	defer sc.DeleteProject(ctx, namespace)
 
 	// nginx 1.14 is in private registry only (so far)
 	deploymentName := "redis-32-rhel7"
@@ -239,11 +239,11 @@ func (sc *SanityChecker) checkCanDeployRedhatIoImages(ctx context.Context) error
 }
 
 func (sc *SanityChecker) checkCanCreateLB(ctx context.Context) error {
-	namespace, err := sc.createProject(ctx)
+	namespace, err := sc.CreateProject(ctx)
 	if err != nil {
 		return err
 	}
-	defer sc.deleteProject(ctx, namespace)
+	defer sc.DeleteProject(ctx, namespace)
 
 	// create standard external loadbalancer
 	err = sc.createService("elb", namespace, corev1.ServiceTypeLoadBalancer, map[string]string{})
@@ -323,11 +323,11 @@ func (sc *SanityChecker) checkCanAccessServices(ctx context.Context) error {
 }
 
 func (sc *SanityChecker) checkCanUseAzureFileStorage(ctx context.Context) error {
-	namespace, err := sc.createProject(ctx)
+	namespace, err := sc.CreateProject(ctx)
 	if err != nil {
 		return err
 	}
-	defer sc.deleteProject(ctx, namespace)
+	defer sc.DeleteProject(ctx, namespace)
 
 	pvcStorage, err := resource.ParseQuantity("2Gi")
 	if err != nil {
@@ -423,11 +423,11 @@ func (sc *SanityChecker) checkEnforcesEmptyDirQuotas(ctx context.Context) error 
 		return nil
 	}
 
-	namespace, err := sc.createProject(ctx)
+	namespace, err := sc.CreateProject(ctx)
 	if err != nil {
 		return err
 	}
-	defer sc.deleteProject(ctx, namespace)
+	defer sc.DeleteProject(ctx, namespace)
 
 	// create test pod
 	podName := "busybox"
