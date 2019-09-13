@@ -11,6 +11,15 @@ else
     export RESOURCEGROUP=$(awk '/^    resourceGroup:/ { print $2 }' <_data/containerservice.yaml)
 fi
 
+if [[ -z "${ADMIN_MANIFEST}${TEST_IN_PRODUCTION}" ]]; then
+    echo ""
+    echo "ADMIN_MANIFEST is not set, this will only do an empty update"
+    echo ""
+    echo "To do an upgrade set ADMIN_MANIFEST=test/manifests/fakerp/admin-update.yaml"
+    echo "To scale up compute by one set ADMIN_MANIFEST=test/manifests/fakerp/scale.yaml"
+    echo ""
+fi
+
 if [[ -n "$TEST_IN_PRODUCTION" ]]; then
     TEST_IN_PRODUCTION="-use-prod=true"
 else
