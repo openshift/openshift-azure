@@ -3,6 +3,7 @@ GITCOMMIT=$(shell git describe --tags HEAD)$(shell [[ $$(git status --porcelain)
 LDFLAGS="-X main.gitCommit=$(GITCOMMIT)"
 
 AZURE_IMAGE ?= quay.io/openshift-on-azure/azure:$(GITCOMMIT)
+LATEST_PLUGIN_VERSION=v$(shell ls -d pkg/sync/v* | sed -e 's/.*v//' | tail -1)
 
 .PHONY: all artifacts azure-image azure-push clean create delete e2e generate monitoring monitoring-run monitoring-stop secrets sync-run test testinsights unit upgrade verify vmimage
 
@@ -58,10 +59,11 @@ releasenotes:
 	go build -tags releasenotes ./cmd/$@
 
 content:
-	go test -timeout=300s -tags=content -run=TestContent ./pkg/sync/v$(shell ls -d pkg/sync/v* | sed -e 's/.*v//' | sort -n | tail -1)
-	go generate ./pkg/sync/v$(shell ls -d pkg/sync/v* | sed -e 's/.*v//' | sort -n | tail -1)
+	go test -timeout=300s -tags=content -run=TestContent ./pkg/sync/$(LATEST_PLUGIN_VERSION)
+	go generate ./pkg/sync/$(LATEST_PLUGIN_VERSION)
 
 verify:
+	go test -c -tags=content -run=TestContent ./pkg/sync/$(LATEST_PLUGIN_VERSION) && rm $(LATEST_PLUGIN_VERSION).test
 	./hack/verify/validate-generated.sh
 	go vet ./...
 	./hack/verify/validate-code-format.sh

@@ -23,7 +23,7 @@ import (
 )
 
 func init() {
-	err := imagev1.AddToSchemeInCoreGroup(scheme.Scheme)
+	err := imagev1.DeprecatedInstallWithoutGroup(scheme.Scheme)
 	if err != nil {
 		panic(err)
 	}
