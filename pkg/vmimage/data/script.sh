@@ -69,7 +69,7 @@ poweroff
 rootpw --lock
 text
 timezone Etc/UTC
-url --url=http://$IP:8080/content/dist/rhel/server/7/7.6/x86_64/kickstart
+url --url=http://$IP:8080/content/dist/rhel/server/7/7.7/x86_64/kickstart
 zerombr
 %packages --excludedocs --nocore
 @^minimal
@@ -128,6 +128,9 @@ cat >/var/lib/yum/client-key.pem <<'EOF'
 $(cat client-key.pem)
 EOF
 
+# enable EPEL repo
+yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+
 yum -y update
 yum -y install \
     ansible \
@@ -177,8 +180,10 @@ yum -y install \
     azure-mdsd \
     azure-security \
     azsec-monitor \
+    azsec-clamav \
     fluentd \
-    rubygem-fluent-plugin-systemd
+    rubygem-fluent-plugin-systemd \
+    clamav
 
 # create docker group whose members will have access to /var/run/docker.sock
 groupadd -f docker
