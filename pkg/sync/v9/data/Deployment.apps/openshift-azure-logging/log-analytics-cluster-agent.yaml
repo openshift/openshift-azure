@@ -7,6 +7,7 @@ metadata:
   name: log-analytics-cluster-agent
   namespace: openshift-azure-logging
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: log-analytics-cluster-agent
@@ -33,6 +34,7 @@ spec:
         - name: NODE_IP
           valueFrom:
             fieldRef:
+              apiVersion: v1
               fieldPath: status.hostIP
         image: '*** GENERATED ***'
         livenessProbe:
@@ -58,7 +60,6 @@ spec:
             memory: 225Mi
         securityContext:
           privileged: true
-          runAsGroup: 0
           runAsUser: 0
         volumeMounts:
         - mountPath: /hostfs
