@@ -17,6 +17,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
+	"github.com/openshift/openshift-azure/pkg/util/enrich"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
@@ -202,6 +203,10 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 	if cs.Properties.MonitorProfile.WorkspaceResourceID != "" {
 		log.Info("enabling ContainerInsights solution on the workspace")
 		err = createOrUpdateContainerInsights(ctx, log, cs)
+		if err != nil {
+			return nil, err
+		}
+		err = enrich.MonitorIDAndKey(ctx, clients.workspacesClient, cs)
 		if err != nil {
 			return nil, err
 		}

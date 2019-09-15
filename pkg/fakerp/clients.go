@@ -9,14 +9,16 @@ import (
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/operationalinsights"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
 )
 
 type clients struct {
-	aadMgr      *aadManager
-	dnsMgr      *dnsManager
-	vaultMgr    *vaultManager
-	groupClient resources.GroupsClient
+	aadMgr           *aadManager
+	dnsMgr           *dnsManager
+	vaultMgr         *vaultManager
+	groupClient      resources.GroupsClient
+	workspacesClient operationalinsights.WorkspacesClient
 }
 
 func newClients(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig, conf *client.Config) (*clients, error) {
@@ -39,6 +41,10 @@ func newClients(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManaged
 		return nil, err
 	}
 	c.groupClient = resources.NewGroupsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer)
+	if err != nil {
+		return nil, err
+	}
+	c.workspacesClient = operationalinsights.NewWorkspacesClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer)
 	if err != nil {
 		return nil, err
 	}
