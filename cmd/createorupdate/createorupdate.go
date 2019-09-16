@@ -12,13 +12,14 @@ import (
 	"syscall"
 	"time"
 
+	azgraphrbac "github.com/Azure/azure-sdk-for-go/services/graphrbac/1.6/graphrbac"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	v20190930preview "github.com/openshift/openshift-azure/pkg/api/2019-09-30-preview"
-	admin "github.com/openshift/openshift-azure/pkg/api/admin"
+	"github.com/openshift/openshift-azure/pkg/api/admin"
 	fakerp "github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/aadapp"
@@ -51,7 +52,7 @@ func validate() error {
 		return errors.New("restoring clusters is not supported yet in the production RP")
 	}
 	if *restoreFromBlob != "" && m == http.MethodDelete {
-		return errors.New("cannot restore a cluster while requesting a DELETE?")
+		return errors.New("cannot restore a cluster while requesting a DELETE")
 	}
 	return nil
 }
@@ -164,27 +165,47 @@ func execute(
 	return oc, nil
 }
 
-func updateAadApplication(ctx context.Context, oc *v20190930preview.OpenShiftManagedCluster, log *logrus.Entry, conf *fakerp.Config) error {
+func linkClusterToAadApp(ctx context.Context, log *logrus.Entry, aadClient *graphrbac.ApplicationsClient, aadApp *azgraphrbac.Application, conf *fakerp.Config) error {
 	if len(conf.AADClientID) > 0 && conf.AADClientID != conf.ClientID {
-		log.Info("updating the aad application")
-		graphauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azure.PublicCloud.GraphEndpoint)
-		if err != nil {
-			return fmt.Errorf("cannot get authorizer: %v", err)
+		log.Infof("linked cluster %s to aad object id %s", conf.ResourceGroup, *aadApp.ObjectID)
+		callbackURL := fmt.Sprintf("https://openshift.%s.osadev.cloud/oauth2callback/Azure%%20AD", conf.ResourceGroup)
+		addUrl := func(urls []string, newUrl string) []string {
+			for _, url := range urls {
+				if url == newUrl {
+					return urls
+				}
+			}
+			urls = append(urls, newUrl)
+			return urls
 		}
-
-		aadClient := graphrbac.NewApplicationsClient(ctx, log, conf.TenantID, graphauthorizer)
-		objID, err := aadapp.GetApplicationObjectIDFromAppID(ctx, aadClient, conf.AADClientID)
+		links := addUrl(*aadApp.ReplyUrls, callbackURL)
+		err := aadapp.UpdateAADApp(ctx, *aadClient, *aadApp.ObjectID, links)
 		if err != nil {
-			return err
-		}
-
-		callbackURL := fmt.Sprintf("https://%s/oauth2callback/Azure%%20AD", *oc.Properties.PublicHostname)
-		err = aadapp.UpdateAADApp(ctx, aadClient, objID, callbackURL)
-		if err != nil {
-			return fmt.Errorf("cannot update aad app secret: %v", err)
+			return fmt.Errorf("could not update aad app: %v", err)
 		}
 	}
+	return nil
+}
 
+func unlinkClusterFromAadApp(ctx context.Context, log *logrus.Entry, aadClient *graphrbac.ApplicationsClient, aadApp *azgraphrbac.Application, conf *fakerp.Config) error {
+	if len(conf.AADClientID) > 0 && conf.AADClientID != conf.ClientID {
+		log.Infof("unlinked cluster %s from aad object id %s", conf.ResourceGroup, *aadApp.ObjectID)
+		callbackURL := fmt.Sprintf("https://openshift.%s.osadev.cloud/oauth2callback/Azure%%20AD", conf.ResourceGroup)
+		removeUrl := func(urls []string, deleteUrl string) []string {
+			var newUrls []string
+			for _, url := range urls {
+				if url != deleteUrl {
+					newUrls = append(newUrls, url)
+				}
+			}
+			return newUrls
+		}
+		links := removeUrl(*aadApp.ReplyUrls, callbackURL)
+		err := aadapp.UpdateAADApp(ctx, *aadClient, *aadApp.ObjectID, links)
+		if err != nil {
+			return fmt.Errorf("could not update aad app: %v", err)
+		}
+	}
 	return nil
 }
 
@@ -193,6 +214,7 @@ func main() {
 	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
 	log := logrus.NewEntry(logrus.StandardLogger())
+	ctx := context.Background()
 
 	if err := validate(); err != nil {
 		log.Fatal(err)
@@ -242,10 +264,28 @@ func main() {
 	}
 	v20190930previewClient.Authorizer = authorizer
 
-	ctx := context.Background()
+	// setup the aad clients
+	graphauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azure.PublicCloud.GraphEndpoint)
+	if err != nil {
+		log.Fatal(fmt.Errorf("cannot get authorizer: %v", err))
+	}
+	aadClient := graphrbac.NewApplicationsClient(ctx, log, conf.TenantID, graphauthorizer)
+	aadObjID, err := aadapp.GetApplicationObjectIDFromAppID(ctx, aadClient, conf.AADClientID)
+	if err != nil {
+		log.Fatal(err)
+	}
+	aadApp, err := aadClient.Get(ctx, aadObjID)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	if isDelete {
 		err = delete(ctx, log, v20190930previewClient, conf.ResourceGroup, conf.NoWait)
 		if err != nil {
+			log.Fatal(err)
+		}
+		// unlink cluster from aad app
+		if err := unlinkClusterFromAadApp(ctx, log, &aadClient, &aadApp, conf); err != nil {
 			log.Fatal(err)
 		}
 		return
@@ -263,7 +303,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := updateAadApplication(ctx, oc, log, conf); err != nil {
+	if err := linkClusterToAadApp(ctx, log, &aadClient, &aadApp, conf); err != nil {
 		log.Fatal(err)
 	}
 

@@ -18,6 +18,7 @@ import (
 type ApplicationsClient interface {
 	Create(ctx context.Context, parameters graphrbac.ApplicationCreateParameters) (result graphrbac.Application, err error)
 	Delete(ctx context.Context, applicationObjectID string) (result autorest.Response, err error)
+	Get(ctx context.Context, applicationObjectID string) (result graphrbac.Application, err error)
 	List(ctx context.Context, filter string) (result graphrbac.ApplicationListResultPage, err error)
 	Patch(ctx context.Context, applicationObjectID string, parameters graphrbac.ApplicationUpdateParameters) (result autorest.Response, err error)
 }
