@@ -38,6 +38,10 @@ var (
 	restoreFromBlob = flag.String("restore-from-blob", "", "If set, request a restore of the cluster from the provided blob name.")
 )
 
+const (
+	defaultAadAppUri = "http://localhost/"
+)
+
 func validate() error {
 	m := strings.ToUpper(*method)
 	switch m {
@@ -167,46 +171,52 @@ func execute(
 
 func linkClusterToAadApp(ctx context.Context, log *logrus.Entry, aadClient *graphrbac.ApplicationsClient, aadApp *azgraphrbac.Application, conf *fakerp.Config) error {
 	if len(conf.AADClientID) > 0 && conf.AADClientID != conf.ClientID {
-		log.Infof("linked cluster %s to aad object id %s", conf.ResourceGroup, *aadApp.ObjectID)
 		callbackURL := fmt.Sprintf("https://openshift.%s.osadev.cloud/oauth2callback/Azure%%20AD", conf.ResourceGroup)
-		addUrl := func(urls []string, newUrl string) []string {
-			for _, url := range urls {
-				if url == newUrl {
-					return urls
-				}
-			}
-			urls = append(urls, newUrl)
-			return urls
-		}
 		links := addUrl(*aadApp.ReplyUrls, callbackURL)
-		err := aadapp.UpdateAADApp(ctx, *aadClient, *aadApp.ObjectID, links)
+		links = removeUrl(links, defaultAadAppUri)
+		err := aadapp.UpdateAADApp(ctx, *aadClient, *aadApp.ObjectID, callbackURL, links)
 		if err != nil {
 			return fmt.Errorf("could not update aad app: %v", err)
 		}
+		log.Infof("linked cluster %s to aad object id %s", conf.ResourceGroup, *aadApp.ObjectID)
 	}
 	return nil
 }
 
 func unlinkClusterFromAadApp(ctx context.Context, log *logrus.Entry, aadClient *graphrbac.ApplicationsClient, aadApp *azgraphrbac.Application, conf *fakerp.Config) error {
 	if len(conf.AADClientID) > 0 && conf.AADClientID != conf.ClientID {
-		log.Infof("unlinked cluster %s from aad object id %s", conf.ResourceGroup, *aadApp.ObjectID)
 		callbackURL := fmt.Sprintf("https://openshift.%s.osadev.cloud/oauth2callback/Azure%%20AD", conf.ResourceGroup)
-		removeUrl := func(urls []string, deleteUrl string) []string {
-			var newUrls []string
-			for _, url := range urls {
-				if url != deleteUrl {
-					newUrls = append(newUrls, url)
-				}
-			}
-			return newUrls
-		}
 		links := removeUrl(*aadApp.ReplyUrls, callbackURL)
-		err := aadapp.UpdateAADApp(ctx, *aadClient, *aadApp.ObjectID, links)
+		if len(links) == 0 {
+			links = append(links, defaultAadAppUri)
+		}
+		err := aadapp.UpdateAADApp(ctx, *aadClient, *aadApp.ObjectID, callbackURL, links)
 		if err != nil {
 			return fmt.Errorf("could not update aad app: %v", err)
 		}
+		log.Infof("unlinked cluster %s from aad object id %s", conf.ResourceGroup, *aadApp.ObjectID)
 	}
 	return nil
+}
+
+func addUrl(urls []string, newUrl string) []string {
+	for _, url := range urls {
+		if url == newUrl {
+			return urls
+		}
+	}
+	urls = append(urls, newUrl)
+	return urls
+}
+
+func removeUrl(urls []string, deleteUrl string) []string {
+	var newUrls []string
+	for _, url := range urls {
+		if url != deleteUrl {
+			newUrls = append(newUrls, url)
+		}
+	}
+	return newUrls
 }
 
 func main() {

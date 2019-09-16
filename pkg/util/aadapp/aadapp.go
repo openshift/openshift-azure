@@ -41,16 +41,11 @@ func GetServicePrincipalObjectIDFromAppID(ctx context.Context, spc graphrbac.Ser
 }
 
 // UpdateAADApp updates the ReplyURLs for an AAD app.
-func UpdateAADApp(ctx context.Context, appClient graphrbac.ApplicationsClient, appObjID string, callbackURLs []string) error {
-	size := len(callbackURLs)
-	homepage := "http://localhost/"
-	if size > 0 {
-		homepage = callbackURLs[size-1]
-	}
+func UpdateAADApp(ctx context.Context, appClient graphrbac.ApplicationsClient, appObjID, clusterUrl string, replyUrls []string) error {
 	_, err := appClient.Patch(ctx, appObjID, azgraphrbac.ApplicationUpdateParameters{
-		Homepage:       to.StringPtr(homepage),
-		ReplyUrls:      &callbackURLs,
-		IdentifierUris: &callbackURLs,
+		Homepage:       to.StringPtr(clusterUrl),
+		ReplyUrls:      &replyUrls,
+		IdentifierUris: to.StringSlicePtr([]string{clusterUrl}),
 	})
 	return err
 }
