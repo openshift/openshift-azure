@@ -64,6 +64,7 @@ func TestAdminAPIValidateUpdate(t *testing.T) {
 				}
 			},
 			expectedErrs: []*regexp.Regexp{
+				regexp.MustCompile(`invalid properties.agentPoolProfiles\["infra"\].count 2`),
 				regexp.MustCompile(`Count:\s+?2(?s).+?Count:\s+?3`),
 			},
 		},
