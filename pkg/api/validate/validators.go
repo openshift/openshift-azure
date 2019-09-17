@@ -247,8 +247,7 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile, vnet *net.IPNet) (errs 
 		if app.Name != string(app.Role) {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q]", app.Name))
 		}
-		// TODO: remove count "2" check when CLI is adjusted
-		if app.Count < 2 || app.Count > 3 {
+		if app.Count != 3 {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %d", app.Name, app.Count))
 		}
 

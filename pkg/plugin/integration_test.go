@@ -419,7 +419,7 @@ func newTestCs() *api.OpenShiftManagedCluster {
 			AgentPoolProfiles: []api.AgentPoolProfile{
 				{Role: api.AgentPoolProfileRoleMaster, Count: 3, Name: "master", VMSize: "Standard_D2s_v3", SubnetCIDR: "10.0.0.0/24", OSType: "Linux"},
 				{Role: api.AgentPoolProfileRoleCompute, Count: 1, Name: "compute", VMSize: "Standard_D2s_v3", SubnetCIDR: "10.0.0.0/24", OSType: "Linux"},
-				{Role: api.AgentPoolProfileRoleInfra, Count: 2, Name: "infra", VMSize: "Standard_D2s_v3", SubnetCIDR: "10.0.0.0/24", OSType: "Linux"},
+				{Role: api.AgentPoolProfileRoleInfra, Count: 3, Name: "infra", VMSize: "Standard_D2s_v3", SubnetCIDR: "10.0.0.0/24", OSType: "Linux"},
 			},
 			NetworkProfile: api.NetworkProfile{VnetCIDR: "10.0.0.0/8"},
 		},
@@ -692,7 +692,7 @@ func TestHowActionsCauseRotations(t *testing.T) {
 		{
 			name:           "scale up",
 			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
-			expectNodes:    map[rotationType]int{rotationCompute: 6, rotationInfra: 2, rotationMaster: 3},
+			expectNodes:    map[rotationType]int{rotationCompute: 6, rotationInfra: 3, rotationMaster: 3},
 			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
 				oldCs := cs.DeepCopy()
 				for i, p := range cs.Properties.AgentPoolProfiles {
@@ -714,7 +714,7 @@ func TestHowActionsCauseRotations(t *testing.T) {
 		{
 			name:           "rotate cluster secrets",
 			expectRotation: map[rotationType]bool{rotationMaster: true, rotationInfra: true, rotationSync: true, rotationCompute: true},
-			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 2, rotationMaster: 3},
+			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 3, rotationMaster: 3},
 			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
 				perr := p.RotateClusterSecrets(ctx, cs, getFakeDeployer(log, cs, az))
 				if perr != nil {
@@ -726,7 +726,7 @@ func TestHowActionsCauseRotations(t *testing.T) {
 		{
 			name:           "GetPluginVersion() cause no rotations",
 			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
-			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 2, rotationMaster: 3},
+			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 3, rotationMaster: 3},
 			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
 				p.GetPluginVersion(ctx)
 				return nil
@@ -735,7 +735,7 @@ func TestHowActionsCauseRotations(t *testing.T) {
 		{
 			name:           "ListClusterVMs() cause no rotations",
 			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
-			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 2, rotationMaster: 3},
+			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 3, rotationMaster: 3},
 			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
 				_, perr := p.ListClusterVMs(ctx, cs)
 				if perr != nil {
@@ -747,7 +747,7 @@ func TestHowActionsCauseRotations(t *testing.T) {
 		{
 			name:           "ListEtcdBackups() cause no rotations",
 			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
-			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 2, rotationMaster: 3},
+			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 3, rotationMaster: 3},
 			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
 				_, perr := p.ListEtcdBackups(ctx, cs)
 				if perr != nil {
@@ -759,7 +759,7 @@ func TestHowActionsCauseRotations(t *testing.T) {
 		{
 			name:           "GetControlPlanePods() cause no rotations",
 			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
-			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 2, rotationMaster: 3},
+			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 3, rotationMaster: 3},
 			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
 				_, perr := p.GetControlPlanePods(ctx, cs)
 				if perr != nil {
@@ -771,7 +771,7 @@ func TestHowActionsCauseRotations(t *testing.T) {
 		{
 			name:           "runcommand - no rotations and correct call",
 			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
-			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 2, rotationMaster: 3},
+			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 3, rotationMaster: 3},
 			expectCalls:    []string{"VirtualMachineScaleSetVMsClient:RunCommand:ss-master:1"},
 			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
 				perr := p.RunCommand(ctx, cs, "master-000001", "RestartDocker")
