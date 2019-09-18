@@ -16,9 +16,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/config"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient/operationalinsights"
-	"github.com/openshift/openshift-azure/pkg/util/enrich"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 )
 
@@ -236,21 +233,6 @@ func (p *plugin) createOrUpdateExt(ctx context.Context, cs *api.OpenShiftManaged
 	clusterUpgrader, err := p.upgraderFactory(ctx, p.log, cs, false, true, p.testConfig)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
-	}
-
-	if cs.Properties.MonitorProfile.WorkspaceResourceID != "" {
-		authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
-		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
-		}
-		wc := operationalinsights.NewWorkspacesClient(ctx, p.log, cs.Properties.AzProfile.SubscriptionID, authorizer)
-		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
-		}
-		err = enrich.MonitorIDAndKey(ctx, wc, cs)
-		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepEnrichMonitorProfile}
-		}
 	}
 
 	p.log.Info("creating Config storage")

@@ -86,8 +86,7 @@ func CertificatesFromVault(ctx context.Context, kvc keyvault.KeyVaultClient, cs 
 }
 
 func MonitorIDAndKey(ctx context.Context, client operationalinsights.WorkspacesClient, cs *api.OpenShiftManagedCluster) error {
-	wID := ""
-	wKey := ""
+	var wID, wKey string
 	var err error
 	if cs.Properties.MonitorProfile.WorkspaceResourceID != "" {
 		wID, wKey, err = workspace.GetWorkspaceInfo(ctx, client, cs.Properties.MonitorProfile.WorkspaceResourceID)
