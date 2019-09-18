@@ -201,6 +201,7 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 	}
 
 	if cs.Properties.MonitorProfile.WorkspaceResourceID != "" {
+		log.Infof("using workspace %s", cs.Properties.MonitorProfile.WorkspaceResourceID)
 		log.Info("enabling ContainerInsights solution on the workspace")
 		err = createOrUpdateContainerInsights(ctx, log, cs)
 		if err != nil {
@@ -209,6 +210,9 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 		err = enrich.MonitorIDAndKey(ctx, clients.workspacesClient, cs)
 		if err != nil {
 			return nil, err
+		}
+		if !isUpdate {
+			cs.Properties.MonitorProfile.Enabled = true
 		}
 	}
 
@@ -311,5 +315,8 @@ func enrichCs(cs *api.OpenShiftManagedCluster, conf *client.Config) error {
 		}
 	}
 
+	if cs.Properties.MonitorProfile.WorkspaceResourceID == "" {
+		cs.Properties.MonitorProfile.WorkspaceResourceID = conf.WorkspaceResourceID
+	}
 	return nil
 }

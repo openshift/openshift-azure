@@ -57,6 +57,7 @@ func GetInternalMockCluster() *OpenShiftManagedCluster {
 				PeerVnetID: to.StringPtr("Properties.NetworkProfile.PeerVnetID"),
 			},
 			MonitorProfile: MonitorProfile{
+				Enabled:             true,
 				WorkspaceResourceID: "Properties.MonitorProfile.WorkspaceResourceID",
 				WorkspaceID:         "Properties.MonitorProfile.WorkspaceID",
 				WorkspaceKey:        "Properties.MonitorProfile.WorkspaceKey",

@@ -556,6 +556,22 @@ func TestValidate(t *testing.T) {
 			},
 			expectedErrs: []error{errors.New(`invalid properties.apiCertProfile.keyVaultSecretURL "bad"`)},
 		},
+		"monitorProfile valid config": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.MonitorProfile.Enabled = false
+				oc.Properties.MonitorProfile.WorkspaceResourceID = "workspaceResourceId"
+				oc.Properties.MonitorProfile.WorkspaceID = "workspaceId"
+				oc.Properties.MonitorProfile.WorkspaceKey = "workspaceKey"
+			},
+		},
+		"monitorProfile invalid config": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.MonitorProfile.Enabled = true
+			},
+			expectedErrs: []error{
+				errors.New(`properties.monitorProfile.workspaceResourceID cannot be empty if properties.monitorProfile.Enabled = true`),
+			},
+		},
 	}
 
 	for name, test := range tests {

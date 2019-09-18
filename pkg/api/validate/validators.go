@@ -82,6 +82,8 @@ func validateProperties(p *api.Properties, location string, externalOnly bool) (
 
 	errs = append(errs, validateAuthProfile("properties.authProfile", &p.AuthProfile)...)
 
+	errs = append(errs, validateMonitorProfile("properties.monitorProfile", &p.MonitorProfile)...)
+
 	if !externalOnly {
 		errs = append(errs, validateServicePrincipalProfile("properties.masterServicePrincipalProfile", &p.MasterServicePrincipalProfile)...)
 
@@ -113,6 +115,15 @@ func validateNetworkProfile(path string, np *api.NetworkProfile) (errs []error) 
 		errs = append(errs, fmt.Errorf("invalid %s.peerVnetId %q", path, *np.PeerVnetID))
 	}
 
+	return
+}
+
+func validateMonitorProfile(path string, mp *api.MonitorProfile) (errs []error) {
+	if mp.Enabled {
+		if mp.WorkspaceResourceID == "" {
+			errs = append(errs, fmt.Errorf("%s.workspaceResourceID cannot be empty if %s.Enabled = true", path, path))
+		}
+	}
 	return
 }
 

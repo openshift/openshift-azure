@@ -326,7 +326,7 @@ var translations = map[string][]struct {
 		{
 			Path: jsonpath.MustCompile("$.metadata.labels['azure.openshift.io/sync-pod-optionally-apply']"),
 			F: func(cs *api.OpenShiftManagedCluster, o interface{}) (interface{}, error) {
-				if cs.Properties.MonitorProfile.WorkspaceID != "" && cs.Properties.MonitorProfile.WorkspaceKey != "" {
+				if cs.Properties.MonitorProfile.Enabled {
 					return "true", nil
 				}
 				return "false", nil
@@ -381,7 +381,7 @@ var translations = map[string][]struct {
 		{
 			Path: jsonpath.MustCompile("$.metadata.labels['azure.openshift.io/sync-pod-optionally-apply']"),
 			F: func(cs *api.OpenShiftManagedCluster, o interface{}) (interface{}, error) {
-				if cs.Properties.MonitorProfile.WorkspaceID != "" && cs.Properties.MonitorProfile.WorkspaceKey != "" {
+				if cs.Properties.MonitorProfile.Enabled {
 					return "true", nil
 				}
 				return "false", nil
