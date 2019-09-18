@@ -3,6 +3,7 @@ GITCOMMIT=$(shell git describe --tags HEAD)$(shell [[ $$(git status --porcelain)
 LDFLAGS="-X main.gitCommit=$(GITCOMMIT)"
 
 AZURE_IMAGE ?= quay.io/openshift-on-azure/azure:$(GITCOMMIT)
+AZURE_IMAGE_ACR ?= osarpint.azurecr.io/openshift-on-azure/azure:$(GITCOMMIT)
 LATEST_PLUGIN_VERSION=$(shell go run hack/dev-version/dev-version.go)
 
 .PHONY: all artifacts azure-image azure-push clean create delete e2e generate monitoring monitoring-run monitoring-stop secrets sync-run test testinsights unit upgrade verify vmimage
@@ -13,6 +14,15 @@ secrets:
 	@rm -rf secrets
 	@mkdir secrets
 	@oc extract -n azure secret/cluster-secrets-azure --to=secrets >/dev/null
+
+private-secrets:
+	@echo "These secrets are sensitive, please do not keep them on your workstation. Execute make private-secrets-clean after you done" 
+	@rm -rf private-secrets
+	@mkdir private-secrets
+	@oc extract -n azure-private secret/cluster-secrets-azure --to=private-secrets >/dev/null
+
+private-secrets-clean:
+	@rm -rf private-secrets	
 
 clean:
 	rm -f coverage.out azure releasenotes testinsights
@@ -39,6 +49,12 @@ azure-image: azure
 
 azure-push: azure-image
 	docker push $(AZURE_IMAGE)
+	if [ -a private-secrets/acr-docker-pull-push-secret ] ; \
+	then \
+		docker tag $(AZURE_IMAGE) $(AZURE_IMAGE_ACR) ; \
+		cp private-secrets/acr-docker-pull-push-secret private-secrets/config.json ; \
+		docker --config private-secrets/ push $(AZURE_IMAGE_ACR) ; \
+	fi;
 
 azure: generate
 	go build -ldflags ${LDFLAGS} ./cmd/$@
