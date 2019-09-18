@@ -12,6 +12,7 @@ coverage.out
 cscope.files
 cscope.out
 /secrets
+/private-secrets
 /fakerp
 /artifacts
 /monitoring
