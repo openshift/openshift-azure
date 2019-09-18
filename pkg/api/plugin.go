@@ -24,7 +24,6 @@ const (
 	PluginStepClientCreation                      PluginStep = "ClientCreation"
 	PluginStepEnrichCertificatesFromVault         PluginStep = "EnrichCertificatesFromVault"
 	PluginStepEnrichStorageAccountKeys            PluginStep = "EnrichStorageAccountKeys"
-	PluginStepEnrichMonitorProfile                PluginStep = "EnrichMonitorProfile"
 	PluginStepScaleSetDelete                      PluginStep = "ScaleSetDelete"
 	PluginStepWriteStartupBlobs                   PluginStep = "WriteStartupBlobs"
 	PluginStepCreateOrUpdateConfigStorageAccount  PluginStep = "CreateOrUpdateConfigStorageAccount"
