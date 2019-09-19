@@ -16,7 +16,7 @@ function get_az_hosts() {
 BRANCH="${BRANCH:-v3}"
 VERIFICATION_TESTS_GIT="${VERIFICATION_TESTS_GIT:-https://github.com/openshift/verification-tests.git}"
 # Env vars for setting up test
-ARO_PUBLIC_HOSTNAME=$(awk '/^  publicHostname:/{ print $2}' ${HOME}/go/src/github.com/openshift/openshift-azure/_data/containerservice.yaml)
+ARO_PUBLIC_HOSTNAME="${ARO_PUBLIC_HOSTNAME:-$(awk '/^  publicHostname:/{ print $2}' ${HOME}/go/src/github.com/openshift/openshift-azure/_data/containerservice.yaml)}"
 RESOURCEGROUP="${RESOURCEGROUP:-$(awk '/^name:/{ print $2}' ${HOME}/go/src/github.com/openshift/openshift-azure/_data/containerservice.yaml)}"
 export OPENSHIFT_ENV_OSE_WEB_CONSOLE_URL="${OPENSHIFT_ENV_OSE_WEB_CONSOLE_URL:-https://${ARO_PUBLIC_HOSTNAME}/}"
 export BUSHSLICER_CONFIG='{"global": {"browser": "chrome"}}'
@@ -33,8 +33,6 @@ env
 echo =========================
 
 git clone --branch $BRANCH $VERIFICATION_TESTS_GIT
-#scl enable rh-ror50 verification-tests/tools/install_os_deps.sh
-#scl enable rh-ror50 verification-tests/tools/hack_bundle.rb
 pushd verification-tests
 tools/openshift-ci/verification_tests_ci_entrypoint.sh $TESTS_URL
 # do what we need to do to publish logs under junit-report/
