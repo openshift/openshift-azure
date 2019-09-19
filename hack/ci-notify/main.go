@@ -98,12 +98,10 @@ func (c *client) createOrUpdateJobIssue(ctx context.Context, jobName, comment, o
 	}
 
 	if issue == nil {
-		users := []string{"openshift/sig-azure"}
 		fmt.Print("No issue found.  Creating one")
 		ir := &github.IssueRequest{
-			Title:     to.StringPtr(jobName),
-			Body:      to.StringPtr(fmt.Sprintf("The %s build has failed.  Please check the following [link](%s)<br/><br/>%s", jobName, getJobLogsURL(jobName), comment)),
-			Assignees: to.StringSlicePtr(users),
+			Title: to.StringPtr(jobName),
+			Body:  to.StringPtr(fmt.Sprintf("The %s build has failed. Please check the following [link](%s)<br/><br/>%s<br/><br/>@openshift/sig-azure", jobName, getJobLogsURL(jobName), comment)),
 		}
 		_, _, err = c.gh.Issues.Create(ctx, owner, repo, ir)
 		if err != nil {
@@ -112,7 +110,7 @@ func (c *client) createOrUpdateJobIssue(ctx context.Context, jobName, comment, o
 	} else {
 		// Since we found the issue we need to add a comment
 		cmt := &github.IssueComment{
-			Body: to.StringPtr(fmt.Sprintf("The %s build has failed.  Please check the following [link](%s).<br/><br/>%s", jobName, getJobLogsURL(jobName), comment)),
+			Body: to.StringPtr(fmt.Sprintf("The %s build has failed.  Please check the following [link](%s).<br/><br/>%s<br/><br/>@openshift/sig-azure", jobName, getJobLogsURL(jobName), comment)),
 			User: &github.User{
 				Login: to.StringPtr(*creator),
 			},
