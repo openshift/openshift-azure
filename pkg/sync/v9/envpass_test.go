@@ -11,6 +11,7 @@ package sync
  * patterns we ultimately want to replace. We probably want to use KeyVault instead.
  */
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -82,7 +83,7 @@ func checkValueGenerated(path string, o unstructured.Unstructured, t *testing.T)
 }
 
 func TestEnvPass(t *testing.T) {
-	var paths []string
+	var secErrs []error
 
 	err := filepath.Walk("data", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -108,10 +109,10 @@ func TestEnvPass(t *testing.T) {
 		}
 
 		if r := checkSecretKeyRef(path, u); r == true {
-			t.Logf("%s: contains 'password' in env[*].valueFrom.secretKeyRef.key which probably means that secrets are passed in environment variables. This is not allowed for security reasons.", path)
+			secErrs = append(secErrs, fmt.Errorf("%s: contains 'password' in env[*].valueFrom.secretKeyRef.key which probably means that secrets are passed in environment variables", path))
 		}
 		if r := checkValueGenerated(path, u, t); r == true {
-			t.Logf("%s: contains '*** GENERATED ***' in env[*].value which probably means that secrets are passed in environment variables. This is not allowed for security reasons.", path)
+			secErrs = append(secErrs, fmt.Errorf("%s: contains '*** GENERATED ***' in env[*].value which probably means that secrets are passed in environment variables", path))
 		}
 
 		return nil
@@ -119,7 +120,11 @@ func TestEnvPass(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(paths) > 0 {
-		t.Errorf("invalid files (rerun with REGENERATE environment variable set):\n  %s", strings.Join(paths, "\n  "))
+	if len(secErrs) > 0 {
+		msg := "The following errors are not allowed for security reasons:"
+		for _, sErr := range secErrs {
+			msg += "\n" + sErr.Error()
+		}
+		t.Errorf(msg)
 	}
 }
