@@ -55,8 +55,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -411,6 +411,42 @@ func NewSinksService(s *Service) *SinksService {
 
 type SinksService struct {
 	s *Service
+}
+
+// BigQueryOptions: Options that change functionality of a sink
+// exporting data to BigQuery.
+type BigQueryOptions struct {
+	// UsePartitionedTables: Optional. Whether to use BigQuery's partition
+	// tables. By default, Logging creates dated tables based on the log
+	// entries' timestamps, e.g. syslog_20170523. With partitioned tables
+	// the date suffix is no longer present and special query syntax has to
+	// be used instead. In both cases, tables are sharded based on UTC
+	// timezone.
+	UsePartitionedTables bool `json:"usePartitionedTables,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g.
+	// "UsePartitionedTables") to unconditionally include in API requests.
+	// By default, fields with empty values are omitted from API requests.
+	// However, any non-pointer, non-interface field appearing in
+	// ForceSendFields will be sent to the server regardless of whether the
+	// field is empty or not. This may be used to include empty fields in
+	// Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "UsePartitionedTables") to
+	// include in API requests with the JSON null value. By default, fields
+	// with empty values are omitted from API requests. However, any field
+	// with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *BigQueryOptions) MarshalJSON() ([]byte, error) {
+	type NoMethod BigQueryOptions
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
 // BucketOptions: BucketOptions describes the bucket boundaries used to
@@ -950,8 +986,9 @@ func (s *ListLogMetricsResponse) MarshalJSON() ([]byte, error) {
 // ListLogsResponse: Result returned from ListLogs.
 type ListLogsResponse struct {
 	// LogNames: A list of log names. For example,
-	// "projects/my-project/syslog" or
-	// "organizations/123/cloudresourcemanager.googleapis.com%2Factivity".
+	// "projects/my-project/logs/syslog" or
+	// "organizations/123/logs/cloudresourcemanager.googleapis.com%2Factivity
+	// ".
 	LogNames []string `json:"logNames,omitempty"`
 
 	// NextPageToken: If there might be more results than those appearing in
@@ -1312,11 +1349,12 @@ func (s *LogEntrySourceLocation) MarshalJSON() ([]byte, error) {
 }
 
 // LogExclusion: Specifies a set of log entries that are not to be
-// stored in Logging. If your project receives a large volume of logs,
-// you might be able to use exclusions to reduce your chargeable logs.
+// stored in Logging. If your GCP resource receives a large volume of
+// logs, you can use exclusions to reduce your chargeable logs.
 // Exclusions are processed after log sinks, so you can export log
-// entries before they are excluded. Audit log entries and log entries
-// from Amazon Web Services are never excluded.
+// entries before they are excluded. Note that organization-level and
+// folder-level exclusions don't apply to child resources, and that you
+// can't exclude audit log entries.
 type LogExclusion struct {
 	// CreateTime: Output only. The creation timestamp of the exclusion.This
 	// field may not be present for older exclusions.
@@ -1333,8 +1371,8 @@ type LogExclusion struct {
 	// Filter: Required. An advanced logs filter that matches the log
 	// entries to be excluded. By using the sample function, you can exclude
 	// less than 100% of the matching log entries. For example, the
-	// following filter matches 99% of low-severity log entries from load
-	// balancers:"resource.type=http_load_balancer severity<ERROR
+	// following query matches 99% of low-severity log entries from Google
+	// Cloud Storage buckets:"resource.type=gcs_bucket severity<ERROR
 	// sample(insertId, 0.99)"
 	Filter string `json:"filter,omitempty"`
 
@@ -1563,6 +1601,10 @@ func (s *LogMetric) MarshalJSON() ([]byte, error) {
 // which log entries are exported. The sink must be created within a
 // project, organization, billing account, or folder.
 type LogSink struct {
+	// BigqueryOptions: Optional. Options that affect sinks exporting data
+	// to BigQuery.
+	BigqueryOptions *BigQueryOptions `json:"bigqueryOptions,omitempty"`
+
 	// CreateTime: Output only. The creation timestamp of the sink.This
 	// field may not be present for older sinks.
 	CreateTime string `json:"createTime,omitempty"`
@@ -1642,7 +1684,7 @@ type LogSink struct {
 	// server.
 	googleapi.ServerResponse `json:"-"`
 
-	// ForceSendFields is a list of field names (e.g. "CreateTime") to
+	// ForceSendFields is a list of field names (e.g. "BigqueryOptions") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -1650,12 +1692,13 @@ type LogSink struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "CreateTime") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
+	// NullFields is a list of field names (e.g. "BigqueryOptions") to
+	// include in API requests with the JSON null value. By default, fields
+	// with empty values are omitted from API requests. However, any field
+	// with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
 	NullFields []string `json:"-"`
 }
 
@@ -2494,6 +2537,7 @@ func (c *BillingAccountsExclusionsCreateCall) Header() http.Header {
 
 func (c *BillingAccountsExclusionsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2632,6 +2676,7 @@ func (c *BillingAccountsExclusionsDeleteCall) Header() http.Header {
 
 func (c *BillingAccountsExclusionsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2773,6 +2818,7 @@ func (c *BillingAccountsExclusionsGetCall) Header() http.Header {
 
 func (c *BillingAccountsExclusionsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2938,6 +2984,7 @@ func (c *BillingAccountsExclusionsListCall) Header() http.Header {
 
 func (c *BillingAccountsExclusionsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3081,7 +3128,7 @@ func (r *BillingAccountsExclusionsService) Patch(name string, logexclusion *LogE
 }
 
 // UpdateMask sets the optional parameter "updateMask": Required. A
-// nonempty list of fields to change in the existing exclusion. New
+// non-empty list of fields to change in the existing exclusion. New
 // values for the fields are taken from the corresponding fields in the
 // LogExclusion included in this request. Fields not mentioned in
 // update_mask are not changed and are ignored in the request.For
@@ -3119,6 +3166,7 @@ func (c *BillingAccountsExclusionsPatchCall) Header() http.Header {
 
 func (c *BillingAccountsExclusionsPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3198,7 +3246,7 @@ func (c *BillingAccountsExclusionsPatchCall) Do(opts ...googleapi.CallOption) (*
 	//       "type": "string"
 	//     },
 	//     "updateMask": {
-	//       "description": "Required. A nonempty list of fields to change in the existing exclusion. New values for the fields are taken from the corresponding fields in the LogExclusion included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.For example, to change the filter and description of an exclusion, specify an update_mask of \"filter,description\".",
+	//       "description": "Required. A non-empty list of fields to change in the existing exclusion. New values for the fields are taken from the corresponding fields in the LogExclusion included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.For example, to change the filter and description of an exclusion, specify an update_mask of \"filter,description\".",
 	//       "format": "google-fieldmask",
 	//       "location": "query",
 	//       "type": "string"
@@ -3265,6 +3313,7 @@ func (c *BillingAccountsLogsDeleteCall) Header() http.Header {
 
 func (c *BillingAccountsLogsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3426,6 +3475,7 @@ func (c *BillingAccountsLogsListCall) Header() http.Header {
 
 func (c *BillingAccountsLogsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3615,6 +3665,7 @@ func (c *BillingAccountsSinksCreateCall) Header() http.Header {
 
 func (c *BillingAccountsSinksCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3759,6 +3810,7 @@ func (c *BillingAccountsSinksDeleteCall) Header() http.Header {
 
 func (c *BillingAccountsSinksDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3900,6 +3952,7 @@ func (c *BillingAccountsSinksGetCall) Header() http.Header {
 
 func (c *BillingAccountsSinksGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4065,6 +4118,7 @@ func (c *BillingAccountsSinksListCall) Header() http.Header {
 
 func (c *BillingAccountsSinksListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4268,6 +4322,7 @@ func (c *BillingAccountsSinksPatchCall) Header() http.Header {
 
 func (c *BillingAccountsSinksPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4453,6 +4508,7 @@ func (c *BillingAccountsSinksUpdateCall) Header() http.Header {
 
 func (c *BillingAccountsSinksUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4604,6 +4660,7 @@ func (c *EntriesListCall) Header() http.Header {
 
 func (c *EntriesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4757,6 +4814,7 @@ func (c *EntriesWriteCall) Header() http.Header {
 
 func (c *EntriesWriteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4887,6 +4945,7 @@ func (c *ExclusionsCreateCall) Header() http.Header {
 
 func (c *ExclusionsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5025,6 +5084,7 @@ func (c *ExclusionsDeleteCall) Header() http.Header {
 
 func (c *ExclusionsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5166,6 +5226,7 @@ func (c *ExclusionsGetCall) Header() http.Header {
 
 func (c *ExclusionsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5331,6 +5392,7 @@ func (c *ExclusionsListCall) Header() http.Header {
 
 func (c *ExclusionsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5474,7 +5536,7 @@ func (r *ExclusionsService) Patch(name string, logexclusion *LogExclusion) *Excl
 }
 
 // UpdateMask sets the optional parameter "updateMask": Required. A
-// nonempty list of fields to change in the existing exclusion. New
+// non-empty list of fields to change in the existing exclusion. New
 // values for the fields are taken from the corresponding fields in the
 // LogExclusion included in this request. Fields not mentioned in
 // update_mask are not changed and are ignored in the request.For
@@ -5512,6 +5574,7 @@ func (c *ExclusionsPatchCall) Header() http.Header {
 
 func (c *ExclusionsPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5591,7 +5654,7 @@ func (c *ExclusionsPatchCall) Do(opts ...googleapi.CallOption) (*LogExclusion, e
 	//       "type": "string"
 	//     },
 	//     "updateMask": {
-	//       "description": "Required. A nonempty list of fields to change in the existing exclusion. New values for the fields are taken from the corresponding fields in the LogExclusion included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.For example, to change the filter and description of an exclusion, specify an update_mask of \"filter,description\".",
+	//       "description": "Required. A non-empty list of fields to change in the existing exclusion. New values for the fields are taken from the corresponding fields in the LogExclusion included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.For example, to change the filter and description of an exclusion, specify an update_mask of \"filter,description\".",
 	//       "format": "google-fieldmask",
 	//       "location": "query",
 	//       "type": "string"
@@ -5660,6 +5723,7 @@ func (c *FoldersExclusionsCreateCall) Header() http.Header {
 
 func (c *FoldersExclusionsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5798,6 +5862,7 @@ func (c *FoldersExclusionsDeleteCall) Header() http.Header {
 
 func (c *FoldersExclusionsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5939,6 +6004,7 @@ func (c *FoldersExclusionsGetCall) Header() http.Header {
 
 func (c *FoldersExclusionsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6104,6 +6170,7 @@ func (c *FoldersExclusionsListCall) Header() http.Header {
 
 func (c *FoldersExclusionsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6247,7 +6314,7 @@ func (r *FoldersExclusionsService) Patch(name string, logexclusion *LogExclusion
 }
 
 // UpdateMask sets the optional parameter "updateMask": Required. A
-// nonempty list of fields to change in the existing exclusion. New
+// non-empty list of fields to change in the existing exclusion. New
 // values for the fields are taken from the corresponding fields in the
 // LogExclusion included in this request. Fields not mentioned in
 // update_mask are not changed and are ignored in the request.For
@@ -6285,6 +6352,7 @@ func (c *FoldersExclusionsPatchCall) Header() http.Header {
 
 func (c *FoldersExclusionsPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6364,7 +6432,7 @@ func (c *FoldersExclusionsPatchCall) Do(opts ...googleapi.CallOption) (*LogExclu
 	//       "type": "string"
 	//     },
 	//     "updateMask": {
-	//       "description": "Required. A nonempty list of fields to change in the existing exclusion. New values for the fields are taken from the corresponding fields in the LogExclusion included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.For example, to change the filter and description of an exclusion, specify an update_mask of \"filter,description\".",
+	//       "description": "Required. A non-empty list of fields to change in the existing exclusion. New values for the fields are taken from the corresponding fields in the LogExclusion included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.For example, to change the filter and description of an exclusion, specify an update_mask of \"filter,description\".",
 	//       "format": "google-fieldmask",
 	//       "location": "query",
 	//       "type": "string"
@@ -6431,6 +6499,7 @@ func (c *FoldersLogsDeleteCall) Header() http.Header {
 
 func (c *FoldersLogsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6592,6 +6661,7 @@ func (c *FoldersLogsListCall) Header() http.Header {
 
 func (c *FoldersLogsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6781,6 +6851,7 @@ func (c *FoldersSinksCreateCall) Header() http.Header {
 
 func (c *FoldersSinksCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6925,6 +6996,7 @@ func (c *FoldersSinksDeleteCall) Header() http.Header {
 
 func (c *FoldersSinksDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7066,6 +7138,7 @@ func (c *FoldersSinksGetCall) Header() http.Header {
 
 func (c *FoldersSinksGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7231,6 +7304,7 @@ func (c *FoldersSinksListCall) Header() http.Header {
 
 func (c *FoldersSinksListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7434,6 +7508,7 @@ func (c *FoldersSinksPatchCall) Header() http.Header {
 
 func (c *FoldersSinksPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7619,6 +7694,7 @@ func (c *FoldersSinksUpdateCall) Header() http.Header {
 
 func (c *FoldersSinksUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7770,6 +7846,7 @@ func (c *LogsDeleteCall) Header() http.Header {
 
 func (c *LogsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7931,6 +8008,7 @@ func (c *LogsListCall) Header() http.Header {
 
 func (c *LogsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8127,6 +8205,7 @@ func (c *MonitoredResourceDescriptorsListCall) Header() http.Header {
 
 func (c *MonitoredResourceDescriptorsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8288,6 +8367,7 @@ func (c *OrganizationsExclusionsCreateCall) Header() http.Header {
 
 func (c *OrganizationsExclusionsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8426,6 +8506,7 @@ func (c *OrganizationsExclusionsDeleteCall) Header() http.Header {
 
 func (c *OrganizationsExclusionsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8567,6 +8648,7 @@ func (c *OrganizationsExclusionsGetCall) Header() http.Header {
 
 func (c *OrganizationsExclusionsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8732,6 +8814,7 @@ func (c *OrganizationsExclusionsListCall) Header() http.Header {
 
 func (c *OrganizationsExclusionsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8875,7 +8958,7 @@ func (r *OrganizationsExclusionsService) Patch(name string, logexclusion *LogExc
 }
 
 // UpdateMask sets the optional parameter "updateMask": Required. A
-// nonempty list of fields to change in the existing exclusion. New
+// non-empty list of fields to change in the existing exclusion. New
 // values for the fields are taken from the corresponding fields in the
 // LogExclusion included in this request. Fields not mentioned in
 // update_mask are not changed and are ignored in the request.For
@@ -8913,6 +8996,7 @@ func (c *OrganizationsExclusionsPatchCall) Header() http.Header {
 
 func (c *OrganizationsExclusionsPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8992,7 +9076,7 @@ func (c *OrganizationsExclusionsPatchCall) Do(opts ...googleapi.CallOption) (*Lo
 	//       "type": "string"
 	//     },
 	//     "updateMask": {
-	//       "description": "Required. A nonempty list of fields to change in the existing exclusion. New values for the fields are taken from the corresponding fields in the LogExclusion included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.For example, to change the filter and description of an exclusion, specify an update_mask of \"filter,description\".",
+	//       "description": "Required. A non-empty list of fields to change in the existing exclusion. New values for the fields are taken from the corresponding fields in the LogExclusion included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.For example, to change the filter and description of an exclusion, specify an update_mask of \"filter,description\".",
 	//       "format": "google-fieldmask",
 	//       "location": "query",
 	//       "type": "string"
@@ -9059,6 +9143,7 @@ func (c *OrganizationsLogsDeleteCall) Header() http.Header {
 
 func (c *OrganizationsLogsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -9220,6 +9305,7 @@ func (c *OrganizationsLogsListCall) Header() http.Header {
 
 func (c *OrganizationsLogsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -9409,6 +9495,7 @@ func (c *OrganizationsSinksCreateCall) Header() http.Header {
 
 func (c *OrganizationsSinksCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -9553,6 +9640,7 @@ func (c *OrganizationsSinksDeleteCall) Header() http.Header {
 
 func (c *OrganizationsSinksDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -9694,6 +9782,7 @@ func (c *OrganizationsSinksGetCall) Header() http.Header {
 
 func (c *OrganizationsSinksGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -9859,6 +9948,7 @@ func (c *OrganizationsSinksListCall) Header() http.Header {
 
 func (c *OrganizationsSinksListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10062,6 +10152,7 @@ func (c *OrganizationsSinksPatchCall) Header() http.Header {
 
 func (c *OrganizationsSinksPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10247,6 +10338,7 @@ func (c *OrganizationsSinksUpdateCall) Header() http.Header {
 
 func (c *OrganizationsSinksUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10400,6 +10492,7 @@ func (c *ProjectsExclusionsCreateCall) Header() http.Header {
 
 func (c *ProjectsExclusionsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10538,6 +10631,7 @@ func (c *ProjectsExclusionsDeleteCall) Header() http.Header {
 
 func (c *ProjectsExclusionsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10679,6 +10773,7 @@ func (c *ProjectsExclusionsGetCall) Header() http.Header {
 
 func (c *ProjectsExclusionsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10844,6 +10939,7 @@ func (c *ProjectsExclusionsListCall) Header() http.Header {
 
 func (c *ProjectsExclusionsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10987,7 +11083,7 @@ func (r *ProjectsExclusionsService) Patch(name string, logexclusion *LogExclusio
 }
 
 // UpdateMask sets the optional parameter "updateMask": Required. A
-// nonempty list of fields to change in the existing exclusion. New
+// non-empty list of fields to change in the existing exclusion. New
 // values for the fields are taken from the corresponding fields in the
 // LogExclusion included in this request. Fields not mentioned in
 // update_mask are not changed and are ignored in the request.For
@@ -11025,6 +11121,7 @@ func (c *ProjectsExclusionsPatchCall) Header() http.Header {
 
 func (c *ProjectsExclusionsPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -11104,7 +11201,7 @@ func (c *ProjectsExclusionsPatchCall) Do(opts ...googleapi.CallOption) (*LogExcl
 	//       "type": "string"
 	//     },
 	//     "updateMask": {
-	//       "description": "Required. A nonempty list of fields to change in the existing exclusion. New values for the fields are taken from the corresponding fields in the LogExclusion included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.For example, to change the filter and description of an exclusion, specify an update_mask of \"filter,description\".",
+	//       "description": "Required. A non-empty list of fields to change in the existing exclusion. New values for the fields are taken from the corresponding fields in the LogExclusion included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.For example, to change the filter and description of an exclusion, specify an update_mask of \"filter,description\".",
 	//       "format": "google-fieldmask",
 	//       "location": "query",
 	//       "type": "string"
@@ -11171,6 +11268,7 @@ func (c *ProjectsLogsDeleteCall) Header() http.Header {
 
 func (c *ProjectsLogsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -11332,6 +11430,7 @@ func (c *ProjectsLogsListCall) Header() http.Header {
 
 func (c *ProjectsLogsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -11501,6 +11600,7 @@ func (c *ProjectsMetricsCreateCall) Header() http.Header {
 
 func (c *ProjectsMetricsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -11640,6 +11740,7 @@ func (c *ProjectsMetricsDeleteCall) Header() http.Header {
 
 func (c *ProjectsMetricsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -11782,6 +11883,7 @@ func (c *ProjectsMetricsGetCall) Header() http.Header {
 
 func (c *ProjectsMetricsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -11947,6 +12049,7 @@ func (c *ProjectsMetricsListCall) Header() http.Header {
 
 func (c *ProjectsMetricsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -12116,6 +12219,7 @@ func (c *ProjectsMetricsUpdateCall) Header() http.Header {
 
 func (c *ProjectsMetricsUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -12277,6 +12381,7 @@ func (c *ProjectsSinksCreateCall) Header() http.Header {
 
 func (c *ProjectsSinksCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -12421,6 +12526,7 @@ func (c *ProjectsSinksDeleteCall) Header() http.Header {
 
 func (c *ProjectsSinksDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -12562,6 +12668,7 @@ func (c *ProjectsSinksGetCall) Header() http.Header {
 
 func (c *ProjectsSinksGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -12727,6 +12834,7 @@ func (c *ProjectsSinksListCall) Header() http.Header {
 
 func (c *ProjectsSinksListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -12930,6 +13038,7 @@ func (c *ProjectsSinksPatchCall) Header() http.Header {
 
 func (c *ProjectsSinksPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -13115,6 +13224,7 @@ func (c *ProjectsSinksUpdateCall) Header() http.Header {
 
 func (c *ProjectsSinksUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -13286,6 +13396,7 @@ func (c *SinksCreateCall) Header() http.Header {
 
 func (c *SinksCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -13430,6 +13541,7 @@ func (c *SinksDeleteCall) Header() http.Header {
 
 func (c *SinksDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -13571,6 +13683,7 @@ func (c *SinksGetCall) Header() http.Header {
 
 func (c *SinksGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -13736,6 +13849,7 @@ func (c *SinksListCall) Header() http.Header {
 
 func (c *SinksListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -13939,6 +14053,7 @@ func (c *SinksUpdateCall) Header() http.Header {
 
 func (c *SinksUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

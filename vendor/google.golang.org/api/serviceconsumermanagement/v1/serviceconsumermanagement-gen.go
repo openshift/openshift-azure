@@ -49,8 +49,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -3711,13 +3711,8 @@ type QuotaLimit struct {
 	// display name generated from the configuration.
 	DisplayName string `json:"displayName,omitempty"`
 
-	// Duration: Duration of this limit in textual notation. Example:
-	// "100s", "24h", "1d".
-	// For duration longer than a day, only multiple of days is supported.
-	// We
-	// support only "100s" and "1d" for now. Additional support will be
-	// added in
-	// the future. "0" indicates indefinite duration.
+	// Duration: Duration of this limit in textual notation. Must be "100s"
+	// or "1d".
 	//
 	// Used by group-based quotas only.
 	Duration string `json:"duration,omitempty"`
@@ -5189,6 +5184,7 @@ func (c *OperationsCancelCall) Header() http.Header {
 
 func (c *OperationsCancelCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5332,6 +5328,7 @@ func (c *OperationsDeleteCall) Header() http.Header {
 
 func (c *OperationsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5476,6 +5473,7 @@ func (c *OperationsGetCall) Header() http.Header {
 
 func (c *OperationsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5656,6 +5654,7 @@ func (c *OperationsListCall) Header() http.Header {
 
 func (c *OperationsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5886,6 +5885,7 @@ func (c *ServicesSearchCall) Header() http.Header {
 
 func (c *ServicesSearchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6065,6 +6065,7 @@ func (c *ServicesTenancyUnitsAddProjectCall) Header() http.Header {
 
 func (c *ServicesTenancyUnitsAddProjectCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6230,6 +6231,7 @@ func (c *ServicesTenancyUnitsApplyProjectConfigCall) Header() http.Header {
 
 func (c *ServicesTenancyUnitsApplyProjectConfigCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6386,6 +6388,7 @@ func (c *ServicesTenancyUnitsAttachProjectCall) Header() http.Header {
 
 func (c *ServicesTenancyUnitsAttachProjectCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6491,6 +6494,12 @@ type ServicesTenancyUnitsCreateCall struct {
 }
 
 // Create: Creates a tenancy unit with no tenant resources.
+// If tenancy unit already exists, it will be returned,
+// however, in this case, returned TenancyUnit does not have
+// tenant_resources
+// field set and ListTenancyUnit has to be used to get a
+// complete
+// TenancyUnit with all fields populated.
 func (r *ServicesTenancyUnitsService) Create(parent string, createtenancyunitrequest *CreateTenancyUnitRequest) *ServicesTenancyUnitsCreateCall {
 	c := &ServicesTenancyUnitsCreateCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.parent = parent
@@ -6525,6 +6534,7 @@ func (c *ServicesTenancyUnitsCreateCall) Header() http.Header {
 
 func (c *ServicesTenancyUnitsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6588,7 +6598,7 @@ func (c *ServicesTenancyUnitsCreateCall) Do(opts ...googleapi.CallOption) (*Tena
 	}
 	return ret, nil
 	// {
-	//   "description": "Creates a tenancy unit with no tenant resources.",
+	//   "description": "Creates a tenancy unit with no tenant resources.\nIf tenancy unit already exists, it will be returned,\nhowever, in this case, returned TenancyUnit does not have tenant_resources\nfield set and ListTenancyUnit has to be used to get a complete\nTenancyUnit with all fields populated.",
 	//   "flatPath": "v1/services/{servicesId}/{servicesId1}/{servicesId2}/tenancyUnits",
 	//   "httpMethod": "POST",
 	//   "id": "serviceconsumermanagement.services.tenancyUnits.create",
@@ -6666,6 +6676,7 @@ func (c *ServicesTenancyUnitsDeleteCall) Header() http.Header {
 
 func (c *ServicesTenancyUnitsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6812,6 +6823,7 @@ func (c *ServicesTenancyUnitsDeleteProjectCall) Header() http.Header {
 
 func (c *ServicesTenancyUnitsDeleteProjectCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6992,6 +7004,7 @@ func (c *ServicesTenancyUnitsListCall) Header() http.Header {
 
 func (c *ServicesTenancyUnitsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7176,6 +7189,7 @@ func (c *ServicesTenancyUnitsRemoveProjectCall) Header() http.Header {
 
 func (c *ServicesTenancyUnitsRemoveProjectCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7324,6 +7338,7 @@ func (c *ServicesTenancyUnitsUndeleteProjectCall) Header() http.Header {
 
 func (c *ServicesTenancyUnitsUndeleteProjectCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

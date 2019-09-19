@@ -49,8 +49,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -369,6 +369,7 @@ func (c *ShelvesGetCall) Header() http.Header {
 
 func (c *ShelvesGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -439,7 +440,7 @@ func (c *ShelvesGetCall) Do(opts ...googleapi.CallOption) (*GoogleExampleLibrary
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "The name of the shelf to retrieve.",
+	//       "description": "Required. The name of the shelf to retrieve.",
 	//       "location": "path",
 	//       "pattern": "^shelves/[^/]+$",
 	//       "required": true,
@@ -531,6 +532,7 @@ func (c *ShelvesListCall) Header() http.Header {
 
 func (c *ShelvesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -691,6 +693,7 @@ func (c *ShelvesBooksBorrowCall) Header() http.Header {
 
 func (c *ShelvesBooksBorrowCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -758,7 +761,7 @@ func (c *ShelvesBooksBorrowCall) Do(opts ...googleapi.CallOption) (*GoogleExampl
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "The name of the book to borrow.",
+	//       "description": "Required. The name of the book to borrow.",
 	//       "location": "path",
 	//       "pattern": "^shelves/[^/]+/books/[^/]+$",
 	//       "required": true,
@@ -831,6 +834,7 @@ func (c *ShelvesBooksGetCall) Header() http.Header {
 
 func (c *ShelvesBooksGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -901,7 +905,7 @@ func (c *ShelvesBooksGetCall) Do(opts ...googleapi.CallOption) (*GoogleExampleLi
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "The name of the book to retrieve.",
+	//       "description": "Required. The name of the book to retrieve.",
 	//       "location": "path",
 	//       "pattern": "^shelves/[^/]+/books/[^/]+$",
 	//       "required": true,
@@ -997,6 +1001,7 @@ func (c *ShelvesBooksListCall) Header() http.Header {
 
 func (c *ShelvesBooksListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1080,7 +1085,7 @@ func (c *ShelvesBooksListCall) Do(opts ...googleapi.CallOption) (*GoogleExampleL
 	//       "type": "string"
 	//     },
 	//     "parent": {
-	//       "description": "The name of the shelf whose books we'd like to list.",
+	//       "description": "Required. The name of the shelf whose books we'd like to list.",
 	//       "location": "path",
 	//       "pattern": "^shelves/[^/]+$",
 	//       "required": true,
@@ -1167,6 +1172,7 @@ func (c *ShelvesBooksReturnCall) Header() http.Header {
 
 func (c *ShelvesBooksReturnCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1234,7 +1240,7 @@ func (c *ShelvesBooksReturnCall) Do(opts ...googleapi.CallOption) (*GoogleExampl
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "The name of the book to return.",
+	//       "description": "Required. The name of the book to return.",
 	//       "location": "path",
 	//       "pattern": "^shelves/[^/]+/books/[^/]+$",
 	//       "required": true,

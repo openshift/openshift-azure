@@ -15,7 +15,7 @@
   "description": "API for viewing and managing your reports in DoubleClick Bid Manager.",
   "discoveryVersion": "v1",
   "documentationLink": "https://developers.google.com/bid-manager/",
-  "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/EksXu9fzLlIS4f_irK3G9BKBZK8\"",
+  "etag": "\"LYADMvHWYH2ul9D6m9UT9gT77YM/GsxLUMpCoROTPpsSNWRtMe6V3QI\"",
   "icons": {
     "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
     "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
@@ -257,7 +257,7 @@
       }
     }
   },
-  "revision": "20190618",
+  "revision": "20190917",
   "rootUrl": "https://www.googleapis.com/",
   "schemas": {
     "DownloadLineItemsRequest": {
@@ -426,7 +426,7 @@
             "FILTER_ADVERTISER_TIMEZONE",
             "FILTER_AD_POSITION",
             "FILTER_AGE",
-            "FILTER_AUTHORIZED_SELLER_STATE_ID",
+            "FILTER_AUTHORIZED_SELLER_STATE",
             "FILTER_BRANDSAFE_CHANNEL_ID",
             "FILTER_BROWSER",
             "FILTER_BUDGET_SEGMENT_DESCRIPTION",
@@ -451,10 +451,8 @@
             "FILTER_DEVICE_TYPE",
             "FILTER_DFP_ORDER_ID",
             "FILTER_DMA",
-            "FILTER_DV360_ACTIVITY_ID",
             "FILTER_EXCHANGE_ID",
             "FILTER_FLOODLIGHT_ACTIVITY_ID",
-            "FILTER_FLOODLIGHT_PIXEL_ID",
             "FILTER_GENDER",
             "FILTER_INSERTION_ORDER",
             "FILTER_INVENTORY_COMMITMENT_TYPE",
@@ -538,6 +536,7 @@
             "FILTER_VIDEO_CREATIVE_DURATION",
             "FILTER_VIDEO_CREATIVE_DURATION_SKIPPABLE",
             "FILTER_VIDEO_DURATION_SECONDS",
+            "FILTER_VIDEO_DURATION_SECONDS_RANGE",
             "FILTER_VIDEO_FORMAT_SUPPORT",
             "FILTER_VIDEO_INVENTORY_TYPE",
             "FILTER_VIDEO_PLAYER_SIZE",
@@ -550,7 +549,6 @@
             "FILTER_ZIP_CODE"
           ],
           "enumDescriptions": [
-            "",
             "",
             "",
             "",
@@ -749,7 +747,7 @@
               "FILTER_ADVERTISER_TIMEZONE",
               "FILTER_AD_POSITION",
               "FILTER_AGE",
-              "FILTER_AUTHORIZED_SELLER_STATE_ID",
+              "FILTER_AUTHORIZED_SELLER_STATE",
               "FILTER_BRANDSAFE_CHANNEL_ID",
               "FILTER_BROWSER",
               "FILTER_BUDGET_SEGMENT_DESCRIPTION",
@@ -774,10 +772,8 @@
               "FILTER_DEVICE_TYPE",
               "FILTER_DFP_ORDER_ID",
               "FILTER_DMA",
-              "FILTER_DV360_ACTIVITY_ID",
               "FILTER_EXCHANGE_ID",
               "FILTER_FLOODLIGHT_ACTIVITY_ID",
-              "FILTER_FLOODLIGHT_PIXEL_ID",
               "FILTER_GENDER",
               "FILTER_INSERTION_ORDER",
               "FILTER_INVENTORY_COMMITMENT_TYPE",
@@ -861,6 +857,7 @@
               "FILTER_VIDEO_CREATIVE_DURATION",
               "FILTER_VIDEO_CREATIVE_DURATION_SKIPPABLE",
               "FILTER_VIDEO_DURATION_SECONDS",
+              "FILTER_VIDEO_DURATION_SECONDS_RANGE",
               "FILTER_VIDEO_FORMAT_SUPPORT",
               "FILTER_VIDEO_INVENTORY_TYPE",
               "FILTER_VIDEO_PLAYER_SIZE",
@@ -873,7 +870,6 @@
               "FILTER_ZIP_CODE"
             ],
             "enumDescriptions": [
-              "",
               "",
               "",
               "",
@@ -1147,6 +1143,8 @@
               "METRIC_IMPRESSIONS_TO_CONVERSION_RATE",
               "METRIC_LAST_CLICKS",
               "METRIC_LAST_IMPRESSIONS",
+              "METRIC_LINEAR_TV_RESERVED_SPOTS",
+              "METRIC_LINEAR_TV_RESERVED_SPOT_COST",
               "METRIC_MEDIA_COST_ADVERTISER",
               "METRIC_MEDIA_COST_ECPAPC_ADVERTISER",
               "METRIC_MEDIA_COST_ECPAPC_PARTNER",
@@ -1329,6 +1327,8 @@
               "METRIC_VIEWABLE_BID_REQUESTS"
             ],
             "enumDescriptions": [
+              "",
+              "",
               "",
               "",
               "",

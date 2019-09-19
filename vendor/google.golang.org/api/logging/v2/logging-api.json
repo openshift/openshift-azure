@@ -259,7 +259,7 @@
                   "type": "string"
                 },
                 "updateMask": {
-                  "description": "Required. A nonempty list of fields to change in the existing exclusion. New values for the fields are taken from the corresponding fields in the LogExclusion included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.For example, to change the filter and description of an exclusion, specify an update_mask of \"filter,description\".",
+                  "description": "Required. A non-empty list of fields to change in the existing exclusion. New values for the fields are taken from the corresponding fields in the LogExclusion included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.For example, to change the filter and description of an exclusion, specify an update_mask of \"filter,description\".",
                   "format": "google-fieldmask",
                   "location": "query",
                   "type": "string"
@@ -747,7 +747,7 @@
               "type": "string"
             },
             "updateMask": {
-              "description": "Required. A nonempty list of fields to change in the existing exclusion. New values for the fields are taken from the corresponding fields in the LogExclusion included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.For example, to change the filter and description of an exclusion, specify an update_mask of \"filter,description\".",
+              "description": "Required. A non-empty list of fields to change in the existing exclusion. New values for the fields are taken from the corresponding fields in the LogExclusion included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.For example, to change the filter and description of an exclusion, specify an update_mask of \"filter,description\".",
               "format": "google-fieldmask",
               "location": "query",
               "type": "string"
@@ -910,7 +910,7 @@
                   "type": "string"
                 },
                 "updateMask": {
-                  "description": "Required. A nonempty list of fields to change in the existing exclusion. New values for the fields are taken from the corresponding fields in the LogExclusion included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.For example, to change the filter and description of an exclusion, specify an update_mask of \"filter,description\".",
+                  "description": "Required. A non-empty list of fields to change in the existing exclusion. New values for the fields are taken from the corresponding fields in the LogExclusion included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.For example, to change the filter and description of an exclusion, specify an update_mask of \"filter,description\".",
                   "format": "google-fieldmask",
                   "location": "query",
                   "type": "string"
@@ -1458,7 +1458,7 @@
                   "type": "string"
                 },
                 "updateMask": {
-                  "description": "Required. A nonempty list of fields to change in the existing exclusion. New values for the fields are taken from the corresponding fields in the LogExclusion included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.For example, to change the filter and description of an exclusion, specify an update_mask of \"filter,description\".",
+                  "description": "Required. A non-empty list of fields to change in the existing exclusion. New values for the fields are taken from the corresponding fields in the LogExclusion included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.For example, to change the filter and description of an exclusion, specify an update_mask of \"filter,description\".",
                   "format": "google-fieldmask",
                   "location": "query",
                   "type": "string"
@@ -1903,7 +1903,7 @@
                   "type": "string"
                 },
                 "updateMask": {
-                  "description": "Required. A nonempty list of fields to change in the existing exclusion. New values for the fields are taken from the corresponding fields in the LogExclusion included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.For example, to change the filter and description of an exclusion, specify an update_mask of \"filter,description\".",
+                  "description": "Required. A non-empty list of fields to change in the existing exclusion. New values for the fields are taken from the corresponding fields in the LogExclusion included in this request. Fields not mentioned in update_mask are not changed and are ignored in the request.For example, to change the filter and description of an exclusion, specify an update_mask of \"filter,description\".",
                   "format": "google-fieldmask",
                   "location": "query",
                   "type": "string"
@@ -2535,9 +2535,20 @@
       }
     }
   },
-  "revision": "20190608",
+  "revision": "20190907",
   "rootUrl": "https://logging.googleapis.com/",
   "schemas": {
+    "BigQueryOptions": {
+      "description": "Options that change functionality of a sink exporting data to BigQuery.",
+      "id": "BigQueryOptions",
+      "properties": {
+        "usePartitionedTables": {
+          "description": "Optional. Whether to use BigQuery's partition tables. By default, Logging creates dated tables based on the log entries' timestamps, e.g. syslog_20170523. With partitioned tables the date suffix is no longer present and special query syntax has to be used instead. In both cases, tables are sharded based on UTC timezone.",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
     "BucketOptions": {
       "description": "BucketOptions describes the bucket boundaries used to create a histogram for the distribution. The buckets can be in a linear sequence, an exponential sequence, or each bucket can be specified explicitly. BucketOptions does not include the number of values in each bucket.A bucket has an inclusive lower bound and exclusive upper bound for the values that are counted for that bucket. The upper bound of a bucket must be strictly greater than the lower bound. The sequence of N buckets for a distribution consists of an underflow bucket (number 0), zero or more finite buckets (number 1 through N - 2) and an overflow bucket (number N - 1). The buckets are contiguous: the lower bound of bucket i (i \u003e 0) is the same as the upper bound of bucket i - 1. The buckets span the whole range of finite values: lower bound of the underflow bucket is -infinity and the upper bound of the overflow bucket is +infinity. The finite buckets are so-called because both bounds are finite.",
       "id": "BucketOptions",
@@ -2820,7 +2831,7 @@
       "id": "ListLogsResponse",
       "properties": {
         "logNames": {
-          "description": "A list of log names. For example, \"projects/my-project/syslog\" or \"organizations/123/cloudresourcemanager.googleapis.com%2Factivity\".",
+          "description": "A list of log names. For example, \"projects/my-project/logs/syslog\" or \"organizations/123/logs/cloudresourcemanager.googleapis.com%2Factivity\".",
           "items": {
             "type": "string"
           },
@@ -3023,7 +3034,7 @@
       "type": "object"
     },
     "LogExclusion": {
-      "description": "Specifies a set of log entries that are not to be stored in Logging. If your project receives a large volume of logs, you might be able to use exclusions to reduce your chargeable logs. Exclusions are processed after log sinks, so you can export log entries before they are excluded. Audit log entries and log entries from Amazon Web Services are never excluded.",
+      "description": "Specifies a set of log entries that are not to be stored in Logging. If your GCP resource receives a large volume of logs, you can use exclusions to reduce your chargeable logs. Exclusions are processed after log sinks, so you can export log entries before they are excluded. Note that organization-level and folder-level exclusions don't apply to child resources, and that you can't exclude audit log entries.",
       "id": "LogExclusion",
       "properties": {
         "createTime": {
@@ -3040,7 +3051,7 @@
           "type": "boolean"
         },
         "filter": {
-          "description": "Required. An advanced logs filter that matches the log entries to be excluded. By using the sample function, you can exclude less than 100% of the matching log entries. For example, the following filter matches 99% of low-severity log entries from load balancers:\"resource.type=http_load_balancer severity\u003cERROR sample(insertId, 0.99)\"",
+          "description": "Required. An advanced logs filter that matches the log entries to be excluded. By using the sample function, you can exclude less than 100% of the matching log entries. For example, the following query matches 99% of low-severity log entries from Google Cloud Storage buckets:\"resource.type=gcs_bucket severity\u003cERROR sample(insertId, 0.99)\"",
           "type": "string"
         },
         "name": {
@@ -3165,6 +3176,10 @@
       "description": "Describes a sink used to export log entries to one of the following destinations in any project: a Cloud Storage bucket, a BigQuery dataset, or a Cloud Pub/Sub topic. A logs filter controls which log entries are exported. The sink must be created within a project, organization, billing account, or folder.",
       "id": "LogSink",
       "properties": {
+        "bigqueryOptions": {
+          "$ref": "BigQueryOptions",
+          "description": "Optional. Options that affect sinks exporting data to BigQuery."
+        },
         "createTime": {
           "description": "Output only. The creation timestamp of the sink.This field may not be present for older sinks.",
           "format": "google-datetime",

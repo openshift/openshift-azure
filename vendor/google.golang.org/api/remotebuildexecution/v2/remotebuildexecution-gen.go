@@ -49,8 +49,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -2597,6 +2597,42 @@ func (s *GoogleDevtoolsRemotebuildbotCommandStatus) MarshalJSON() ([]byte, error
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// GoogleDevtoolsRemotebuildexecutionAdminV1alphaAcceleratorConfig:
+// AcceleratorConfig defines the accelerator cards to attach to the VM.
+type GoogleDevtoolsRemotebuildexecutionAdminV1alphaAcceleratorConfig struct {
+	// AcceleratorCount: The number of the guest accelerator cards exposed
+	// to this VM.
+	AcceleratorCount int64 `json:"acceleratorCount,omitempty,string"`
+
+	// AcceleratorType: The type of accelerator to attach to this VM, e.g.
+	// "nvidia-tesla-k80" for
+	// nVidia Tesla K80.
+	AcceleratorType string `json:"acceleratorType,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "AcceleratorCount") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "AcceleratorCount") to
+	// include in API requests with the JSON null value. By default, fields
+	// with empty values are omitted from API requests. However, any field
+	// with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GoogleDevtoolsRemotebuildexecutionAdminV1alphaAcceleratorConfig) MarshalJSON() ([]byte, error) {
+	type NoMethod GoogleDevtoolsRemotebuildexecutionAdminV1alphaAcceleratorConfig
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // GoogleDevtoolsRemotebuildexecutionAdminV1alphaCreateInstanceRequest:
 // The request used for `CreateInstance`.
 type GoogleDevtoolsRemotebuildexecutionAdminV1alphaCreateInstanceRequest struct {
@@ -2934,30 +2970,43 @@ func (s *GoogleDevtoolsRemotebuildexecutionAdminV1alphaListInstancesResponse) Ma
 }
 
 type GoogleDevtoolsRemotebuildexecutionAdminV1alphaListWorkerPoolsRequest struct {
-	// Filter: Optional. A filter to constrain the pools returned. Filters
-	// have the form:
+	// Filter: Optional. A filter expression that filters resources listed
+	// in
+	// the response. The expression must specify the field name, a
+	// comparison
+	// operator, and the value that you want to use for filtering. The
+	// value
+	// must be a string, a number, or a boolean. String values
+	// are
+	// case-insensitive.
+	// The comparison operator must be either `:`, `=`, `!=`, `>`, `>=`,
+	// `<=` or
+	// `<`.
+	// The `:` operator can be used with string fields to match
+	// substrings.
+	// For non-string fields it is equivalent to the `=` operator.
+	// The `:*` comparison can be used to test  whether a key has been
+	// defined.
 	//
-	// <field> <operator> <value> [[AND|OR] <field> <operator>
-	// <value>]...
+	// You can also filter on nested fields.
 	//
-	// <field> is the path for a field or map key in the Pool proto
-	// message.
-	// e.g. "configuration.disk_size_gb" or
-	// "configuration.labels.key".
-	// <operator> can be one of "<", "<=", ">=", ">", "=", "!=", ":".
-	// ":" is a HAS operation for strings and repeated primitive
-	// fields.
-	// <value> is the value to test, case-insensitive for strings. "*"
-	// stands for
-	// any value and can be used to test for key presence.
-	// Parenthesis determine AND/OR precedence. In space separated
-	// restrictions,
-	// AND is implicit, e.g. "a = b x = y" is equivalent to "a = b AND x =
-	// y".
+	// To filter on multiple expressions, you can separate expression
+	// using
+	// `AND` and `OR` operators, using parentheses to specify precedence.
+	// If
+	// neither operator is specified, `AND` is assumed.
 	//
-	// Example filter:
-	// configuration.labels.key1 = * AND (state = RUNNING OR state =
-	// UPDATING)
+	// Examples:
+	//
+	// Include only pools with more than 100 reserved
+	// workers:
+	// `(worker_count > 100) (worker_config.reserved = true)`
+	//
+	// Include only pools with a certain label or machines of the
+	// n1-standard
+	// family:
+	// `worker_config.labels.key1 : * OR worker_config.machine_type:
+	// n1-standard`
 	Filter string `json:"filter,omitempty"`
 
 	// Parent: Resource name of the instance.
@@ -3062,6 +3111,9 @@ func (s *GoogleDevtoolsRemotebuildexecutionAdminV1alphaUpdateWorkerPoolRequest) 
 // the configuration to be used for a creating workers in
 // the worker pool.
 type GoogleDevtoolsRemotebuildexecutionAdminV1alphaWorkerConfig struct {
+	// Accelerator: The accelerator card attached to each VM.
+	Accelerator *GoogleDevtoolsRemotebuildexecutionAdminV1alphaAcceleratorConfig `json:"accelerator,omitempty"`
+
 	// DiskSizeGb: Required. Size of the disk attached to the worker, in
 	// GB.
 	// See https://cloud.google.com/compute/docs/disks/
@@ -3080,9 +3132,9 @@ type GoogleDevtoolsRemotebuildexecutionAdminV1alphaWorkerConfig struct {
 	// contain
 	// lowercase letters, numeric characters, underscores and
 	// dashes.
-	// International letters are permitted. Keys must start with a letter
-	// but
-	// values are optional.
+	// International letters are permitted. Label keys must start with a
+	// letter.
+	// Label values are optional.
 	// There can not be more than 64 labels per resource.
 	Labels map[string]string `json:"labels,omitempty"`
 
@@ -3109,7 +3161,7 @@ type GoogleDevtoolsRemotebuildexecutionAdminV1alphaWorkerConfig struct {
 	// details.
 	Reserved bool `json:"reserved,omitempty"`
 
-	// ForceSendFields is a list of field names (e.g. "DiskSizeGb") to
+	// ForceSendFields is a list of field names (e.g. "Accelerator") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -3117,10 +3169,10 @@ type GoogleDevtoolsRemotebuildexecutionAdminV1alphaWorkerConfig struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "DiskSizeGb") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
+	// NullFields is a list of field names (e.g. "Accelerator") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
 	// null. It is an error if a field in this list has a non-empty value.
 	// This may be used to include null fields in Patch requests.
 	NullFields []string `json:"-"`
@@ -5031,6 +5083,7 @@ func (c *ActionResultsGetCall) Header() http.Header {
 
 func (c *ActionResultsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5240,6 +5293,7 @@ func (c *ActionResultsUpdateCall) Header() http.Header {
 
 func (c *ActionResultsUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5494,6 +5548,7 @@ func (c *ActionsExecuteCall) Header() http.Header {
 
 func (c *ActionsExecuteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5656,6 +5711,7 @@ func (c *BlobsBatchReadCall) Header() http.Header {
 
 func (c *BlobsBatchReadCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5824,6 +5880,7 @@ func (c *BlobsBatchUpdateCall) Header() http.Header {
 
 func (c *BlobsBatchUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5972,6 +6029,7 @@ func (c *BlobsFindMissingCall) Header() http.Header {
 
 func (c *BlobsFindMissingCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6175,6 +6233,7 @@ func (c *BlobsGetTreeCall) Header() http.Header {
 
 func (c *BlobsGetTreeCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6370,6 +6429,7 @@ func (c *OperationsWaitExecutionCall) Header() http.Header {
 
 func (c *OperationsWaitExecutionCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6527,6 +6587,7 @@ func (c *V2GetCapabilitiesCall) Header() http.Header {
 
 func (c *V2GetCapabilitiesCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

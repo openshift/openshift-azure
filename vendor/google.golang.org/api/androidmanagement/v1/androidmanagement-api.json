@@ -918,7 +918,7 @@
       }
     }
   },
-  "revision": "20190701",
+  "revision": "20190906",
   "rootUrl": "https://androidmanagement.googleapis.com/",
   "schemas": {
     "AlwaysOnVpnPackage": {
@@ -948,10 +948,32 @@
       },
       "type": "object"
     },
+    "AppTrackInfo": {
+      "description": "Id to name association of a app track.",
+      "id": "AppTrackInfo",
+      "properties": {
+        "trackAlias": {
+          "description": "The track name associated with the trackId, set in the Play Console. The name is modifiable from Play Console.",
+          "type": "string"
+        },
+        "trackId": {
+          "description": "The unmodifiable unique track identifier, taken from the releaseTrackId in the URL of the Play Console page that displays the app’s track information.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "Application": {
       "description": "Information about an app.",
       "id": "Application",
       "properties": {
+        "appTracks": {
+          "description": "Application tracks visible to the enterprise.",
+          "items": {
+            "$ref": "AppTrackInfo"
+          },
+          "type": "array"
+        },
         "managedProperties": {
           "description": "The set of managed properties available to be pre-configured for the app.",
           "items": {
@@ -1038,6 +1060,13 @@
       "description": "Policy for an individual app.",
       "id": "ApplicationPolicy",
       "properties": {
+        "accessibleTrackIds": {
+          "description": "List of the app’s track IDs that a device belonging to the enterprise can access. If the list contains multiple track IDs, devices receive the latest version among all accessible tracks. If the list contains no track IDs, devices only have access to the app’s production track. More details about each track are available in AppTrackInfo.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
         "defaultPermissionPolicy": {
           "description": "The default policy for all permissions requested by the app. If specified, this overrides the policy-level default_permission_policy which applies to all apps. It does not override the permission_grants which applies to all apps.",
           "enum": [
@@ -1091,7 +1120,8 @@
             "FORCE_INSTALLED",
             "BLOCKED",
             "AVAILABLE",
-            "REQUIRED_FOR_SETUP"
+            "REQUIRED_FOR_SETUP",
+            "KIOSK"
           ],
           "enumDescriptions": [
             "Unspecified. Defaults to AVAILABLE.",
@@ -1099,12 +1129,13 @@
             "The app is automatically installed and can't be removed by the user.",
             "The app is blocked and can't be installed. If the app was installed under a previous policy, it will be uninstalled.",
             "The app is available to install.",
-            "The app is automatically installed and can't be removed by the user and will prevent setup from completion until installation is complete."
+            "The app is automatically installed and can't be removed by the user and will prevent setup from completion until installation is complete.",
+            "The app is automatically installed in kiosk mode: it's set as the preferred home intent and whitelisted for lock task mode. Device setup won't complete until the app is installed. After installation, users won't be able to remove the app. You can only set this installType for one app per policy. When this is present in the policy, status bar will be automatically disabled."
           ],
           "type": "string"
         },
         "lockTaskAllowed": {
-          "description": "Whether the app is allowed to lock itself in full-screen mode.",
+          "description": "Whether the app is allowed to lock itself in full-screen mode. DEPRECATED. Use InstallType KIOSK or kioskCustomLauncherEnabled to to configure a dedicated device.",
           "type": "boolean"
         },
         "managedConfiguration": {
@@ -1529,6 +1560,10 @@
           },
           "type": "array"
         },
+        "securityPosture": {
+          "$ref": "SecurityPosture",
+          "description": "Device's security posture value that reflects how secure the device is."
+        },
         "softwareInfo": {
           "$ref": "SoftwareInfo",
           "description": "Detailed information about the device software. This information is only available if softwareInfoEnabled is true in the device's policy."
@@ -1555,7 +1590,7 @@
           "additionalProperties": {
             "type": "string"
           },
-          "description": "Map of selected system properties name and value related to the device.",
+          "description": "Map of selected system properties name and value related to the device. This information is only available if systemPropertiesEnabled is true in the device's policy.",
           "type": "object"
         },
         "user": {
@@ -2512,7 +2547,7 @@
             "The password must contain numeric characters with no repeating (4444) or ordered (1234, 4321, 2468) sequences.",
             "The password must contain alphabetic (or symbol) characters.",
             "The password must contain both numeric and alphabetic (or symbol) characters.",
-            "The password must contain at least a letter, a numerical digit and a special symbol. Other password constraints, for example, password_minimum_letters are enforced."
+            "The password must meet the minimum requirements specified in passwordMinimumLength, passwordMinimumLetters, passwordMinimumSymbols, etc. For example, if passwordMinimumSymbols is 2, the password must contain at least two symbols."
           ],
           "type": "string"
         },
@@ -2561,7 +2596,7 @@
       "type": "object"
     },
     "PersistentPreferredActivity": {
-      "description": "A default activity for handling intents that match a particular intent filter.",
+      "description": "A default activity for handling intents that match a particular intent filter. Note: To set up a kiosk, use InstallType to KIOSK rather than use persistent preferred activities.",
       "id": "PersistentPreferredActivity",
       "properties": {
         "actions": {
@@ -2781,8 +2816,11 @@
             "Disable showing all notifications on secure keyguard screens.",
             "Disable unredacted notifications on secure keyguard screens.",
             "Ignore trust agent state on secure keyguard screens.",
-            "Disable fingerprint sensor on keyguard secure screens.",
+            "Disable fingerprint sensor on secure keyguard screens.",
             "Disable text entry into notifications on secure keyguard screens.",
+            "Disable face authentication on secure keyguard screens.",
+            "Disable iris authentication on secure keyguard screens.",
+            "Disable all biometric authentication on secure keyguard screens.",
             "Disable all current and future keyguard customizations."
           ],
           "items": {
@@ -2794,6 +2832,9 @@
               "TRUST_AGENTS",
               "DISABLE_FINGERPRINT",
               "DISABLE_REMOTE_INPUT",
+              "FACE",
+              "IRIS",
+              "BIOMETRICS",
               "ALL_FEATURES"
             ],
             "type": "string"
@@ -2801,7 +2842,7 @@
           "type": "array"
         },
         "kioskCustomLauncherEnabled": {
-          "description": "Whether the kiosk custom launcher is enabled. This replaces the home screen with a launcher that locks down the device to the apps installed via the applications setting. The apps appear on a single page in alphabetical order. It is recommended to also use status_bar_disabled to block access to device settings.",
+          "description": "Whether the kiosk custom launcher is enabled. This replaces the home screen with a launcher that locks down the device to the apps installed via the applications setting. Apps appear on a single page in alphabetical order. The status bar is disabled when this is set.",
           "type": "boolean"
         },
         "locationMode": {
@@ -2894,6 +2935,10 @@
           },
           "type": "array"
         },
+        "permittedAccessibilityServices": {
+          "$ref": "PackageNameList",
+          "description": "Specifies permitted accessibility services. If the field is not set, any accessibility service can be used. If the field is set, only the accessibility services in this list and the system's built-in accessibility services can be used. In particular, if the field is set to empty, only the system's built-in accessibility services can be used."
+        },
         "permittedInputMethods": {
           "$ref": "PackageNameList",
           "description": "If present, only the input methods provided by packages in this list are permitted. If this field is present, but the list is empty, then only system input methods are permitted."
@@ -2978,7 +3023,7 @@
           "type": "boolean"
         },
         "statusBarDisabled": {
-          "description": "Whether the status bar is disabled. This disables notifications, quick settings, and other screen overlays that allow escape from full-screen mode.",
+          "description": "Whether the status bar is disabled. This disables notifications, quick settings, and other screen overlays that allow escape from full-screen mode. DEPRECATED. To disable the status bar on a kiosk device, use InstallType KIOSK or kioskCustomLauncherEnabled.",
           "type": "boolean"
         },
         "statusReportingSettings": {
@@ -3067,6 +3112,34 @@
       },
       "type": "object"
     },
+    "PostureDetail": {
+      "description": "Additional details regarding the security posture of the device.",
+      "id": "PostureDetail",
+      "properties": {
+        "advice": {
+          "description": "Corresponding admin-facing advice to mitigate this security risk and improve the security posture of the device.",
+          "items": {
+            "$ref": "UserFacingMessage"
+          },
+          "type": "array"
+        },
+        "securityRisk": {
+          "description": "A specific security risk that negatively affects the security posture of the device.",
+          "enum": [
+            "SECURITY_RISK_UNSPECIFIED",
+            "UNKNOWN_OS",
+            "COMPROMISED_OS"
+          ],
+          "enumDescriptions": [
+            "Unspecified.",
+            "SafetyNet detects that the device is running an unknown OS (basicIntegrity check succeeds but ctsProfileMatch fails).",
+            "SafetyNet detects that the device is running a compromised OS (basicIntegrity check fails)."
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "PowerManagementEvent": {
       "description": "A power management event.",
       "id": "PowerManagementEvent",
@@ -3131,6 +3204,36 @@
           "description": "The port of the direct proxy.",
           "format": "int32",
           "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "SecurityPosture": {
+      "description": "The security posture of the device, as determined by the current device state and the policies applied.",
+      "id": "SecurityPosture",
+      "properties": {
+        "devicePosture": {
+          "description": "Device's security posture value.",
+          "enum": [
+            "POSTURE_UNSPECIFIED",
+            "SECURE",
+            "AT_RISK",
+            "POTENTIALLY_COMPROMISED"
+          ],
+          "enumDescriptions": [
+            "Unspecified. There is no posture detail for this posture value.",
+            "This device is secure.",
+            "This device may be more vulnerable to malicious actors than is recommended for use with corporate data.",
+            "This device may be compromised and corporate data may be accessible to unauthorized actors."
+          ],
+          "type": "string"
+        },
+        "postureDetails": {
+          "description": "Additional details regarding the security posture of the device.",
+          "items": {
+            "$ref": "PostureDetail"
+          },
+          "type": "array"
         }
       },
       "type": "object"
@@ -3302,6 +3405,10 @@
         },
         "softwareInfoEnabled": {
           "description": "Whether software info reporting is enabled.",
+          "type": "boolean"
+        },
+        "systemPropertiesEnabled": {
+          "description": "Whether system properties reporting is enabled.",
           "type": "boolean"
         }
       },

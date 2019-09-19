@@ -53,8 +53,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -770,7 +770,9 @@ type DriveItem struct {
 	// DriveFile: The Drive item is a file.
 	DriveFile *DriveFile `json:"driveFile,omitempty"`
 
-	// DriveFolder: The Drive item is a folder.
+	// DriveFolder: The Drive item is a folder. Includes information about
+	// the type of
+	// folder.
 	DriveFolder *DriveFolder `json:"driveFolder,omitempty"`
 
 	// File: This field is deprecated; please use the `driveFile` field
@@ -824,7 +826,9 @@ type DriveItemReference struct {
 	// DriveFile: The Drive item is a file.
 	DriveFile *DriveFile `json:"driveFile,omitempty"`
 
-	// DriveFolder: The Drive item is a folder.
+	// DriveFolder: The Drive item is a folder. Includes information about
+	// the type of
+	// folder.
 	DriveFolder *DriveFolder `json:"driveFolder,omitempty"`
 
 	// File: This field is deprecated; please use the `driveFile` field
@@ -1919,6 +1923,7 @@ func (c *ActivityQueryCall) Header() http.Header {
 
 func (c *ActivityQueryCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

@@ -49,8 +49,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -243,6 +243,10 @@ type GoogleFactcheckingFactchecktoolsV1alpha1ClaimRating struct {
 
 	// ImageUrl: Corresponds to `ClaimReview.reviewRating.image`.
 	ImageUrl string `json:"imageUrl,omitempty"`
+
+	// RatingExplanation: Corresponds to
+	// `ClaimReview.reviewRating.ratingExplanation`.
+	RatingExplanation string `json:"ratingExplanation,omitempty"`
 
 	// RatingValue: A numeric rating of this claim, in the range worstRating
 	// — bestRating
@@ -767,6 +771,7 @@ func (c *ClaimsSearchCall) Header() http.Header {
 
 func (c *ClaimsSearchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -946,6 +951,7 @@ func (c *PagesCreateCall) Header() http.Header {
 
 func (c *PagesCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1073,6 +1079,7 @@ func (c *PagesDeleteCall) Header() http.Header {
 
 func (c *PagesDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1213,6 +1220,7 @@ func (c *PagesGetCall) Header() http.Header {
 
 func (c *PagesGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1412,6 +1420,7 @@ func (c *PagesListCall) Header() http.Header {
 
 func (c *PagesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1593,6 +1602,7 @@ func (c *PagesUpdateCall) Header() http.Header {
 
 func (c *PagesUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

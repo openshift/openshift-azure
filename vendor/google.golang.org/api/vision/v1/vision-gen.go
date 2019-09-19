@@ -55,8 +55,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -202,6 +202,8 @@ type OperationsService struct {
 
 func NewProjectsService(s *Service) *ProjectsService {
 	rs := &ProjectsService{s: s}
+	rs.Files = NewProjectsFilesService(s)
+	rs.Images = NewProjectsImagesService(s)
 	rs.Locations = NewProjectsLocationsService(s)
 	rs.Operations = NewProjectsOperationsService(s)
 	return rs
@@ -210,13 +212,37 @@ func NewProjectsService(s *Service) *ProjectsService {
 type ProjectsService struct {
 	s *Service
 
+	Files *ProjectsFilesService
+
+	Images *ProjectsImagesService
+
 	Locations *ProjectsLocationsService
 
 	Operations *ProjectsOperationsService
 }
 
+func NewProjectsFilesService(s *Service) *ProjectsFilesService {
+	rs := &ProjectsFilesService{s: s}
+	return rs
+}
+
+type ProjectsFilesService struct {
+	s *Service
+}
+
+func NewProjectsImagesService(s *Service) *ProjectsImagesService {
+	rs := &ProjectsImagesService{s: s}
+	return rs
+}
+
+type ProjectsImagesService struct {
+	s *Service
+}
+
 func NewProjectsLocationsService(s *Service) *ProjectsLocationsService {
 	rs := &ProjectsLocationsService{s: s}
+	rs.Files = NewProjectsLocationsFilesService(s)
+	rs.Images = NewProjectsLocationsImagesService(s)
 	rs.Operations = NewProjectsLocationsOperationsService(s)
 	rs.ProductSets = NewProjectsLocationsProductSetsService(s)
 	rs.Products = NewProjectsLocationsProductsService(s)
@@ -226,11 +252,33 @@ func NewProjectsLocationsService(s *Service) *ProjectsLocationsService {
 type ProjectsLocationsService struct {
 	s *Service
 
+	Files *ProjectsLocationsFilesService
+
+	Images *ProjectsLocationsImagesService
+
 	Operations *ProjectsLocationsOperationsService
 
 	ProductSets *ProjectsLocationsProductSetsService
 
 	Products *ProjectsLocationsProductsService
+}
+
+func NewProjectsLocationsFilesService(s *Service) *ProjectsLocationsFilesService {
+	rs := &ProjectsLocationsFilesService{s: s}
+	return rs
+}
+
+type ProjectsLocationsFilesService struct {
+	s *Service
+}
+
+func NewProjectsLocationsImagesService(s *Service) *ProjectsLocationsImagesService {
+	rs := &ProjectsLocationsImagesService{s: s}
+	return rs
+}
+
+type ProjectsLocationsImagesService struct {
+	s *Service
 }
 
 func NewProjectsLocationsOperationsService(s *Service) *ProjectsLocationsOperationsService {
@@ -296,8 +344,8 @@ type ProjectsOperationsService struct {
 // AddProductToProductSetRequest: Request message for the
 // `AddProductToProductSet` method.
 type AddProductToProductSetRequest struct {
-	// Product: The resource name for the Product to be added to this
-	// ProductSet.
+	// Product: Required. The resource name for the Product to be added to
+	// this ProductSet.
 	//
 	// Format is:
 	// `projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`
@@ -386,6 +434,11 @@ func (s *AnnotateFileRequest) MarshalJSON() ([]byte, error) {
 // file may contain one or more
 // images, which individually have their own responses.
 type AnnotateFileResponse struct {
+	// Error: If set, represents the error message for the failed request.
+	// The
+	// `responses` field will not be set in this case.
+	Error *Status `json:"error,omitempty"`
+
 	// InputConfig: Information about the file for which this response is
 	// generated.
 	InputConfig *InputConfig `json:"inputConfig,omitempty"`
@@ -398,7 +451,7 @@ type AnnotateFileResponse struct {
 	// TotalPages: This field gives the total number of pages in the file.
 	TotalPages int64 `json:"totalPages,omitempty"`
 
-	// ForceSendFields is a list of field names (e.g. "InputConfig") to
+	// ForceSendFields is a list of field names (e.g. "Error") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -406,10 +459,10 @@ type AnnotateFileResponse struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "InputConfig") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
+	// NullFields is a list of field names (e.g. "Error") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
 	// null. It is an error if a field in this list has a non-empty value.
 	// This may be used to include null fields in Patch requests.
 	NullFields []string `json:"-"`
@@ -617,10 +670,27 @@ func (s *AsyncAnnotateFileResponse) MarshalJSON() ([]byte, error) {
 // requests are batched into a single service
 // call.
 type AsyncBatchAnnotateFilesRequest struct {
-	// Requests: Individual async file annotation requests for this batch.
+	// Parent: Optional. Target project and location to make a
+	// call.
+	//
+	// Format: `projects/{project-id}/locations/{location-id}`.
+	//
+	// If no parent is specified, a region will be chosen
+	// automatically.
+	//
+	// Supported location-ids:
+	//     `us`: USA country only,
+	//     `asia`: East asia areas, like Japan, Taiwan,
+	//     `eu`: The European Union.
+	//
+	// Example: `projects/project-A/locations/eu`.
+	Parent string `json:"parent,omitempty"`
+
+	// Requests: Required. Individual async file annotation requests for
+	// this batch.
 	Requests []*AsyncAnnotateFileRequest `json:"requests,omitempty"`
 
-	// ForceSendFields is a list of field names (e.g. "Requests") to
+	// ForceSendFields is a list of field names (e.g. "Parent") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -628,8 +698,8 @@ type AsyncBatchAnnotateFilesRequest struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "Requests") to include in
-	// API requests with the JSON null value. By default, fields with empty
+	// NullFields is a list of field names (e.g. "Parent") to include in API
+	// requests with the JSON null value. By default, fields with empty
 	// values are omitted from API requests. However, any field with an
 	// empty value appearing in NullFields will be sent to the server as
 	// null. It is an error if a field in this list has a non-empty value.
@@ -681,7 +751,24 @@ type AsyncBatchAnnotateImagesRequest struct {
 	// (e.g. format).
 	OutputConfig *OutputConfig `json:"outputConfig,omitempty"`
 
-	// Requests: Individual image annotation requests for this batch.
+	// Parent: Optional. Target project and location to make a
+	// call.
+	//
+	// Format: `projects/{project-id}/locations/{location-id}`.
+	//
+	// If no parent is specified, a region will be chosen
+	// automatically.
+	//
+	// Supported location-ids:
+	//     `us`: USA country only,
+	//     `asia`: East asia areas, like Japan, Taiwan,
+	//     `eu`: The European Union.
+	//
+	// Example: `projects/project-A/locations/eu`.
+	Parent string `json:"parent,omitempty"`
+
+	// Requests: Required. Individual image annotation requests for this
+	// batch.
 	Requests []*AnnotateImageRequest `json:"requests,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "OutputConfig") to
@@ -740,12 +827,28 @@ func (s *AsyncBatchAnnotateImagesResponse) MarshalJSON() ([]byte, error) {
 // BatchAnnotateFilesRequest: A list of requests to annotate files using
 // the BatchAnnotateFiles API.
 type BatchAnnotateFilesRequest struct {
-	// Requests: The list of file annotation requests. Right now we support
-	// only one
+	// Parent: Optional. Target project and location to make a
+	// call.
+	//
+	// Format: `projects/{project-id}/locations/{location-id}`.
+	//
+	// If no parent is specified, a region will be chosen
+	// automatically.
+	//
+	// Supported location-ids:
+	//     `us`: USA country only,
+	//     `asia`: East asia areas, like Japan, Taiwan,
+	//     `eu`: The European Union.
+	//
+	// Example: `projects/project-A/locations/eu`.
+	Parent string `json:"parent,omitempty"`
+
+	// Requests: Required. The list of file annotation requests. Right now
+	// we support only one
 	// AnnotateFileRequest in BatchAnnotateFilesRequest.
 	Requests []*AnnotateFileRequest `json:"requests,omitempty"`
 
-	// ForceSendFields is a list of field names (e.g. "Requests") to
+	// ForceSendFields is a list of field names (e.g. "Parent") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -753,8 +856,8 @@ type BatchAnnotateFilesRequest struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "Requests") to include in
-	// API requests with the JSON null value. By default, fields with empty
+	// NullFields is a list of field names (e.g. "Parent") to include in API
+	// requests with the JSON null value. By default, fields with empty
 	// values are omitted from API requests. However, any field with an
 	// empty value appearing in NullFields will be sent to the server as
 	// null. It is an error if a field in this list has a non-empty value.
@@ -805,10 +908,27 @@ func (s *BatchAnnotateFilesResponse) MarshalJSON() ([]byte, error) {
 // BatchAnnotateImagesRequest: Multiple image annotation requests are
 // batched into a single service call.
 type BatchAnnotateImagesRequest struct {
-	// Requests: Individual image annotation requests for this batch.
+	// Parent: Optional. Target project and location to make a
+	// call.
+	//
+	// Format: `projects/{project-id}/locations/{location-id}`.
+	//
+	// If no parent is specified, a region will be chosen
+	// automatically.
+	//
+	// Supported location-ids:
+	//     `us`: USA country only,
+	//     `asia`: East asia areas, like Japan, Taiwan,
+	//     `eu`: The European Union.
+	//
+	// Example: `projects/project-A/locations/eu`.
+	Parent string `json:"parent,omitempty"`
+
+	// Requests: Required. Individual image annotation requests for this
+	// batch.
 	Requests []*AnnotateImageRequest `json:"requests,omitempty"`
 
-	// ForceSendFields is a list of field names (e.g. "Requests") to
+	// ForceSendFields is a list of field names (e.g. "Parent") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -816,8 +936,8 @@ type BatchAnnotateImagesRequest struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "Requests") to include in
-	// API requests with the JSON null value. By default, fields with empty
+	// NullFields is a list of field names (e.g. "Parent") to include in API
+	// requests with the JSON null value. By default, fields with empty
 	// values are omitted from API requests. However, any field with an
 	// empty value appearing in NullFields will be sent to the server as
 	// null. It is an error if a field in this list has a non-empty value.
@@ -1672,32 +1792,22 @@ type FaceAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	AngerLikelihood string `json:"angerLikelihood,omitempty"`
 
 	// BlurredLikelihood: Blurred likelihood.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	BlurredLikelihood string `json:"blurredLikelihood,omitempty"`
 
 	// BoundingPoly: The bounding polygon around the face. The coordinates
@@ -1732,32 +1842,22 @@ type FaceAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	HeadwearLikelihood string `json:"headwearLikelihood,omitempty"`
 
 	// JoyLikelihood: Joy likelihood.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	JoyLikelihood string `json:"joyLikelihood,omitempty"`
 
 	// LandmarkingConfidence: Face landmarking confidence. Range [0, 1].
@@ -1784,32 +1884,22 @@ type FaceAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	SorrowLikelihood string `json:"sorrowLikelihood,omitempty"`
 
 	// SurpriseLikelihood: Surprise likelihood.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	SurpriseLikelihood string `json:"surpriseLikelihood,omitempty"`
 
 	// TiltAngle: Pitch angle, which indicates the upwards/downwards angle
@@ -1821,16 +1911,11 @@ type FaceAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	UnderExposedLikelihood string `json:"underExposedLikelihood,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "AngerLikelihood") to
@@ -2044,6 +2129,11 @@ func (s *GcsSource) MarshalJSON() ([]byte, error) {
 // file annotation request. A file may contain one or more
 // images, which individually have their own responses.
 type GoogleCloudVisionV1p1beta1AnnotateFileResponse struct {
+	// Error: If set, represents the error message for the failed request.
+	// The
+	// `responses` field will not be set in this case.
+	Error *Status `json:"error,omitempty"`
+
 	// InputConfig: Information about the file for which this response is
 	// generated.
 	InputConfig *GoogleCloudVisionV1p1beta1InputConfig `json:"inputConfig,omitempty"`
@@ -2056,7 +2146,7 @@ type GoogleCloudVisionV1p1beta1AnnotateFileResponse struct {
 	// TotalPages: This field gives the total number of pages in the file.
 	TotalPages int64 `json:"totalPages,omitempty"`
 
-	// ForceSendFields is a list of field names (e.g. "InputConfig") to
+	// ForceSendFields is a list of field names (e.g. "Error") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -2064,10 +2154,10 @@ type GoogleCloudVisionV1p1beta1AnnotateFileResponse struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "InputConfig") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
+	// NullFields is a list of field names (e.g. "Error") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
 	// null. It is an error if a field in this list has a non-empty value.
 	// This may be used to include null fields in Patch requests.
 	NullFields []string `json:"-"`
@@ -2624,32 +2714,22 @@ type GoogleCloudVisionV1p1beta1FaceAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	AngerLikelihood string `json:"angerLikelihood,omitempty"`
 
 	// BlurredLikelihood: Blurred likelihood.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	BlurredLikelihood string `json:"blurredLikelihood,omitempty"`
 
 	// BoundingPoly: The bounding polygon around the face. The coordinates
@@ -2684,32 +2764,22 @@ type GoogleCloudVisionV1p1beta1FaceAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	HeadwearLikelihood string `json:"headwearLikelihood,omitempty"`
 
 	// JoyLikelihood: Joy likelihood.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	JoyLikelihood string `json:"joyLikelihood,omitempty"`
 
 	// LandmarkingConfidence: Face landmarking confidence. Range [0, 1].
@@ -2736,32 +2806,22 @@ type GoogleCloudVisionV1p1beta1FaceAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	SorrowLikelihood string `json:"sorrowLikelihood,omitempty"`
 
 	// SurpriseLikelihood: Surprise likelihood.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	SurpriseLikelihood string `json:"surpriseLikelihood,omitempty"`
 
 	// TiltAngle: Pitch angle, which indicates the upwards/downwards angle
@@ -2773,16 +2833,11 @@ type GoogleCloudVisionV1p1beta1FaceAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	UnderExposedLikelihood string `json:"underExposedLikelihood,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "AngerLikelihood") to
@@ -3539,15 +3594,13 @@ type GoogleCloudVisionV1p1beta1Product struct {
 	// This field is ignored when creating a product.
 	Name string `json:"name,omitempty"`
 
-	// ProductCategory: The category for the product identified by the
-	// reference image. This should
+	// ProductCategory: Immutable. The category for the product identified
+	// by the reference image. This should
 	// be either "homegoods-v2", "apparel-v2", or "toys-v2". The legacy
 	// categories
 	// "homegoods", "apparel", and "toys" are still supported, but these
 	// should
 	// not be used for new products.
-	//
-	// This field is immutable.
 	ProductCategory string `json:"productCategory,omitempty"`
 
 	// ProductLabels: Key-value pairs that can be attached to a product. At
@@ -3684,6 +3737,10 @@ type GoogleCloudVisionV1p1beta1ProductSearchResultsGroupedResult struct {
 	// query image.
 	BoundingPoly *GoogleCloudVisionV1p1beta1BoundingPoly `json:"boundingPoly,omitempty"`
 
+	// ObjectAnnotations: List of generic predictions for the object in the
+	// bounding box.
+	ObjectAnnotations []*GoogleCloudVisionV1p1beta1ProductSearchResultsObjectAnnotation `json:"objectAnnotations,omitempty"`
+
 	// Results: List of results, one for each product match.
 	Results []*GoogleCloudVisionV1p1beta1ProductSearchResultsResult `json:"results,omitempty"`
 
@@ -3708,6 +3765,62 @@ func (s *GoogleCloudVisionV1p1beta1ProductSearchResultsGroupedResult) MarshalJSO
 	type NoMethod GoogleCloudVisionV1p1beta1ProductSearchResultsGroupedResult
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// GoogleCloudVisionV1p1beta1ProductSearchResultsObjectAnnotation:
+// Prediction for what the object in the bounding box is.
+type GoogleCloudVisionV1p1beta1ProductSearchResultsObjectAnnotation struct {
+	// LanguageCode: The BCP-47 language code, such as "en-US" or "sr-Latn".
+	// For more
+	// information,
+	// see
+	// http://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
+	LanguageCode string `json:"languageCode,omitempty"`
+
+	// Mid: Object ID that should align with EntityAnnotation mid.
+	Mid string `json:"mid,omitempty"`
+
+	// Name: Object name, expressed in its `language_code` language.
+	Name string `json:"name,omitempty"`
+
+	// Score: Score of the result. Range [0, 1].
+	Score float64 `json:"score,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "LanguageCode") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "LanguageCode") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GoogleCloudVisionV1p1beta1ProductSearchResultsObjectAnnotation) MarshalJSON() ([]byte, error) {
+	type NoMethod GoogleCloudVisionV1p1beta1ProductSearchResultsObjectAnnotation
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+func (s *GoogleCloudVisionV1p1beta1ProductSearchResultsObjectAnnotation) UnmarshalJSON(data []byte) error {
+	type NoMethod GoogleCloudVisionV1p1beta1ProductSearchResultsObjectAnnotation
+	var s1 struct {
+		Score gensupport.JSONFloat64 `json:"score"`
+		*NoMethod
+	}
+	s1.NoMethod = (*NoMethod)(s)
+	if err := json.Unmarshal(data, &s1); err != nil {
+		return err
+	}
+	s.Score = float64(s1.Score)
+	return nil
 }
 
 // GoogleCloudVisionV1p1beta1ProductSearchResultsResult: Information
@@ -3812,32 +3925,22 @@ type GoogleCloudVisionV1p1beta1SafeSearchAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Adult string `json:"adult,omitempty"`
 
 	// Medical: Likelihood that this is a medical image.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Medical string `json:"medical,omitempty"`
 
 	// Racy: Likelihood that the request image contains racy content. Racy
@@ -3850,16 +3953,11 @@ type GoogleCloudVisionV1p1beta1SafeSearchAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Racy string `json:"racy,omitempty"`
 
 	// Spoof: Spoof likelihood. The likelihood that an modification
@@ -3868,32 +3966,22 @@ type GoogleCloudVisionV1p1beta1SafeSearchAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Spoof string `json:"spoof,omitempty"`
 
 	// Violence: Likelihood that this image contains violent content.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Violence string `json:"violence,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Adult") to
@@ -4512,6 +4600,11 @@ func (s *GoogleCloudVisionV1p1beta1Word) UnmarshalJSON(data []byte) error {
 // file annotation request. A file may contain one or more
 // images, which individually have their own responses.
 type GoogleCloudVisionV1p2beta1AnnotateFileResponse struct {
+	// Error: If set, represents the error message for the failed request.
+	// The
+	// `responses` field will not be set in this case.
+	Error *Status `json:"error,omitempty"`
+
 	// InputConfig: Information about the file for which this response is
 	// generated.
 	InputConfig *GoogleCloudVisionV1p2beta1InputConfig `json:"inputConfig,omitempty"`
@@ -4524,7 +4617,7 @@ type GoogleCloudVisionV1p2beta1AnnotateFileResponse struct {
 	// TotalPages: This field gives the total number of pages in the file.
 	TotalPages int64 `json:"totalPages,omitempty"`
 
-	// ForceSendFields is a list of field names (e.g. "InputConfig") to
+	// ForceSendFields is a list of field names (e.g. "Error") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -4532,10 +4625,10 @@ type GoogleCloudVisionV1p2beta1AnnotateFileResponse struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "InputConfig") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
+	// NullFields is a list of field names (e.g. "Error") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
 	// null. It is an error if a field in this list has a non-empty value.
 	// This may be used to include null fields in Patch requests.
 	NullFields []string `json:"-"`
@@ -5092,32 +5185,22 @@ type GoogleCloudVisionV1p2beta1FaceAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	AngerLikelihood string `json:"angerLikelihood,omitempty"`
 
 	// BlurredLikelihood: Blurred likelihood.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	BlurredLikelihood string `json:"blurredLikelihood,omitempty"`
 
 	// BoundingPoly: The bounding polygon around the face. The coordinates
@@ -5152,32 +5235,22 @@ type GoogleCloudVisionV1p2beta1FaceAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	HeadwearLikelihood string `json:"headwearLikelihood,omitempty"`
 
 	// JoyLikelihood: Joy likelihood.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	JoyLikelihood string `json:"joyLikelihood,omitempty"`
 
 	// LandmarkingConfidence: Face landmarking confidence. Range [0, 1].
@@ -5204,32 +5277,22 @@ type GoogleCloudVisionV1p2beta1FaceAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	SorrowLikelihood string `json:"sorrowLikelihood,omitempty"`
 
 	// SurpriseLikelihood: Surprise likelihood.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	SurpriseLikelihood string `json:"surpriseLikelihood,omitempty"`
 
 	// TiltAngle: Pitch angle, which indicates the upwards/downwards angle
@@ -5241,16 +5304,11 @@ type GoogleCloudVisionV1p2beta1FaceAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	UnderExposedLikelihood string `json:"underExposedLikelihood,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "AngerLikelihood") to
@@ -6007,15 +6065,13 @@ type GoogleCloudVisionV1p2beta1Product struct {
 	// This field is ignored when creating a product.
 	Name string `json:"name,omitempty"`
 
-	// ProductCategory: The category for the product identified by the
-	// reference image. This should
+	// ProductCategory: Immutable. The category for the product identified
+	// by the reference image. This should
 	// be either "homegoods-v2", "apparel-v2", or "toys-v2". The legacy
 	// categories
 	// "homegoods", "apparel", and "toys" are still supported, but these
 	// should
 	// not be used for new products.
-	//
-	// This field is immutable.
 	ProductCategory string `json:"productCategory,omitempty"`
 
 	// ProductLabels: Key-value pairs that can be attached to a product. At
@@ -6152,6 +6208,10 @@ type GoogleCloudVisionV1p2beta1ProductSearchResultsGroupedResult struct {
 	// query image.
 	BoundingPoly *GoogleCloudVisionV1p2beta1BoundingPoly `json:"boundingPoly,omitempty"`
 
+	// ObjectAnnotations: List of generic predictions for the object in the
+	// bounding box.
+	ObjectAnnotations []*GoogleCloudVisionV1p2beta1ProductSearchResultsObjectAnnotation `json:"objectAnnotations,omitempty"`
+
 	// Results: List of results, one for each product match.
 	Results []*GoogleCloudVisionV1p2beta1ProductSearchResultsResult `json:"results,omitempty"`
 
@@ -6176,6 +6236,62 @@ func (s *GoogleCloudVisionV1p2beta1ProductSearchResultsGroupedResult) MarshalJSO
 	type NoMethod GoogleCloudVisionV1p2beta1ProductSearchResultsGroupedResult
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// GoogleCloudVisionV1p2beta1ProductSearchResultsObjectAnnotation:
+// Prediction for what the object in the bounding box is.
+type GoogleCloudVisionV1p2beta1ProductSearchResultsObjectAnnotation struct {
+	// LanguageCode: The BCP-47 language code, such as "en-US" or "sr-Latn".
+	// For more
+	// information,
+	// see
+	// http://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
+	LanguageCode string `json:"languageCode,omitempty"`
+
+	// Mid: Object ID that should align with EntityAnnotation mid.
+	Mid string `json:"mid,omitempty"`
+
+	// Name: Object name, expressed in its `language_code` language.
+	Name string `json:"name,omitempty"`
+
+	// Score: Score of the result. Range [0, 1].
+	Score float64 `json:"score,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "LanguageCode") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "LanguageCode") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GoogleCloudVisionV1p2beta1ProductSearchResultsObjectAnnotation) MarshalJSON() ([]byte, error) {
+	type NoMethod GoogleCloudVisionV1p2beta1ProductSearchResultsObjectAnnotation
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+func (s *GoogleCloudVisionV1p2beta1ProductSearchResultsObjectAnnotation) UnmarshalJSON(data []byte) error {
+	type NoMethod GoogleCloudVisionV1p2beta1ProductSearchResultsObjectAnnotation
+	var s1 struct {
+		Score gensupport.JSONFloat64 `json:"score"`
+		*NoMethod
+	}
+	s1.NoMethod = (*NoMethod)(s)
+	if err := json.Unmarshal(data, &s1); err != nil {
+		return err
+	}
+	s.Score = float64(s1.Score)
+	return nil
 }
 
 // GoogleCloudVisionV1p2beta1ProductSearchResultsResult: Information
@@ -6280,32 +6396,22 @@ type GoogleCloudVisionV1p2beta1SafeSearchAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Adult string `json:"adult,omitempty"`
 
 	// Medical: Likelihood that this is a medical image.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Medical string `json:"medical,omitempty"`
 
 	// Racy: Likelihood that the request image contains racy content. Racy
@@ -6318,16 +6424,11 @@ type GoogleCloudVisionV1p2beta1SafeSearchAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Racy string `json:"racy,omitempty"`
 
 	// Spoof: Spoof likelihood. The likelihood that an modification
@@ -6336,32 +6437,22 @@ type GoogleCloudVisionV1p2beta1SafeSearchAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Spoof string `json:"spoof,omitempty"`
 
 	// Violence: Likelihood that this image contains violent content.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Violence string `json:"violence,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Adult") to
@@ -6980,6 +7071,11 @@ func (s *GoogleCloudVisionV1p2beta1Word) UnmarshalJSON(data []byte) error {
 // file annotation request. A file may contain one or more
 // images, which individually have their own responses.
 type GoogleCloudVisionV1p3beta1AnnotateFileResponse struct {
+	// Error: If set, represents the error message for the failed request.
+	// The
+	// `responses` field will not be set in this case.
+	Error *Status `json:"error,omitempty"`
+
 	// InputConfig: Information about the file for which this response is
 	// generated.
 	InputConfig *GoogleCloudVisionV1p3beta1InputConfig `json:"inputConfig,omitempty"`
@@ -6992,7 +7088,7 @@ type GoogleCloudVisionV1p3beta1AnnotateFileResponse struct {
 	// TotalPages: This field gives the total number of pages in the file.
 	TotalPages int64 `json:"totalPages,omitempty"`
 
-	// ForceSendFields is a list of field names (e.g. "InputConfig") to
+	// ForceSendFields is a list of field names (e.g. "Error") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -7000,10 +7096,10 @@ type GoogleCloudVisionV1p3beta1AnnotateFileResponse struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "InputConfig") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
+	// NullFields is a list of field names (e.g. "Error") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
 	// null. It is an error if a field in this list has a non-empty value.
 	// This may be used to include null fields in Patch requests.
 	NullFields []string `json:"-"`
@@ -7616,32 +7712,22 @@ type GoogleCloudVisionV1p3beta1FaceAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	AngerLikelihood string `json:"angerLikelihood,omitempty"`
 
 	// BlurredLikelihood: Blurred likelihood.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	BlurredLikelihood string `json:"blurredLikelihood,omitempty"`
 
 	// BoundingPoly: The bounding polygon around the face. The coordinates
@@ -7676,32 +7762,22 @@ type GoogleCloudVisionV1p3beta1FaceAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	HeadwearLikelihood string `json:"headwearLikelihood,omitempty"`
 
 	// JoyLikelihood: Joy likelihood.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	JoyLikelihood string `json:"joyLikelihood,omitempty"`
 
 	// LandmarkingConfidence: Face landmarking confidence. Range [0, 1].
@@ -7728,32 +7804,22 @@ type GoogleCloudVisionV1p3beta1FaceAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	SorrowLikelihood string `json:"sorrowLikelihood,omitempty"`
 
 	// SurpriseLikelihood: Surprise likelihood.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	SurpriseLikelihood string `json:"surpriseLikelihood,omitempty"`
 
 	// TiltAngle: Pitch angle, which indicates the upwards/downwards angle
@@ -7765,16 +7831,11 @@ type GoogleCloudVisionV1p3beta1FaceAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	UnderExposedLikelihood string `json:"underExposedLikelihood,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "AngerLikelihood") to
@@ -8579,15 +8640,13 @@ type GoogleCloudVisionV1p3beta1Product struct {
 	// This field is ignored when creating a product.
 	Name string `json:"name,omitempty"`
 
-	// ProductCategory: The category for the product identified by the
-	// reference image. This should
+	// ProductCategory: Immutable. The category for the product identified
+	// by the reference image. This should
 	// be either "homegoods-v2", "apparel-v2", or "toys-v2". The legacy
 	// categories
 	// "homegoods", "apparel", and "toys" are still supported, but these
 	// should
 	// not be used for new products.
-	//
-	// This field is immutable.
 	ProductCategory string `json:"productCategory,omitempty"`
 
 	// ProductLabels: Key-value pairs that can be attached to a product. At
@@ -8724,6 +8783,10 @@ type GoogleCloudVisionV1p3beta1ProductSearchResultsGroupedResult struct {
 	// query image.
 	BoundingPoly *GoogleCloudVisionV1p3beta1BoundingPoly `json:"boundingPoly,omitempty"`
 
+	// ObjectAnnotations: List of generic predictions for the object in the
+	// bounding box.
+	ObjectAnnotations []*GoogleCloudVisionV1p3beta1ProductSearchResultsObjectAnnotation `json:"objectAnnotations,omitempty"`
+
 	// Results: List of results, one for each product match.
 	Results []*GoogleCloudVisionV1p3beta1ProductSearchResultsResult `json:"results,omitempty"`
 
@@ -8748,6 +8811,62 @@ func (s *GoogleCloudVisionV1p3beta1ProductSearchResultsGroupedResult) MarshalJSO
 	type NoMethod GoogleCloudVisionV1p3beta1ProductSearchResultsGroupedResult
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// GoogleCloudVisionV1p3beta1ProductSearchResultsObjectAnnotation:
+// Prediction for what the object in the bounding box is.
+type GoogleCloudVisionV1p3beta1ProductSearchResultsObjectAnnotation struct {
+	// LanguageCode: The BCP-47 language code, such as "en-US" or "sr-Latn".
+	// For more
+	// information,
+	// see
+	// http://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
+	LanguageCode string `json:"languageCode,omitempty"`
+
+	// Mid: Object ID that should align with EntityAnnotation mid.
+	Mid string `json:"mid,omitempty"`
+
+	// Name: Object name, expressed in its `language_code` language.
+	Name string `json:"name,omitempty"`
+
+	// Score: Score of the result. Range [0, 1].
+	Score float64 `json:"score,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "LanguageCode") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "LanguageCode") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GoogleCloudVisionV1p3beta1ProductSearchResultsObjectAnnotation) MarshalJSON() ([]byte, error) {
+	type NoMethod GoogleCloudVisionV1p3beta1ProductSearchResultsObjectAnnotation
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+func (s *GoogleCloudVisionV1p3beta1ProductSearchResultsObjectAnnotation) UnmarshalJSON(data []byte) error {
+	type NoMethod GoogleCloudVisionV1p3beta1ProductSearchResultsObjectAnnotation
+	var s1 struct {
+		Score gensupport.JSONFloat64 `json:"score"`
+		*NoMethod
+	}
+	s1.NoMethod = (*NoMethod)(s)
+	if err := json.Unmarshal(data, &s1); err != nil {
+		return err
+	}
+	s.Score = float64(s1.Score)
+	return nil
 }
 
 // GoogleCloudVisionV1p3beta1ProductSearchResultsResult: Information
@@ -8842,10 +8961,10 @@ func (s *GoogleCloudVisionV1p3beta1Property) MarshalJSON() ([]byte, error) {
 // represents a product image and its associated metadata,
 // such as bounding boxes.
 type GoogleCloudVisionV1p3beta1ReferenceImage struct {
-	// BoundingPolys: Bounding polygons around the areas of interest in the
-	// reference image.
-	// Optional. If this field is empty, the system will try to detect
-	// regions of
+	// BoundingPolys: Optional. Bounding polygons around the areas of
+	// interest in the reference image.
+	// If this field is empty, the system will try to detect regions
+	// of
 	// interest. At most 10 bounding polygons will be used.
 	//
 	// The provided shape is converted into a non-rotated rectangle.
@@ -8868,11 +8987,10 @@ type GoogleCloudVisionV1p3beta1ReferenceImage struct {
 	// This field is ignored when creating a reference image.
 	Name string `json:"name,omitempty"`
 
-	// Uri: The Google Cloud Storage URI of the reference image.
+	// Uri: Required. The Google Cloud Storage URI of the reference
+	// image.
 	//
 	// The URI must start with `gs://`.
-	//
-	// Required.
 	Uri string `json:"uri,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "BoundingPolys") to
@@ -8912,32 +9030,22 @@ type GoogleCloudVisionV1p3beta1SafeSearchAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Adult string `json:"adult,omitempty"`
 
 	// Medical: Likelihood that this is a medical image.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Medical string `json:"medical,omitempty"`
 
 	// Racy: Likelihood that the request image contains racy content. Racy
@@ -8950,16 +9058,11 @@ type GoogleCloudVisionV1p3beta1SafeSearchAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Racy string `json:"racy,omitempty"`
 
 	// Spoof: Spoof likelihood. The likelihood that an modification
@@ -8968,32 +9071,22 @@ type GoogleCloudVisionV1p3beta1SafeSearchAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Spoof string `json:"spoof,omitempty"`
 
 	// Violence: Likelihood that this image contains violent content.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Violence string `json:"violence,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Adult") to
@@ -9612,6 +9705,11 @@ func (s *GoogleCloudVisionV1p3beta1Word) UnmarshalJSON(data []byte) error {
 // file annotation request. A file may contain one or more
 // images, which individually have their own responses.
 type GoogleCloudVisionV1p4beta1AnnotateFileResponse struct {
+	// Error: If set, represents the error message for the failed request.
+	// The
+	// `responses` field will not be set in this case.
+	Error *Status `json:"error,omitempty"`
+
 	// InputConfig: Information about the file for which this response is
 	// generated.
 	InputConfig *GoogleCloudVisionV1p4beta1InputConfig `json:"inputConfig,omitempty"`
@@ -9624,7 +9722,7 @@ type GoogleCloudVisionV1p4beta1AnnotateFileResponse struct {
 	// TotalPages: This field gives the total number of pages in the file.
 	TotalPages int64 `json:"totalPages,omitempty"`
 
-	// ForceSendFields is a list of field names (e.g. "InputConfig") to
+	// ForceSendFields is a list of field names (e.g. "Error") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -9632,10 +9730,10 @@ type GoogleCloudVisionV1p4beta1AnnotateFileResponse struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "InputConfig") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
+	// NullFields is a list of field names (e.g. "Error") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
 	// null. It is an error if a field in this list has a non-empty value.
 	// This may be used to include null fields in Patch requests.
 	NullFields []string `json:"-"`
@@ -10317,32 +10415,22 @@ type GoogleCloudVisionV1p4beta1FaceAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	AngerLikelihood string `json:"angerLikelihood,omitempty"`
 
 	// BlurredLikelihood: Blurred likelihood.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	BlurredLikelihood string `json:"blurredLikelihood,omitempty"`
 
 	// BoundingPoly: The bounding polygon around the face. The coordinates
@@ -10377,32 +10465,22 @@ type GoogleCloudVisionV1p4beta1FaceAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	HeadwearLikelihood string `json:"headwearLikelihood,omitempty"`
 
 	// JoyLikelihood: Joy likelihood.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	JoyLikelihood string `json:"joyLikelihood,omitempty"`
 
 	// LandmarkingConfidence: Face landmarking confidence. Range [0, 1].
@@ -10429,32 +10507,22 @@ type GoogleCloudVisionV1p4beta1FaceAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	SorrowLikelihood string `json:"sorrowLikelihood,omitempty"`
 
 	// SurpriseLikelihood: Surprise likelihood.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	SurpriseLikelihood string `json:"surpriseLikelihood,omitempty"`
 
 	// TiltAngle: Pitch angle, which indicates the upwards/downwards angle
@@ -10466,16 +10534,11 @@ type GoogleCloudVisionV1p4beta1FaceAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	UnderExposedLikelihood string `json:"underExposedLikelihood,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "AngerLikelihood") to
@@ -10755,6 +10818,50 @@ func (s *GoogleCloudVisionV1p4beta1ImageProperties) MarshalJSON() ([]byte, error
 // GoogleCloudVisionV1p4beta1ImageQuality: Stores image quality scores,
 // could be aesthetic quality or technical quality.
 type GoogleCloudVisionV1p4beta1ImageQuality struct {
+	// QualityScore: A score representing the aesthetic/technical quality of
+	// the image. The
+	// score is in range [0, 1]. Higher value corresponds to more
+	// professional
+	// looking photos. 0 means the image looks very bad, 1 means the image
+	// with
+	// very high quality.
+	QualityScore float64 `json:"qualityScore,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "QualityScore") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "QualityScore") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GoogleCloudVisionV1p4beta1ImageQuality) MarshalJSON() ([]byte, error) {
+	type NoMethod GoogleCloudVisionV1p4beta1ImageQuality
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+func (s *GoogleCloudVisionV1p4beta1ImageQuality) UnmarshalJSON(data []byte) error {
+	type NoMethod GoogleCloudVisionV1p4beta1ImageQuality
+	var s1 struct {
+		QualityScore gensupport.JSONFloat64 `json:"qualityScore"`
+		*NoMethod
+	}
+	s1.NoMethod = (*NoMethod)(s)
+	if err := json.Unmarshal(data, &s1); err != nil {
+		return err
+	}
+	s.QualityScore = float64(s1.QualityScore)
+	return nil
 }
 
 // GoogleCloudVisionV1p4beta1ImportProductSetsResponse: Response message
@@ -11285,15 +11392,13 @@ type GoogleCloudVisionV1p4beta1Product struct {
 	// This field is ignored when creating a product.
 	Name string `json:"name,omitempty"`
 
-	// ProductCategory: The category for the product identified by the
-	// reference image. This should
+	// ProductCategory: Immutable. The category for the product identified
+	// by the reference image. This should
 	// be either "homegoods-v2", "apparel-v2", or "toys-v2". The legacy
 	// categories
 	// "homegoods", "apparel", and "toys" are still supported, but these
 	// should
 	// not be used for new products.
-	//
-	// This field is immutable.
 	ProductCategory string `json:"productCategory,omitempty"`
 
 	// ProductLabels: Key-value pairs that can be attached to a product. At
@@ -11430,6 +11535,10 @@ type GoogleCloudVisionV1p4beta1ProductSearchResultsGroupedResult struct {
 	// query image.
 	BoundingPoly *GoogleCloudVisionV1p4beta1BoundingPoly `json:"boundingPoly,omitempty"`
 
+	// ObjectAnnotations: List of generic predictions for the object in the
+	// bounding box.
+	ObjectAnnotations []*GoogleCloudVisionV1p4beta1ProductSearchResultsObjectAnnotation `json:"objectAnnotations,omitempty"`
+
 	// Results: List of results, one for each product match.
 	Results []*GoogleCloudVisionV1p4beta1ProductSearchResultsResult `json:"results,omitempty"`
 
@@ -11454,6 +11563,62 @@ func (s *GoogleCloudVisionV1p4beta1ProductSearchResultsGroupedResult) MarshalJSO
 	type NoMethod GoogleCloudVisionV1p4beta1ProductSearchResultsGroupedResult
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// GoogleCloudVisionV1p4beta1ProductSearchResultsObjectAnnotation:
+// Prediction for what the object in the bounding box is.
+type GoogleCloudVisionV1p4beta1ProductSearchResultsObjectAnnotation struct {
+	// LanguageCode: The BCP-47 language code, such as "en-US" or "sr-Latn".
+	// For more
+	// information,
+	// see
+	// http://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
+	LanguageCode string `json:"languageCode,omitempty"`
+
+	// Mid: Object ID that should align with EntityAnnotation mid.
+	Mid string `json:"mid,omitempty"`
+
+	// Name: Object name, expressed in its `language_code` language.
+	Name string `json:"name,omitempty"`
+
+	// Score: Score of the result. Range [0, 1].
+	Score float64 `json:"score,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "LanguageCode") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "LanguageCode") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GoogleCloudVisionV1p4beta1ProductSearchResultsObjectAnnotation) MarshalJSON() ([]byte, error) {
+	type NoMethod GoogleCloudVisionV1p4beta1ProductSearchResultsObjectAnnotation
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+func (s *GoogleCloudVisionV1p4beta1ProductSearchResultsObjectAnnotation) UnmarshalJSON(data []byte) error {
+	type NoMethod GoogleCloudVisionV1p4beta1ProductSearchResultsObjectAnnotation
+	var s1 struct {
+		Score gensupport.JSONFloat64 `json:"score"`
+		*NoMethod
+	}
+	s1.NoMethod = (*NoMethod)(s)
+	if err := json.Unmarshal(data, &s1); err != nil {
+		return err
+	}
+	s.Score = float64(s1.Score)
+	return nil
 }
 
 // GoogleCloudVisionV1p4beta1ProductSearchResultsResult: Information
@@ -11608,10 +11773,10 @@ func (s *GoogleCloudVisionV1p4beta1QualityOptimizationResult) MarshalJSON() ([]b
 // represents a product image and its associated metadata,
 // such as bounding boxes.
 type GoogleCloudVisionV1p4beta1ReferenceImage struct {
-	// BoundingPolys: Bounding polygons around the areas of interest in the
-	// reference image.
-	// Optional. If this field is empty, the system will try to detect
-	// regions of
+	// BoundingPolys: Optional. Bounding polygons around the areas of
+	// interest in the reference image.
+	// If this field is empty, the system will try to detect regions
+	// of
 	// interest. At most 10 bounding polygons will be used.
 	//
 	// The provided shape is converted into a non-rotated rectangle.
@@ -11634,11 +11799,10 @@ type GoogleCloudVisionV1p4beta1ReferenceImage struct {
 	// This field is ignored when creating a reference image.
 	Name string `json:"name,omitempty"`
 
-	// Uri: The Google Cloud Storage URI of the reference image.
+	// Uri: Required. The Google Cloud Storage URI of the reference
+	// image.
 	//
 	// The URI must start with `gs://`.
-	//
-	// Required.
 	Uri string `json:"uri,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "BoundingPolys") to
@@ -11678,33 +11842,38 @@ type GoogleCloudVisionV1p4beta1SafeSearchAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Adult string `json:"adult,omitempty"`
+
+	// AdultConfidence: Confidence of adult_score. Range [0, 1]. 0 means not
+	// confident, 1 means
+	// very confident.
+	AdultConfidence float64 `json:"adultConfidence,omitempty"`
 
 	// Medical: Likelihood that this is a medical image.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Medical string `json:"medical,omitempty"`
+
+	// MedicalConfidence: Confidence of medical_score. Range [0, 1]. 0 means
+	// not confident, 1 means
+	// very confident.
+	MedicalConfidence float64 `json:"medicalConfidence,omitempty"`
+
+	// NsfwConfidence: Confidence of nsfw_score. Range [0, 1]. 0 means not
+	// confident, 1 means very
+	// confident.
+	NsfwConfidence float64 `json:"nsfwConfidence,omitempty"`
 
 	// Racy: Likelihood that the request image contains racy content. Racy
 	// content may
@@ -11716,17 +11885,17 @@ type GoogleCloudVisionV1p4beta1SafeSearchAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Racy string `json:"racy,omitempty"`
+
+	// RacyConfidence: Confidence of racy_score. Range [0, 1]. 0 means not
+	// confident, 1 means very
+	// confident.
+	RacyConfidence float64 `json:"racyConfidence,omitempty"`
 
 	// Spoof: Spoof likelihood. The likelihood that an modification
 	// was made to the image's canonical version to make it appear
@@ -11734,33 +11903,33 @@ type GoogleCloudVisionV1p4beta1SafeSearchAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Spoof string `json:"spoof,omitempty"`
+
+	// SpoofConfidence: Confidence of spoof_score. Range [0, 1]. 0 means not
+	// confident, 1 means
+	// very confident.
+	SpoofConfidence float64 `json:"spoofConfidence,omitempty"`
 
 	// Violence: Likelihood that this image contains violent content.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Violence string `json:"violence,omitempty"`
+
+	// ViolenceConfidence: Confidence of violence_score. Range [0, 1]. 0
+	// means not confident, 1 means
+	// very confident.
+	ViolenceConfidence float64 `json:"violenceConfidence,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Adult") to
 	// unconditionally include in API requests. By default, fields with
@@ -11783,6 +11952,30 @@ func (s *GoogleCloudVisionV1p4beta1SafeSearchAnnotation) MarshalJSON() ([]byte, 
 	type NoMethod GoogleCloudVisionV1p4beta1SafeSearchAnnotation
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+func (s *GoogleCloudVisionV1p4beta1SafeSearchAnnotation) UnmarshalJSON(data []byte) error {
+	type NoMethod GoogleCloudVisionV1p4beta1SafeSearchAnnotation
+	var s1 struct {
+		AdultConfidence    gensupport.JSONFloat64 `json:"adultConfidence"`
+		MedicalConfidence  gensupport.JSONFloat64 `json:"medicalConfidence"`
+		NsfwConfidence     gensupport.JSONFloat64 `json:"nsfwConfidence"`
+		RacyConfidence     gensupport.JSONFloat64 `json:"racyConfidence"`
+		SpoofConfidence    gensupport.JSONFloat64 `json:"spoofConfidence"`
+		ViolenceConfidence gensupport.JSONFloat64 `json:"violenceConfidence"`
+		*NoMethod
+	}
+	s1.NoMethod = (*NoMethod)(s)
+	if err := json.Unmarshal(data, &s1); err != nil {
+		return err
+	}
+	s.AdultConfidence = float64(s1.AdultConfidence)
+	s.MedicalConfidence = float64(s1.MedicalConfidence)
+	s.NsfwConfidence = float64(s1.NsfwConfidence)
+	s.RacyConfidence = float64(s1.RacyConfidence)
+	s.SpoofConfidence = float64(s1.SpoofConfidence)
+	s.ViolenceConfidence = float64(s1.ViolenceConfidence)
+	return nil
 }
 
 // GoogleCloudVisionV1p4beta1Symbol: A single symbol representation.
@@ -12374,2892 +12567,6 @@ func (s *GoogleCloudVisionV1p4beta1Word) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// GoogleCloudVisionV1p5beta1AnnotateFileResponse: Response to a single
-// file annotation request. A file may contain one or more
-// images, which individually have their own responses.
-type GoogleCloudVisionV1p5beta1AnnotateFileResponse struct {
-	// InputConfig: Information about the file for which this response is
-	// generated.
-	InputConfig *GoogleCloudVisionV1p5beta1InputConfig `json:"inputConfig,omitempty"`
-
-	// Responses: Individual responses to images found within the file. This
-	// field will be
-	// empty if the `error` field is set.
-	Responses []*GoogleCloudVisionV1p5beta1AnnotateImageResponse `json:"responses,omitempty"`
-
-	// TotalPages: This field gives the total number of pages in the file.
-	TotalPages int64 `json:"totalPages,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "InputConfig") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "InputConfig") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1AnnotateFileResponse) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1AnnotateFileResponse
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1AnnotateImageResponse: Response to an image
-// annotation request.
-type GoogleCloudVisionV1p5beta1AnnotateImageResponse struct {
-	// Context: If present, contextual information is needed to understand
-	// where this image
-	// comes from.
-	Context *GoogleCloudVisionV1p5beta1ImageAnnotationContext `json:"context,omitempty"`
-
-	// CropHintsAnnotation: If present, crop hints have completed
-	// successfully.
-	CropHintsAnnotation *GoogleCloudVisionV1p5beta1CropHintsAnnotation `json:"cropHintsAnnotation,omitempty"`
-
-	// Error: If set, represents the error message for the operation.
-	// Note that filled-in image annotations are guaranteed to be
-	// correct, even when `error` is set.
-	Error *Status `json:"error,omitempty"`
-
-	// FaceAnnotations: If present, face detection has completed
-	// successfully.
-	FaceAnnotations []*GoogleCloudVisionV1p5beta1FaceAnnotation `json:"faceAnnotations,omitempty"`
-
-	// FullTextAnnotation: If present, text (OCR) detection or document
-	// (OCR) text detection has
-	// completed successfully.
-	// This annotation provides the structural hierarchy for the OCR
-	// detected
-	// text.
-	FullTextAnnotation *GoogleCloudVisionV1p5beta1TextAnnotation `json:"fullTextAnnotation,omitempty"`
-
-	// ImagePropertiesAnnotation: If present, image properties were
-	// extracted successfully.
-	ImagePropertiesAnnotation *GoogleCloudVisionV1p5beta1ImageProperties `json:"imagePropertiesAnnotation,omitempty"`
-
-	// LabelAnnotations: If present, label detection has completed
-	// successfully.
-	LabelAnnotations []*GoogleCloudVisionV1p5beta1EntityAnnotation `json:"labelAnnotations,omitempty"`
-
-	// LandmarkAnnotations: If present, landmark detection has completed
-	// successfully.
-	LandmarkAnnotations []*GoogleCloudVisionV1p5beta1EntityAnnotation `json:"landmarkAnnotations,omitempty"`
-
-	// LocalizedObjectAnnotations: If present, localized object detection
-	// has completed successfully.
-	// This will be sorted descending by confidence score.
-	LocalizedObjectAnnotations []*GoogleCloudVisionV1p5beta1LocalizedObjectAnnotation `json:"localizedObjectAnnotations,omitempty"`
-
-	// LogoAnnotations: If present, logo detection has completed
-	// successfully.
-	LogoAnnotations []*GoogleCloudVisionV1p5beta1EntityAnnotation `json:"logoAnnotations,omitempty"`
-
-	// ProductSearchResults: If present, product search has completed
-	// successfully.
-	ProductSearchResults *GoogleCloudVisionV1p5beta1ProductSearchResults `json:"productSearchResults,omitempty"`
-
-	// SafeSearchAnnotation: If present, safe-search annotation has
-	// completed successfully.
-	SafeSearchAnnotation *GoogleCloudVisionV1p5beta1SafeSearchAnnotation `json:"safeSearchAnnotation,omitempty"`
-
-	// TextAnnotations: If present, text (OCR) detection has completed
-	// successfully.
-	TextAnnotations []*GoogleCloudVisionV1p5beta1EntityAnnotation `json:"textAnnotations,omitempty"`
-
-	// WebDetection: If present, web detection has completed successfully.
-	WebDetection *GoogleCloudVisionV1p5beta1WebDetection `json:"webDetection,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Context") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Context") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1AnnotateImageResponse) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1AnnotateImageResponse
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1AsyncAnnotateFileResponse: The response for
-// a single offline file annotation request.
-type GoogleCloudVisionV1p5beta1AsyncAnnotateFileResponse struct {
-	// OutputConfig: The output location and metadata from
-	// AsyncAnnotateFileRequest.
-	OutputConfig *GoogleCloudVisionV1p5beta1OutputConfig `json:"outputConfig,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "OutputConfig") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "OutputConfig") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1AsyncAnnotateFileResponse) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1AsyncAnnotateFileResponse
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1AsyncBatchAnnotateFilesResponse: Response
-// to an async batch file annotation request.
-type GoogleCloudVisionV1p5beta1AsyncBatchAnnotateFilesResponse struct {
-	// Responses: The list of file annotation responses, one for each
-	// request in
-	// AsyncBatchAnnotateFilesRequest.
-	Responses []*GoogleCloudVisionV1p5beta1AsyncAnnotateFileResponse `json:"responses,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Responses") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Responses") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1AsyncBatchAnnotateFilesResponse) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1AsyncBatchAnnotateFilesResponse
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1AsyncBatchAnnotateImagesResponse: Response
-// to an async batch image annotation request.
-type GoogleCloudVisionV1p5beta1AsyncBatchAnnotateImagesResponse struct {
-	// OutputConfig: The output location and metadata from
-	// AsyncBatchAnnotateImagesRequest.
-	OutputConfig *GoogleCloudVisionV1p5beta1OutputConfig `json:"outputConfig,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "OutputConfig") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "OutputConfig") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1AsyncBatchAnnotateImagesResponse) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1AsyncBatchAnnotateImagesResponse
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1BatchAnnotateFilesResponse: A list of file
-// annotation responses.
-type GoogleCloudVisionV1p5beta1BatchAnnotateFilesResponse struct {
-	// Responses: The list of file annotation responses, each response
-	// corresponding to each
-	// AnnotateFileRequest in BatchAnnotateFilesRequest.
-	Responses []*GoogleCloudVisionV1p5beta1AnnotateFileResponse `json:"responses,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Responses") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Responses") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1BatchAnnotateFilesResponse) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1BatchAnnotateFilesResponse
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1BatchOperationMetadata: Metadata for the
-// batch operations such as the current state.
-//
-// This is included in the `metadata` field of the `Operation` returned
-// by the
-// `GetOperation` call of the `google::longrunning::Operations` service.
-type GoogleCloudVisionV1p5beta1BatchOperationMetadata struct {
-	// EndTime: The time when the batch request is finished
-	// and
-	// google.longrunning.Operation.done is set to true.
-	EndTime string `json:"endTime,omitempty"`
-
-	// State: The current state of the batch operation.
-	//
-	// Possible values:
-	//   "STATE_UNSPECIFIED" - Invalid.
-	//   "PROCESSING" - Request is actively being processed.
-	//   "SUCCESSFUL" - The request is done and at least one item has been
-	// successfully
-	// processed.
-	//   "FAILED" - The request is done and no item has been successfully
-	// processed.
-	//   "CANCELLED" - The request is done after the
-	// longrunning.Operations.CancelOperation has
-	// been called by the user.  Any records that were processed before
-	// the
-	// cancel command are output as specified in the request.
-	State string `json:"state,omitempty"`
-
-	// SubmitTime: The time when the batch request was submitted to the
-	// server.
-	SubmitTime string `json:"submitTime,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "EndTime") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "EndTime") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1BatchOperationMetadata) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1BatchOperationMetadata
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1Block: Logical element on the page.
-type GoogleCloudVisionV1p5beta1Block struct {
-	// BlockType: Detected block type (text, image etc) for this block.
-	//
-	// Possible values:
-	//   "UNKNOWN" - Unknown block type.
-	//   "TEXT" - Regular text block.
-	//   "TABLE" - Table block.
-	//   "PICTURE" - Image block.
-	//   "RULER" - Horizontal/vertical line box.
-	//   "BARCODE" - Barcode block.
-	//   "KEY_VALUE_PAIR" - A key-value pair block.
-	BlockType string `json:"blockType,omitempty"`
-
-	// BoundingBox: The bounding box for the block.
-	// The vertices are in the order of top-left, top-right,
-	// bottom-right,
-	// bottom-left. When a rotation of the bounding box is detected the
-	// rotation
-	// is represented as around the top-left corner as defined when the text
-	// is
-	// read in the 'natural' orientation.
-	// For example:
-	//
-	// * when the text is horizontal it might look like:
-	//
-	//         0----1
-	//         |    |
-	//         3----2
-	//
-	// * when it's rotated 180 degrees around the top-left corner it
-	// becomes:
-	//
-	//         2----3
-	//         |    |
-	//         1----0
-	//
-	//   and the vertex order will still be (0, 1, 2, 3).
-	BoundingBox *GoogleCloudVisionV1p5beta1BoundingPoly `json:"boundingBox,omitempty"`
-
-	// Confidence: Confidence of the OCR results on the block. Range [0, 1].
-	Confidence float64 `json:"confidence,omitempty"`
-
-	// KeyValuePair: Detected pair for KEY_VALUE_PAIR block_type. This
-	// detection can be turned
-	// off by explicitly setting desired fields
-	// in
-	// DocumentParsingParams.block_filter.
-	KeyValuePair *GoogleCloudVisionV1p5beta1KeyValuePair `json:"keyValuePair,omitempty"`
-
-	// MergedText: All UTF-8 text detected in this block. This field is by
-	// default not
-	// returned unless specified in TextDetectionParams.block_filter
-	// or
-	// DocumentParsingParams.block_filter.
-	MergedText string `json:"mergedText,omitempty"`
-
-	// Paragraphs: List of paragraphs in this block (if this blocks is of
-	// type text).
-	Paragraphs []*GoogleCloudVisionV1p5beta1Paragraph `json:"paragraphs,omitempty"`
-
-	// Property: Additional information detected for the block.
-	Property *GoogleCloudVisionV1p5beta1TextAnnotationTextProperty `json:"property,omitempty"`
-
-	// Table: Detected table for TABLE block_type. This detection can be
-	// turned off by
-	// explicitly setting desired fields in
-	// DocumentParsingParams.block_filter.
-	Table *GoogleCloudVisionV1p5beta1Table `json:"table,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "BlockType") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "BlockType") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1Block) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1Block
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-func (s *GoogleCloudVisionV1p5beta1Block) UnmarshalJSON(data []byte) error {
-	type NoMethod GoogleCloudVisionV1p5beta1Block
-	var s1 struct {
-		Confidence gensupport.JSONFloat64 `json:"confidence"`
-		*NoMethod
-	}
-	s1.NoMethod = (*NoMethod)(s)
-	if err := json.Unmarshal(data, &s1); err != nil {
-		return err
-	}
-	s.Confidence = float64(s1.Confidence)
-	return nil
-}
-
-// GoogleCloudVisionV1p5beta1BoundingPoly: A bounding polygon for the
-// detected image annotation.
-type GoogleCloudVisionV1p5beta1BoundingPoly struct {
-	// NormalizedVertices: The bounding polygon normalized vertices.
-	NormalizedVertices []*GoogleCloudVisionV1p5beta1NormalizedVertex `json:"normalizedVertices,omitempty"`
-
-	// Vertices: The bounding polygon vertices.
-	Vertices []*GoogleCloudVisionV1p5beta1Vertex `json:"vertices,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "NormalizedVertices")
-	// to unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "NormalizedVertices") to
-	// include in API requests with the JSON null value. By default, fields
-	// with empty values are omitted from API requests. However, any field
-	// with an empty value appearing in NullFields will be sent to the
-	// server as null. It is an error if a field in this list has a
-	// non-empty value. This may be used to include null fields in Patch
-	// requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1BoundingPoly) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1BoundingPoly
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1ColorInfo: Color information consists of
-// RGB channels, score, and the fraction of
-// the image that the color occupies in the image.
-type GoogleCloudVisionV1p5beta1ColorInfo struct {
-	// Color: RGB components of the color.
-	Color *Color `json:"color,omitempty"`
-
-	// PixelFraction: The fraction of pixels the color occupies in the
-	// image.
-	// Value in range [0, 1].
-	PixelFraction float64 `json:"pixelFraction,omitempty"`
-
-	// Score: Image-specific score for this color. Value in range [0, 1].
-	Score float64 `json:"score,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Color") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Color") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1ColorInfo) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1ColorInfo
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-func (s *GoogleCloudVisionV1p5beta1ColorInfo) UnmarshalJSON(data []byte) error {
-	type NoMethod GoogleCloudVisionV1p5beta1ColorInfo
-	var s1 struct {
-		PixelFraction gensupport.JSONFloat64 `json:"pixelFraction"`
-		Score         gensupport.JSONFloat64 `json:"score"`
-		*NoMethod
-	}
-	s1.NoMethod = (*NoMethod)(s)
-	if err := json.Unmarshal(data, &s1); err != nil {
-		return err
-	}
-	s.PixelFraction = float64(s1.PixelFraction)
-	s.Score = float64(s1.Score)
-	return nil
-}
-
-// GoogleCloudVisionV1p5beta1CropHint: Single crop hint that is used to
-// generate a new crop when serving an image.
-type GoogleCloudVisionV1p5beta1CropHint struct {
-	// BoundingPoly: The bounding polygon for the crop region. The
-	// coordinates of the bounding
-	// box are in the original image's scale.
-	BoundingPoly *GoogleCloudVisionV1p5beta1BoundingPoly `json:"boundingPoly,omitempty"`
-
-	// Confidence: Confidence of this being a salient region.  Range [0, 1].
-	Confidence float64 `json:"confidence,omitempty"`
-
-	// ImportanceFraction: Fraction of importance of this salient region
-	// with respect to the original
-	// image.
-	ImportanceFraction float64 `json:"importanceFraction,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "BoundingPoly") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "BoundingPoly") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1CropHint) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1CropHint
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-func (s *GoogleCloudVisionV1p5beta1CropHint) UnmarshalJSON(data []byte) error {
-	type NoMethod GoogleCloudVisionV1p5beta1CropHint
-	var s1 struct {
-		Confidence         gensupport.JSONFloat64 `json:"confidence"`
-		ImportanceFraction gensupport.JSONFloat64 `json:"importanceFraction"`
-		*NoMethod
-	}
-	s1.NoMethod = (*NoMethod)(s)
-	if err := json.Unmarshal(data, &s1); err != nil {
-		return err
-	}
-	s.Confidence = float64(s1.Confidence)
-	s.ImportanceFraction = float64(s1.ImportanceFraction)
-	return nil
-}
-
-// GoogleCloudVisionV1p5beta1CropHintsAnnotation: Set of crop hints that
-// are used to generate new crops when serving images.
-type GoogleCloudVisionV1p5beta1CropHintsAnnotation struct {
-	// CropHints: Crop hint results.
-	CropHints []*GoogleCloudVisionV1p5beta1CropHint `json:"cropHints,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "CropHints") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "CropHints") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1CropHintsAnnotation) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1CropHintsAnnotation
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1DominantColorsAnnotation: Set of dominant
-// colors and their corresponding scores.
-type GoogleCloudVisionV1p5beta1DominantColorsAnnotation struct {
-	// Colors: RGB color values with their score and pixel fraction.
-	Colors []*GoogleCloudVisionV1p5beta1ColorInfo `json:"colors,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Colors") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Colors") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1DominantColorsAnnotation) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1DominantColorsAnnotation
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1EntityAnnotation: Set of detected entity
-// features.
-type GoogleCloudVisionV1p5beta1EntityAnnotation struct {
-	// BoundingPoly: Image region to which this entity belongs. Not
-	// produced
-	// for `LABEL_DETECTION` features.
-	BoundingPoly *GoogleCloudVisionV1p5beta1BoundingPoly `json:"boundingPoly,omitempty"`
-
-	// Confidence: **Deprecated. Use `score` instead.**
-	// The accuracy of the entity detection in an image.
-	// For example, for an image in which the "Eiffel Tower" entity is
-	// detected,
-	// this field represents the confidence that there is a tower in the
-	// query
-	// image. Range [0, 1].
-	Confidence float64 `json:"confidence,omitempty"`
-
-	// Description: Entity textual description, expressed in its `locale`
-	// language.
-	Description string `json:"description,omitempty"`
-
-	// Locale: The language code for the locale in which the entity
-	// textual
-	// `description` is expressed.
-	Locale string `json:"locale,omitempty"`
-
-	// Locations: The location information for the detected entity.
-	// Multiple
-	// `LocationInfo` elements can be present because one location
-	// may
-	// indicate the location of the scene in the image, and another
-	// location
-	// may indicate the location of the place where the image was
-	// taken.
-	// Location information is usually present for landmarks.
-	Locations []*GoogleCloudVisionV1p5beta1LocationInfo `json:"locations,omitempty"`
-
-	// Mid: Opaque entity ID. Some IDs may be available in
-	// [Google Knowledge Graph
-	// Search
-	// API](https://developers.google.com/knowledge-graph/).
-	Mid string `json:"mid,omitempty"`
-
-	// Properties: Some entities may have optional user-supplied `Property`
-	// (name/value)
-	// fields, such a score or string that qualifies the entity.
-	Properties []*GoogleCloudVisionV1p5beta1Property `json:"properties,omitempty"`
-
-	// Score: Overall score of the result. Range [0, 1].
-	Score float64 `json:"score,omitempty"`
-
-	// Topicality: The relevancy of the ICA (Image Content Annotation) label
-	// to the
-	// image. For example, the relevancy of "tower" is likely higher to an
-	// image
-	// containing the detected "Eiffel Tower" than to an image containing
-	// a
-	// detected distant towering building, even though the confidence
-	// that
-	// there is a tower in each image may be the same. Range [0, 1].
-	Topicality float64 `json:"topicality,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "BoundingPoly") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "BoundingPoly") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1EntityAnnotation) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1EntityAnnotation
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-func (s *GoogleCloudVisionV1p5beta1EntityAnnotation) UnmarshalJSON(data []byte) error {
-	type NoMethod GoogleCloudVisionV1p5beta1EntityAnnotation
-	var s1 struct {
-		Confidence gensupport.JSONFloat64 `json:"confidence"`
-		Score      gensupport.JSONFloat64 `json:"score"`
-		Topicality gensupport.JSONFloat64 `json:"topicality"`
-		*NoMethod
-	}
-	s1.NoMethod = (*NoMethod)(s)
-	if err := json.Unmarshal(data, &s1); err != nil {
-		return err
-	}
-	s.Confidence = float64(s1.Confidence)
-	s.Score = float64(s1.Score)
-	s.Topicality = float64(s1.Topicality)
-	return nil
-}
-
-// GoogleCloudVisionV1p5beta1FaceAnnotation: A face annotation object
-// contains the results of face detection.
-type GoogleCloudVisionV1p5beta1FaceAnnotation struct {
-	// AngerLikelihood: Anger likelihood.
-	//
-	// Possible values:
-	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
-	AngerLikelihood string `json:"angerLikelihood,omitempty"`
-
-	// BlurredLikelihood: Blurred likelihood.
-	//
-	// Possible values:
-	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
-	BlurredLikelihood string `json:"blurredLikelihood,omitempty"`
-
-	// BoundingPoly: The bounding polygon around the face. The coordinates
-	// of the bounding box
-	// are in the original image's scale.
-	// The bounding box is computed to "frame" the face in accordance with
-	// human
-	// expectations. It is based on the landmarker results.
-	// Note that one or more x and/or y coordinates may not be generated in
-	// the
-	// `BoundingPoly` (the polygon will be unbounded) if only a partial
-	// face
-	// appears in the image to be annotated.
-	BoundingPoly *GoogleCloudVisionV1p5beta1BoundingPoly `json:"boundingPoly,omitempty"`
-
-	// DetectionConfidence: Detection confidence. Range [0, 1].
-	DetectionConfidence float64 `json:"detectionConfidence,omitempty"`
-
-	// FdBoundingPoly: The `fd_bounding_poly` bounding polygon is tighter
-	// than the
-	// `boundingPoly`, and encloses only the skin part of the face.
-	// Typically, it
-	// is used to eliminate the face from any image analysis that detects
-	// the
-	// "amount of skin" visible in an image. It is not based on
-	// the
-	// landmarker results, only on the initial face detection, hence
-	// the <code>fd</code> (face detection) prefix.
-	FdBoundingPoly *GoogleCloudVisionV1p5beta1BoundingPoly `json:"fdBoundingPoly,omitempty"`
-
-	// HeadwearLikelihood: Headwear likelihood.
-	//
-	// Possible values:
-	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
-	HeadwearLikelihood string `json:"headwearLikelihood,omitempty"`
-
-	// JoyLikelihood: Joy likelihood.
-	//
-	// Possible values:
-	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
-	JoyLikelihood string `json:"joyLikelihood,omitempty"`
-
-	// LandmarkingConfidence: Face landmarking confidence. Range [0, 1].
-	LandmarkingConfidence float64 `json:"landmarkingConfidence,omitempty"`
-
-	// Landmarks: Detected face landmarks.
-	Landmarks []*GoogleCloudVisionV1p5beta1FaceAnnotationLandmark `json:"landmarks,omitempty"`
-
-	// PanAngle: Yaw angle, which indicates the leftward/rightward angle
-	// that the face is
-	// pointing relative to the vertical plane perpendicular to the image.
-	// Range
-	// [-180,180].
-	PanAngle float64 `json:"panAngle,omitempty"`
-
-	// RollAngle: Roll angle, which indicates the amount of
-	// clockwise/anti-clockwise rotation
-	// of the face relative to the image vertical about the axis
-	// perpendicular to
-	// the face. Range [-180,180].
-	RollAngle float64 `json:"rollAngle,omitempty"`
-
-	// SorrowLikelihood: Sorrow likelihood.
-	//
-	// Possible values:
-	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
-	SorrowLikelihood string `json:"sorrowLikelihood,omitempty"`
-
-	// SurpriseLikelihood: Surprise likelihood.
-	//
-	// Possible values:
-	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
-	SurpriseLikelihood string `json:"surpriseLikelihood,omitempty"`
-
-	// TiltAngle: Pitch angle, which indicates the upwards/downwards angle
-	// that the face is
-	// pointing relative to the image's horizontal plane. Range [-180,180].
-	TiltAngle float64 `json:"tiltAngle,omitempty"`
-
-	// UnderExposedLikelihood: Under-exposed likelihood.
-	//
-	// Possible values:
-	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
-	UnderExposedLikelihood string `json:"underExposedLikelihood,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "AngerLikelihood") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "AngerLikelihood") to
-	// include in API requests with the JSON null value. By default, fields
-	// with empty values are omitted from API requests. However, any field
-	// with an empty value appearing in NullFields will be sent to the
-	// server as null. It is an error if a field in this list has a
-	// non-empty value. This may be used to include null fields in Patch
-	// requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1FaceAnnotation) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1FaceAnnotation
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-func (s *GoogleCloudVisionV1p5beta1FaceAnnotation) UnmarshalJSON(data []byte) error {
-	type NoMethod GoogleCloudVisionV1p5beta1FaceAnnotation
-	var s1 struct {
-		DetectionConfidence   gensupport.JSONFloat64 `json:"detectionConfidence"`
-		LandmarkingConfidence gensupport.JSONFloat64 `json:"landmarkingConfidence"`
-		PanAngle              gensupport.JSONFloat64 `json:"panAngle"`
-		RollAngle             gensupport.JSONFloat64 `json:"rollAngle"`
-		TiltAngle             gensupport.JSONFloat64 `json:"tiltAngle"`
-		*NoMethod
-	}
-	s1.NoMethod = (*NoMethod)(s)
-	if err := json.Unmarshal(data, &s1); err != nil {
-		return err
-	}
-	s.DetectionConfidence = float64(s1.DetectionConfidence)
-	s.LandmarkingConfidence = float64(s1.LandmarkingConfidence)
-	s.PanAngle = float64(s1.PanAngle)
-	s.RollAngle = float64(s1.RollAngle)
-	s.TiltAngle = float64(s1.TiltAngle)
-	return nil
-}
-
-// GoogleCloudVisionV1p5beta1FaceAnnotationLandmark: A face-specific
-// landmark (for example, a face feature).
-type GoogleCloudVisionV1p5beta1FaceAnnotationLandmark struct {
-	// Position: Face landmark position.
-	Position *GoogleCloudVisionV1p5beta1Position `json:"position,omitempty"`
-
-	// Type: Face landmark type.
-	//
-	// Possible values:
-	//   "UNKNOWN_LANDMARK" - Unknown face landmark detected. Should not be
-	// filled.
-	//   "LEFT_EYE" - Left eye.
-	//   "RIGHT_EYE" - Right eye.
-	//   "LEFT_OF_LEFT_EYEBROW" - Left of left eyebrow.
-	//   "RIGHT_OF_LEFT_EYEBROW" - Right of left eyebrow.
-	//   "LEFT_OF_RIGHT_EYEBROW" - Left of right eyebrow.
-	//   "RIGHT_OF_RIGHT_EYEBROW" - Right of right eyebrow.
-	//   "MIDPOINT_BETWEEN_EYES" - Midpoint between eyes.
-	//   "NOSE_TIP" - Nose tip.
-	//   "UPPER_LIP" - Upper lip.
-	//   "LOWER_LIP" - Lower lip.
-	//   "MOUTH_LEFT" - Mouth left.
-	//   "MOUTH_RIGHT" - Mouth right.
-	//   "MOUTH_CENTER" - Mouth center.
-	//   "NOSE_BOTTOM_RIGHT" - Nose, bottom right.
-	//   "NOSE_BOTTOM_LEFT" - Nose, bottom left.
-	//   "NOSE_BOTTOM_CENTER" - Nose, bottom center.
-	//   "LEFT_EYE_TOP_BOUNDARY" - Left eye, top boundary.
-	//   "LEFT_EYE_RIGHT_CORNER" - Left eye, right corner.
-	//   "LEFT_EYE_BOTTOM_BOUNDARY" - Left eye, bottom boundary.
-	//   "LEFT_EYE_LEFT_CORNER" - Left eye, left corner.
-	//   "RIGHT_EYE_TOP_BOUNDARY" - Right eye, top boundary.
-	//   "RIGHT_EYE_RIGHT_CORNER" - Right eye, right corner.
-	//   "RIGHT_EYE_BOTTOM_BOUNDARY" - Right eye, bottom boundary.
-	//   "RIGHT_EYE_LEFT_CORNER" - Right eye, left corner.
-	//   "LEFT_EYEBROW_UPPER_MIDPOINT" - Left eyebrow, upper midpoint.
-	//   "RIGHT_EYEBROW_UPPER_MIDPOINT" - Right eyebrow, upper midpoint.
-	//   "LEFT_EAR_TRAGION" - Left ear tragion.
-	//   "RIGHT_EAR_TRAGION" - Right ear tragion.
-	//   "LEFT_EYE_PUPIL" - Left eye pupil.
-	//   "RIGHT_EYE_PUPIL" - Right eye pupil.
-	//   "FOREHEAD_GLABELLA" - Forehead glabella.
-	//   "CHIN_GNATHION" - Chin gnathion.
-	//   "CHIN_LEFT_GONION" - Chin left gonion.
-	//   "CHIN_RIGHT_GONION" - Chin right gonion.
-	Type string `json:"type,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Position") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Position") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1FaceAnnotationLandmark) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1FaceAnnotationLandmark
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1GcsDestination: The Google Cloud Storage
-// location where the output will be written to.
-type GoogleCloudVisionV1p5beta1GcsDestination struct {
-	// Uri: Google Cloud Storage URI prefix where the results will be
-	// stored. Results
-	// will be in JSON format and preceded by its corresponding input URI
-	// prefix.
-	// This field can either represent a gcs file prefix or gcs directory.
-	// In
-	// either case, the uri should be unique because in order to get all of
-	// the
-	// output files, you will need to do a wildcard gcs search on the uri
-	// prefix
-	// you provide.
-	//
-	// Examples:
-	//
-	// *    File Prefix: gs://bucket-name/here/filenameprefix   The output
-	// files
-	// will be created in gs://bucket-name/here/ and the names of the
-	// output files will begin with "filenameprefix".
-	//
-	// *    Directory Prefix: gs://bucket-name/some/location/   The output
-	// files
-	// will be created in gs://bucket-name/some/location/ and the names of
-	// the
-	// output files could be anything because there was no filename
-	// prefix
-	// specified.
-	//
-	// If multiple outputs, each response is still AnnotateFileResponse,
-	// each of
-	// which contains some subset of the full list of
-	// AnnotateImageResponse.
-	// Multiple outputs can happen if, for example, the output JSON is too
-	// large
-	// and overflows into multiple sharded files.
-	Uri string `json:"uri,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Uri") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Uri") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1GcsDestination) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1GcsDestination
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1GcsSource: The Google Cloud Storage
-// location where the input will be read from.
-type GoogleCloudVisionV1p5beta1GcsSource struct {
-	// Uri: Google Cloud Storage URI for the input file. This must only be
-	// a
-	// Google Cloud Storage object. Wildcards are not currently supported.
-	Uri string `json:"uri,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Uri") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Uri") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1GcsSource) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1GcsSource
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1ImageAnnotationContext: If an image was
-// produced from a file (e.g. a PDF), this message gives
-// information about the source of that image.
-type GoogleCloudVisionV1p5beta1ImageAnnotationContext struct {
-	// PageNumber: If the file was a PDF or TIFF, this field gives the page
-	// number within
-	// the file used to produce the image.
-	PageNumber int64 `json:"pageNumber,omitempty"`
-
-	// Uri: The URI of the file used to produce the image.
-	Uri string `json:"uri,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "PageNumber") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "PageNumber") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1ImageAnnotationContext) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1ImageAnnotationContext
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1ImageProperties: Stores image properties,
-// such as dominant colors.
-type GoogleCloudVisionV1p5beta1ImageProperties struct {
-	// DominantColors: If present, dominant colors completed successfully.
-	DominantColors *GoogleCloudVisionV1p5beta1DominantColorsAnnotation `json:"dominantColors,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "DominantColors") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "DominantColors") to
-	// include in API requests with the JSON null value. By default, fields
-	// with empty values are omitted from API requests. However, any field
-	// with an empty value appearing in NullFields will be sent to the
-	// server as null. It is an error if a field in this list has a
-	// non-empty value. This may be used to include null fields in Patch
-	// requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1ImageProperties) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1ImageProperties
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1ImportProductSetsResponse: Response message
-// for the `ImportProductSets` method.
-//
-// This message is returned by
-// the
-// google.longrunning.Operations.GetOperation method in the
-// returned
-// google.longrunning.Operation.response field.
-type GoogleCloudVisionV1p5beta1ImportProductSetsResponse struct {
-	// ReferenceImages: The list of reference_images that are imported
-	// successfully.
-	ReferenceImages []*GoogleCloudVisionV1p5beta1ReferenceImage `json:"referenceImages,omitempty"`
-
-	// Statuses: The rpc status for each ImportProductSet request, including
-	// both successes
-	// and errors.
-	//
-	// The number of statuses here matches the number of lines in the csv
-	// file,
-	// and statuses[i] stores the success or failure status of processing
-	// the i-th
-	// line of the csv, starting from line 0.
-	Statuses []*Status `json:"statuses,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "ReferenceImages") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "ReferenceImages") to
-	// include in API requests with the JSON null value. By default, fields
-	// with empty values are omitted from API requests. However, any field
-	// with an empty value appearing in NullFields will be sent to the
-	// server as null. It is an error if a field in this list has a
-	// non-empty value. This may be used to include null fields in Patch
-	// requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1ImportProductSetsResponse) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1ImportProductSetsResponse
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1InputConfig: The desired input location and
-// metadata.
-type GoogleCloudVisionV1p5beta1InputConfig struct {
-	// Content: File content, represented as a stream of bytes.
-	// Note: As with all `bytes` fields, protobuffers use a pure
-	// binary
-	// representation, whereas JSON representations use base64.
-	//
-	// Currently, this field only works for BatchAnnotateFiles requests. It
-	// does
-	// not work for AsyncBatchAnnotateFiles requests.
-	Content string `json:"content,omitempty"`
-
-	// GcsSource: The Google Cloud Storage location to read the input from.
-	GcsSource *GoogleCloudVisionV1p5beta1GcsSource `json:"gcsSource,omitempty"`
-
-	// MimeType: The type of the file. Currently only "application/pdf",
-	// "image/tiff" and
-	// "image/gif" are supported. Wildcards are not supported.
-	MimeType string `json:"mimeType,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Content") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Content") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1InputConfig) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1InputConfig
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1KeyValuePair: Proto for a key value pair.
-type GoogleCloudVisionV1p5beta1KeyValuePair struct {
-	// Key: The key string value.
-	Key string `json:"key,omitempty"`
-
-	// KeyBlock: Key block of the pair containing the normalized bounding
-	// box and key text.
-	KeyBlock *GoogleCloudVisionV1p5beta1Block `json:"keyBlock,omitempty"`
-
-	// NormalizedKey: Optional. The translation of key text if the text is
-	// not in English.
-	NormalizedKey string `json:"normalizedKey,omitempty"`
-
-	// ValueBlock: Value block of the pair containing the normalized
-	// bounding box and value
-	// text, including potentially deeper structures within the value text.
-	ValueBlock *GoogleCloudVisionV1p5beta1Block `json:"valueBlock,omitempty"`
-
-	// ValueType: Type of the value. Valid strings are the following:
-	//
-	//  "generic" - For generic text that is mapped to a value.
-	//  "number" - for numeric types
-	//  "id" - for generic identifiers.
-	//  "currency" - for currency values.
-	//  "date" - for dates.
-	//  "time" - for time and duration values.
-	//  "date_range" - for date ranges.
-	//  "address" - for address values (can be long).
-	//  "person" - for names of people or other personal identifiers.
-	//  "phone" - for phone numbers.
-	ValueType string `json:"valueType,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Key") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Key") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1KeyValuePair) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1KeyValuePair
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1LocalizedObjectAnnotation: Set of detected
-// objects with bounding boxes.
-type GoogleCloudVisionV1p5beta1LocalizedObjectAnnotation struct {
-	// BoundingPoly: Image region to which this object belongs. This must be
-	// populated.
-	BoundingPoly *GoogleCloudVisionV1p5beta1BoundingPoly `json:"boundingPoly,omitempty"`
-
-	// LanguageCode: The BCP-47 language code, such as "en-US" or "sr-Latn".
-	// For more
-	// information,
-	// see
-	// http://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
-	LanguageCode string `json:"languageCode,omitempty"`
-
-	// Mid: Object ID that should align with EntityAnnotation mid.
-	Mid string `json:"mid,omitempty"`
-
-	// Name: Object name, expressed in its `language_code` language.
-	Name string `json:"name,omitempty"`
-
-	// Score: Score of the result. Range [0, 1].
-	Score float64 `json:"score,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "BoundingPoly") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "BoundingPoly") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1LocalizedObjectAnnotation) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1LocalizedObjectAnnotation
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-func (s *GoogleCloudVisionV1p5beta1LocalizedObjectAnnotation) UnmarshalJSON(data []byte) error {
-	type NoMethod GoogleCloudVisionV1p5beta1LocalizedObjectAnnotation
-	var s1 struct {
-		Score gensupport.JSONFloat64 `json:"score"`
-		*NoMethod
-	}
-	s1.NoMethod = (*NoMethod)(s)
-	if err := json.Unmarshal(data, &s1); err != nil {
-		return err
-	}
-	s.Score = float64(s1.Score)
-	return nil
-}
-
-// GoogleCloudVisionV1p5beta1LocationInfo: Detected entity location
-// information.
-type GoogleCloudVisionV1p5beta1LocationInfo struct {
-	// LatLng: lat/long location coordinates.
-	LatLng *LatLng `json:"latLng,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "LatLng") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "LatLng") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1LocationInfo) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1LocationInfo
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1NormalizedVertex: A vertex represents a 2D
-// point in the image.
-// NOTE: the normalized vertex coordinates are relative to the original
-// image
-// and range from 0 to 1.
-type GoogleCloudVisionV1p5beta1NormalizedVertex struct {
-	// X: X coordinate.
-	X float64 `json:"x,omitempty"`
-
-	// Y: Y coordinate.
-	Y float64 `json:"y,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "X") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "X") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1NormalizedVertex) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1NormalizedVertex
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-func (s *GoogleCloudVisionV1p5beta1NormalizedVertex) UnmarshalJSON(data []byte) error {
-	type NoMethod GoogleCloudVisionV1p5beta1NormalizedVertex
-	var s1 struct {
-		X gensupport.JSONFloat64 `json:"x"`
-		Y gensupport.JSONFloat64 `json:"y"`
-		*NoMethod
-	}
-	s1.NoMethod = (*NoMethod)(s)
-	if err := json.Unmarshal(data, &s1); err != nil {
-		return err
-	}
-	s.X = float64(s1.X)
-	s.Y = float64(s1.Y)
-	return nil
-}
-
-// GoogleCloudVisionV1p5beta1OperationMetadata: Contains metadata for
-// the BatchAnnotateImages operation.
-type GoogleCloudVisionV1p5beta1OperationMetadata struct {
-	// CreateTime: The time when the batch request was received.
-	CreateTime string `json:"createTime,omitempty"`
-
-	// State: Current state of the batch operation.
-	//
-	// Possible values:
-	//   "STATE_UNSPECIFIED" - Invalid.
-	//   "CREATED" - Request is received.
-	//   "RUNNING" - Request is actively being processed.
-	//   "DONE" - The batch processing is done.
-	//   "CANCELLED" - The batch processing was cancelled.
-	State string `json:"state,omitempty"`
-
-	// UpdateTime: The time when the operation result was last updated.
-	UpdateTime string `json:"updateTime,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "CreateTime") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "CreateTime") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1OperationMetadata) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1OperationMetadata
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1OutputConfig: The desired output location
-// and metadata.
-type GoogleCloudVisionV1p5beta1OutputConfig struct {
-	// BatchSize: The max number of response protos to put into each output
-	// JSON file on
-	// Google Cloud Storage.
-	// The valid range is [1, 100]. If not specified, the default value is
-	// 20.
-	//
-	// For example, for one pdf file with 100 pages, 100 response protos
-	// will
-	// be generated. If `batch_size` = 20, then 5 json files each
-	// containing 20 response protos will be written under the
-	// prefix
-	// `gcs_destination`.`uri`.
-	//
-	// Currently, batch_size only applies to GcsDestination, with potential
-	// future
-	// support for other output configurations.
-	BatchSize int64 `json:"batchSize,omitempty"`
-
-	// GcsDestination: The Google Cloud Storage location to write the
-	// output(s) to.
-	GcsDestination *GoogleCloudVisionV1p5beta1GcsDestination `json:"gcsDestination,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "BatchSize") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "BatchSize") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1OutputConfig) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1OutputConfig
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1Page: Detected page from OCR.
-type GoogleCloudVisionV1p5beta1Page struct {
-	// Blocks: List of blocks of text, images etc on this page.
-	Blocks []*GoogleCloudVisionV1p5beta1Block `json:"blocks,omitempty"`
-
-	// Confidence: Confidence of the OCR results on the page. Range [0, 1].
-	Confidence float64 `json:"confidence,omitempty"`
-
-	// Height: Page height. For PDFs the unit is points. For images
-	// (including
-	// TIFFs) the unit is pixels.
-	Height int64 `json:"height,omitempty"`
-
-	// MergedText: All UTF-8 text detected in this page. This field is by
-	// default not
-	// returned unless specified in TextDetectionParams.page_filter.
-	MergedText string `json:"mergedText,omitempty"`
-
-	// Property: Additional information detected on the page.
-	Property *GoogleCloudVisionV1p5beta1TextAnnotationTextProperty `json:"property,omitempty"`
-
-	// Width: Page width. For PDFs the unit is points. For images
-	// (including
-	// TIFFs) the unit is pixels.
-	Width int64 `json:"width,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Blocks") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Blocks") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1Page) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1Page
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-func (s *GoogleCloudVisionV1p5beta1Page) UnmarshalJSON(data []byte) error {
-	type NoMethod GoogleCloudVisionV1p5beta1Page
-	var s1 struct {
-		Confidence gensupport.JSONFloat64 `json:"confidence"`
-		*NoMethod
-	}
-	s1.NoMethod = (*NoMethod)(s)
-	if err := json.Unmarshal(data, &s1); err != nil {
-		return err
-	}
-	s.Confidence = float64(s1.Confidence)
-	return nil
-}
-
-// GoogleCloudVisionV1p5beta1Paragraph: Structural unit of text
-// representing a number of words in certain order.
-type GoogleCloudVisionV1p5beta1Paragraph struct {
-	// BoundingBox: The bounding box for the paragraph.
-	// The vertices are in the order of top-left, top-right,
-	// bottom-right,
-	// bottom-left. When a rotation of the bounding box is detected the
-	// rotation
-	// is represented as around the top-left corner as defined when the text
-	// is
-	// read in the 'natural' orientation.
-	// For example:
-	//   * when the text is horizontal it might look like:
-	//      0----1
-	//      |    |
-	//      3----2
-	//   * when it's rotated 180 degrees around the top-left corner it
-	// becomes:
-	//      2----3
-	//      |    |
-	//      1----0
-	//   and the vertex order will still be (0, 1, 2, 3).
-	BoundingBox *GoogleCloudVisionV1p5beta1BoundingPoly `json:"boundingBox,omitempty"`
-
-	// Confidence: Confidence of the OCR results for the paragraph. Range
-	// [0, 1].
-	Confidence float64 `json:"confidence,omitempty"`
-
-	// MergedText: All UTF-8 text detected in this paragraph. This field is
-	// by default not
-	// returned unless specified in TextDetectionParams.paragraph_filter.
-	MergedText string `json:"mergedText,omitempty"`
-
-	// Property: Additional information detected for the paragraph.
-	Property *GoogleCloudVisionV1p5beta1TextAnnotationTextProperty `json:"property,omitempty"`
-
-	// Words: List of all words in this paragraph.
-	Words []*GoogleCloudVisionV1p5beta1Word `json:"words,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "BoundingBox") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "BoundingBox") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1Paragraph) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1Paragraph
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-func (s *GoogleCloudVisionV1p5beta1Paragraph) UnmarshalJSON(data []byte) error {
-	type NoMethod GoogleCloudVisionV1p5beta1Paragraph
-	var s1 struct {
-		Confidence gensupport.JSONFloat64 `json:"confidence"`
-		*NoMethod
-	}
-	s1.NoMethod = (*NoMethod)(s)
-	if err := json.Unmarshal(data, &s1); err != nil {
-		return err
-	}
-	s.Confidence = float64(s1.Confidence)
-	return nil
-}
-
-// GoogleCloudVisionV1p5beta1Position: A 3D position in the image, used
-// primarily for Face detection landmarks.
-// A valid Position must have both x and y coordinates.
-// The position coordinates are in the same scale as the original image.
-type GoogleCloudVisionV1p5beta1Position struct {
-	// X: X coordinate.
-	X float64 `json:"x,omitempty"`
-
-	// Y: Y coordinate.
-	Y float64 `json:"y,omitempty"`
-
-	// Z: Z coordinate (or depth).
-	Z float64 `json:"z,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "X") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "X") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1Position) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1Position
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-func (s *GoogleCloudVisionV1p5beta1Position) UnmarshalJSON(data []byte) error {
-	type NoMethod GoogleCloudVisionV1p5beta1Position
-	var s1 struct {
-		X gensupport.JSONFloat64 `json:"x"`
-		Y gensupport.JSONFloat64 `json:"y"`
-		Z gensupport.JSONFloat64 `json:"z"`
-		*NoMethod
-	}
-	s1.NoMethod = (*NoMethod)(s)
-	if err := json.Unmarshal(data, &s1); err != nil {
-		return err
-	}
-	s.X = float64(s1.X)
-	s.Y = float64(s1.Y)
-	s.Z = float64(s1.Z)
-	return nil
-}
-
-// GoogleCloudVisionV1p5beta1Product: A Product contains
-// ReferenceImages.
-type GoogleCloudVisionV1p5beta1Product struct {
-	// Description: User-provided metadata to be stored with this product.
-	// Must be at most 4096
-	// characters long.
-	Description string `json:"description,omitempty"`
-
-	// DisplayName: The user-provided name for this Product. Must not be
-	// empty. Must be at most
-	// 4096 characters long.
-	DisplayName string `json:"displayName,omitempty"`
-
-	// Name: The resource name of the product.
-	//
-	// Format
-	// is:
-	// `projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`.
-	//
-	// This field is ignored when creating a product.
-	Name string `json:"name,omitempty"`
-
-	// ProductCategory: The category for the product identified by the
-	// reference image. This should
-	// be either "homegoods-v2", "apparel-v2", or "toys-v2". The legacy
-	// categories
-	// "homegoods", "apparel", and "toys" are still supported, but these
-	// should
-	// not be used for new products.
-	//
-	// This field is immutable.
-	ProductCategory string `json:"productCategory,omitempty"`
-
-	// ProductLabels: Key-value pairs that can be attached to a product. At
-	// query time,
-	// constraints can be specified based on the product_labels.
-	//
-	// Note that integer values can be provided as strings, e.g. "1199".
-	// Only
-	// strings with integer values can match a range-based restriction which
-	// is
-	// to be supported soon.
-	//
-	// Multiple values can be assigned to the same key. One product may have
-	// up to
-	// 500 product_labels.
-	//
-	// Notice that the total number of distinct product_labels over all
-	// products
-	// in one ProductSet cannot exceed 1M, otherwise the product search
-	// pipeline
-	// will refuse to work for that ProductSet.
-	ProductLabels []*GoogleCloudVisionV1p5beta1ProductKeyValue `json:"productLabels,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Description") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Description") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1Product) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1Product
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1ProductKeyValue: A product label
-// represented as a key-value pair.
-type GoogleCloudVisionV1p5beta1ProductKeyValue struct {
-	// Key: The key of the label attached to the product. Cannot be empty
-	// and cannot
-	// exceed 128 bytes.
-	Key string `json:"key,omitempty"`
-
-	// Value: The value of the label attached to the product. Cannot be
-	// empty and
-	// cannot exceed 128 bytes.
-	Value string `json:"value,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Key") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Key") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1ProductKeyValue) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1ProductKeyValue
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1ProductSearchResults: Results for a product
-// search request.
-type GoogleCloudVisionV1p5beta1ProductSearchResults struct {
-	// IndexTime: Timestamp of the index which provided these results.
-	// Products added to the
-	// product set and products removed from the product set after this time
-	// are
-	// not reflected in the current results.
-	IndexTime string `json:"indexTime,omitempty"`
-
-	// ProductGroupedResults: List of results grouped by products detected
-	// in the query image. Each entry
-	// corresponds to one bounding polygon in the query image, and contains
-	// the
-	// matching products specific to that region. There may be duplicate
-	// product
-	// matches in the union of all the per-product results.
-	ProductGroupedResults []*GoogleCloudVisionV1p5beta1ProductSearchResultsGroupedResult `json:"productGroupedResults,omitempty"`
-
-	// Results: List of results, one for each product match.
-	Results []*GoogleCloudVisionV1p5beta1ProductSearchResultsResult `json:"results,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "IndexTime") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "IndexTime") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1ProductSearchResults) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1ProductSearchResults
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1ProductSearchResultsGroupedResult:
-// Information about the products similar to a single product in a
-// query
-// image.
-type GoogleCloudVisionV1p5beta1ProductSearchResultsGroupedResult struct {
-	// BoundingPoly: The bounding polygon around the product detected in the
-	// query image.
-	BoundingPoly *GoogleCloudVisionV1p5beta1BoundingPoly `json:"boundingPoly,omitempty"`
-
-	// Results: List of results, one for each product match.
-	Results []*GoogleCloudVisionV1p5beta1ProductSearchResultsResult `json:"results,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "BoundingPoly") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "BoundingPoly") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1ProductSearchResultsGroupedResult) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1ProductSearchResultsGroupedResult
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1ProductSearchResultsResult: Information
-// about a product.
-type GoogleCloudVisionV1p5beta1ProductSearchResultsResult struct {
-	// Image: The resource name of the image from the product that is the
-	// closest match
-	// to the query.
-	Image string `json:"image,omitempty"`
-
-	// Product: The Product.
-	Product *GoogleCloudVisionV1p5beta1Product `json:"product,omitempty"`
-
-	// Score: A confidence level on the match, ranging from 0 (no
-	// confidence) to
-	// 1 (full confidence).
-	Score float64 `json:"score,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Image") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Image") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1ProductSearchResultsResult) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1ProductSearchResultsResult
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-func (s *GoogleCloudVisionV1p5beta1ProductSearchResultsResult) UnmarshalJSON(data []byte) error {
-	type NoMethod GoogleCloudVisionV1p5beta1ProductSearchResultsResult
-	var s1 struct {
-		Score gensupport.JSONFloat64 `json:"score"`
-		*NoMethod
-	}
-	s1.NoMethod = (*NoMethod)(s)
-	if err := json.Unmarshal(data, &s1); err != nil {
-		return err
-	}
-	s.Score = float64(s1.Score)
-	return nil
-}
-
-// GoogleCloudVisionV1p5beta1Property: A `Property` consists of a
-// user-supplied name/value pair.
-type GoogleCloudVisionV1p5beta1Property struct {
-	// Name: Name of the property.
-	Name string `json:"name,omitempty"`
-
-	// Uint64Value: Value of numeric properties.
-	Uint64Value uint64 `json:"uint64Value,omitempty,string"`
-
-	// Value: Value of the property.
-	Value string `json:"value,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Name") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Name") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1Property) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1Property
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1ReferenceImage: A `ReferenceImage`
-// represents a product image and its associated metadata,
-// such as bounding boxes.
-type GoogleCloudVisionV1p5beta1ReferenceImage struct {
-	// BoundingPolys: Bounding polygons around the areas of interest in the
-	// reference image.
-	// Optional. If this field is empty, the system will try to detect
-	// regions of
-	// interest. At most 10 bounding polygons will be used.
-	//
-	// The provided shape is converted into a non-rotated rectangle.
-	// Once
-	// converted, the small edge of the rectangle must be greater than or
-	// equal
-	// to 300 pixels. The aspect ratio must be 1:4 or less (i.e. 1:3 is ok;
-	// 1:5
-	// is not).
-	BoundingPolys []*GoogleCloudVisionV1p5beta1BoundingPoly `json:"boundingPolys,omitempty"`
-
-	// Name: The resource name of the reference image.
-	//
-	// Format
-	// is:
-	//
-	// `projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID/referen
-	// ceImages/IMAGE_ID`.
-	//
-	// This field is ignored when creating a reference image.
-	Name string `json:"name,omitempty"`
-
-	// Uri: The Google Cloud Storage URI of the reference image.
-	//
-	// The URI must start with `gs://`.
-	//
-	// Required.
-	Uri string `json:"uri,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "BoundingPolys") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "BoundingPolys") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1ReferenceImage) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1ReferenceImage
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1SafeSearchAnnotation: Set of features
-// pertaining to the image, computed by computer vision
-// methods over safe-search verticals (for example, adult, spoof,
-// medical,
-// violence).
-type GoogleCloudVisionV1p5beta1SafeSearchAnnotation struct {
-	// Adult: Represents the adult content likelihood for the image. Adult
-	// content may
-	// contain elements such as nudity, pornographic images or cartoons,
-	// or
-	// sexual activities.
-	//
-	// Possible values:
-	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
-	Adult string `json:"adult,omitempty"`
-
-	// Medical: Likelihood that this is a medical image.
-	//
-	// Possible values:
-	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
-	Medical string `json:"medical,omitempty"`
-
-	// Racy: Likelihood that the request image contains racy content. Racy
-	// content may
-	// include (but is not limited to) skimpy or sheer clothing,
-	// strategically
-	// covered nudity, lewd or provocative poses, or close-ups of
-	// sensitive
-	// body areas.
-	//
-	// Possible values:
-	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
-	Racy string `json:"racy,omitempty"`
-
-	// Spoof: Spoof likelihood. The likelihood that an modification
-	// was made to the image's canonical version to make it appear
-	// funny or offensive.
-	//
-	// Possible values:
-	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
-	Spoof string `json:"spoof,omitempty"`
-
-	// Violence: Likelihood that this image contains violent content.
-	//
-	// Possible values:
-	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
-	Violence string `json:"violence,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Adult") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Adult") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1SafeSearchAnnotation) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1SafeSearchAnnotation
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1Symbol: A single symbol representation.
-type GoogleCloudVisionV1p5beta1Symbol struct {
-	// BoundingBox: The bounding box for the symbol.
-	// The vertices are in the order of top-left, top-right,
-	// bottom-right,
-	// bottom-left. When a rotation of the bounding box is detected the
-	// rotation
-	// is represented as around the top-left corner as defined when the text
-	// is
-	// read in the 'natural' orientation.
-	// For example:
-	//   * when the text is horizontal it might look like:
-	//      0----1
-	//      |    |
-	//      3----2
-	//   * when it's rotated 180 degrees around the top-left corner it
-	// becomes:
-	//      2----3
-	//      |    |
-	//      1----0
-	//   and the vertex order will still be (0, 1, 2, 3).
-	BoundingBox *GoogleCloudVisionV1p5beta1BoundingPoly `json:"boundingBox,omitempty"`
-
-	// Confidence: Confidence of the OCR results for the symbol. Range [0,
-	// 1].
-	Confidence float64 `json:"confidence,omitempty"`
-
-	// Property: Additional information detected for the symbol.
-	Property *GoogleCloudVisionV1p5beta1TextAnnotationTextProperty `json:"property,omitempty"`
-
-	// Text: The actual UTF-8 representation of the symbol.
-	Text string `json:"text,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "BoundingBox") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "BoundingBox") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1Symbol) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1Symbol
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-func (s *GoogleCloudVisionV1p5beta1Symbol) UnmarshalJSON(data []byte) error {
-	type NoMethod GoogleCloudVisionV1p5beta1Symbol
-	var s1 struct {
-		Confidence gensupport.JSONFloat64 `json:"confidence"`
-		*NoMethod
-	}
-	s1.NoMethod = (*NoMethod)(s)
-	if err := json.Unmarshal(data, &s1); err != nil {
-		return err
-	}
-	s.Confidence = float64(s1.Confidence)
-	return nil
-}
-
-// GoogleCloudVisionV1p5beta1Table: A table representation similar to
-// HTML table structure.
-type GoogleCloudVisionV1p5beta1Table struct {
-	// BodyRows: Body rows of the table
-	BodyRows []*GoogleCloudVisionV1p5beta1TableTableRow `json:"bodyRows,omitempty"`
-
-	// HeaderRows: Header rows of the table
-	HeaderRows []*GoogleCloudVisionV1p5beta1TableTableRow `json:"headerRows,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "BodyRows") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "BodyRows") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1Table) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1Table
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1TableTableCell: A cell representation
-// inside of tables.
-type GoogleCloudVisionV1p5beta1TableTableCell struct {
-	// ColSpan: How many columns this cell spans.
-	ColSpan int64 `json:"colSpan,omitempty"`
-
-	// RowSpan: How many rows this cell spans.
-	RowSpan int64 `json:"rowSpan,omitempty"`
-
-	// Text: The merged text value of this cell, omitting any deeper
-	// structural
-	// information unlike `text_block`. This is useful for simple cells.
-	Text string `json:"text,omitempty"`
-
-	// TextBlock: Text block for this cell which also contains the
-	// normalized bounding box
-	// for the cell and deeper structures within a cell if present.
-	TextBlock *GoogleCloudVisionV1p5beta1Block `json:"textBlock,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "ColSpan") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "ColSpan") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1TableTableCell) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1TableTableCell
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1TableTableRow: A row of table cells.
-type GoogleCloudVisionV1p5beta1TableTableRow struct {
-	// Cells: Cells that make up this row.
-	Cells []*GoogleCloudVisionV1p5beta1TableTableCell `json:"cells,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Cells") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Cells") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1TableTableRow) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1TableTableRow
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1TextAnnotation: TextAnnotation contains a
-// structured representation of OCR extracted text.
-// The hierarchy of an OCR extracted text structure is like this:
-//     TextAnnotation -> Page -> Block -> Paragraph -> Word ->
-// Symbol
-// Each structural component, starting from Page, may further have their
-// own
-// properties. Properties describe detected languages, breaks etc..
-// Please refer
-// to the TextAnnotation.TextProperty message definition below for
-// more
-// detail.
-type GoogleCloudVisionV1p5beta1TextAnnotation struct {
-	// Pages: List of pages detected by OCR.
-	Pages []*GoogleCloudVisionV1p5beta1Page `json:"pages,omitempty"`
-
-	// Text: UTF-8 text detected on the pages.
-	Text string `json:"text,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Pages") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Pages") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1TextAnnotation) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1TextAnnotation
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1TextAnnotationDetectedBreak: Detected start
-// or end of a structural component.
-type GoogleCloudVisionV1p5beta1TextAnnotationDetectedBreak struct {
-	// IsPrefix: True if break prepends the element.
-	IsPrefix bool `json:"isPrefix,omitempty"`
-
-	// Type: Detected break type.
-	//
-	// Possible values:
-	//   "UNKNOWN" - Unknown break label type.
-	//   "SPACE" - Regular space.
-	//   "SURE_SPACE" - Sure space (very wide).
-	//   "EOL_SURE_SPACE" - Line-wrapping break.
-	//   "HYPHEN" - End-line hyphen that is not present in text; does not
-	// co-occur with
-	// `SPACE`, `LEADER_SPACE`, or `LINE_BREAK`.
-	//   "LINE_BREAK" - Line break that ends a paragraph.
-	Type string `json:"type,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "IsPrefix") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "IsPrefix") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1TextAnnotationDetectedBreak) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1TextAnnotationDetectedBreak
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1TextAnnotationDetectedLanguage: Detected
-// language for a structural component.
-type GoogleCloudVisionV1p5beta1TextAnnotationDetectedLanguage struct {
-	// Confidence: Confidence of detected language. Range [0, 1].
-	Confidence float64 `json:"confidence,omitempty"`
-
-	// LanguageCode: The BCP-47 language code, such as "en-US" or "sr-Latn".
-	// For more
-	// information,
-	// see
-	// http://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
-	LanguageCode string `json:"languageCode,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Confidence") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Confidence") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1TextAnnotationDetectedLanguage) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1TextAnnotationDetectedLanguage
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-func (s *GoogleCloudVisionV1p5beta1TextAnnotationDetectedLanguage) UnmarshalJSON(data []byte) error {
-	type NoMethod GoogleCloudVisionV1p5beta1TextAnnotationDetectedLanguage
-	var s1 struct {
-		Confidence gensupport.JSONFloat64 `json:"confidence"`
-		*NoMethod
-	}
-	s1.NoMethod = (*NoMethod)(s)
-	if err := json.Unmarshal(data, &s1); err != nil {
-		return err
-	}
-	s.Confidence = float64(s1.Confidence)
-	return nil
-}
-
-// GoogleCloudVisionV1p5beta1TextAnnotationTextProperty: Additional
-// information detected on the structural component.
-type GoogleCloudVisionV1p5beta1TextAnnotationTextProperty struct {
-	// DetectedBreak: Detected start or end of a text segment.
-	DetectedBreak *GoogleCloudVisionV1p5beta1TextAnnotationDetectedBreak `json:"detectedBreak,omitempty"`
-
-	// DetectedLanguages: A list of detected languages together with
-	// confidence.
-	DetectedLanguages []*GoogleCloudVisionV1p5beta1TextAnnotationDetectedLanguage `json:"detectedLanguages,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "DetectedBreak") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "DetectedBreak") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1TextAnnotationTextProperty) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1TextAnnotationTextProperty
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1Vertex: A vertex represents a 2D point in
-// the image.
-// NOTE: the vertex coordinates are in the same scale as the original
-// image.
-type GoogleCloudVisionV1p5beta1Vertex struct {
-	// X: X coordinate.
-	X int64 `json:"x,omitempty"`
-
-	// Y: Y coordinate.
-	Y int64 `json:"y,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "X") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "X") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1Vertex) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1Vertex
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1WebDetection: Relevant information for the
-// image from the Internet.
-type GoogleCloudVisionV1p5beta1WebDetection struct {
-	// BestGuessLabels: The service's best guess as to the topic of the
-	// request image.
-	// Inferred from similar images on the open web.
-	BestGuessLabels []*GoogleCloudVisionV1p5beta1WebDetectionWebLabel `json:"bestGuessLabels,omitempty"`
-
-	// FullMatchingImages: Fully matching images from the Internet.
-	// Can include resized copies of the query image.
-	FullMatchingImages []*GoogleCloudVisionV1p5beta1WebDetectionWebImage `json:"fullMatchingImages,omitempty"`
-
-	// PagesWithMatchingImages: Web pages containing the matching images
-	// from the Internet.
-	PagesWithMatchingImages []*GoogleCloudVisionV1p5beta1WebDetectionWebPage `json:"pagesWithMatchingImages,omitempty"`
-
-	// PartialMatchingImages: Partial matching images from the
-	// Internet.
-	// Those images are similar enough to share some key-point features.
-	// For
-	// example an original image will likely have partial matching for its
-	// crops.
-	PartialMatchingImages []*GoogleCloudVisionV1p5beta1WebDetectionWebImage `json:"partialMatchingImages,omitempty"`
-
-	// VisuallySimilarImages: The visually similar image results.
-	VisuallySimilarImages []*GoogleCloudVisionV1p5beta1WebDetectionWebImage `json:"visuallySimilarImages,omitempty"`
-
-	// WebEntities: Deduced entities from similar images on the Internet.
-	WebEntities []*GoogleCloudVisionV1p5beta1WebDetectionWebEntity `json:"webEntities,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "BestGuessLabels") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "BestGuessLabels") to
-	// include in API requests with the JSON null value. By default, fields
-	// with empty values are omitted from API requests. However, any field
-	// with an empty value appearing in NullFields will be sent to the
-	// server as null. It is an error if a field in this list has a
-	// non-empty value. This may be used to include null fields in Patch
-	// requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1WebDetection) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1WebDetection
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1WebDetectionWebEntity: Entity deduced from
-// similar images on the Internet.
-type GoogleCloudVisionV1p5beta1WebDetectionWebEntity struct {
-	// Description: Canonical description of the entity, in English.
-	Description string `json:"description,omitempty"`
-
-	// EntityId: Opaque entity ID.
-	EntityId string `json:"entityId,omitempty"`
-
-	// Score: Overall relevancy score for the entity.
-	// Not normalized and not comparable across different image queries.
-	Score float64 `json:"score,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Description") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Description") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1WebDetectionWebEntity) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1WebDetectionWebEntity
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-func (s *GoogleCloudVisionV1p5beta1WebDetectionWebEntity) UnmarshalJSON(data []byte) error {
-	type NoMethod GoogleCloudVisionV1p5beta1WebDetectionWebEntity
-	var s1 struct {
-		Score gensupport.JSONFloat64 `json:"score"`
-		*NoMethod
-	}
-	s1.NoMethod = (*NoMethod)(s)
-	if err := json.Unmarshal(data, &s1); err != nil {
-		return err
-	}
-	s.Score = float64(s1.Score)
-	return nil
-}
-
-// GoogleCloudVisionV1p5beta1WebDetectionWebImage: Metadata for online
-// images.
-type GoogleCloudVisionV1p5beta1WebDetectionWebImage struct {
-	// Score: (Deprecated) Overall relevancy score for the image.
-	Score float64 `json:"score,omitempty"`
-
-	// Url: The result image URL.
-	Url string `json:"url,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Score") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Score") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1WebDetectionWebImage) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1WebDetectionWebImage
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-func (s *GoogleCloudVisionV1p5beta1WebDetectionWebImage) UnmarshalJSON(data []byte) error {
-	type NoMethod GoogleCloudVisionV1p5beta1WebDetectionWebImage
-	var s1 struct {
-		Score gensupport.JSONFloat64 `json:"score"`
-		*NoMethod
-	}
-	s1.NoMethod = (*NoMethod)(s)
-	if err := json.Unmarshal(data, &s1); err != nil {
-		return err
-	}
-	s.Score = float64(s1.Score)
-	return nil
-}
-
-// GoogleCloudVisionV1p5beta1WebDetectionWebLabel: Label to provide
-// extra metadata for the web detection.
-type GoogleCloudVisionV1p5beta1WebDetectionWebLabel struct {
-	// Label: Label for extra metadata.
-	Label string `json:"label,omitempty"`
-
-	// LanguageCode: The BCP-47 language code for `label`, such as "en-US"
-	// or "sr-Latn".
-	// For more information,
-	// see
-	// http://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
-	LanguageCode string `json:"languageCode,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Label") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Label") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1WebDetectionWebLabel) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1WebDetectionWebLabel
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GoogleCloudVisionV1p5beta1WebDetectionWebPage: Metadata for web
-// pages.
-type GoogleCloudVisionV1p5beta1WebDetectionWebPage struct {
-	// FullMatchingImages: Fully matching images on the page.
-	// Can include resized copies of the query image.
-	FullMatchingImages []*GoogleCloudVisionV1p5beta1WebDetectionWebImage `json:"fullMatchingImages,omitempty"`
-
-	// PageTitle: Title for the web page, may contain HTML markups.
-	PageTitle string `json:"pageTitle,omitempty"`
-
-	// PartialMatchingImages: Partial matching images on the page.
-	// Those images are similar enough to share some key-point features.
-	// For
-	// example an original image will likely have partial matching for
-	// its
-	// crops.
-	PartialMatchingImages []*GoogleCloudVisionV1p5beta1WebDetectionWebImage `json:"partialMatchingImages,omitempty"`
-
-	// Score: (Deprecated) Overall relevancy score for the web page.
-	Score float64 `json:"score,omitempty"`
-
-	// Url: The result web page URL.
-	Url string `json:"url,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "FullMatchingImages")
-	// to unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "FullMatchingImages") to
-	// include in API requests with the JSON null value. By default, fields
-	// with empty values are omitted from API requests. However, any field
-	// with an empty value appearing in NullFields will be sent to the
-	// server as null. It is an error if a field in this list has a
-	// non-empty value. This may be used to include null fields in Patch
-	// requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1WebDetectionWebPage) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1WebDetectionWebPage
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-func (s *GoogleCloudVisionV1p5beta1WebDetectionWebPage) UnmarshalJSON(data []byte) error {
-	type NoMethod GoogleCloudVisionV1p5beta1WebDetectionWebPage
-	var s1 struct {
-		Score gensupport.JSONFloat64 `json:"score"`
-		*NoMethod
-	}
-	s1.NoMethod = (*NoMethod)(s)
-	if err := json.Unmarshal(data, &s1); err != nil {
-		return err
-	}
-	s.Score = float64(s1.Score)
-	return nil
-}
-
-// GoogleCloudVisionV1p5beta1Word: A word representation.
-type GoogleCloudVisionV1p5beta1Word struct {
-	// BoundingBox: The bounding box for the word.
-	// The vertices are in the order of top-left, top-right,
-	// bottom-right,
-	// bottom-left. When a rotation of the bounding box is detected the
-	// rotation
-	// is represented as around the top-left corner as defined when the text
-	// is
-	// read in the 'natural' orientation.
-	// For example:
-	//   * when the text is horizontal it might look like:
-	//      0----1
-	//      |    |
-	//      3----2
-	//   * when it's rotated 180 degrees around the top-left corner it
-	// becomes:
-	//      2----3
-	//      |    |
-	//      1----0
-	//   and the vertex order will still be (0, 1, 2, 3).
-	BoundingBox *GoogleCloudVisionV1p5beta1BoundingPoly `json:"boundingBox,omitempty"`
-
-	// Confidence: Confidence of the OCR results for the word. Range [0, 1].
-	Confidence float64 `json:"confidence,omitempty"`
-
-	// MergedText: All UTF-8 text detected in this word. This field is by
-	// default not
-	// returned unless specified in TextDetectionParams.word_filter.
-	MergedText string `json:"mergedText,omitempty"`
-
-	// Property: Additional information detected for the word.
-	Property *GoogleCloudVisionV1p5beta1TextAnnotationTextProperty `json:"property,omitempty"`
-
-	// Symbols: List of symbols in the word.
-	// The order of the symbols follows the natural reading order.
-	Symbols []*GoogleCloudVisionV1p5beta1Symbol `json:"symbols,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "BoundingBox") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "BoundingBox") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GoogleCloudVisionV1p5beta1Word) MarshalJSON() ([]byte, error) {
-	type NoMethod GoogleCloudVisionV1p5beta1Word
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-func (s *GoogleCloudVisionV1p5beta1Word) UnmarshalJSON(data []byte) error {
-	type NoMethod GoogleCloudVisionV1p5beta1Word
-	var s1 struct {
-		Confidence gensupport.JSONFloat64 `json:"confidence"`
-		*NoMethod
-	}
-	s1.NoMethod = (*NoMethod)(s)
-	if err := json.Unmarshal(data, &s1); err != nil {
-		return err
-	}
-	s.Confidence = float64(s1.Confidence)
-	return nil
-}
-
 // GroupedResult: Information about the products similar to a single
 // product in a query
 // image.
@@ -15267,6 +12574,10 @@ type GroupedResult struct {
 	// BoundingPoly: The bounding polygon around the product detected in the
 	// query image.
 	BoundingPoly *BoundingPoly `json:"boundingPoly,omitempty"`
+
+	// ObjectAnnotations: List of generic predictions for the object in the
+	// bounding box.
+	ObjectAnnotations []*ObjectAnnotation `json:"objectAnnotations,omitempty"`
 
 	// Results: List of results, one for each product match.
 	Results []*Result `json:"results,omitempty"`
@@ -15659,7 +12970,7 @@ func (s *ImportProductSetsInputConfig) MarshalJSON() ([]byte, error) {
 // ImportProductSetsRequest: Request message for the `ImportProductSets`
 // method.
 type ImportProductSetsRequest struct {
-	// InputConfig: The input content for the list of requests.
+	// InputConfig: Required. The input content for the list of requests.
 	InputConfig *ImportProductSetsInputConfig `json:"inputConfig,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "InputConfig") to
@@ -16297,6 +13608,62 @@ func (s *NormalizedVertex) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// ObjectAnnotation: Prediction for what the object in the bounding box
+// is.
+type ObjectAnnotation struct {
+	// LanguageCode: The BCP-47 language code, such as "en-US" or "sr-Latn".
+	// For more
+	// information,
+	// see
+	// http://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
+	LanguageCode string `json:"languageCode,omitempty"`
+
+	// Mid: Object ID that should align with EntityAnnotation mid.
+	Mid string `json:"mid,omitempty"`
+
+	// Name: Object name, expressed in its `language_code` language.
+	Name string `json:"name,omitempty"`
+
+	// Score: Score of the result. Range [0, 1].
+	Score float64 `json:"score,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "LanguageCode") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "LanguageCode") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *ObjectAnnotation) MarshalJSON() ([]byte, error) {
+	type NoMethod ObjectAnnotation
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+func (s *ObjectAnnotation) UnmarshalJSON(data []byte) error {
+	type NoMethod ObjectAnnotation
+	var s1 struct {
+		Score gensupport.JSONFloat64 `json:"score"`
+		*NoMethod
+	}
+	s1.NoMethod = (*NoMethod)(s)
+	if err := json.Unmarshal(data, &s1); err != nil {
+		return err
+	}
+	s.Score = float64(s1.Score)
+	return nil
+}
+
 // Operation: This resource represents a long-running operation that is
 // the result of a
 // network API call.
@@ -16667,15 +14034,13 @@ type Product struct {
 	// This field is ignored when creating a product.
 	Name string `json:"name,omitempty"`
 
-	// ProductCategory: The category for the product identified by the
-	// reference image. This should
+	// ProductCategory: Immutable. The category for the product identified
+	// by the reference image. This should
 	// be either "homegoods-v2", "apparel-v2", or "toys-v2". The legacy
 	// categories
 	// "homegoods", "apparel", and "toys" are still supported, but these
 	// should
 	// not be used for new products.
-	//
-	// This field is immutable.
 	ProductCategory string `json:"productCategory,omitempty"`
 
 	// ProductLabels: Key-value pairs that can be attached to a product. At
@@ -16751,17 +14116,17 @@ type ProductSearchParams struct {
 
 	// ProductCategories: The list of product categories to search in.
 	// Currently, we only consider
-	// the first category, and either "homegoods-v2", "apparel-v2", or
-	// "toys-v2"
-	// should be specified. The legacy categories "homegoods", "apparel",
-	// and
-	// "toys" are still supported but will be deprecated. For new products,
-	// please
-	// use "homegoods-v2", "apparel-v2", or "toys-v2" for better product
-	// search
-	// accuracy. It is recommended to migrate existing products to
-	// these
-	// categories as well.
+	// the first category, and either "homegoods-v2", "apparel-v2",
+	// "toys-v2",
+	// "packagedgoods-v1", or "general-v1" should be specified. The
+	// legacy
+	// categories "homegoods", "apparel", and "toys" are still supported but
+	// will
+	// be deprecated. For new products, please use "homegoods-v2",
+	// "apparel-v2",
+	// or "toys-v2" for better product search accuracy. It is recommended
+	// to
+	// migrate existing products to these categories as well.
 	ProductCategories []string `json:"productCategories,omitempty"`
 
 	// ProductSet: The resource name of a ProductSet to be searched for
@@ -16905,6 +14270,39 @@ func (s *ProductSet) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// ProductSetPurgeConfig: Config to control which ProductSet contains
+// the Products to be deleted.
+type ProductSetPurgeConfig struct {
+	// ProductSetId: The ProductSet that contains the Products to delete. If
+	// a Product is a
+	// member of product_set_id in addition to other ProductSets, the
+	// Product will
+	// still be deleted.
+	ProductSetId string `json:"productSetId,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "ProductSetId") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "ProductSetId") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *ProductSetPurgeConfig) MarshalJSON() ([]byte, error) {
+	type NoMethod ProductSetPurgeConfig
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // Property: A `Property` consists of a user-supplied name/value pair.
 type Property struct {
 	// Name: Name of the property.
@@ -16939,14 +14337,55 @@ func (s *Property) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// PurgeProductsRequest: Request message for the `PurgeProducts` method.
+type PurgeProductsRequest struct {
+	// DeleteOrphanProducts: If delete_orphan_products is true, all Products
+	// that are not in any
+	// ProductSet will be deleted.
+	DeleteOrphanProducts bool `json:"deleteOrphanProducts,omitempty"`
+
+	// Force: The default value is false. Override this value to true to
+	// actually perform
+	// the purge.
+	Force bool `json:"force,omitempty"`
+
+	// ProductSetPurgeConfig: Specify which ProductSet contains the Products
+	// to be deleted.
+	ProductSetPurgeConfig *ProductSetPurgeConfig `json:"productSetPurgeConfig,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g.
+	// "DeleteOrphanProducts") to unconditionally include in API requests.
+	// By default, fields with empty values are omitted from API requests.
+	// However, any non-pointer, non-interface field appearing in
+	// ForceSendFields will be sent to the server regardless of whether the
+	// field is empty or not. This may be used to include empty fields in
+	// Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "DeleteOrphanProducts") to
+	// include in API requests with the JSON null value. By default, fields
+	// with empty values are omitted from API requests. However, any field
+	// with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *PurgeProductsRequest) MarshalJSON() ([]byte, error) {
+	type NoMethod PurgeProductsRequest
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // ReferenceImage: A `ReferenceImage` represents a product image and its
 // associated metadata,
 // such as bounding boxes.
 type ReferenceImage struct {
-	// BoundingPolys: Bounding polygons around the areas of interest in the
-	// reference image.
-	// Optional. If this field is empty, the system will try to detect
-	// regions of
+	// BoundingPolys: Optional. Bounding polygons around the areas of
+	// interest in the reference image.
+	// If this field is empty, the system will try to detect regions
+	// of
 	// interest. At most 10 bounding polygons will be used.
 	//
 	// The provided shape is converted into a non-rotated rectangle.
@@ -16969,11 +14408,10 @@ type ReferenceImage struct {
 	// This field is ignored when creating a reference image.
 	Name string `json:"name,omitempty"`
 
-	// Uri: The Google Cloud Storage URI of the reference image.
+	// Uri: Required. The Google Cloud Storage URI of the reference
+	// image.
 	//
 	// The URI must start with `gs://`.
-	//
-	// Required.
 	Uri string `json:"uri,omitempty"`
 
 	// ServerResponse contains the HTTP response code and headers from the
@@ -17006,8 +14444,8 @@ func (s *ReferenceImage) MarshalJSON() ([]byte, error) {
 // RemoveProductFromProductSetRequest: Request message for the
 // `RemoveProductFromProductSet` method.
 type RemoveProductFromProductSetRequest struct {
-	// Product: The resource name for the Product to be removed from this
-	// ProductSet.
+	// Product: Required. The resource name for the Product to be removed
+	// from this ProductSet.
 	//
 	// Format is:
 	// `projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`
@@ -17102,33 +14540,38 @@ type SafeSearchAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Adult string `json:"adult,omitempty"`
+
+	// AdultConfidence: Confidence of adult_score. Range [0, 1]. 0 means not
+	// confident, 1 means
+	// very confident.
+	AdultConfidence float64 `json:"adultConfidence,omitempty"`
 
 	// Medical: Likelihood that this is a medical image.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Medical string `json:"medical,omitempty"`
+
+	// MedicalConfidence: Confidence of medical_score. Range [0, 1]. 0 means
+	// not confident, 1 means
+	// very confident.
+	MedicalConfidence float64 `json:"medicalConfidence,omitempty"`
+
+	// NsfwConfidence: Confidence of nsfw_score. Range [0, 1]. 0 means not
+	// confident, 1 means very
+	// confident.
+	NsfwConfidence float64 `json:"nsfwConfidence,omitempty"`
 
 	// Racy: Likelihood that the request image contains racy content. Racy
 	// content may
@@ -17140,17 +14583,17 @@ type SafeSearchAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Racy string `json:"racy,omitempty"`
+
+	// RacyConfidence: Confidence of racy_score. Range [0, 1]. 0 means not
+	// confident, 1 means very
+	// confident.
+	RacyConfidence float64 `json:"racyConfidence,omitempty"`
 
 	// Spoof: Spoof likelihood. The likelihood that an modification
 	// was made to the image's canonical version to make it appear
@@ -17158,33 +14601,33 @@ type SafeSearchAnnotation struct {
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Spoof string `json:"spoof,omitempty"`
+
+	// SpoofConfidence: Confidence of spoof_score. Range [0, 1]. 0 means not
+	// confident, 1 means
+	// very confident.
+	SpoofConfidence float64 `json:"spoofConfidence,omitempty"`
 
 	// Violence: Likelihood that this image contains violent content.
 	//
 	// Possible values:
 	//   "UNKNOWN" - Unknown likelihood.
-	//   "VERY_UNLIKELY" - It is very unlikely that the image belongs to the
-	// specified vertical.
-	//   "UNLIKELY" - It is unlikely that the image belongs to the specified
-	// vertical.
-	//   "POSSIBLE" - It is possible that the image belongs to the specified
-	// vertical.
-	//   "LIKELY" - It is likely that the image belongs to the specified
-	// vertical.
-	//   "VERY_LIKELY" - It is very likely that the image belongs to the
-	// specified vertical.
+	//   "VERY_UNLIKELY" - It is very unlikely.
+	//   "UNLIKELY" - It is unlikely.
+	//   "POSSIBLE" - It is possible.
+	//   "LIKELY" - It is likely.
+	//   "VERY_LIKELY" - It is very likely.
 	Violence string `json:"violence,omitempty"`
+
+	// ViolenceConfidence: Confidence of violence_score. Range [0, 1]. 0
+	// means not confident, 1 means
+	// very confident.
+	ViolenceConfidence float64 `json:"violenceConfidence,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Adult") to
 	// unconditionally include in API requests. By default, fields with
@@ -17207,6 +14650,30 @@ func (s *SafeSearchAnnotation) MarshalJSON() ([]byte, error) {
 	type NoMethod SafeSearchAnnotation
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+func (s *SafeSearchAnnotation) UnmarshalJSON(data []byte) error {
+	type NoMethod SafeSearchAnnotation
+	var s1 struct {
+		AdultConfidence    gensupport.JSONFloat64 `json:"adultConfidence"`
+		MedicalConfidence  gensupport.JSONFloat64 `json:"medicalConfidence"`
+		NsfwConfidence     gensupport.JSONFloat64 `json:"nsfwConfidence"`
+		RacyConfidence     gensupport.JSONFloat64 `json:"racyConfidence"`
+		SpoofConfidence    gensupport.JSONFloat64 `json:"spoofConfidence"`
+		ViolenceConfidence gensupport.JSONFloat64 `json:"violenceConfidence"`
+		*NoMethod
+	}
+	s1.NoMethod = (*NoMethod)(s)
+	if err := json.Unmarshal(data, &s1); err != nil {
+		return err
+	}
+	s.AdultConfidence = float64(s1.AdultConfidence)
+	s.MedicalConfidence = float64(s1.MedicalConfidence)
+	s.NsfwConfidence = float64(s1.NsfwConfidence)
+	s.RacyConfidence = float64(s1.RacyConfidence)
+	s.SpoofConfidence = float64(s1.SpoofConfidence)
+	s.ViolenceConfidence = float64(s1.ViolenceConfidence)
+	return nil
 }
 
 // Status: The `Status` type defines a logical error model that is
@@ -17837,6 +15304,7 @@ func (c *FilesAnnotateCall) Header() http.Header {
 
 func (c *FilesAnnotateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -17972,6 +15440,7 @@ func (c *FilesAsyncBatchAnnotateCall) Header() http.Header {
 
 func (c *FilesAsyncBatchAnnotateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -18097,6 +15566,7 @@ func (c *ImagesAnnotateCall) Header() http.Header {
 
 func (c *ImagesAnnotateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -18236,6 +15706,7 @@ func (c *ImagesAsyncBatchAnnotateCall) Header() http.Header {
 
 func (c *ImagesAsyncBatchAnnotateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -18376,6 +15847,7 @@ func (c *LocationsOperationsGetCall) Header() http.Header {
 
 func (c *LocationsOperationsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -18528,6 +16000,7 @@ func (c *OperationsCancelCall) Header() http.Header {
 
 func (c *OperationsCancelCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -18672,6 +16145,7 @@ func (c *OperationsDeleteCall) Header() http.Header {
 
 func (c *OperationsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -18817,6 +16291,7 @@ func (c *OperationsGetCall) Header() http.Header {
 
 func (c *OperationsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -18998,6 +16473,7 @@ func (c *OperationsListCall) Header() http.Header {
 
 func (c *OperationsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -19124,6 +16600,1204 @@ func (c *OperationsListCall) Pages(ctx context.Context, f func(*ListOperationsRe
 	}
 }
 
+// method id "vision.projects.files.annotate":
+
+type ProjectsFilesAnnotateCall struct {
+	s                         *Service
+	parent                    string
+	batchannotatefilesrequest *BatchAnnotateFilesRequest
+	urlParams_                gensupport.URLParams
+	ctx_                      context.Context
+	header_                   http.Header
+}
+
+// Annotate: Service that performs image detection and annotation for a
+// batch of files.
+// Now only "application/pdf", "image/tiff" and "image/gif" are
+// supported.
+//
+// This service will extract at most 5 (customers can specify which 5
+// in
+// AnnotateFileRequest.pages) frames (gif) or pages (pdf or tiff) from
+// each
+// file provided and perform detection and annotation for each
+// image
+// extracted.
+func (r *ProjectsFilesService) Annotate(parent string, batchannotatefilesrequest *BatchAnnotateFilesRequest) *ProjectsFilesAnnotateCall {
+	c := &ProjectsFilesAnnotateCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.parent = parent
+	c.batchannotatefilesrequest = batchannotatefilesrequest
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsFilesAnnotateCall) Fields(s ...googleapi.Field) *ProjectsFilesAnnotateCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsFilesAnnotateCall) Context(ctx context.Context) *ProjectsFilesAnnotateCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsFilesAnnotateCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsFilesAnnotateCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.batchannotatefilesrequest)
+	if err != nil {
+		return nil, err
+	}
+	reqHeaders.Set("Content-Type", "application/json")
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/{+parent}/files:annotate")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"parent": c.parent,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "vision.projects.files.annotate" call.
+// Exactly one of *BatchAnnotateFilesResponse or error will be non-nil.
+// Any non-2xx status code is an error. Response headers are in either
+// *BatchAnnotateFilesResponse.ServerResponse.Header or (if a response
+// was returned at all) in error.(*googleapi.Error).Header. Use
+// googleapi.IsNotModified to check whether the returned error was
+// because http.StatusNotModified was returned.
+func (c *ProjectsFilesAnnotateCall) Do(opts ...googleapi.CallOption) (*BatchAnnotateFilesResponse, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &BatchAnnotateFilesResponse{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Service that performs image detection and annotation for a batch of files.\nNow only \"application/pdf\", \"image/tiff\" and \"image/gif\" are supported.\n\nThis service will extract at most 5 (customers can specify which 5 in\nAnnotateFileRequest.pages) frames (gif) or pages (pdf or tiff) from each\nfile provided and perform detection and annotation for each image\nextracted.",
+	//   "flatPath": "v1/projects/{projectsId}/files:annotate",
+	//   "httpMethod": "POST",
+	//   "id": "vision.projects.files.annotate",
+	//   "parameterOrder": [
+	//     "parent"
+	//   ],
+	//   "parameters": {
+	//     "parent": {
+	//       "description": "Optional. Target project and location to make a call.\n\nFormat: `projects/{project-id}/locations/{location-id}`.\n\nIf no parent is specified, a region will be chosen automatically.\n\nSupported location-ids:\n    `us`: USA country only,\n    `asia`: East asia areas, like Japan, Taiwan,\n    `eu`: The European Union.\n\nExample: `projects/project-A/locations/eu`.",
+	//       "location": "path",
+	//       "pattern": "^projects/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1/{+parent}/files:annotate",
+	//   "request": {
+	//     "$ref": "BatchAnnotateFilesRequest"
+	//   },
+	//   "response": {
+	//     "$ref": "BatchAnnotateFilesResponse"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/cloud-vision"
+	//   ]
+	// }
+
+}
+
+// method id "vision.projects.files.asyncBatchAnnotate":
+
+type ProjectsFilesAsyncBatchAnnotateCall struct {
+	s                              *Service
+	parent                         string
+	asyncbatchannotatefilesrequest *AsyncBatchAnnotateFilesRequest
+	urlParams_                     gensupport.URLParams
+	ctx_                           context.Context
+	header_                        http.Header
+}
+
+// AsyncBatchAnnotate: Run asynchronous image detection and annotation
+// for a list of generic
+// files, such as PDF files, which may contain multiple pages and
+// multiple
+// images per page. Progress and results can be retrieved through
+// the
+// `google.longrunning.Operations` interface.
+// `Operation.metadata` contains `OperationMetadata`
+// (metadata).
+// `Operation.response` contains `AsyncBatchAnnotateFilesResponse`
+// (results).
+func (r *ProjectsFilesService) AsyncBatchAnnotate(parent string, asyncbatchannotatefilesrequest *AsyncBatchAnnotateFilesRequest) *ProjectsFilesAsyncBatchAnnotateCall {
+	c := &ProjectsFilesAsyncBatchAnnotateCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.parent = parent
+	c.asyncbatchannotatefilesrequest = asyncbatchannotatefilesrequest
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsFilesAsyncBatchAnnotateCall) Fields(s ...googleapi.Field) *ProjectsFilesAsyncBatchAnnotateCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsFilesAsyncBatchAnnotateCall) Context(ctx context.Context) *ProjectsFilesAsyncBatchAnnotateCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsFilesAsyncBatchAnnotateCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsFilesAsyncBatchAnnotateCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.asyncbatchannotatefilesrequest)
+	if err != nil {
+		return nil, err
+	}
+	reqHeaders.Set("Content-Type", "application/json")
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/{+parent}/files:asyncBatchAnnotate")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"parent": c.parent,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "vision.projects.files.asyncBatchAnnotate" call.
+// Exactly one of *Operation or error will be non-nil. Any non-2xx
+// status code is an error. Response headers are in either
+// *Operation.ServerResponse.Header or (if a response was returned at
+// all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
+// to check whether the returned error was because
+// http.StatusNotModified was returned.
+func (c *ProjectsFilesAsyncBatchAnnotateCall) Do(opts ...googleapi.CallOption) (*Operation, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &Operation{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Run asynchronous image detection and annotation for a list of generic\nfiles, such as PDF files, which may contain multiple pages and multiple\nimages per page. Progress and results can be retrieved through the\n`google.longrunning.Operations` interface.\n`Operation.metadata` contains `OperationMetadata` (metadata).\n`Operation.response` contains `AsyncBatchAnnotateFilesResponse` (results).",
+	//   "flatPath": "v1/projects/{projectsId}/files:asyncBatchAnnotate",
+	//   "httpMethod": "POST",
+	//   "id": "vision.projects.files.asyncBatchAnnotate",
+	//   "parameterOrder": [
+	//     "parent"
+	//   ],
+	//   "parameters": {
+	//     "parent": {
+	//       "description": "Optional. Target project and location to make a call.\n\nFormat: `projects/{project-id}/locations/{location-id}`.\n\nIf no parent is specified, a region will be chosen automatically.\n\nSupported location-ids:\n    `us`: USA country only,\n    `asia`: East asia areas, like Japan, Taiwan,\n    `eu`: The European Union.\n\nExample: `projects/project-A/locations/eu`.",
+	//       "location": "path",
+	//       "pattern": "^projects/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1/{+parent}/files:asyncBatchAnnotate",
+	//   "request": {
+	//     "$ref": "AsyncBatchAnnotateFilesRequest"
+	//   },
+	//   "response": {
+	//     "$ref": "Operation"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/cloud-vision"
+	//   ]
+	// }
+
+}
+
+// method id "vision.projects.images.annotate":
+
+type ProjectsImagesAnnotateCall struct {
+	s                          *Service
+	parent                     string
+	batchannotateimagesrequest *BatchAnnotateImagesRequest
+	urlParams_                 gensupport.URLParams
+	ctx_                       context.Context
+	header_                    http.Header
+}
+
+// Annotate: Run image detection and annotation for a batch of images.
+func (r *ProjectsImagesService) Annotate(parent string, batchannotateimagesrequest *BatchAnnotateImagesRequest) *ProjectsImagesAnnotateCall {
+	c := &ProjectsImagesAnnotateCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.parent = parent
+	c.batchannotateimagesrequest = batchannotateimagesrequest
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsImagesAnnotateCall) Fields(s ...googleapi.Field) *ProjectsImagesAnnotateCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsImagesAnnotateCall) Context(ctx context.Context) *ProjectsImagesAnnotateCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsImagesAnnotateCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsImagesAnnotateCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.batchannotateimagesrequest)
+	if err != nil {
+		return nil, err
+	}
+	reqHeaders.Set("Content-Type", "application/json")
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/{+parent}/images:annotate")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"parent": c.parent,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "vision.projects.images.annotate" call.
+// Exactly one of *BatchAnnotateImagesResponse or error will be non-nil.
+// Any non-2xx status code is an error. Response headers are in either
+// *BatchAnnotateImagesResponse.ServerResponse.Header or (if a response
+// was returned at all) in error.(*googleapi.Error).Header. Use
+// googleapi.IsNotModified to check whether the returned error was
+// because http.StatusNotModified was returned.
+func (c *ProjectsImagesAnnotateCall) Do(opts ...googleapi.CallOption) (*BatchAnnotateImagesResponse, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &BatchAnnotateImagesResponse{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Run image detection and annotation for a batch of images.",
+	//   "flatPath": "v1/projects/{projectsId}/images:annotate",
+	//   "httpMethod": "POST",
+	//   "id": "vision.projects.images.annotate",
+	//   "parameterOrder": [
+	//     "parent"
+	//   ],
+	//   "parameters": {
+	//     "parent": {
+	//       "description": "Optional. Target project and location to make a call.\n\nFormat: `projects/{project-id}/locations/{location-id}`.\n\nIf no parent is specified, a region will be chosen automatically.\n\nSupported location-ids:\n    `us`: USA country only,\n    `asia`: East asia areas, like Japan, Taiwan,\n    `eu`: The European Union.\n\nExample: `projects/project-A/locations/eu`.",
+	//       "location": "path",
+	//       "pattern": "^projects/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1/{+parent}/images:annotate",
+	//   "request": {
+	//     "$ref": "BatchAnnotateImagesRequest"
+	//   },
+	//   "response": {
+	//     "$ref": "BatchAnnotateImagesResponse"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/cloud-vision"
+	//   ]
+	// }
+
+}
+
+// method id "vision.projects.images.asyncBatchAnnotate":
+
+type ProjectsImagesAsyncBatchAnnotateCall struct {
+	s                               *Service
+	parent                          string
+	asyncbatchannotateimagesrequest *AsyncBatchAnnotateImagesRequest
+	urlParams_                      gensupport.URLParams
+	ctx_                            context.Context
+	header_                         http.Header
+}
+
+// AsyncBatchAnnotate: Run asynchronous image detection and annotation
+// for a list of images.
+//
+// Progress and results can be retrieved through
+// the
+// `google.longrunning.Operations` interface.
+// `Operation.metadata` contains `OperationMetadata`
+// (metadata).
+// `Operation.response` contains `AsyncBatchAnnotateImagesResponse`
+// (results).
+//
+// This service will write image annotation outputs to json files in
+// customer
+// GCS bucket, each json file containing BatchAnnotateImagesResponse
+// proto.
+func (r *ProjectsImagesService) AsyncBatchAnnotate(parent string, asyncbatchannotateimagesrequest *AsyncBatchAnnotateImagesRequest) *ProjectsImagesAsyncBatchAnnotateCall {
+	c := &ProjectsImagesAsyncBatchAnnotateCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.parent = parent
+	c.asyncbatchannotateimagesrequest = asyncbatchannotateimagesrequest
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsImagesAsyncBatchAnnotateCall) Fields(s ...googleapi.Field) *ProjectsImagesAsyncBatchAnnotateCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsImagesAsyncBatchAnnotateCall) Context(ctx context.Context) *ProjectsImagesAsyncBatchAnnotateCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsImagesAsyncBatchAnnotateCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsImagesAsyncBatchAnnotateCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.asyncbatchannotateimagesrequest)
+	if err != nil {
+		return nil, err
+	}
+	reqHeaders.Set("Content-Type", "application/json")
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/{+parent}/images:asyncBatchAnnotate")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"parent": c.parent,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "vision.projects.images.asyncBatchAnnotate" call.
+// Exactly one of *Operation or error will be non-nil. Any non-2xx
+// status code is an error. Response headers are in either
+// *Operation.ServerResponse.Header or (if a response was returned at
+// all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
+// to check whether the returned error was because
+// http.StatusNotModified was returned.
+func (c *ProjectsImagesAsyncBatchAnnotateCall) Do(opts ...googleapi.CallOption) (*Operation, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &Operation{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Run asynchronous image detection and annotation for a list of images.\n\nProgress and results can be retrieved through the\n`google.longrunning.Operations` interface.\n`Operation.metadata` contains `OperationMetadata` (metadata).\n`Operation.response` contains `AsyncBatchAnnotateImagesResponse` (results).\n\nThis service will write image annotation outputs to json files in customer\nGCS bucket, each json file containing BatchAnnotateImagesResponse proto.",
+	//   "flatPath": "v1/projects/{projectsId}/images:asyncBatchAnnotate",
+	//   "httpMethod": "POST",
+	//   "id": "vision.projects.images.asyncBatchAnnotate",
+	//   "parameterOrder": [
+	//     "parent"
+	//   ],
+	//   "parameters": {
+	//     "parent": {
+	//       "description": "Optional. Target project and location to make a call.\n\nFormat: `projects/{project-id}/locations/{location-id}`.\n\nIf no parent is specified, a region will be chosen automatically.\n\nSupported location-ids:\n    `us`: USA country only,\n    `asia`: East asia areas, like Japan, Taiwan,\n    `eu`: The European Union.\n\nExample: `projects/project-A/locations/eu`.",
+	//       "location": "path",
+	//       "pattern": "^projects/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1/{+parent}/images:asyncBatchAnnotate",
+	//   "request": {
+	//     "$ref": "AsyncBatchAnnotateImagesRequest"
+	//   },
+	//   "response": {
+	//     "$ref": "Operation"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/cloud-vision"
+	//   ]
+	// }
+
+}
+
+// method id "vision.projects.locations.files.annotate":
+
+type ProjectsLocationsFilesAnnotateCall struct {
+	s                         *Service
+	parent                    string
+	batchannotatefilesrequest *BatchAnnotateFilesRequest
+	urlParams_                gensupport.URLParams
+	ctx_                      context.Context
+	header_                   http.Header
+}
+
+// Annotate: Service that performs image detection and annotation for a
+// batch of files.
+// Now only "application/pdf", "image/tiff" and "image/gif" are
+// supported.
+//
+// This service will extract at most 5 (customers can specify which 5
+// in
+// AnnotateFileRequest.pages) frames (gif) or pages (pdf or tiff) from
+// each
+// file provided and perform detection and annotation for each
+// image
+// extracted.
+func (r *ProjectsLocationsFilesService) Annotate(parent string, batchannotatefilesrequest *BatchAnnotateFilesRequest) *ProjectsLocationsFilesAnnotateCall {
+	c := &ProjectsLocationsFilesAnnotateCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.parent = parent
+	c.batchannotatefilesrequest = batchannotatefilesrequest
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsLocationsFilesAnnotateCall) Fields(s ...googleapi.Field) *ProjectsLocationsFilesAnnotateCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsLocationsFilesAnnotateCall) Context(ctx context.Context) *ProjectsLocationsFilesAnnotateCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsLocationsFilesAnnotateCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsLocationsFilesAnnotateCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.batchannotatefilesrequest)
+	if err != nil {
+		return nil, err
+	}
+	reqHeaders.Set("Content-Type", "application/json")
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/{+parent}/files:annotate")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"parent": c.parent,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "vision.projects.locations.files.annotate" call.
+// Exactly one of *BatchAnnotateFilesResponse or error will be non-nil.
+// Any non-2xx status code is an error. Response headers are in either
+// *BatchAnnotateFilesResponse.ServerResponse.Header or (if a response
+// was returned at all) in error.(*googleapi.Error).Header. Use
+// googleapi.IsNotModified to check whether the returned error was
+// because http.StatusNotModified was returned.
+func (c *ProjectsLocationsFilesAnnotateCall) Do(opts ...googleapi.CallOption) (*BatchAnnotateFilesResponse, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &BatchAnnotateFilesResponse{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Service that performs image detection and annotation for a batch of files.\nNow only \"application/pdf\", \"image/tiff\" and \"image/gif\" are supported.\n\nThis service will extract at most 5 (customers can specify which 5 in\nAnnotateFileRequest.pages) frames (gif) or pages (pdf or tiff) from each\nfile provided and perform detection and annotation for each image\nextracted.",
+	//   "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/files:annotate",
+	//   "httpMethod": "POST",
+	//   "id": "vision.projects.locations.files.annotate",
+	//   "parameterOrder": [
+	//     "parent"
+	//   ],
+	//   "parameters": {
+	//     "parent": {
+	//       "description": "Optional. Target project and location to make a call.\n\nFormat: `projects/{project-id}/locations/{location-id}`.\n\nIf no parent is specified, a region will be chosen automatically.\n\nSupported location-ids:\n    `us`: USA country only,\n    `asia`: East asia areas, like Japan, Taiwan,\n    `eu`: The European Union.\n\nExample: `projects/project-A/locations/eu`.",
+	//       "location": "path",
+	//       "pattern": "^projects/[^/]+/locations/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1/{+parent}/files:annotate",
+	//   "request": {
+	//     "$ref": "BatchAnnotateFilesRequest"
+	//   },
+	//   "response": {
+	//     "$ref": "BatchAnnotateFilesResponse"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/cloud-vision"
+	//   ]
+	// }
+
+}
+
+// method id "vision.projects.locations.files.asyncBatchAnnotate":
+
+type ProjectsLocationsFilesAsyncBatchAnnotateCall struct {
+	s                              *Service
+	parent                         string
+	asyncbatchannotatefilesrequest *AsyncBatchAnnotateFilesRequest
+	urlParams_                     gensupport.URLParams
+	ctx_                           context.Context
+	header_                        http.Header
+}
+
+// AsyncBatchAnnotate: Run asynchronous image detection and annotation
+// for a list of generic
+// files, such as PDF files, which may contain multiple pages and
+// multiple
+// images per page. Progress and results can be retrieved through
+// the
+// `google.longrunning.Operations` interface.
+// `Operation.metadata` contains `OperationMetadata`
+// (metadata).
+// `Operation.response` contains `AsyncBatchAnnotateFilesResponse`
+// (results).
+func (r *ProjectsLocationsFilesService) AsyncBatchAnnotate(parent string, asyncbatchannotatefilesrequest *AsyncBatchAnnotateFilesRequest) *ProjectsLocationsFilesAsyncBatchAnnotateCall {
+	c := &ProjectsLocationsFilesAsyncBatchAnnotateCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.parent = parent
+	c.asyncbatchannotatefilesrequest = asyncbatchannotatefilesrequest
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsLocationsFilesAsyncBatchAnnotateCall) Fields(s ...googleapi.Field) *ProjectsLocationsFilesAsyncBatchAnnotateCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsLocationsFilesAsyncBatchAnnotateCall) Context(ctx context.Context) *ProjectsLocationsFilesAsyncBatchAnnotateCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsLocationsFilesAsyncBatchAnnotateCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsLocationsFilesAsyncBatchAnnotateCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.asyncbatchannotatefilesrequest)
+	if err != nil {
+		return nil, err
+	}
+	reqHeaders.Set("Content-Type", "application/json")
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/{+parent}/files:asyncBatchAnnotate")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"parent": c.parent,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "vision.projects.locations.files.asyncBatchAnnotate" call.
+// Exactly one of *Operation or error will be non-nil. Any non-2xx
+// status code is an error. Response headers are in either
+// *Operation.ServerResponse.Header or (if a response was returned at
+// all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
+// to check whether the returned error was because
+// http.StatusNotModified was returned.
+func (c *ProjectsLocationsFilesAsyncBatchAnnotateCall) Do(opts ...googleapi.CallOption) (*Operation, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &Operation{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Run asynchronous image detection and annotation for a list of generic\nfiles, such as PDF files, which may contain multiple pages and multiple\nimages per page. Progress and results can be retrieved through the\n`google.longrunning.Operations` interface.\n`Operation.metadata` contains `OperationMetadata` (metadata).\n`Operation.response` contains `AsyncBatchAnnotateFilesResponse` (results).",
+	//   "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/files:asyncBatchAnnotate",
+	//   "httpMethod": "POST",
+	//   "id": "vision.projects.locations.files.asyncBatchAnnotate",
+	//   "parameterOrder": [
+	//     "parent"
+	//   ],
+	//   "parameters": {
+	//     "parent": {
+	//       "description": "Optional. Target project and location to make a call.\n\nFormat: `projects/{project-id}/locations/{location-id}`.\n\nIf no parent is specified, a region will be chosen automatically.\n\nSupported location-ids:\n    `us`: USA country only,\n    `asia`: East asia areas, like Japan, Taiwan,\n    `eu`: The European Union.\n\nExample: `projects/project-A/locations/eu`.",
+	//       "location": "path",
+	//       "pattern": "^projects/[^/]+/locations/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1/{+parent}/files:asyncBatchAnnotate",
+	//   "request": {
+	//     "$ref": "AsyncBatchAnnotateFilesRequest"
+	//   },
+	//   "response": {
+	//     "$ref": "Operation"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/cloud-vision"
+	//   ]
+	// }
+
+}
+
+// method id "vision.projects.locations.images.annotate":
+
+type ProjectsLocationsImagesAnnotateCall struct {
+	s                          *Service
+	parent                     string
+	batchannotateimagesrequest *BatchAnnotateImagesRequest
+	urlParams_                 gensupport.URLParams
+	ctx_                       context.Context
+	header_                    http.Header
+}
+
+// Annotate: Run image detection and annotation for a batch of images.
+func (r *ProjectsLocationsImagesService) Annotate(parent string, batchannotateimagesrequest *BatchAnnotateImagesRequest) *ProjectsLocationsImagesAnnotateCall {
+	c := &ProjectsLocationsImagesAnnotateCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.parent = parent
+	c.batchannotateimagesrequest = batchannotateimagesrequest
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsLocationsImagesAnnotateCall) Fields(s ...googleapi.Field) *ProjectsLocationsImagesAnnotateCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsLocationsImagesAnnotateCall) Context(ctx context.Context) *ProjectsLocationsImagesAnnotateCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsLocationsImagesAnnotateCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsLocationsImagesAnnotateCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.batchannotateimagesrequest)
+	if err != nil {
+		return nil, err
+	}
+	reqHeaders.Set("Content-Type", "application/json")
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/{+parent}/images:annotate")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"parent": c.parent,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "vision.projects.locations.images.annotate" call.
+// Exactly one of *BatchAnnotateImagesResponse or error will be non-nil.
+// Any non-2xx status code is an error. Response headers are in either
+// *BatchAnnotateImagesResponse.ServerResponse.Header or (if a response
+// was returned at all) in error.(*googleapi.Error).Header. Use
+// googleapi.IsNotModified to check whether the returned error was
+// because http.StatusNotModified was returned.
+func (c *ProjectsLocationsImagesAnnotateCall) Do(opts ...googleapi.CallOption) (*BatchAnnotateImagesResponse, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &BatchAnnotateImagesResponse{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Run image detection and annotation for a batch of images.",
+	//   "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/images:annotate",
+	//   "httpMethod": "POST",
+	//   "id": "vision.projects.locations.images.annotate",
+	//   "parameterOrder": [
+	//     "parent"
+	//   ],
+	//   "parameters": {
+	//     "parent": {
+	//       "description": "Optional. Target project and location to make a call.\n\nFormat: `projects/{project-id}/locations/{location-id}`.\n\nIf no parent is specified, a region will be chosen automatically.\n\nSupported location-ids:\n    `us`: USA country only,\n    `asia`: East asia areas, like Japan, Taiwan,\n    `eu`: The European Union.\n\nExample: `projects/project-A/locations/eu`.",
+	//       "location": "path",
+	//       "pattern": "^projects/[^/]+/locations/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1/{+parent}/images:annotate",
+	//   "request": {
+	//     "$ref": "BatchAnnotateImagesRequest"
+	//   },
+	//   "response": {
+	//     "$ref": "BatchAnnotateImagesResponse"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/cloud-vision"
+	//   ]
+	// }
+
+}
+
+// method id "vision.projects.locations.images.asyncBatchAnnotate":
+
+type ProjectsLocationsImagesAsyncBatchAnnotateCall struct {
+	s                               *Service
+	parent                          string
+	asyncbatchannotateimagesrequest *AsyncBatchAnnotateImagesRequest
+	urlParams_                      gensupport.URLParams
+	ctx_                            context.Context
+	header_                         http.Header
+}
+
+// AsyncBatchAnnotate: Run asynchronous image detection and annotation
+// for a list of images.
+//
+// Progress and results can be retrieved through
+// the
+// `google.longrunning.Operations` interface.
+// `Operation.metadata` contains `OperationMetadata`
+// (metadata).
+// `Operation.response` contains `AsyncBatchAnnotateImagesResponse`
+// (results).
+//
+// This service will write image annotation outputs to json files in
+// customer
+// GCS bucket, each json file containing BatchAnnotateImagesResponse
+// proto.
+func (r *ProjectsLocationsImagesService) AsyncBatchAnnotate(parent string, asyncbatchannotateimagesrequest *AsyncBatchAnnotateImagesRequest) *ProjectsLocationsImagesAsyncBatchAnnotateCall {
+	c := &ProjectsLocationsImagesAsyncBatchAnnotateCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.parent = parent
+	c.asyncbatchannotateimagesrequest = asyncbatchannotateimagesrequest
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsLocationsImagesAsyncBatchAnnotateCall) Fields(s ...googleapi.Field) *ProjectsLocationsImagesAsyncBatchAnnotateCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsLocationsImagesAsyncBatchAnnotateCall) Context(ctx context.Context) *ProjectsLocationsImagesAsyncBatchAnnotateCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsLocationsImagesAsyncBatchAnnotateCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsLocationsImagesAsyncBatchAnnotateCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.asyncbatchannotateimagesrequest)
+	if err != nil {
+		return nil, err
+	}
+	reqHeaders.Set("Content-Type", "application/json")
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/{+parent}/images:asyncBatchAnnotate")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"parent": c.parent,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "vision.projects.locations.images.asyncBatchAnnotate" call.
+// Exactly one of *Operation or error will be non-nil. Any non-2xx
+// status code is an error. Response headers are in either
+// *Operation.ServerResponse.Header or (if a response was returned at
+// all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
+// to check whether the returned error was because
+// http.StatusNotModified was returned.
+func (c *ProjectsLocationsImagesAsyncBatchAnnotateCall) Do(opts ...googleapi.CallOption) (*Operation, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &Operation{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Run asynchronous image detection and annotation for a list of images.\n\nProgress and results can be retrieved through the\n`google.longrunning.Operations` interface.\n`Operation.metadata` contains `OperationMetadata` (metadata).\n`Operation.response` contains `AsyncBatchAnnotateImagesResponse` (results).\n\nThis service will write image annotation outputs to json files in customer\nGCS bucket, each json file containing BatchAnnotateImagesResponse proto.",
+	//   "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/images:asyncBatchAnnotate",
+	//   "httpMethod": "POST",
+	//   "id": "vision.projects.locations.images.asyncBatchAnnotate",
+	//   "parameterOrder": [
+	//     "parent"
+	//   ],
+	//   "parameters": {
+	//     "parent": {
+	//       "description": "Optional. Target project and location to make a call.\n\nFormat: `projects/{project-id}/locations/{location-id}`.\n\nIf no parent is specified, a region will be chosen automatically.\n\nSupported location-ids:\n    `us`: USA country only,\n    `asia`: East asia areas, like Japan, Taiwan,\n    `eu`: The European Union.\n\nExample: `projects/project-A/locations/eu`.",
+	//       "location": "path",
+	//       "pattern": "^projects/[^/]+/locations/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1/{+parent}/images:asyncBatchAnnotate",
+	//   "request": {
+	//     "$ref": "AsyncBatchAnnotateImagesRequest"
+	//   },
+	//   "response": {
+	//     "$ref": "Operation"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/cloud-vision"
+	//   ]
+	// }
+
+}
+
 // method id "vision.projects.locations.operations.get":
 
 type ProjectsLocationsOperationsGetCall struct {
@@ -19183,6 +17857,7 @@ func (c *ProjectsLocationsOperationsGetCall) Header() http.Header {
 
 func (c *ProjectsLocationsOperationsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -19326,6 +18001,7 @@ func (c *ProjectsLocationsProductSetsAddProductCall) Header() http.Header {
 
 func (c *ProjectsLocationsProductSetsAddProductCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -19398,7 +18074,7 @@ func (c *ProjectsLocationsProductSetsAddProductCall) Do(opts ...googleapi.CallOp
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "The resource name for the ProductSet to modify.\n\nFormat is:\n`projects/PROJECT_ID/locations/LOC_ID/productSets/PRODUCT_SET_ID`",
+	//       "description": "Required. The resource name for the ProductSet to modify.\n\nFormat is:\n`projects/PROJECT_ID/locations/LOC_ID/productSets/PRODUCT_SET_ID`",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/productSets/[^/]+$",
 	//       "required": true,
@@ -19485,6 +18161,7 @@ func (c *ProjectsLocationsProductSetsCreateCall) Header() http.Header {
 
 func (c *ProjectsLocationsProductSetsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -19557,7 +18234,7 @@ func (c *ProjectsLocationsProductSetsCreateCall) Do(opts ...googleapi.CallOption
 	//   ],
 	//   "parameters": {
 	//     "parent": {
-	//       "description": "The project in which the ProductSet should be created.\n\nFormat is `projects/PROJECT_ID/locations/LOC_ID`.",
+	//       "description": "Required. The project in which the ProductSet should be created.\n\nFormat is `projects/PROJECT_ID/locations/LOC_ID`.",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+$",
 	//       "required": true,
@@ -19632,6 +18309,7 @@ func (c *ProjectsLocationsProductSetsDeleteCall) Header() http.Header {
 
 func (c *ProjectsLocationsProductSetsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -19699,7 +18377,7 @@ func (c *ProjectsLocationsProductSetsDeleteCall) Do(opts ...googleapi.CallOption
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "Resource name of the ProductSet to delete.\n\nFormat is:\n`projects/PROJECT_ID/locations/LOC_ID/productSets/PRODUCT_SET_ID`",
+	//       "description": "Required. Resource name of the ProductSet to delete.\n\nFormat is:\n`projects/PROJECT_ID/locations/LOC_ID/productSets/PRODUCT_SET_ID`",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/productSets/[^/]+$",
 	//       "required": true,
@@ -19777,6 +18455,7 @@ func (c *ProjectsLocationsProductSetsGetCall) Header() http.Header {
 
 func (c *ProjectsLocationsProductSetsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -19847,7 +18526,7 @@ func (c *ProjectsLocationsProductSetsGetCall) Do(opts ...googleapi.CallOption) (
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "Resource name of the ProductSet to get.\n\nFormat is:\n`projects/PROJECT_ID/locations/LOG_ID/productSets/PRODUCT_SET_ID`",
+	//       "description": "Required. Resource name of the ProductSet to get.\n\nFormat is:\n`projects/PROJECT_ID/locations/LOG_ID/productSets/PRODUCT_SET_ID`",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/productSets/[^/]+$",
 	//       "required": true,
@@ -19928,6 +18607,7 @@ func (c *ProjectsLocationsProductSetsImportCall) Header() http.Header {
 
 func (c *ProjectsLocationsProductSetsImportCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -20000,7 +18680,7 @@ func (c *ProjectsLocationsProductSetsImportCall) Do(opts ...googleapi.CallOption
 	//   ],
 	//   "parameters": {
 	//     "parent": {
-	//       "description": "The project in which the ProductSets should be imported.\n\nFormat is `projects/PROJECT_ID/locations/LOC_ID`.",
+	//       "description": "Required. The project in which the ProductSets should be imported.\n\nFormat is `projects/PROJECT_ID/locations/LOC_ID`.",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+$",
 	//       "required": true,
@@ -20096,6 +18776,7 @@ func (c *ProjectsLocationsProductSetsListCall) Header() http.Header {
 
 func (c *ProjectsLocationsProductSetsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -20177,7 +18858,7 @@ func (c *ProjectsLocationsProductSetsListCall) Do(opts ...googleapi.CallOption) 
 	//       "type": "string"
 	//     },
 	//     "parent": {
-	//       "description": "The project from which ProductSets should be listed.\n\nFormat is `projects/PROJECT_ID/locations/LOC_ID`.",
+	//       "description": "Required. The project from which ProductSets should be listed.\n\nFormat is `projects/PROJECT_ID/locations/LOC_ID`.",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+$",
 	//       "required": true,
@@ -20282,6 +18963,7 @@ func (c *ProjectsLocationsProductSetsPatchCall) Header() http.Header {
 
 func (c *ProjectsLocationsProductSetsPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -20428,6 +19110,7 @@ func (c *ProjectsLocationsProductSetsRemoveProductCall) Header() http.Header {
 
 func (c *ProjectsLocationsProductSetsRemoveProductCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -20500,7 +19183,7 @@ func (c *ProjectsLocationsProductSetsRemoveProductCall) Do(opts ...googleapi.Cal
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "The resource name for the ProductSet to modify.\n\nFormat is:\n`projects/PROJECT_ID/locations/LOC_ID/productSets/PRODUCT_SET_ID`",
+	//       "description": "Required. The resource name for the ProductSet to modify.\n\nFormat is:\n`projects/PROJECT_ID/locations/LOC_ID/productSets/PRODUCT_SET_ID`",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/productSets/[^/]+$",
 	//       "required": true,
@@ -20600,6 +19283,7 @@ func (c *ProjectsLocationsProductSetsProductsListCall) Header() http.Header {
 
 func (c *ProjectsLocationsProductSetsProductsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -20670,7 +19354,7 @@ func (c *ProjectsLocationsProductSetsProductsListCall) Do(opts ...googleapi.Call
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "The ProductSet resource for which to retrieve Products.\n\nFormat is:\n`projects/PROJECT_ID/locations/LOC_ID/productSets/PRODUCT_SET_ID`",
+	//       "description": "Required. The ProductSet resource for which to retrieve Products.\n\nFormat is:\n`projects/PROJECT_ID/locations/LOC_ID/productSets/PRODUCT_SET_ID`",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/productSets/[^/]+$",
 	//       "required": true,
@@ -20788,6 +19472,7 @@ func (c *ProjectsLocationsProductsCreateCall) Header() http.Header {
 
 func (c *ProjectsLocationsProductsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -20860,7 +19545,7 @@ func (c *ProjectsLocationsProductsCreateCall) Do(opts ...googleapi.CallOption) (
 	//   ],
 	//   "parameters": {
 	//     "parent": {
-	//       "description": "The project in which the Product should be created.\n\nFormat is\n`projects/PROJECT_ID/locations/LOC_ID`.",
+	//       "description": "Required. The project in which the Product should be created.\n\nFormat is\n`projects/PROJECT_ID/locations/LOC_ID`.",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+$",
 	//       "required": true,
@@ -20938,6 +19623,7 @@ func (c *ProjectsLocationsProductsDeleteCall) Header() http.Header {
 
 func (c *ProjectsLocationsProductsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -21005,7 +19691,7 @@ func (c *ProjectsLocationsProductsDeleteCall) Do(opts ...googleapi.CallOption) (
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "Resource name of product to delete.\n\nFormat is:\n`projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`",
+	//       "description": "Required. Resource name of product to delete.\n\nFormat is:\n`projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/products/[^/]+$",
 	//       "required": true,
@@ -21083,6 +19769,7 @@ func (c *ProjectsLocationsProductsGetCall) Header() http.Header {
 
 func (c *ProjectsLocationsProductsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -21153,7 +19840,7 @@ func (c *ProjectsLocationsProductsGetCall) Do(opts ...googleapi.CallOption) (*Pr
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "Resource name of the Product to get.\n\nFormat is:\n`projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`",
+	//       "description": "Required. Resource name of the Product to get.\n\nFormat is:\n`projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/products/[^/]+$",
 	//       "required": true,
@@ -21246,6 +19933,7 @@ func (c *ProjectsLocationsProductsListCall) Header() http.Header {
 
 func (c *ProjectsLocationsProductsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -21327,7 +20015,7 @@ func (c *ProjectsLocationsProductsListCall) Do(opts ...googleapi.CallOption) (*L
 	//       "type": "string"
 	//     },
 	//     "parent": {
-	//       "description": "The project OR ProductSet from which Products should be listed.\n\nFormat:\n`projects/PROJECT_ID/locations/LOC_ID`",
+	//       "description": "Required. The project OR ProductSet from which Products should be listed.\n\nFormat:\n`projects/PROJECT_ID/locations/LOC_ID`",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+$",
 	//       "required": true,
@@ -21445,6 +20133,7 @@ func (c *ProjectsLocationsProductsPatchCall) Header() http.Header {
 
 func (c *ProjectsLocationsProductsPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -21545,6 +20234,183 @@ func (c *ProjectsLocationsProductsPatchCall) Do(opts ...googleapi.CallOption) (*
 
 }
 
+// method id "vision.projects.locations.products.purge":
+
+type ProjectsLocationsProductsPurgeCall struct {
+	s                    *Service
+	parent               string
+	purgeproductsrequest *PurgeProductsRequest
+	urlParams_           gensupport.URLParams
+	ctx_                 context.Context
+	header_              http.Header
+}
+
+// Purge: Asynchronous API to delete all Products in a ProductSet or all
+// Products
+// that are in no ProductSet.
+//
+// If a Product is a member of the specified ProductSet in addition to
+// other
+// ProductSets, the Product will still be deleted.
+//
+// It is recommended to not delete the specified ProductSet until after
+// this
+// operation has completed. It is also recommended to not add any of
+// the
+// Products involved in the batch delete to a new ProductSet while
+// this
+// operation is running because those Products may still end up
+// deleted.
+//
+// It's not possible to undo the PurgeProducts operation. Therefore, it
+// is
+// recommended to keep the csv files used in ImportProductSets (if that
+// was
+// how you originally built the Product Set) before starting
+// PurgeProducts, in
+// case you need to re-import the data after deletion.
+//
+// If the plan is to purge all of the Products from a ProductSet and
+// then
+// re-use the empty ProductSet to re-import new Products into the
+// empty
+// ProductSet, you must wait until the PurgeProducts operation has
+// finished
+// for that ProductSet.
+//
+// The google.longrunning.Operation API can be used to keep track of
+// the
+// progress and results of the request.
+// `Operation.metadata` contains `BatchOperationMetadata`. (progress)
+func (r *ProjectsLocationsProductsService) Purge(parent string, purgeproductsrequest *PurgeProductsRequest) *ProjectsLocationsProductsPurgeCall {
+	c := &ProjectsLocationsProductsPurgeCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.parent = parent
+	c.purgeproductsrequest = purgeproductsrequest
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsLocationsProductsPurgeCall) Fields(s ...googleapi.Field) *ProjectsLocationsProductsPurgeCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsLocationsProductsPurgeCall) Context(ctx context.Context) *ProjectsLocationsProductsPurgeCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsLocationsProductsPurgeCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsLocationsProductsPurgeCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.purgeproductsrequest)
+	if err != nil {
+		return nil, err
+	}
+	reqHeaders.Set("Content-Type", "application/json")
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/{+parent}/products:purge")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"parent": c.parent,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "vision.projects.locations.products.purge" call.
+// Exactly one of *Operation or error will be non-nil. Any non-2xx
+// status code is an error. Response headers are in either
+// *Operation.ServerResponse.Header or (if a response was returned at
+// all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
+// to check whether the returned error was because
+// http.StatusNotModified was returned.
+func (c *ProjectsLocationsProductsPurgeCall) Do(opts ...googleapi.CallOption) (*Operation, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &Operation{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Asynchronous API to delete all Products in a ProductSet or all Products\nthat are in no ProductSet.\n\nIf a Product is a member of the specified ProductSet in addition to other\nProductSets, the Product will still be deleted.\n\nIt is recommended to not delete the specified ProductSet until after this\noperation has completed. It is also recommended to not add any of the\nProducts involved in the batch delete to a new ProductSet while this\noperation is running because those Products may still end up deleted.\n\nIt's not possible to undo the PurgeProducts operation. Therefore, it is\nrecommended to keep the csv files used in ImportProductSets (if that was\nhow you originally built the Product Set) before starting PurgeProducts, in\ncase you need to re-import the data after deletion.\n\nIf the plan is to purge all of the Products from a ProductSet and then\nre-use the empty ProductSet to re-import new Products into the empty\nProductSet, you must wait until the PurgeProducts operation has finished\nfor that ProductSet.\n\nThe google.longrunning.Operation API can be used to keep track of the\nprogress and results of the request.\n`Operation.metadata` contains `BatchOperationMetadata`. (progress)",
+	//   "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/products:purge",
+	//   "httpMethod": "POST",
+	//   "id": "vision.projects.locations.products.purge",
+	//   "parameterOrder": [
+	//     "parent"
+	//   ],
+	//   "parameters": {
+	//     "parent": {
+	//       "description": "Required. The project and location in which the Products should be deleted.\n\nFormat is `projects/PROJECT_ID/locations/LOC_ID`.",
+	//       "location": "path",
+	//       "pattern": "^projects/[^/]+/locations/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1/{+parent}/products:purge",
+	//   "request": {
+	//     "$ref": "PurgeProductsRequest"
+	//   },
+	//   "response": {
+	//     "$ref": "Operation"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/cloud-vision"
+	//   ]
+	// }
+
+}
+
 // method id "vision.projects.locations.products.referenceImages.create":
 
 type ProjectsLocationsProductsReferenceImagesCreateCall struct {
@@ -21631,6 +20497,7 @@ func (c *ProjectsLocationsProductsReferenceImagesCreateCall) Header() http.Heade
 
 func (c *ProjectsLocationsProductsReferenceImagesCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -21703,7 +20570,7 @@ func (c *ProjectsLocationsProductsReferenceImagesCreateCall) Do(opts ...googleap
 	//   ],
 	//   "parameters": {
 	//     "parent": {
-	//       "description": "Resource name of the product in which to create the reference image.\n\nFormat is\n`projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`.",
+	//       "description": "Required. Resource name of the product in which to create the reference image.\n\nFormat is\n`projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`.",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/products/[^/]+$",
 	//       "required": true,
@@ -21782,6 +20649,7 @@ func (c *ProjectsLocationsProductsReferenceImagesDeleteCall) Header() http.Heade
 
 func (c *ProjectsLocationsProductsReferenceImagesDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -21849,7 +20717,7 @@ func (c *ProjectsLocationsProductsReferenceImagesDeleteCall) Do(opts ...googleap
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "The resource name of the reference image to delete.\n\nFormat is:\n\n`projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID/referenceImages/IMAGE_ID`",
+	//       "description": "Required. The resource name of the reference image to delete.\n\nFormat is:\n\n`projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID/referenceImages/IMAGE_ID`",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/products/[^/]+/referenceImages/[^/]+$",
 	//       "required": true,
@@ -21927,6 +20795,7 @@ func (c *ProjectsLocationsProductsReferenceImagesGetCall) Header() http.Header {
 
 func (c *ProjectsLocationsProductsReferenceImagesGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -21997,7 +20866,7 @@ func (c *ProjectsLocationsProductsReferenceImagesGetCall) Do(opts ...googleapi.C
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "The resource name of the ReferenceImage to get.\n\nFormat is:\n\n`projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID/referenceImages/IMAGE_ID`.",
+	//       "description": "Required. The resource name of the ReferenceImage to get.\n\nFormat is:\n\n`projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID/referenceImages/IMAGE_ID`.",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/products/[^/]+/referenceImages/[^/]+$",
 	//       "required": true,
@@ -22096,6 +20965,7 @@ func (c *ProjectsLocationsProductsReferenceImagesListCall) Header() http.Header 
 
 func (c *ProjectsLocationsProductsReferenceImagesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -22177,7 +21047,7 @@ func (c *ProjectsLocationsProductsReferenceImagesListCall) Do(opts ...googleapi.
 	//       "type": "string"
 	//     },
 	//     "parent": {
-	//       "description": "Resource name of the product containing the reference images.\n\nFormat is\n`projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`.",
+	//       "description": "Required. Resource name of the product containing the reference images.\n\nFormat is\n`projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`.",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/products/[^/]+$",
 	//       "required": true,
@@ -22276,6 +21146,7 @@ func (c *ProjectsOperationsGetCall) Header() http.Header {
 
 func (c *ProjectsOperationsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

@@ -665,7 +665,7 @@
               ],
               "parameters": {
                 "name": {
-                  "description": "The resource name of the service account in the following format:\n`projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_UNIQUE_ID}'.\nUsing `-` as a wildcard for the `PROJECT_ID` will infer the project from\nthe account.",
+                  "description": "The resource name of the service account in the following format:\n`projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.\nUsing `-` as a wildcard for the `PROJECT_ID` will infer the project from\nthe account. The `ACCOUNT` value can be the `email` address or the\n`unique_id` of the service account.",
                   "location": "path",
                   "pattern": "^projects/[^/]+/serviceAccounts/[^/]+$",
                   "required": true,
@@ -718,7 +718,7 @@
               ],
               "parameters": {
                 "options.requestedPolicyVersion": {
-                  "description": "Optional. The policy format version to be returned.\nAcceptable values are 0 and 1.\nIf the value is 0, or the field is omitted, policy format version 1 will be\nreturned.",
+                  "description": "Optional. The policy format version to be returned.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nRequests for policies with any conditional bindings must specify version 3.\nPolicies without any conditional bindings may specify any valid value or\nleave the field unset.",
                   "format": "int32",
                   "location": "query",
                   "type": "integer"
@@ -925,7 +925,7 @@
               ],
               "parameters": {
                 "name": {
-                  "description": "The resource name of the service account in the following format:\n`projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_UNIQUE_ID}'.\nUsing `-` as a wildcard for the `PROJECT_ID` will infer the project from\nthe account.",
+                  "description": "The resource name of the service account in the following format:\n`projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_UNIQUE_ID}`.\nUsing `-` as a wildcard for the `PROJECT_ID` will infer the project from\nthe account.",
                   "location": "path",
                   "pattern": "^projects/[^/]+/serviceAccounts/[^/]+$",
                   "required": true,
@@ -1098,6 +1098,34 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ]
+                },
+                "upload": {
+                  "description": "Upload public key for a given service account.\nThis rpc will create a\nServiceAccountKey that has the\nprovided public key and returns it.",
+                  "flatPath": "v1/projects/{projectsId}/serviceAccounts/{serviceAccountsId}/keys:upload",
+                  "httpMethod": "POST",
+                  "id": "iam.projects.serviceAccounts.keys.upload",
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "parameters": {
+                    "name": {
+                      "description": "The resource name of the service account in the following format:\n`projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.\nUsing `-` as a wildcard for the `PROJECT_ID` will infer the project from\nthe account. The `ACCOUNT` value can be the `email` address or the\n`unique_id` of the service account.",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/serviceAccounts/[^/]+$",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "path": "v1/{+name}/keys:upload",
+                  "request": {
+                    "$ref": "UploadServiceAccountKeyRequest"
+                  },
+                  "response": {
+                    "$ref": "ServiceAccountKey"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ]
                 }
               }
             }
@@ -1199,7 +1227,7 @@
       }
     }
   },
-  "revision": "20190704",
+  "revision": "20190906",
   "rootUrl": "https://iam.googleapis.com/",
   "schemas": {
     "AdminAuditData": {
@@ -1325,7 +1353,7 @@
         },
         "condition": {
           "$ref": "Expr",
-          "description": "Unimplemented. The condition that is associated with this binding.\nThis field is logged only for Cloud Audit Logging."
+          "description": "The condition that is associated with this binding. This field is logged\nonly for Cloud Audit Logging."
         },
         "member": {
           "description": "A single identity requesting access for a Cloud Platform resource.\nFollows the same format of Binding.members.\nRequired",
@@ -1652,6 +1680,10 @@
           "description": "This permission can ONLY be used in predefined roles.",
           "type": "boolean"
         },
+        "primaryPermission": {
+          "description": "The preferred name for this permission. If present, then this permission is\nan alias of, and equivalent to, the listed primary_permission.",
+          "type": "string"
+        },
         "stage": {
           "description": "The current launch stage of the permission.",
           "enum": [
@@ -1720,7 +1752,7 @@
           "type": "string"
         },
         "version": {
-          "description": "Deprecated.",
+          "description": "Specifies the format of the policy.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nPolicies with any conditional bindings must specify version 3. Policies\nwithout any conditional bindings may specify any valid value or leave the\nfield unset.",
           "format": "int32",
           "type": "integer"
         }
@@ -1878,7 +1910,7 @@
           "type": "array"
         },
         "name": {
-          "description": "The name of the role.\n\nWhen Role is used in CreateRole, the role name must not be set.\n\nWhen Role is used in output and other input such as UpdateRole, the role\nname is the complete path, e.g., roles/logging.viewer for curated roles\nand organizations/{ORGANIZATION_ID}/roles/logging.viewer for custom roles.",
+          "description": "The name of the role.\n\nWhen Role is used in CreateRole, the role name must not be set.\n\nWhen Role is used in output and other input such as UpdateRole, the role\nname is the complete path, e.g., roles/logging.viewer for predefined roles\nand organizations/{ORGANIZATION_ID}/roles/logging.viewer for custom roles.",
           "type": "string"
         },
         "stage": {
@@ -2018,7 +2050,7 @@
           "type": "string"
         },
         "validBeforeTime": {
-          "description": "The key can be used before this timestamp.",
+          "description": "The key can be used before this timestamp.\nFor system-managed key pairs, this timestamp is the end time for the\nprivate key signing operation. The public key could still be used\nfor verification for a few hours after this time.",
           "format": "google-datetime",
           "type": "string"
         }
@@ -2147,6 +2179,18 @@
         "restoredAccount": {
           "$ref": "ServiceAccount",
           "description": "Metadata for the restored service account."
+        }
+      },
+      "type": "object"
+    },
+    "UploadServiceAccountKeyRequest": {
+      "description": "The service account key upload request.",
+      "id": "UploadServiceAccountKeyRequest",
+      "properties": {
+        "publicKeyData": {
+          "description": "A field that allows clients to upload their own public key. If set,\nuse this public key data to create a service account key for given\nservice account.\nPlease note, the expected format for this field is X509_PEM.",
+          "format": "byte",
+          "type": "string"
         }
       },
       "type": "object"

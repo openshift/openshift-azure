@@ -53,8 +53,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -1591,6 +1591,7 @@ func (s *IosDeviceList) MarshalJSON() ([]byte, error) {
 }
 
 // IosModel: A description of an iOS device tests may be run on.
+// Next tag: 10
 type IosModel struct {
 	// DeviceCapabilities: Device capabilities.
 	// Copied
@@ -1618,6 +1619,17 @@ type IosModel struct {
 	// Name: The human-readable name for this device model.
 	// Examples: "iPhone 4s", "iPad Mini 2".
 	Name string `json:"name,omitempty"`
+
+	// ScreenDensity: Screen density in DPI.
+	ScreenDensity int64 `json:"screenDensity,omitempty"`
+
+	// ScreenX: Screen size in the horizontal (X) dimension measured in
+	// pixels.
+	ScreenX int64 `json:"screenX,omitempty"`
+
+	// ScreenY: Screen size in the vertical (Y) dimension measured in
+	// pixels.
+	ScreenY int64 `json:"screenY,omitempty"`
 
 	// SupportedVersionIds: The set of iOS major software versions this
 	// device supports.
@@ -2574,8 +2586,6 @@ type TestMatrix struct {
 	// could not be parsed.
 	//   "TEST_ONLY_APK" - The APK is marked as "testOnly".
 	// Deprecated and not currently used.
-	//   "MALFORMED_IPA" - The input IPA could not be parsed.
-	// Deprecated and not currently used.
 	//   "NO_CODE_APK" - APK contains no code.
 	// See
 	// also
@@ -3091,6 +3101,7 @@ func (c *ApplicationDetailServiceGetApkDetailsCall) Header() http.Header {
 
 func (c *ApplicationDetailServiceGetApkDetailsCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3227,6 +3238,7 @@ func (c *ProjectsTestMatricesCancelCall) Header() http.Header {
 
 func (c *ProjectsTestMatricesCancelCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3389,6 +3401,7 @@ func (c *ProjectsTestMatricesCreateCall) Header() http.Header {
 
 func (c *ProjectsTestMatricesCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3549,6 +3562,7 @@ func (c *ProjectsTestMatricesGetCall) Header() http.Header {
 
 func (c *ProjectsTestMatricesGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3713,6 +3727,7 @@ func (c *TestEnvironmentCatalogGetCall) Header() http.Header {
 
 func (c *TestEnvironmentCatalogGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

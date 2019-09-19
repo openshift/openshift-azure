@@ -51,8 +51,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -421,7 +421,8 @@ func (s *Operation) MarshalJSON() ([]byte, error) {
 // Either `content` or `uri` must be supplied. Supplying both or
 // neither
 // returns google.rpc.Code.INVALID_ARGUMENT. See
-// [content limits](/speech-to-text/quotas#content).
+// [content
+// limits](https://cloud.google.com/speech-to-text/quotas#content).
 type RecognitionAudio struct {
 	// Content: The audio data bytes encoded as specified
 	// in
@@ -578,8 +579,11 @@ type RecognitionConfig struct {
 	// [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language
 	// tag.
 	// Example: "en-US".
-	// See [Language Support](/speech-to-text/docs/languages)
-	// for a list of the currently supported language codes.
+	// See
+	// [Language
+	// Support](https://cloud.google.com/speech-to-text/docs/langua
+	// ges) for a list
+	// of the currently supported language codes.
 	LanguageCode string `json:"languageCode,omitempty"`
 
 	// MaxAlternatives: *Optional* Maximum number of recognition hypotheses
@@ -662,8 +666,11 @@ type RecognitionConfig struct {
 	// SpeechContexts: *Optional* array of SpeechContext.
 	// A means to provide context to assist the speech recognition. For
 	// more
-	// information, see [Phrase
-	// Hints](/speech-to-text/docs/basics#phrase-hints).
+	// information,
+	// see
+	// [speech
+	// adaptation](https://cloud.google.com/speech-to-text/docs/c
+	// ontext-strength).
 	SpeechContexts []*SpeechContext `json:"speechContexts,omitempty"`
 
 	// UseEnhanced: *Optional* Set to true to use an enhanced model for
@@ -915,9 +922,11 @@ type SpeechContext struct {
 	// used
 	// to add additional words to the vocabulary of the recognizer.
 	// See
-	// [usage limits](/speech-to-text/quotas#content).
+	// [usage
+	// limits](https://cloud.google.com/speech-to-text/quotas#content).
 	//
-	// List items can also be set to classes for groups of words that
+	// List
+	//  items can also be set to classes for groups of words that
 	// represent
 	// common concepts that occur in natural language. For example, rather
 	// than
@@ -1216,6 +1225,7 @@ func (c *OperationsGetCall) Header() http.Header {
 
 func (c *OperationsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1401,6 +1411,7 @@ func (c *OperationsListCall) Header() http.Header {
 
 func (c *OperationsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1578,6 +1589,7 @@ func (c *ProjectsLocationsOperationsGetCall) Header() http.Header {
 
 func (c *ProjectsLocationsOperationsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1758,6 +1770,7 @@ func (c *ProjectsLocationsOperationsListCall) Header() http.Header {
 
 func (c *ProjectsLocationsOperationsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1936,6 +1949,7 @@ func (c *SpeechLongrunningrecognizeCall) Header() http.Header {
 
 func (c *SpeechLongrunningrecognizeCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2062,6 +2076,7 @@ func (c *SpeechRecognizeCall) Header() http.Header {
 
 func (c *SpeechRecognizeCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

@@ -254,7 +254,7 @@
               ],
               "parameters": {
                 "options.requestedPolicyVersion": {
-                  "description": "Optional. The policy format version to be returned.\nAcceptable values are 0 and 1.\nIf the value is 0, or the field is omitted, policy format version 1 will be\nreturned.",
+                  "description": "Optional. The policy format version to be returned.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nRequests for policies with any conditional bindings must specify version 3.\nPolicies without any conditional bindings may specify any valid value or\nleave the field unset.",
                   "format": "int32",
                   "location": "query",
                   "type": "integer"
@@ -563,7 +563,7 @@
               ],
               "parameters": {
                 "options.requestedPolicyVersion": {
-                  "description": "Optional. The policy format version to be returned.\nAcceptable values are 0 and 1.\nIf the value is 0, or the field is omitted, policy format version 1 will be\nreturned.",
+                  "description": "Optional. The policy format version to be returned.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nRequests for policies with any conditional bindings must specify version 3.\nPolicies without any conditional bindings may specify any valid value or\nleave the field unset.",
                   "format": "int32",
                   "location": "query",
                   "type": "integer"
@@ -1002,7 +1002,7 @@
       }
     }
   },
-  "revision": "20190704",
+  "revision": "20190909",
   "rootUrl": "https://ml.googleapis.com/",
   "schemas": {
     "GoogleApi__HttpBody": {
@@ -1067,7 +1067,8 @@
             "NVIDIA_TESLA_V100",
             "NVIDIA_TESLA_P4",
             "NVIDIA_TESLA_T4",
-            "TPU_V2"
+            "TPU_V2",
+            "TPU_V3"
           ],
           "enumDescriptions": [
             "Unspecified accelerator type. Default to no GPU.",
@@ -1076,7 +1077,8 @@
             "Nvidia Tesla V100 GPU.",
             "Nvidia Tesla P4 GPU.",
             "Nvidia Tesla T4 GPU.",
-            "TPU v2."
+            "TPU v2.",
+            "TPU v3."
           ],
           "type": "string"
         }
@@ -1136,7 +1138,8 @@
             "Nvidia Tesla V100 GPU.",
             "Nvidia Tesla P4 GPU.",
             "Nvidia Tesla T4 GPU.",
-            "TPU v2."
+            "TPU v2.",
+            "TPU v3."
           ],
           "items": {
             "enum": [
@@ -1146,7 +1149,8 @@
               "NVIDIA_TESLA_V100",
               "NVIDIA_TESLA_P4",
               "NVIDIA_TESLA_T4",
-              "TPU_V2"
+              "TPU_V2",
+              "TPU_V3"
             ],
             "type": "string"
           },
@@ -1846,8 +1850,24 @@
           "type": "string"
         },
         "tpuTfVersion": {
-          "description": "TensorFlow version used in the custom container. This field is required if\nthe replica is a TPU worker that uses a custom container. Otherwise, do not\nspecify this field.",
+          "description": "The AI Platform runtime version that includes a TensorFlow version matching\nthe one used in the custom container. This field is required if the replica\nis a TPU worker that uses a custom container. Otherwise, do not specify\nthis field. This must be a [runtime version that currently supports\ntraining with\nTPUs](/ml-engine/docs/tensorflow/runtime-version-list#tpu-support).\n\nNote that the version of TensorFlow included in a runtime version may\ndiffer from the numbering of the runtime version itself, because it may\nhave a different [patch\nversion](https://www.tensorflow.org/guide/version_compat#semantic_versioning_20).\nIn this field, you must specify the runtime version (TensorFlow minor\nversion). For example, if your custom container runs TensorFlow `1.x.y`,\nspecify `1.x`.",
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudMlV1__RequestLoggingConfig": {
+      "description": "Configuration for logging request-response pairs to a BigQuery table.\nOnline prediction requests to a model version and the responses to these\nrequests are converted to raw strings and saved to the specified BigQuery\ntable. Logging is constrained by [BigQuery quotas and\nlimits](/bigquery/quotas). If your project exceeds BigQuery quotas or limits,\nAI Platform Prediction does not log request-response pairs, but it continues\nto serve predictions.\n\nIf you are using [continuous\nevaluation](/ml-engine/docs/continuous-evaluation/), you do not need to\nspecify this configuration manually. Setting up continuous evaluation\nautomatically enables logging of request-response pairs.",
+      "id": "GoogleCloudMlV1__RequestLoggingConfig",
+      "properties": {
+        "bigqueryTableName": {
+          "description": "Required. Fully qualified BigQuery table name in the following format:\n\"\u003cvar\u003eproject_id\u003c/var\u003e.\u003cvar\u003edataset_name\u003c/var\u003e.\u003cvar\u003etable_name\u003c/var\u003e\"\n\nThe specifcied table must already exist, and the \"Cloud ML Service Agent\"\nfor your project must have permission to write to it. The table must have\nthe following [schema](/bigquery/docs/schemas):\n\n\u003ctable\u003e\n  \u003ctr\u003e\u003cth\u003eField name\u003c/th\u003e\u003cth style=\"display: table-cell\"\u003eType\u003c/th\u003e\n    \u003cth style=\"display: table-cell\"\u003eMode\u003c/th\u003e\u003c/tr\u003e\n  \u003ctr\u003e\u003ctd\u003emodel\u003c/td\u003e\u003ctd\u003eSTRING\u003c/td\u003e\u003ctd\u003eREQUIRED\u003c/td\u003e\u003c/tr\u003e\n  \u003ctr\u003e\u003ctd\u003emodel_version\u003c/td\u003e\u003ctd\u003eSTRING\u003c/td\u003e\u003ctd\u003eREQUIRED\u003c/td\u003e\u003c/tr\u003e\n  \u003ctr\u003e\u003ctd\u003etime\u003c/td\u003e\u003ctd\u003eTIMESTAMP\u003c/td\u003e\u003ctd\u003eREQUIRED\u003c/td\u003e\u003c/tr\u003e\n  \u003ctr\u003e\u003ctd\u003eraw_data\u003c/td\u003e\u003ctd\u003eSTRING\u003c/td\u003e\u003ctd\u003eREQUIRED\u003c/td\u003e\u003c/tr\u003e\n  \u003ctr\u003e\u003ctd\u003eraw_prediction\u003c/td\u003e\u003ctd\u003eSTRING\u003c/td\u003e\u003ctd\u003eNULLABLE\u003c/td\u003e\u003c/tr\u003e\n  \u003ctr\u003e\u003ctd\u003egroundtruth\u003c/td\u003e\u003ctd\u003eSTRING\u003c/td\u003e\u003ctd\u003eNULLABLE\u003c/td\u003e\u003c/tr\u003e\n\u003c/table\u003e",
+          "type": "string"
+        },
+        "samplingPercentage": {
+          "description": "Percentage of requests to be logged, expressed as a fraction from 0 to 1.\nFor example, if you want to log 10% of requests, enter `0.1`. The sampling\nwindow is the lifetime of the model version. Defaults to 0.",
+          "format": "double",
+          "type": "number"
         }
       },
       "type": "object"
@@ -1883,11 +1903,6 @@
         },
         "masterType": {
           "description": "Optional. Specifies the type of virtual machine to use for your training\njob's master worker.\n\nThe following types are supported:\n\n\u003cdl\u003e\n  \u003cdt\u003estandard\u003c/dt\u003e\n  \u003cdd\u003e\n  A basic machine configuration suitable for training simple models with\n  small to moderate datasets.\n  \u003c/dd\u003e\n  \u003cdt\u003elarge_model\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine with a lot of memory, specially suited for parameter servers\n  when your model is large (having many hidden layers or layers with very\n  large numbers of nodes).\n  \u003c/dd\u003e\n  \u003cdt\u003ecomplex_model_s\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine suitable for the master and workers of the cluster when your\n  model requires more computation than the standard machine can handle\n  satisfactorily.\n  \u003c/dd\u003e\n  \u003cdt\u003ecomplex_model_m\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine with roughly twice the number of cores and roughly double the\n  memory of \u003ci\u003ecomplex_model_s\u003c/i\u003e.\n  \u003c/dd\u003e\n  \u003cdt\u003ecomplex_model_l\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine with roughly twice the number of cores and roughly double the\n  memory of \u003ci\u003ecomplex_model_m\u003c/i\u003e.\n  \u003c/dd\u003e\n  \u003cdt\u003estandard_gpu\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine equivalent to \u003ci\u003estandard\u003c/i\u003e that\n  also includes a single NVIDIA Tesla K80 GPU. See more about\n  \u003ca href=\"/ml-engine/docs/tensorflow/using-gpus\"\u003eusing GPUs to\n  train your model\u003c/a\u003e.\n  \u003c/dd\u003e\n  \u003cdt\u003ecomplex_model_m_gpu\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine equivalent to \u003ci\u003ecomplex_model_m\u003c/i\u003e that also includes\n  four NVIDIA Tesla K80 GPUs.\n  \u003c/dd\u003e\n  \u003cdt\u003ecomplex_model_l_gpu\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine equivalent to \u003ci\u003ecomplex_model_l\u003c/i\u003e that also includes\n  eight NVIDIA Tesla K80 GPUs.\n  \u003c/dd\u003e\n  \u003cdt\u003estandard_p100\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine equivalent to \u003ci\u003estandard\u003c/i\u003e that\n  also includes a single NVIDIA Tesla P100 GPU.\n  \u003c/dd\u003e\n  \u003cdt\u003ecomplex_model_m_p100\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine equivalent to \u003ci\u003ecomplex_model_m\u003c/i\u003e that also includes\n  four NVIDIA Tesla P100 GPUs.\n  \u003c/dd\u003e\n  \u003cdt\u003estandard_v100\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine equivalent to \u003ci\u003estandard\u003c/i\u003e that\n  also includes a single NVIDIA Tesla V100 GPU.\n  \u003c/dd\u003e\n  \u003cdt\u003elarge_model_v100\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine equivalent to \u003ci\u003elarge_model\u003c/i\u003e that\n  also includes a single NVIDIA Tesla V100 GPU.\n  \u003c/dd\u003e\n  \u003cdt\u003ecomplex_model_m_v100\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine equivalent to \u003ci\u003ecomplex_model_m\u003c/i\u003e that\n  also includes four NVIDIA Tesla V100 GPUs.\n  \u003c/dd\u003e\n  \u003cdt\u003ecomplex_model_l_v100\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine equivalent to \u003ci\u003ecomplex_model_l\u003c/i\u003e that\n  also includes eight NVIDIA Tesla V100 GPUs.\n  \u003c/dd\u003e\n  \u003cdt\u003ecloud_tpu\u003c/dt\u003e\n  \u003cdd\u003e\n  A TPU VM including one Cloud TPU. See more about\n  \u003ca href=\"/ml-engine/docs/tensorflow/using-tpus\"\u003eusing TPUs to train\n  your model\u003c/a\u003e.\n  \u003c/dd\u003e\n\u003c/dl\u003e\n\nYou may also use certain Compute Engine machine types directly in this\nfield. The following types are supported:\n\n- `n1-standard-4`\n- `n1-standard-8`\n- `n1-standard-16`\n- `n1-standard-32`\n- `n1-standard-64`\n- `n1-standard-96`\n- `n1-highmem-2`\n- `n1-highmem-4`\n- `n1-highmem-8`\n- `n1-highmem-16`\n- `n1-highmem-32`\n- `n1-highmem-64`\n- `n1-highmem-96`\n- `n1-highcpu-16`\n- `n1-highcpu-32`\n- `n1-highcpu-64`\n- `n1-highcpu-96`\n\nSee more about [using Compute Engine machine\ntypes](/ml-engine/docs/tensorflow/machine-types#compute-engine-machine-types).\n\nYou must set this value when `scaleTier` is set to `CUSTOM`.",
-          "type": "string"
-        },
-        "maxRunningTime": {
-          "description": "Optional. The maximum job running time. The default is 7 days.",
-          "format": "google-duration",
           "type": "string"
         },
         "packageUris": {
@@ -2091,6 +2106,10 @@
           "description": "Optional. The version of Python used in prediction. If not set, the default\nversion is '2.7'. Python '3.5' is available when `runtime_version` is set\nto '1.4' and above. Python '2.7' works with all supported runtime versions.",
           "type": "string"
         },
+        "requestLoggingConfig": {
+          "$ref": "GoogleCloudMlV1__RequestLoggingConfig",
+          "description": "Optional. Configures the request-response pair logging on predictions from\nthis Version."
+        },
         "runtimeVersion": {
           "description": "Optional. The AI Platform runtime version to use for this deployment.\nIf not set, AI Platform uses the default stable version, 1.0. For more\ninformation, see the\n[runtime version list](/ml-engine/docs/runtime-version-list) and\n[how to manage runtime versions](/ml-engine/docs/versioning).",
           "type": "string"
@@ -2216,7 +2235,7 @@
           "type": "string"
         },
         "version": {
-          "description": "Deprecated.",
+          "description": "Specifies the format of the policy.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nPolicies with any conditional bindings must specify version 3. Policies\nwithout any conditional bindings may specify any valid value or leave the\nfield unset.",
           "format": "int32",
           "type": "integer"
         }

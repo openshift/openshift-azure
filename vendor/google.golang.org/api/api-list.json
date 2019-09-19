@@ -503,22 +503,6 @@
     },
     {
       "kind": "discovery#directoryItem",
-      "id": "appstate:v1",
-      "name": "appstate",
-      "version": "v1",
-      "title": "Google App State API",
-      "description": "The Google App State API.",
-      "discoveryRestUrl": "https://www.googleapis.com/discovery/v1/apis/appstate/v1/rest",
-      "discoveryLink": "./apis/appstate/v1/rest",
-      "icons": {
-        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
-        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
-      },
-      "documentationLink": "https://developers.google.com/games/services/web/api/states",
-      "preferred": true
-    },
-    {
-      "kind": "discovery#directoryItem",
       "id": "bigquery:v2",
       "name": "bigquery",
       "version": "v2",
@@ -535,12 +519,57 @@
     },
     {
       "kind": "discovery#directoryItem",
+      "id": "bigqueryconnection:v1beta1",
+      "name": "bigqueryconnection",
+      "version": "v1beta1",
+      "title": "BigQuery Connection API",
+      "description": "Allows users to manage BigQuery connections to external data sources.",
+      "discoveryRestUrl": "https://bigqueryconnection.googleapis.com/$discovery/rest?version=v1beta1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://cloud.google.com/bigquery/",
+      "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
       "id": "bigquerydatatransfer:v1",
       "name": "bigquerydatatransfer",
       "version": "v1",
       "title": "BigQuery Data Transfer API",
       "description": "Schedule queries or transfer external data from SaaS applications to Google BigQuery on a regular basis.",
       "discoveryRestUrl": "https://bigquerydatatransfer.googleapis.com/$discovery/rest?version=v1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://cloud.google.com/bigquery/",
+      "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
+      "id": "bigqueryreservation:v1alpha2",
+      "name": "bigqueryreservation",
+      "version": "v1alpha2",
+      "title": "BigQuery Reservation API",
+      "description": "A service to modify your BigQuery flat-rate reservations.",
+      "discoveryRestUrl": "https://bigqueryreservation.googleapis.com/$discovery/rest?version=v1alpha2",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://cloud.google.com/bigquery/",
+      "preferred": false
+    },
+    {
+      "kind": "discovery#directoryItem",
+      "id": "bigqueryreservation:v1",
+      "name": "bigqueryreservation",
+      "version": "v1",
+      "title": "BigQuery Reservation API",
+      "description": "A service to modify your BigQuery flat-rate reservations.",
+      "discoveryRestUrl": "https://bigqueryreservation.googleapis.com/$discovery/rest?version=v1",
       "icons": {
         "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
@@ -580,6 +609,21 @@
     },
     {
       "kind": "discovery#directoryItem",
+      "id": "binaryauthorization:v1",
+      "name": "binaryauthorization",
+      "version": "v1",
+      "title": "Binary Authorization API",
+      "description": "The management interface for Binary Authorization, a system providing policy control for images deployed to Kubernetes Engine clusters.",
+      "discoveryRestUrl": "https://binaryauthorization.googleapis.com/$discovery/rest?version=v1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://cloud.google.com/binary-authorization/",
+      "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
       "id": "binaryauthorization:v1beta1",
       "name": "binaryauthorization",
       "version": "v1beta1",
@@ -591,7 +635,7 @@
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
       },
       "documentationLink": "https://cloud.google.com/binary-authorization/",
-      "preferred": true
+      "preferred": false
     },
     {
       "kind": "discovery#directoryItem",
@@ -1732,6 +1776,21 @@
     },
     {
       "kind": "discovery#directoryItem",
+      "id": "domainsrdap:v1",
+      "name": "domainsrdap",
+      "version": "v1",
+      "title": "Domains RDAP API",
+      "description": "Read-only public API that lets users search for information about domain names.",
+      "discoveryRestUrl": "https://domainsrdap.googleapis.com/$discovery/rest?version=v1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://developers.google.com/domains/rdap/",
+      "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
       "id": "doubleclickbidmanager:v1",
       "name": "doubleclickbidmanager",
       "version": "v1",
@@ -1754,7 +1813,7 @@
       "id": "doubleclicksearch:v2",
       "name": "doubleclicksearch",
       "version": "v2",
-      "title": "DoubleClick Search API",
+      "title": "Search Ads 360 API",
       "description": "Reports and modifies your advertising data in DoubleClick Search (for example, campaigns, ad groups, keywords, and conversions).",
       "discoveryRestUrl": "https://www.googleapis.com/discovery/v1/apis/doubleclicksearch/v2/rest",
       "discoveryLink": "./apis/doubleclicksearch/v2/rest",
@@ -2168,21 +2227,6 @@
     },
     {
       "kind": "discovery#directoryItem",
-      "id": "healthcare:v1alpha2",
-      "name": "healthcare",
-      "version": "v1alpha2",
-      "title": "Cloud Healthcare API",
-      "description": "Manage, store, and access healthcare data in Google Cloud Platform.",
-      "discoveryRestUrl": "https://healthcare.googleapis.com/$discovery/rest?version=v1alpha2",
-      "icons": {
-        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
-        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
-      },
-      "documentationLink": "https://cloud.google.com/healthcare",
-      "preferred": true
-    },
-    {
-      "kind": "discovery#directoryItem",
       "id": "healthcare:v1beta1",
       "name": "healthcare",
       "version": "v1beta1",
@@ -2194,7 +2238,22 @@
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
       },
       "documentationLink": "https://cloud.google.com/healthcare",
-      "preferred": false
+      "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
+      "id": "homegraph:v1",
+      "name": "homegraph",
+      "version": "v1",
+      "title": "HomeGraph API",
+      "description": "",
+      "discoveryRestUrl": "https://homegraph.googleapis.com/$discovery/rest?version=v1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://developers.google.com/actions/smarthome/create-app#request-sync",
+      "preferred": true
     },
     {
       "kind": "discovery#directoryItem",
@@ -2971,21 +3030,6 @@
     },
     {
       "kind": "discovery#directoryItem",
-      "id": "run:v1beta1",
-      "name": "run",
-      "version": "v1beta1",
-      "title": "Cloud Run API",
-      "description": "Deploy and manage user provided container images that scale automatically based on HTTP traffic.",
-      "discoveryRestUrl": "https://run.googleapis.com/$discovery/rest?version=v1beta1",
-      "icons": {
-        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
-        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
-      },
-      "documentationLink": "https://cloud.google.com/run/",
-      "preferred": false
-    },
-    {
-      "kind": "discovery#directoryItem",
       "id": "runtimeconfig:v1",
       "name": "runtimeconfig",
       "version": "v1",
@@ -3347,6 +3391,21 @@
     },
     {
       "kind": "discovery#directoryItem",
+      "id": "speech:v2beta",
+      "name": "speech",
+      "version": "v2beta",
+      "title": "Cloud Speech-to-Text API",
+      "description": "Converts audio to text by applying powerful neural network models.",
+      "discoveryRestUrl": "https://speech.googleapis.com/$discovery/rest?version=v2beta",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://cloud.google.com/speech-to-text/docs/quickstart-protocol",
+      "preferred": false
+    },
+    {
+      "kind": "discovery#directoryItem",
       "id": "speech:v1",
       "name": "speech",
       "version": "v1",
@@ -3676,6 +3735,21 @@
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
       },
       "documentationLink": "https://developers.google.com/vault",
+      "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
+      "id": "verifiedaccess:v1",
+      "name": "verifiedaccess",
+      "version": "v1",
+      "title": "Chrome Verified Access API",
+      "description": "API for Verified Access chrome extension to provide credential verification for chrome devices connecting to an enterprise network",
+      "discoveryRestUrl": "https://verifiedaccess.googleapis.com/$discovery/rest?version=v1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://developers.google.com/chrome/verified-access",
       "preferred": true
     },
     {

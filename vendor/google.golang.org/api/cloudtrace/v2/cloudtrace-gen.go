@@ -53,8 +53,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -585,6 +585,40 @@ type Span struct {
 	// SpanId: The [SPAN_ID] portion of the span's resource name.
 	SpanId string `json:"spanId,omitempty"`
 
+	// SpanKind: Distinguishes between spans generated in a particular
+	// context. For example,
+	// two spans with the same name may be distinguished using `CLIENT`
+	// (caller)
+	// and `SERVER` (callee) to identify an RPC call.
+	//
+	// Possible values:
+	//   "SPAN_KIND_UNSPECIFIED" - Unspecified. Do NOT use as
+	// default.
+	// Implementations MAY assume SpanKind.INTERNAL to be default.
+	//   "INTERNAL" - Indicates that the span is used internally. Default
+	// value.
+	//   "SERVER" - Indicates that the span covers server-side handling of
+	// an RPC or other
+	// remote network request.
+	//   "CLIENT" - Indicates that the span covers the client-side wrapper
+	// around an RPC or
+	// other remote request.
+	//   "PRODUCER" - Indicates that the span describes producer sending a
+	// message to a broker.
+	// Unlike client and  server, there is no direct critical path
+	// latency
+	// relationship between producer and consumer spans (e.g. publishing
+	// a
+	// message to a pubsub service).
+	//   "CONSUMER" - Indicates that the span describes consumer recieving a
+	// message from a
+	// broker. Unlike client and  server, there is no direct critical
+	// path
+	// latency relationship between producer and consumer spans (e.g.
+	// receiving
+	// a message from a pubsub service subscription).
+	SpanKind string `json:"spanKind,omitempty"`
+
 	// StackTrace: Stack trace captured at the start of the span.
 	StackTrace *StackTrace `json:"stackTrace,omitempty"`
 
@@ -988,6 +1022,7 @@ func (c *ProjectsTracesBatchWriteCall) Header() http.Header {
 
 func (c *ProjectsTracesBatchWriteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1128,6 +1163,7 @@ func (c *ProjectsTracesSpansCreateSpanCall) Header() http.Header {
 
 func (c *ProjectsTracesSpansCreateSpanCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20190917")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
