@@ -2,7 +2,6 @@ package customeradmin
 
 import (
 	"context"
-	"fmt"
 	"reflect"
 	"sort"
 	"strings"
@@ -69,7 +68,8 @@ func reconcileUsers(log *logrus.Entry, ocpUserList []v1.User, AADUser graphrbac.
 		AADUser.MailNickname != nil {
 		if strings.Contains(*AADUser.MailNickname, "#EXT#") {
 			s := strings.Replace(*AADUser.MailNickname, "#EXT#", "", 1)
-			email := strings.Replace(s, "_", "@", 1)
+			idx := strings.LastIndex(s, "_")
+			email := s[:idx] + "@" + s[idx+1:]
 			if mail.Validate(email) && strings.EqualFold(email, *AADUser.GivenName) {
 				return *AADUser.GivenName
 			}
@@ -84,7 +84,6 @@ func reconcileUsers(log *logrus.Entry, ocpUserList []v1.User, AADUser graphrbac.
 			if strings.Contains(usr.Name, "#") {
 				loginEmail := strings.SplitN(usr.Name, "#", 2)[1]
 				if strings.EqualFold(loginEmail, *AADUser.Mail) {
-					fmt.Println(usr.Name)
 					return usr.Name
 				}
 			}

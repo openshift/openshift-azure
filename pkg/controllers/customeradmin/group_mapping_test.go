@@ -41,6 +41,11 @@ func TestFromMSGraphGroup(t *testing.T) {
 				Name: "user@home.com",
 			},
 		},
+		&v1.User{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "bob_owner@home.com",
+			},
+		},
 	).UserV1()
 	tests := []struct {
 		name           string
@@ -250,6 +255,32 @@ func TestFromMSGraphGroup(t *testing.T) {
 					Name: osaCustomerAdmins,
 				},
 				Users: []string{"user@home.com"},
+			},
+		},
+		{
+			name:          "email with underscore",
+			kubeGroupName: osaCustomerAdmins,
+			want1:         false,
+			kubeGroup: &v1.Group{
+				ObjectMeta: meta_v1.ObjectMeta{
+					Name: osaCustomerAdmins,
+				},
+				Users: []string{"bob_owner@home.com"},
+			},
+			msGroupMembers: []graphrbac.User{
+				{
+					Mail:              to.StringPtr("bob_owner@home.com"),
+					UserType:          graphrbac.Guest,
+					GivenName:         nil,
+					MailNickname:      to.StringPtr("bob_owner_home.com#EXT#"),
+					UserPrincipalName: to.StringPtr("bob_owner_home.com#EXT#@home2.onmicrosoft.com"),
+				},
+			},
+			want: &v1.Group{
+				ObjectMeta: meta_v1.ObjectMeta{
+					Name: osaCustomerAdmins,
+				},
+				Users: []string{"bob_owner@home.com"},
 			},
 		},
 		{
