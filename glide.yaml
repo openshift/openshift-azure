@@ -90,3 +90,5 @@ import:
   version: v0.3.0
   subpackages:
   - cmp
+- package: github.com/docker/spdystream
+  version: 6480d4af844c189cf5dd913db24ddd339d3a4f85
