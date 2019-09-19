@@ -25,13 +25,17 @@ import (
 
 // Blessed files (full path match)
 var whitelistWhole = []string{
-	//"data/DaemonSet.apps/default/docker-registry.yaml",
+	"data/DaemonSet.apps/default/docker-registry.yaml",
+	"data/DaemonSet.apps/default/router.yaml",
+	"data/DaemonSet.apps/openshift-azure-logging/log-analytics-node-agent.yaml",
+	"data/DaemonSet.apps/openshift-azure-monitoring/etcd-metrics.yaml", // FIXME we control this
+	"data/Deployment.apps/openshift-azure-logging/log-analytics-cluster-agent.yaml",
+	"data/Deployment.apps/default/registry-console.yaml",
 }
 
 // Blessed files (path contains pattern)
 var whiteListContains = []string{
 	"Template.template.openshift.io",
-	//"DaemonSet.apps",
 }
 
 func isWhiteListed(path string) bool {
@@ -95,6 +99,7 @@ func TestEnvPass(t *testing.T) {
 		}
 
 		if isWhiteListed(path) {
+			t.Logf("%s should have passwords passed in via secrets", path)
 			return nil
 		}
 
