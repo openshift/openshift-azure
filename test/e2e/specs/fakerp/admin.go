@@ -2,21 +2,28 @@ package fakerp
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"reflect"
 	"strings"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	"github.com/ghodss/yaml"
+	templatev1 "github.com/openshift/api/template/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
+	"github.com/openshift/openshift-azure/pkg/util/random"
+	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/sanity"
+	"github.com/openshift/openshift-azure/test/util/exec"
 )
 
 var _ = Describe("Openshift on Azure admin e2e tests [EveryPR]", func() {
@@ -53,6 +60,67 @@ var _ = Describe("Openshift on Azure admin e2e tests [EveryPR]", func() {
 			format := jsonpath.MustCompile("$.imageConfig.format").MustGetString(nodeConfig)
 			Expect(strings.HasPrefix(format, registryPrefix)).To(BeTrue())
 		}
+	})
+
+	It("Should check that pods cannot access the Kubelets' read-only port on its VM's default network interface", func() {
+		nginxTemplate := "nginx-example"
+
+		namespace, err := random.LowerCaseAlphanumericString(5)
+		Expect(err).ToNot(HaveOccurred())
+		namespace = "e2e-test-" + namespace
+
+		By(fmt.Sprintf("creating namespace %s", namespace))
+		err = sanity.Checker.Client.EndUser.CreateProject(namespace)
+		Expect(err).ToNot(HaveOccurred())
+		//defer sanity.Checker.Client.EndUser.CleanupProject(namespace)
+
+		By(fmt.Sprintf("getting the %s template", nginxTemplate))
+		template, err := sanity.Checker.Client.Admin.TemplateV1.Templates("openshift").Get(nginxTemplate, metav1.GetOptions{})
+		Expect(err).NotTo(HaveOccurred())
+
+		By(fmt.Sprintf("deploying %s in the %s namespace", nginxTemplate, namespace))
+		_, err = sanity.Checker.Client.Admin.TemplateV1.TemplateInstances(namespace).Create(
+			&templatev1.TemplateInstance{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: namespace,
+				},
+				Spec: templatev1.TemplateInstanceSpec{
+					Template: *template,
+				},
+			})
+		Expect(err).ToNot(HaveOccurred())
+
+		By(fmt.Sprintf("waiting for %s to become ready", nginxTemplate))
+		err = wait.PollImmediate(2*time.Second, 20*time.Minute, ready.CheckTemplateInstanceIsReady(sanity.Checker.Client.EndUser.TemplateV1.TemplateInstances(namespace), namespace))
+		Expect(err).NotTo(HaveOccurred())
+
+		By(fmt.Sprintf("getting the %s pod", nginxTemplate))
+		nginxPods, err := sanity.Checker.Client.EndUser.CoreV1.Pods(namespace).List(metav1.ListOptions{
+			LabelSelector: fmt.Sprintf("name=%s", nginxTemplate),
+		})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(nginxPods).NotTo(BeNil())
+		Expect(len(nginxPods.Items)).To(Equal(1))
+
+		pod := nginxPods.Items[0]
+		hostIP := pod.Status.HostIP
+		maxTimeSeconds := 5
+		timeoutMessage := fmt.Sprintf("Connection timed out after %d seconds", maxTimeSeconds)
+		checkInsecureReadOnlyPort := fmt.Sprintf("curl -sk --max-time %d http://%s:10255/metrics || echo %s", maxTimeSeconds, hostIP, timeoutMessage)
+		checkSecurePort := fmt.Sprintf("curl -sk --max-time %d https://%s:10250/metrics || echo %s", maxTimeSeconds, hostIP, timeoutMessage)
+
+		By(fmt.Sprintf("executing %q in pod running on %s", checkInsecureReadOnlyPort, hostIP))
+		stdout, stderr, err := exec.RunCommandInPod(sanity.Checker.Client.Admin, &pod, checkInsecureReadOnlyPort)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(stderr).To(BeEmpty())
+		Expect(stdout).To(ContainSubstring(timeoutMessage))
+
+		By(fmt.Sprintf("executing %q in pod running on %s", checkSecurePort, hostIP))
+		stdout, stderr, err = exec.RunCommandInPod(sanity.Checker.Client.Admin, &pod, checkSecurePort)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(stderr).To(BeEmpty())
+		Expect(stdout).NotTo(ContainSubstring(timeoutMessage))
+		Expect(stdout).To(ContainSubstring("Forbidden (user=system:anonymous, verb=get, resource=nodes, subresource=metrics)"))
 	})
 
 	It("should ensure no unnecessary VM rotations occured", func() {

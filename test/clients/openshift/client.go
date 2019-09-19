@@ -4,14 +4,6 @@ import (
 	"net/http"
 	"time"
 
-	servicecatalogv1beta1client "github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1beta1"
-	oappsv1client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
-	buildv1client "github.com/openshift/client-go/build/clientset/versioned/typed/build/v1"
-	networkv1client "github.com/openshift/client-go/network/clientset/versioned/typed/network/v1"
-	projectv1client "github.com/openshift/client-go/project/clientset/versioned/typed/project/v1"
-	routev1client "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
-	templatev1client "github.com/openshift/client-go/template/clientset/versioned/typed/template/v1"
-	userv1client "github.com/openshift/client-go/user/clientset/versioned/typed/user/v1"
 	"github.com/sirupsen/logrus"
 	"k8s.io/client-go/discovery"
 	appsv1client "k8s.io/client-go/kubernetes/typed/apps/v1"
@@ -23,6 +15,14 @@ import (
 	"k8s.io/client-go/rest"
 	v1 "k8s.io/client-go/tools/clientcmd/api/v1"
 
+	servicecatalogv1beta1client "github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1beta1"
+	oappsv1client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
+	buildv1client "github.com/openshift/client-go/build/clientset/versioned/typed/build/v1"
+	networkv1client "github.com/openshift/client-go/network/clientset/versioned/typed/network/v1"
+	projectv1client "github.com/openshift/client-go/project/clientset/versioned/typed/project/v1"
+	routev1client "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
+	templatev1client "github.com/openshift/client-go/template/clientset/versioned/typed/template/v1"
+	userv1client "github.com/openshift/client-go/user/clientset/versioned/typed/user/v1"
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
@@ -79,8 +79,9 @@ func newClientFromKubeConfig(log *logrus.Entry, kc *v1.Config) (*Client, error) 
 	restconfig.WrapTransport = func(rt http.RoundTripper) http.RoundTripper {
 		// first, tweak values on the incoming RoundTripper, which we are
 		// relying on being an *http.Transport.
-
-		rt.(*http.Transport).DisableKeepAlives = true
+		if _, ok := rt.(*http.Transport); ok {
+			rt.(*http.Transport).DisableKeepAlives = true
+		}
 
 		// now wrap our retryingRoundTripper around the incoming RoundTripper.
 		return &kubeclient.RetryingRoundTripper{
