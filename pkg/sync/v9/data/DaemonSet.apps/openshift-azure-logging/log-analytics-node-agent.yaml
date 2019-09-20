@@ -31,7 +31,9 @@ spec:
         - name: CONTROLLER_TYPE
           value: DaemonSet
         - name: NODE_IP
-          value: localhost
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
         image: '*** GENERATED ***'
         livenessProbe:
           exec:
@@ -81,8 +83,6 @@ spec:
         - mountPath: /etc/rsyslog.d/95-omsagent.conf
           name: log-analytics-rsyslog-config
           subPath: rsyslog.conf
-      dnsPolicy: ClusterFirstWithHostNet
-      hostNetwork: true
       nodeSelector:
         beta.kubernetes.io/os: linux
         node-role.kubernetes.io/compute: "true"
