@@ -16,6 +16,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	azgraphrbac "github.com/openshift/openshift-azure/pkg/util/azureclient/graphrbac"
+	"github.com/openshift/openshift-azure/pkg/util/mail"
 )
 
 // fromMSGraphGroup syncs the values from the given aad group into kubeGroup
@@ -40,35 +41,61 @@ func fromMSGraphGroup(log *logrus.Entry, userV1 userv1client.UserV1Interface, ku
 
 	g.Users = []string{}
 	for _, user := range msGroupMembers {
-		if user.UserType == graphrbac.Guest && user.Mail != nil {
-			g.Users = append(g.Users, reconcileGuestUsers(log, ocpUserList.Items, user))
-		} else {
-			g.Users = append(g.Users, *user.UserPrincipalName)
-		}
+		g.Users = append(g.Users, reconcileUsers(log, ocpUserList.Items, user))
 	}
 	sort.Strings(g.Users)
 	return g, !reflect.DeepEqual(kubeGroup, g)
 }
 
-// reconcileGuestUsers will take an external user reference from AAD
-// match it with already sign-ed in users and updates required metadata
-// to match external provider prefix.
-// Example: foo@bar.com external guest user in AAD after sign-in
-// would become live.com#foo@bar.com, where live.com# is the origin
-// Function would match user and convert foo@bar.com to live.com#foo@bar.com
-func reconcileGuestUsers(log *logrus.Entry, ocpUserList []v1.User, AADUser graphrbac.User) string {
-	// If AAD user is External type
-	// AADUser.Mail - does not contain ext reference
-	// AADUser.MailNickname - does have ext reference
-	if AADUser.MailNickname != nil && strings.Contains(*AADUser.MailNickname, "#EXT#") {
-		for _, usr := range ocpUserList {
-			// if login name exist and contains email, we gonna use it as ref
-			if strings.Contains(usr.Name, *AADUser.Mail) {
-				return usr.Name
+// reconcileUsers will take an external user reference from AAD
+// match it with already sign-ed in users and updates required metadata.
+// This code is trying to solve 4 usecases for guest accounts:
+// 1. Member owner account - Mail = nil, GiveName = owner@home.com, MailNickname is partial email with owner@home.com#EXT#
+// 2. Guest user with prefix live.com#user@guest.com in OCP users but not in AAD
+// 3. Guest user with no prefix user@trustedGuest.com
+// 4. Normal user/ other usecases - Default: Mail
+// To check structure:
+// az ad group member list -g 44e69b4e-2e70-42df-bb97-3a890730d7b0
+// External links:
+// https://stackoverflow.com/questions/35727866/azure-ad-appending-ext-to-userprincipalname
+// https://github.com/aspnet/Security/issues/1717
+// Internal example:
+// https://microsofteur-my.sharepoint.com/:w:/g/personal/b-majude_microsoft_com/EQCfupKCHN9Gi1uEqRAiiuUBnw_MfcDQLyldWEcV6gGzBw?e=bwfW9K
+func reconcileUsers(log *logrus.Entry, ocpUserList []v1.User, AADUser graphrbac.User) string {
+	// This trys to handle use-case 1
+	if AADUser.GivenName != nil &&
+		AADUser.Mail == nil &&
+		AADUser.MailNickname != nil {
+		if strings.Contains(*AADUser.MailNickname, "#EXT#") {
+			s := strings.Replace(*AADUser.MailNickname, "#EXT#", "", 1)
+			idx := strings.LastIndex(s, "_")
+			email := s[:idx] + "@" + s[idx+1:]
+			if mail.Validate(email) && strings.EqualFold(email, *AADUser.GivenName) {
+				return *AADUser.GivenName
 			}
 		}
 	}
-	return *AADUser.Mail
+	// This is optimistic code, trying to catch use-case 2
+	if AADUser.MailNickname != nil &&
+		AADUser.Mail != nil &&
+		strings.Contains(*AADUser.MailNickname, "#EXT#") {
+		for _, usr := range ocpUserList {
+			// if OpenShift user contains # - we need to drop it for checking.
+			if strings.Contains(usr.Name, "#") {
+				loginEmail := strings.SplitN(usr.Name, "#", 2)[1]
+				if strings.EqualFold(loginEmail, *AADUser.Mail) {
+					return usr.Name
+				}
+			}
+		}
+	}
+	// returning Mail handles use-case 3-4 here and is default behaviour is none
+	// of the use-cases where matched
+	if AADUser.Mail != nil {
+		return *AADUser.Mail
+	}
+	// default
+	return *AADUser.UserPrincipalName
 }
 
 func newAADGroupsClient(ctx context.Context, log *logrus.Entry, config api.AADIdentityProvider) (azgraphrbac.GroupsClient, error) {
