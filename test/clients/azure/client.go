@@ -14,6 +14,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/network"
 	externalapi "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/2019-09-30-preview"
 	adminapi "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/admin"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/operationalinsights"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
@@ -36,6 +37,7 @@ type Client struct {
 	VirtualNetworks                  network.VirtualNetworksClient
 	VirtualNetworksPeerings          network.VirtualNetworksPeeringsClient
 	Groups                           resources.GroupsClient
+	Workspaces                       operationalinsights.WorkspacesClient
 }
 
 // NewClientFromEnvironment creates a new azure client from environment variables and stores it in the RPClient variable
@@ -82,6 +84,7 @@ func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry) error {
 		VirtualNetworks:                  network.NewVirtualNetworkClient(ctx, log, subscriptionID, authorizer),
 		VirtualNetworksPeerings:          network.NewVirtualNetworksPeeringsClient(ctx, log, subscriptionID, authorizer),
 		Groups:                           resources.NewGroupsClient(ctx, log, subscriptionID, authorizer),
+		Workspaces:                       operationalinsights.NewWorkspacesClient(ctx, log, subscriptionID, authorizer),
 	}
 	return nil
 }

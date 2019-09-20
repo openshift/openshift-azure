@@ -35,6 +35,21 @@ func (m *MockWorkspacesClient) EXPECT() *MockWorkspacesClientMockRecorder {
 	return m.recorder
 }
 
+// CreateOrUpdate mocks base method
+func (m *MockWorkspacesClient) CreateOrUpdate(arg0 context.Context, arg1, arg2 string, arg3 operationalinsights.Workspace) (operationalinsights.WorkspacesCreateOrUpdateFuture, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateOrUpdate", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(operationalinsights.WorkspacesCreateOrUpdateFuture)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateOrUpdate indicates an expected call of CreateOrUpdate
+func (mr *MockWorkspacesClientMockRecorder) CreateOrUpdate(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrUpdate", reflect.TypeOf((*MockWorkspacesClient)(nil).CreateOrUpdate), arg0, arg1, arg2, arg3)
+}
+
 // Get mocks base method
 func (m *MockWorkspacesClient) Get(arg0 context.Context, arg1, arg2 string) (operationalinsights.Workspace, error) {
 	m.ctrl.T.Helper()

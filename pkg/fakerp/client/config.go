@@ -46,5 +46,11 @@ func NewConfig(log *logrus.Entry) (*Config, error) {
 		return nil, fmt.Errorf("must set AZURE_REGIONS to a comma separated list")
 	}
 	log.Infof("using region %s", c.Region)
+	if c.WorkspaceResourceID == "" {
+		c.WorkspaceResourceID = fmt.Sprintf(
+			"/subscriptions/%s/resourcegroups/defaultresourcegroup-%s/providers/"+
+				"microsoft.operationalinsights/workspaces/DefaultWorkspace-%s",
+			c.SubscriptionID, c.Region, c.Region)
+	}
 	return &c, nil
 }

@@ -200,6 +200,10 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 		return nil, err
 	}
 
+	if !isUpdate {
+		cs.Properties.MonitorProfile.Enabled = true
+	}
+
 	if cs.Properties.MonitorProfile.WorkspaceResourceID != "" {
 		log.Infof("using workspace %s", cs.Properties.MonitorProfile.WorkspaceResourceID)
 		log.Info("enabling ContainerInsights solution on the workspace")
@@ -210,9 +214,6 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 		err = enrich.MonitorIDAndKey(ctx, clients.workspacesClient, cs)
 		if err != nil {
 			return nil, err
-		}
-		if !isUpdate {
-			cs.Properties.MonitorProfile.Enabled = true
 		}
 	}
 
