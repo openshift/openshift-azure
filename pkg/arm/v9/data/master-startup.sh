@@ -15,41 +15,6 @@ EOF
 cat >/var/lib/yum/client-key.pem <<'EOF'
 {{ PrivateKeyAsBytes .Config.Certificates.PackageRepository.Key | String }}
 EOF
-# TODO: delete the following section after all clusters are run with a vm image with kickstart.repo baked in
-cat > /etc/yum.repos.d/kickstart.repo <<'EOF'
-[rhel-7-server-rpms]
-name=Red Hat Enterprise Linux 7 Server (RPMs)
-baseurl=https://cdn.redhat.com/content/dist/rhel/server/7/7Server/$basearch/os
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
-sslcacert=/etc/rhsm/ca/redhat-uep.pem
-sslclientcert=/var/lib/yum/client-cert.pem
-sslclientkey=/var/lib/yum/client-key.pem
-enabled=yes
-
-[rhel-7-server-extras-rpms]
-name=Red Hat Enterprise Linux 7 Server - Extras (RPMs)
-baseurl=https://cdn.redhat.com/content/dist/rhel/server/7/7Server/$basearch/extras/os
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
-sslcacert=/etc/rhsm/ca/redhat-uep.pem
-sslclientcert=/var/lib/yum/client-cert.pem
-sslclientkey=/var/lib/yum/client-key.pem
-enabled=yes
-
-[rhel-7-server-ose-3.11-rpms]
-name=Red Hat OpenShift Container Platform 3.11 (RPMs)
-baseurl=https://cdn.redhat.com/content/dist/rhel/server/7/7Server/$basearch/ose/3.11/os
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
-sslcacert=/etc/rhsm/ca/redhat-uep.pem
-sslclientcert=/var/lib/yum/client-cert.pem
-sslclientkey=/var/lib/yum/client-key.pem
-enabled=yes
-
-[azurecore]
-name=azurecore
-baseurl=https://packages.microsoft.com/yumrepos/azurecore
-enabled=yes
-gpgcheck=no
-EOF
 
 logger -t master-startup.sh "installing ARO security updates [{{ StringsJoin .Config.SecurityPatchPackages ", " }}] on $(hostname)"
 for attempt in {1..5}; do
@@ -123,6 +88,20 @@ unset SASURI
 
 update-ca-trust
 
+# setting up geneva logging stack as soon as the configuration is laid out by
+# the startup container, the closer this is to the startup container, the more
+# logs from the startup process we will ship to geneva
+
+# these should run once a day only as per the docs
+/usr/local/bin/azsecd config -s baseline -d P1D
+/usr/local/bin/azsecd config -s software -d P1D
+/usr/local/bin/azsecd config -s clamav -d P1D
+
+# enable and start logging stack services
+systemctl unmask mdsd.service azsecd.service azsecmond.service fluentd.service
+systemctl enable mdsd.service azsecd.service azsecmond.service fluentd.service
+systemctl start mdsd.service azsecd.service azsecmond.service fluentd.service
+
 # Pin kubeconfigs to use local api-server
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/master/openshift-master.kubeconfig
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/node/node.kubeconfig
@@ -190,11 +169,6 @@ mkdir -m 0750 -p /var/lib/origin/openshift.local.volumes
 # disabling rsyslog since we manage everything through journald
 systemctl disable rsyslog.service
 systemctl stop rsyslog.service
-
-# setting up geneva logging stack
-systemctl unmask mdsd.service azsecd.service azsecmond.service fluentd.service
-systemctl enable mdsd.service azsecd.service azsecmond.service fluentd.service
-systemctl start mdsd.service azsecd.service azsecmond.service fluentd.service
 
 # note: atomic-openshift-node crash loops until master is up
 systemctl enable atomic-openshift-node.service

@@ -1,0 +1,15 @@
+# Some file and directory watches
+-w /var/log/audit/ -p wxa -k audittampering
+-w /etc/audit/ -p wxa -k audittampering
+-w /etc/passwd -p wxa -k usergroup
+-w /etc/group -p wxa -k usergroup
+-w /etc/pam.d/ -p wxa -k pam
+-w /etc/azsec/ -p wxa -k azsec
+
+# Monitor certain syscalls. NB: already loaded in stock auditd rules
+#-a always,exit -F arch=b32 -S execve,execveat,init_module,finit_module
+#-a always,exit -F arch=b64 -S execve,execveat,init_module,finit_module
+
+# Monitor clock events
+-a always,exit -F arch=b32 -S settimeofday,adjtimex,clock_settime,clock_adjtime
+-a always,exit -F arch=b64 -S adjtimex,settimeofday,clock_settime,clock_adjtime

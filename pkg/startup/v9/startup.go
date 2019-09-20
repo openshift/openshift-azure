@@ -183,6 +183,7 @@ func (s *startup) writeFiles(role api.AgentPoolProfileRole, w writers.Writer, ho
 			return err
 		}
 
+		s.log.Infof("writing file %s", filepath)
 		err = w.WriteFile(filepath, b, perm)
 		if err != nil {
 			return err

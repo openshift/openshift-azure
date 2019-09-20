@@ -35,6 +35,7 @@
         <Source name="heartbeat" schema="azsecv1"/>
         <Source name="baseline" schema="azsecv1"/>
         <Source name="software" schema="azsecv1"/>
+        <Source name="clamav" schema="azsecv1"/>
         <Source name="scan_event" schema="azsecv2"/>
         <Source name="alert" schema="azsecv2"/>
         <Source name="audit" dynamic_schema="true"/>
@@ -44,22 +45,25 @@
     <Events>
         <MdsdEvents>
             <MdsdEventSource source="heartbeat">
-                <RouteEvent eventName="LinuxAsmHeartbeat" priority="Normal" storeType="CentralBond"></RouteEvent>
+                <RouteEvent eventName="LinuxAsmHeartbeat" storeType="CentralBond" priority="Normal"/>
             </MdsdEventSource>
             <MdsdEventSource source="baseline">
-                <RouteEvent eventName="LinuxAsmBaseline" priority="Normal" storeType="CentralBond"></RouteEvent>
+                <RouteEvent eventName="LinuxAsmBaseline" storeType="CentralBond" priority="Normal"/>
             </MdsdEventSource>
             <MdsdEventSource source="software">
-                <RouteEvent eventName="LinuxAsmSoftware" priority="Normal" storeType="CentralBond"></RouteEvent>
+                <RouteEvent eventName="LinuxAsmSoftware" storeType="CentralBond" priority="Normal"/>
             </MdsdEventSource>
-			<MdsdEventSource source="scan_event">
-                <RouteEvent eventName="LinuxAsmScanEvent" priority="Normal" storeType="CentralBond"></RouteEvent>
+            <MdsdEventSource source="clamav">
+                <RouteEvent eventName="LinuxAsmClamav" storeType="CentralBond" priority="Normal"/>
             </MdsdEventSource>
-			<MdsdEventSource source="alert">
-                <RouteEvent eventName="LinuxAsmAlert" priority="Normal" storeType="CentralBond"></RouteEvent>
+            <MdsdEventSource source="scan_event">
+                <RouteEvent eventName="LinuxAsmScanEvent" storeType="CentralBond" priority="Normal"/>
+            </MdsdEventSource>
+            <MdsdEventSource source="alert">
+                <RouteEvent eventName="LinuxAsmAlert" storeType="CentralBond" priority="Normal"/>
             </MdsdEventSource>
             <MdsdEventSource source="audit">
-                <RouteEvent eventName="LinuxAsmAudit" priority="Normal" storeType="CentralBond"></RouteEvent>
+                <RouteEvent eventName="LinuxAsmAudit" storeType="CentralBond" priority="Normal"/>
             </MdsdEventSource>
             <MdsdEventSource source="journald">
                 <RouteEvent eventName="CustomerSyslogEvents" storeType="CentralBond" priority="High"/>
