@@ -19,6 +19,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/test/clients/azure"
+	"github.com/openshift/openshift-azure/test/manifests"
 	"github.com/openshift/openshift-azure/test/sanity"
 )
 
@@ -29,7 +30,7 @@ const (
 )
 
 var _ = Describe("Azure Red Hat OpenShift e2e tests for Azure Monitor Integration [EveryPR]", func() {
-	It("should be possible for a customer to update the azure monitor configuration for their cluster [EndUser]", func() {
+	withAzureMonitorIt("should be possible for a customer to update the azure monitor configuration for their cluster [EndUser]", func() {
 		ctx := context.Background()
 		rgName, err := random.LowerCaseAlphanumericString(5)
 		Expect(err).ToNot(HaveOccurred())
@@ -121,3 +122,21 @@ var _ = Describe("Azure Red Hat OpenShift e2e tests for Azure Monitor Integratio
 		Expect(err).NotTo(HaveOccurred())
 	})
 })
+
+// withAzureMonitorIt wraps It blocks to make sure the tests are run on plugin versions supporting Azure Monitor (>= v9.0).
+func withAzureMonitorIt(description string, f interface{}) {
+	RegisterFailHandler(Fail)
+	internal, err := manifests.InternalConfig()
+	Expect(err).NotTo(HaveOccurred())
+
+	var major, minor int
+	_, err = fmt.Sscanf(internal.Config.PluginVersion, "v%d.%d", &major, &minor)
+	Expect(err).NotTo(HaveOccurred())
+
+	if major >= 9 {
+		It(description, f)
+	} else {
+		By(fmt.Sprintf("Skipping azure monitor test for plugin major version %d", major))
+		PIt(description, f)
+	}
+}

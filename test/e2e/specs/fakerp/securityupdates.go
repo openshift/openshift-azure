@@ -3,7 +3,6 @@ package fakerp
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -11,12 +10,12 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/Azure/go-autorest/autorest/to"
-	"github.com/ghodss/yaml"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/test/clients/azure"
+	"github.com/openshift/openshift-azure/test/manifests"
 	"github.com/openshift/openshift-azure/test/sanity"
 	logger "github.com/openshift/openshift-azure/test/util/log"
 )
@@ -28,20 +27,7 @@ var _ = Describe("Apply security updates E2E tests [ApplySecurityUpdates][LongRu
 			"nano",
 			"wget",
 		}
-		log = logger.GetTestLogger()
-		// Do not use the internal config in other tests! This is necessary here in order to acquire
-		// ssh credentials which will be used to query the sample vm for rpm lists before and
-		// after cve hot patches are applied to a cluster. Usually fakerp tests should be written
-		// to use the admin config wherever possible.
-		internalConfig = func() (*api.OpenShiftManagedCluster, error) {
-			var cs api.OpenShiftManagedCluster
-			b, err := ioutil.ReadFile("../../_data/containerservice.yaml")
-			if err != nil {
-				return nil, err
-			}
-			err = yaml.Unmarshal(b, &cs)
-			return &cs, err
-		}
+		log      = logger.GetTestLogger()
 		sampleVm = "master-000000"
 	)
 
@@ -52,7 +38,7 @@ var _ = Describe("Apply security updates E2E tests [ApplySecurityUpdates][LongRu
 		Expect(beforeUpdate).NotTo(BeNil())
 
 		By("Reading the internal config (not converting from the admin config) for access to secrets for ssh access")
-		internal, err := internalConfig()
+		internal, err := manifests.InternalConfig()
 		Expect(err).NotTo(HaveOccurred())
 		Expect(internal).NotTo(BeNil())
 
