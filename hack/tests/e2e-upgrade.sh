@@ -35,6 +35,7 @@ cp -a "$T/src/github.com/openshift/openshift-azure/_data" .
 
 set_build_images
 
+export AZURE_REGIONS=$(awk '/^location:/ { print $2 }' <_data/containerservice.yaml)
 # try upgrading just a single image to latest
 FOCUS="\[ChangeImage\]" TIMEOUT=50m ./hack/e2e.sh
 
