@@ -8,6 +8,7 @@ import (
 	azresources "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/sirupsen/logrus"
+	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
@@ -23,7 +24,7 @@ func EnsureResourceGroup(log *logrus.Entry, conf *Config) error {
 	ctx := context.Background()
 	gc := resources.NewGroupsClient(ctx, log, conf.SubscriptionID, authorizer)
 
-	if _, err := gc.Get(ctx, conf.ResourceGroup); err == nil {
+	if ready, _ := checkResourceGroupIsReady(ctx, gc, conf.ResourceGroup); ready {
 		return nil
 	}
 
@@ -38,6 +39,17 @@ func EnsureResourceGroup(log *logrus.Entry, conf *Config) error {
 		tags["ttl"] = &conf.ResourceGroupTTL
 	}
 
-	_, err = gc.CreateOrUpdate(ctx, conf.ResourceGroup, azresources.Group{Location: &conf.Region, Tags: tags})
-	return err
+	if _, err = gc.CreateOrUpdate(ctx, conf.ResourceGroup, azresources.Group{Location: &conf.Region, Tags: tags}); err != nil {
+		return err
+	}
+	log.Infof("waiting for successful provision of resource group %s", conf.ResourceGroup)
+	return wait.PollImmediate(5*time.Second, 5*time.Minute, func() (bool, error) { return checkResourceGroupIsReady(ctx, gc, conf.ResourceGroup) })
+}
+
+func checkResourceGroupIsReady(ctx context.Context, gc resources.GroupsClient, resourceGroup string) (bool, error) {
+	g, err := gc.Get(ctx, resourceGroup)
+	if err != nil {
+		return false, err
+	}
+	return *g.Properties.ProvisioningState == "Succeeded", nil
 }
