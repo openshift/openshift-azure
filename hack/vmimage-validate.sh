@@ -44,7 +44,7 @@ fi
 
 if [ -s "${ARTIFACTS:-/tmp}/yum_updateinfo_list_security" ]; then
   >&2 echo "Found pending security updates:"
-  >&2 cat /tmp/yum_updateinfo_list_security
+  >&2 cat "${ARTIFACTS:-/tmp}/yum_updateinfo_list_security"
   exit 1
 fi
 PHASE=build_complete
