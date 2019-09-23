@@ -94,6 +94,9 @@ type NetworkProfile struct {
 	// VnetCIDR (in): the CIDR with which the OSA cluster's Vnet is configured
 	VnetCIDR *string `json:"vnetCidr,omitempty"`
 
+	// ManagementSubnetCIDR (in): the CIDR for OSA management subnet
+	ManagementSubnetCIDR *string `json:"managementSubnetCidr,omitempty"`
+
 	// VnetID (out): the ID of the Vnet created for the OSA cluster
 	VnetID *string `json:"vnetId,omitempty"`
 

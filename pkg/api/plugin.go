@@ -83,7 +83,7 @@ func (pe *PluginError) Error() string {
 // DeployFn makes it possible to plug in different logic to the deploy.
 // The implementor must initiate a deployment of the given template using
 // mode resources.Incremental and wait for it to complete.
-// DeployFn returns string with IP address OR FQDN for API server.
+// DeployFn returns a string with an IP address OR FQDN for the API server.
 type DeployFn func(context.Context, map[string]interface{}) (*string, error)
 
 // TestConfig holds all testing variables. It should be the zero value in

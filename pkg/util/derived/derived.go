@@ -5,7 +5,7 @@ import (
 	"github.com/ghodss/yaml"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/arm"
+	armconst "github.com/openshift/openshift-azure/pkg/arm/const"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 )
 
@@ -14,12 +14,12 @@ func baseCloudProviderConf(cs *api.OpenShiftManagedCluster, disableOutboundSNAT 
 		TenantID:                     cs.Properties.AzProfile.TenantID,
 		SubscriptionID:               cs.Properties.AzProfile.SubscriptionID,
 		ResourceGroup:                cs.Properties.AzProfile.ResourceGroup,
-		LoadBalancerSku:              arm.LoadBalancerSku,
+		LoadBalancerSku:              armconst.LoadBalancerSku,
 		Location:                     cs.Location,
-		SecurityGroupName:            arm.NsgWorkerName,
-		VMType:                       arm.VmssType,
-		SubnetName:                   arm.VnetSubnetName,
-		VnetName:                     arm.VnetName,
+		SecurityGroupName:            armconst.NsgWorkerName,
+		VMType:                       armconst.VmssType,
+		SubnetName:                   armconst.VnetSubnetName,
+		VnetName:                     armconst.VnetName,
 		UseInstanceMetadata:          true,
 		CloudProviderBackoff:         true,
 		CloudProviderBackoffRetries:  6,

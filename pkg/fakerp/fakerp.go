@@ -14,10 +14,11 @@ import (
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/api/features"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/fakerp/arm"
+	armconst "github.com/openshift/openshift-azure/pkg/fakerp/arm/const"
 	"github.com/openshift/openshift-azure/pkg/fakerp/client"
-	utilarm "github.com/openshift/openshift-azure/pkg/util/arm"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
 	"github.com/openshift/openshift-azure/pkg/util/enrich"
@@ -116,6 +117,12 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, conf *clien
 			return nil, err
 		}
 
+		// initiate NetworkManager client
+		nm, err := newNetworkManager(ctx, log, cs.Properties.AzProfile.SubscriptionID, conf.ManagementResourceGroup)
+		if err != nil {
+			return nil, err
+		}
+
 		log.Info("waiting for arm template deployment to complete")
 		err = future.WaitForCompletionRef(ctx, deployments.Client())
 		if err != nil {
@@ -123,71 +130,71 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, conf *clien
 			debugDeployerError(ctx, log, cs, err, testConfig)
 		}
 
-		// This causes fails in our tests because deployer function is not versioned.
-		// TODO: Remove this when v7 is gone and PLS is default in the deployer function
-		if cs.Config.PluginVersion == "v9.0" &&
-			conf != nil {
-			log.Info("applying PLS deployment")
-			now := time.Now().Unix()
-			plsTemplate, err := arm.GenerateClusterSide(ctx, cs)
-			if err != nil {
-				return nil, err
-			}
+		// we check if PE exists and get IP
+		// else, deploy PE and return its IP
+		log.Info("check PE existence")
+		exist := nm.privateEndpointExists(ctx, fmt.Sprintf("%s-%s", armconst.PrivateEndpointNamePrefix, cs.Name))
 
-			future, err = deployments.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "plsdeploy", azresources.Deployment{
-				Properties: &azresources.DeploymentProperties{
-					Template: plsTemplate,
-					Mode:     azresources.Incremental,
-				},
-			})
-			if err != nil {
-				return nil, err
-			}
+		// If we dont check plugin version prefix, code gets triggered on v9 single image updates
+		if strings.HasPrefix(cs.Config.PluginVersion, "v1") {
+			if !exist && features.PrivateLinkEnabled(cs) {
+				log.Info("applying PLS deployment")
+				plsTemplate, err := arm.GenerateClusterSide(ctx, cs)
+				if err != nil {
+					return nil, err
+				}
 
-			log.Info("waiting for arm template deployment to complete")
-			err = future.WaitForCompletionRef(ctx, deployments.Client())
-			if err != nil {
-				log.Warnf("deployment failed: %#v", err)
-				debugDeployerError(ctx, log, cs, err, testConfig)
-			}
+				future, err = deployments.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "plsdeploy", azresources.Deployment{
+					Properties: &azresources.DeploymentProperties{
+						Template: plsTemplate,
+						Mode:     azresources.Incremental,
+					},
+				})
+				if err != nil {
+					return nil, err
+				}
 
-			log.Info("applying PE deployment")
-			peTemplate, err := arm.GenerateRPSide(ctx, cs, conf, now)
-			if err != nil {
-				return nil, err
-			}
+				log.Info("waiting for arm template deployment to complete")
+				err = future.WaitForCompletionRef(ctx, deployments.Client())
+				if err != nil {
+					log.Warnf("deployment failed: %#v", err)
+					debugDeployerError(ctx, log, cs, err, testConfig)
+				}
 
-			future, err = deployments.CreateOrUpdate(ctx, conf.ManagementResourceGroup, fmt.Sprintf("pedeploy-%d", now), azresources.Deployment{
-				Properties: &azresources.DeploymentProperties{
-					Template: peTemplate,
-					Mode:     azresources.Incremental,
-				},
-			})
-			if err != nil {
-				return nil, err
-			}
+				log.Info("applying PE deployment")
+				peTemplate, err := arm.GenerateRPSide(ctx, cs, conf)
+				if err != nil {
+					return nil, err
+				}
 
-			log.Info("waiting for arm template deployment to complete")
-			err = future.WaitForCompletionRef(ctx, deployments.Client())
-			if err != nil {
-				log.Warnf("deployment failed: %#v", err)
-				debugDeployerError(ctx, log, cs, err, testConfig)
-			}
+				future, err = deployments.CreateOrUpdate(ctx, conf.ManagementResourceGroup, fmt.Sprintf("pedeploy-%d", time.Now().Unix()), azresources.Deployment{
+					Properties: &azresources.DeploymentProperties{
+						Template: peTemplate,
+						Mode:     azresources.Incremental,
+					},
+				})
+				if err != nil {
+					return nil, err
+				}
 
-			log.Info("get PE IP address")
-			nm, err := newNetworkManager(ctx, log, cs.Properties.AzProfile.SubscriptionID, conf.ManagementResourceGroup)
-			if err != nil {
-				return nil, err
+				log.Info("waiting for arm template deployment to complete")
+				err = future.WaitForCompletionRef(ctx, deployments.Client())
+				if err != nil {
+					log.Warnf("deployment failed: %#v", err)
+					debugDeployerError(ctx, log, cs, err, testConfig)
+				}
 			}
-			peIP, err := nm.getPrivateEndpointIP(ctx, fmt.Sprintf("%s-%s-%d", utilarm.PrivateEndpointNamePrefix, cs.Name, now))
-			if err != nil {
-				return nil, err
+			if features.PrivateLinkEnabled(cs) {
+				log.Info("get PE IP address")
+				peIP, err := nm.getPrivateEndpointIP(ctx, fmt.Sprintf("%s-%s", armconst.PrivateEndpointNamePrefix, cs.Name))
+				if err != nil {
+					return nil, err
+				}
+				log.Debugf("PE IP Address %s ", peIP)
+				return &peIP, nil
 			}
-			log.Debugf("PE IP Address %s ", *peIP)
-			return peIP, err
 		}
-
-		return nil, err
+		return nil, nil
 	}
 }
 
@@ -196,16 +203,11 @@ func parsePluginVersion(pluginVersion string) (major, minor int, err error) {
 	return
 }
 
-func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, oldCs *api.OpenShiftManagedCluster, isAdmin bool, testConfig api.TestConfig) (*api.OpenShiftManagedCluster, error) {
+func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, oldCs *api.OpenShiftManagedCluster, isAdmin bool, conf *client.Config, testConfig api.TestConfig) (*api.OpenShiftManagedCluster, error) {
 	isUpdate := (oldCs != nil) // this is until we have called writeHelpers()
 
 	log.Info("enrich")
-	conf, err := client.NewConfig(log, cs)
-	if err != nil {
-		return nil, err
-	}
-
-	err = enrichCs(cs, conf)
+	err := enrichCs(cs, conf)
 	if err != nil {
 		return nil, err
 	}

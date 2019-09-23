@@ -8,21 +8,21 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	armconst "github.com/openshift/openshift-azure/pkg/arm/const"
+	farmconst "github.com/openshift/openshift-azure/pkg/fakerp/arm/const"
 	"github.com/openshift/openshift-azure/pkg/fakerp/client"
-	"github.com/openshift/openshift-azure/pkg/util/arm"
 	pl "github.com/openshift/openshift-azure/pkg/util/azureclient/network/privatelink"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 )
 
 func privateLinkService(cs *api.OpenShiftManagedCluster) *pl.PrivateLinkService {
-	subList := []string{"*"}
 	return &pl.PrivateLinkService{
 		PrivateLinkServiceProperties: &pl.PrivateLinkServiceProperties{
 			Visibility: &pl.PrivateLinkServicePropertiesVisibility{
-				Subscriptions: &subList,
+				Subscriptions: &[]string{"*"},
 			},
 			AutoApproval: &pl.PrivateLinkServicePropertiesAutoApproval{
-				Subscriptions: &subList,
+				Subscriptions: &[]string{"*"},
 			},
 			LoadBalancerFrontendIPConfigurations: &[]network.FrontendIPConfiguration{
 				{
@@ -37,18 +37,18 @@ func privateLinkService(cs *api.OpenShiftManagedCluster) *pl.PrivateLinkService 
 							ID: to.StringPtr(cs.Properties.NetworkProfile.ManagementSubnetID),
 						},
 					},
-					Name: to.StringPtr(arm.PrivateLinkNicName),
+					Name: to.StringPtr(farmconst.PrivateLinkNicName),
 				},
 			},
 		},
-		Name:     to.StringPtr(arm.PrivateLinkName),
+		Name:     to.StringPtr(farmconst.PrivateLinkName),
 		Type:     to.StringPtr("Microsoft.Network/privateLinkServices"),
 		Version:  to.StringPtr("2019-06-01"),
 		Location: to.StringPtr(cs.Location),
 	}
 }
 
-func privateEndpoint(cs *api.OpenShiftManagedCluster, conf *client.Config, now int64) *pl.PrivateEndpoint {
+func privateEndpoint(cs *api.OpenShiftManagedCluster, conf *client.Config) *pl.PrivateEndpoint {
 	tags := map[string]*string{
 		"now": to.StringPtr(fmt.Sprintf("%d", time.Now().Unix())),
 		"ttl": to.StringPtr("72h"),
@@ -66,7 +66,7 @@ func privateEndpoint(cs *api.OpenShiftManagedCluster, conf *client.Config, now i
 							cs.Properties.AzProfile.SubscriptionID,
 							cs.Properties.AzProfile.ResourceGroup,
 							"Microsoft.Network/privateLinkServices",
-							arm.PrivateLinkName)),
+							farmconst.PrivateLinkName)),
 					},
 				},
 			},
@@ -75,11 +75,11 @@ func privateEndpoint(cs *api.OpenShiftManagedCluster, conf *client.Config, now i
 					cs.Properties.AzProfile.SubscriptionID,
 					conf.ManagementResourceGroup,
 					"Microsoft.Network/virtualNetworks",
-					arm.VnetName,
-				) + "/subnets/" + arm.VnetManagementSubnetName),
+					armconst.VnetName,
+				) + "/subnets/" + armconst.VnetManagementSubnetName),
 			},
 		},
-		Name:     to.StringPtr(fmt.Sprintf("%s-%s-%d", arm.PrivateEndpointNamePrefix, cs.Name, now)),
+		Name:     to.StringPtr(fmt.Sprintf("%s-%s", farmconst.PrivateEndpointNamePrefix, cs.Name)),
 		Type:     to.StringPtr("Microsoft.Network/privateEndpoints"),
 		Version:  to.StringPtr("2019-06-01"),
 		Location: to.StringPtr(cs.Location),

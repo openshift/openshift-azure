@@ -80,6 +80,8 @@ func (v *AdminAPIValidator) validateUpdateContainerService(cs, oldCs *api.OpenSh
 	old.Config.SecurityPatchPackages = cs.Config.SecurityPatchPackages
 	old.Config.SSHSourceAddressPrefixes = cs.Config.SSHSourceAddressPrefixes
 
+	old.Properties.NetworkProfile.ManagementSubnetCIDR = cs.Properties.NetworkProfile.ManagementSubnetCIDR
+
 	if !reflect.DeepEqual(cs, old) {
 		errs = append(errs, fmt.Errorf("invalid change %s", cmp.Diff(cs, old)))
 	}

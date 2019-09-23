@@ -59,6 +59,7 @@ properties:
     workspaceKey: a2V5Cg==
   networkProfile:
     vnetCidr: 10.0.0.0/8
+    managementSubnetCIDR: 10.0.1.0/24
   openShiftVersion: v3.11
   publicHostname: test.example.com
   routerProfiles:
@@ -270,6 +271,12 @@ func TestValidate(t *testing.T) {
 				oc.Properties.NetworkProfile.PeerVnetID = to.StringPtr("foo")
 			},
 			expectedErrs: []error{errors.New(`invalid properties.networkProfile.peerVnetId "foo"`)},
+		},
+		"network profile invalid managementSubnetCIDR": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.NetworkProfile.ManagementSubnetCIDR = to.StringPtr("foo")
+			},
+			expectedErrs: []error{errors.New(`invalid properties.networkProfile.managementSubnetCIDR "foo"`)},
 		},
 		"router profile duplicate names": {
 			f: func(oc *api.OpenShiftManagedCluster) {

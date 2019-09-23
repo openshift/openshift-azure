@@ -25,6 +25,7 @@ var marshalled = []byte(`{
 		"fqdn": "Properties.FQDN",
 		"networkProfile": {
 			"vnetCidr": "Properties.NetworkProfile.VnetCIDR",
+			"managementSubnetCidr": "Properties.NetworkProfile.ManagementSubnetCIDR",
 			"vnetId": "Properties.NetworkProfile.VnetID",
 			"peerVnetId": "Properties.NetworkProfile.PeerVnetID"
 		},
@@ -316,7 +317,8 @@ func TestUnmarshal(t *testing.T) {
 	populatedOc.Config.MasterStartupSASURI = ""
 	populatedOc.Config.WorkerStartupSASURI = ""
 
-	populatedOc.Properties.NetworkProfile.PrivateEndpoint = ""
+	// we dont serialize these fields into the json
+	populatedOc.Properties.NetworkProfile.PrivateEndpoint = nil
 	populatedOc.Properties.NetworkProfile.ManagementSubnetID = ""
 	populatedOc.Properties.NetworkProfile.InternalLoadBalancerFrontendIPID = ""
 

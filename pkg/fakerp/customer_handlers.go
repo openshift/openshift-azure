@@ -5,23 +5,19 @@ import (
 	"net/http"
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
+	armconst "github.com/openshift/openshift-azure/pkg/fakerp/arm/const"
 	"github.com/openshift/openshift-azure/pkg/fakerp/client"
-	"github.com/openshift/openshift-azure/pkg/util/arm"
 )
 
 func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(contextKeyContainerService).(*internalapi.OpenShiftManagedCluster)
+	config := req.Context().Value(contextKeyConfig).(*client.Config)
 
 	cs.Properties.ProvisioningState = internalapi.Deleting
 	s.store.Put(cs)
 
-	conf, err := client.NewConfig(s.log, cs)
-	if err != nil {
-		return
-	}
-
 	s.log.Info("creating clients")
-	clients, err := newClients(req.Context(), s.log, cs, s.testConfig, conf)
+	clients, err := newClients(req.Context(), s.log, cs, s.testConfig, config)
 	if err != nil {
 		s.badRequest(w, fmt.Sprintf("Failed to create clients: %v", err))
 		return
@@ -42,9 +38,9 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	}
 
 	s.log.Info("delete pe resources")
-	err = clients.nmMgr.deletePLSPE(req.Context(), cs.Name, arm.PrivateLinkName)
+	err = clients.netMgr.deletePEs(req.Context(), fmt.Sprintf("%s-%s", armconst.PrivateEndpointNamePrefix, cs.Name))
 	if err != nil {
-		s.badRequest(w, fmt.Sprintf("Failed to delete dns records: %v", err))
+		s.badRequest(w, fmt.Sprintf("Failed to delete pe resources: %v", err))
 		return
 	}
 
@@ -92,8 +88,13 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	config, err := client.NewServerConfig(s.log, cs)
+	if err != nil {
+		return
+	}
+
 	// apply the request
-	newCS, err := createOrUpdateWrapper(req.Context(), s.plugin, s.log, cs, oldCs, isAdmin, s.testConfig)
+	newCS, err := createOrUpdateWrapper(req.Context(), s.plugin, s.log, cs, oldCs, isAdmin, config, s.testConfig)
 	if err != nil {
 		cs.Properties.ProvisioningState = internalapi.Failed
 		s.store.Put(cs)

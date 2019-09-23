@@ -37,12 +37,12 @@ type Config struct {
 	NoWait           bool   `envconfig:"NO_WAIT"`
 }
 
-// NewConfig parses env variables and sets fakeRP configuration.
+// newConfig parses env variables and sets fakeRP configuration.
 // This function is being re-used in client and server side of fakeRP.
 // Server side uses CS object, passed from client in a form of manifest to
 // prepopulate some of the random generated fields with the same value
 // as client side.
-func NewConfig(log *logrus.Entry, cs *api.OpenShiftManagedCluster) (*Config, error) {
+func newConfig(log *logrus.Entry, cs *api.OpenShiftManagedCluster) (*Config, error) {
 	var c Config
 	if err := envconfig.Process("", &c); err != nil {
 		return nil, err
@@ -71,4 +71,14 @@ func NewConfig(log *logrus.Entry, cs *api.OpenShiftManagedCluster) (*Config, err
 	log.Infof("using management resource group %s", c.ManagementResourceGroup)
 
 	return &c, nil
+}
+
+// NewClientConfig returns instance of Config for client
+func NewClientConfig(log *logrus.Entry) (*Config, error) {
+	return newConfig(log, nil)
+}
+
+// NewServerConfig returns instance of Config for server
+func NewServerConfig(log *logrus.Entry, cs *api.OpenShiftManagedCluster) (*Config, error) {
+	return newConfig(log, cs)
 }

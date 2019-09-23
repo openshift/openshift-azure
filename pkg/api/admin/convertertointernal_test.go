@@ -43,6 +43,7 @@ func internalManagedCluster() *api.OpenShiftManagedCluster {
 		}
 	}
 	populate.Walk(&cs, prepare)
+
 	return cs
 }
 

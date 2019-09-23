@@ -28,16 +28,5 @@ const (
 	VmssCSEName                                   = "cse"
 	VmssAdminUsername                             = "cloud-user"
 	VmssType                                      = "vmss"
-	PrivateLinkNicName                            = "mgmtpls-nic"
-	PrivateLinkName                               = "mgmtpls"
 	LoadBalancerSku                               = "standard"
-
-	// FakeRP side names/constants
-	// PrivateEndpointNamePrefix name is Management side private endpoint name prefix
-	PrivateEndpointNamePrefix = "mgmtpe"
-
-	// Management infrastrucutre names/constants
-	VnetGatewaySubnetName = "GatewaySubnet"
-	GatewayIPAddressName  = "gateway-ip"
-	GatewayName           = "gateway"
 )

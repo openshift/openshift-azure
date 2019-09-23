@@ -36,6 +36,7 @@ func setDefaults(oc *OpenShiftManagedCluster) {
 		if oc.Properties.AgentPoolProfiles[i].OSType == nil {
 			oc.Properties.AgentPoolProfiles[i].OSType = (*OSType)(to.StringPtr("Linux"))
 		}
+
 	}
 
 	if len(oc.Properties.RouterProfiles) == 0 {

@@ -11,6 +11,9 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
 
+	armconst "github.com/openshift/openshift-azure/pkg/arm/const"
+	fakerparm "github.com/openshift/openshift-azure/pkg/fakerp/arm"
+	farmconst "github.com/openshift/openshift-azure/pkg/fakerp/arm/const"
 	"github.com/openshift/openshift-azure/pkg/util/arm"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
@@ -29,13 +32,13 @@ const (
 
 var (
 	versionMap = map[string]string{
-		"Microsoft.Network": "2019-02-01",
+		"Microsoft.Network": "2019-04-01",
 	}
 
 	// subnets split logic:
 	// vnet - contains all network addresses used for manamagement infrastructure.
 	// at the moment it has 1024 addresses allocated.
-	// x.x.0.0/22 - default vnet subnet, where all client will be created
+	// x.x.0.0/22 - vnet network size
 	// 	x.x.1.0/24 - subnet for the gateway
 	//  x.x.2.0/24 - management subnet, where all EP/PLS resources should be created
 	//  x.x.3.0/24 - reserved for future extensions
@@ -165,7 +168,7 @@ func generate(ctx context.Context, conf *Config) (map[string]interface{}, error)
 		virtualGateway(conf),
 	}
 
-	template, err := arm.Generate(ctx, conf.SubscriptionID, conf.resourceGroup, resources)
+	template, err := fakerparm.Generate(ctx, conf.SubscriptionID, conf.resourceGroup, resources)
 	if err != nil {
 		return nil, err
 	}
@@ -189,23 +192,23 @@ func vnet(conf *Config) *network.VirtualNetwork {
 					SubnetPropertiesFormat: &network.SubnetPropertiesFormat{
 						AddressPrefix: to.StringPtr(conf.subnets[cidrDefaultSubnet]),
 					},
-					Name: to.StringPtr(arm.VnetSubnetName),
+					Name: to.StringPtr(armconst.VnetSubnetName),
 				},
 				{
 					SubnetPropertiesFormat: &network.SubnetPropertiesFormat{
 						AddressPrefix: to.StringPtr(conf.subnets[cidrManagmentSubnet]),
 					},
-					Name: to.StringPtr(arm.VnetManagementSubnetName),
+					Name: to.StringPtr(armconst.VnetManagementSubnetName),
 				},
 				{
 					SubnetPropertiesFormat: &network.SubnetPropertiesFormat{
 						AddressPrefix: to.StringPtr(conf.subnets[cidrGatewaySubnet]),
 					},
-					Name: to.StringPtr(arm.VnetGatewaySubnetName),
+					Name: to.StringPtr(farmconst.VnetGatewaySubnetName),
 				},
 			},
 		},
-		Name:     to.StringPtr(arm.VnetName),
+		Name:     to.StringPtr(armconst.VnetName),
 		Type:     to.StringPtr("Microsoft.Network/virtualNetworks"),
 		Location: to.StringPtr(conf.region),
 	}
@@ -217,7 +220,7 @@ func ipAddress(conf *Config) *network.PublicIPAddress {
 			PublicIPAllocationMethod: network.Dynamic,
 			IdleTimeoutInMinutes:     to.Int32Ptr(15),
 		},
-		Name:     to.StringPtr(arm.GatewayIPAddressName),
+		Name:     to.StringPtr(farmconst.GatewayIPAddressName),
 		Type:     to.StringPtr("Microsoft.Network/publicIPAddresses"),
 		Location: to.StringPtr(conf.region),
 	}
@@ -263,7 +266,7 @@ func virtualGateway(conf *Config) *network.VirtualNetworkGateway {
 								conf.SubscriptionID,
 								conf.resourceGroup,
 								"Microsoft.Network/publicIPAddresses",
-								arm.GatewayIPAddressName,
+								farmconst.GatewayIPAddressName,
 							)),
 						},
 						Subnet: &network.SubResource{
@@ -271,14 +274,14 @@ func virtualGateway(conf *Config) *network.VirtualNetworkGateway {
 								conf.SubscriptionID,
 								conf.resourceGroup,
 								"Microsoft.Network/virtualNetworks",
-								arm.VnetName,
-							) + "/subnets/" + arm.VnetGatewaySubnetName),
+								armconst.VnetName,
+							) + "/subnets/" + farmconst.VnetGatewaySubnetName),
 						},
 					},
 				},
 			},
 		},
-		Name:     to.StringPtr(arm.GatewayName),
+		Name:     to.StringPtr(farmconst.GatewayName),
 		Type:     to.StringPtr("Microsoft.Network/virtualNetworkGateways"),
 		Location: to.StringPtr(conf.region),
 	}

@@ -37,9 +37,10 @@ func FromInternal(cs *api.OpenShiftManagedCluster) *OpenShiftManagedCluster {
 	}
 
 	oc.Properties.NetworkProfile = &NetworkProfile{
-		VnetID:     &cs.Properties.NetworkProfile.VnetID,
-		VnetCIDR:   &cs.Properties.NetworkProfile.VnetCIDR,
-		PeerVnetID: cs.Properties.NetworkProfile.PeerVnetID,
+		VnetID:               &cs.Properties.NetworkProfile.VnetID,
+		VnetCIDR:             &cs.Properties.NetworkProfile.VnetCIDR,
+		ManagementSubnetCIDR: cs.Properties.NetworkProfile.ManagementSubnetCIDR,
+		PeerVnetID:           cs.Properties.NetworkProfile.PeerVnetID,
 	}
 	oc.Properties.MonitorProfile = &MonitorProfile{
 		Enabled:             &cs.Properties.MonitorProfile.Enabled,

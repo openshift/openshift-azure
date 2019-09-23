@@ -52,9 +52,10 @@ func GetInternalMockCluster() *OpenShiftManagedCluster {
 				},
 			},
 			NetworkProfile: NetworkProfile{
-				VnetID:     "Properties.NetworkProfile.VnetID",
-				VnetCIDR:   "Properties.NetworkProfile.VnetCIDR",
-				PeerVnetID: to.StringPtr("Properties.NetworkProfile.PeerVnetID"),
+				VnetID:               "Properties.NetworkProfile.VnetID",
+				VnetCIDR:             "Properties.NetworkProfile.VnetCIDR",
+				ManagementSubnetCIDR: to.StringPtr("Properties.NetworkProfile.ManagementSubnetCIDR"),
+				PeerVnetID:           to.StringPtr("Properties.NetworkProfile.PeerVnetID"),
 			},
 			MonitorProfile: MonitorProfile{
 				Enabled:             true,

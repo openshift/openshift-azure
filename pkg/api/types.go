@@ -106,6 +106,9 @@ type NetworkProfile struct {
 	// VnetCIDR (in): the CIDR with which the OSA cluster's Vnet is configured
 	VnetCIDR string `json:"vnetCidr,omitempty"`
 
+	// ManagementSubnetCIDR (in): the CIDR for OSA management subnet
+	ManagementSubnetCIDR *string `json:"managementSubnetCidr,omitempty"`
+
 	// VnetID (out): the ID of the Vnet created for the OSA cluster
 	VnetID string `json:"vnetId,omitempty"`
 
@@ -118,14 +121,21 @@ type NetworkProfile struct {
 	PeerVnetID *string `json:"peerVnetId,omitempty"`
 
 	// PrivateEndpoint contains IP or DNS of PrivateEndpoint
-	// If this field is not nil, value should be used to reach
-	// api server. Otherwise, use public API DNS.
-	PrivateEndpoint string `json:"-"`
-	// ManagementSubnetID is ID of  management subnet.
-	// Used for PrivateLinkService creation in callback function.
+	// RP sets the endpoint that the plugin should dial before
+	// calling any plugin functions. This value is used based on
+	// cluster type - Private/Public. Depending on cluster type
+	// different endpoint will be used to reach API server -
+	// PrivateEndpoint or FQDN.
+	PrivateEndpoint *string `json:"-"`
+	// ManagementSubnetID is ID of the management subnet.
+	// Plugin ensures these are set to valid values
+	// It be set during Generate plugin phase as they used by
+	// the RP in the deployment callback function
 	ManagementSubnetID string `json:"-"`
-	// InternalLoadBalancerFrontendIPID is ID of internal loadbalancer.
-	// Used for PrivateLinkService creation in callback function
+	// InternalLoadBalancerFrontendIPID is ID of the internal loadbalancer.
+	// Plugin ensures these are set to valid values
+	// It be set during Generate plugin phase as they used by
+	// the RP in the deployment callback function
 	InternalLoadBalancerFrontendIPID string `json:"-"`
 }
 

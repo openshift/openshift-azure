@@ -16,6 +16,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/api/features"
 	"github.com/openshift/openshift-azure/pkg/util/arm"
 )
 
@@ -53,6 +54,9 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 	if !isUpdate {
 		t.Resources = append(t.Resources, g.ipOutbound(), g.lbKubernetes(), g.nsgWorker())
 	}
+	if features.PrivateLinkEnabled(g.cs) {
+		t.Resources = append(t.Resources, g.ilbAPIServer())
+	}
 	for _, app := range g.cs.Properties.AgentPoolProfiles {
 		if app.Role == api.AgentPoolProfileRoleMaster || !isUpdate {
 			vmss, err := g.Vmss(&app, backupBlob, suffix)
@@ -80,6 +84,12 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 	}
 
 	arm.FixupDepends(g.cs.Properties.AzProfile.SubscriptionID, g.cs.Properties.AzProfile.ResourceGroup, azuretemplate)
+
+	// HACK: Current SDK version is v24. Private link support comes into the version v28+.
+	// To use PLS/PE we need to set configurables on vnet and create PLS itself
+	// search for PrivateEndpointNetworkPolicies in https://raw.githubusercontent.com/Azure/azure-sdk-for-go/master/services/network/mgmt/2019-04-01/network/models.go
+	// To have these configs in our we need to modify the object after we generate them
+	arm.FixupSDKMismatch(azuretemplate)
 
 	return azuretemplate, nil
 }

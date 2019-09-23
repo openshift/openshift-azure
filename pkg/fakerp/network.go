@@ -2,18 +2,16 @@ package fakerp
 
 import (
 	"context"
+	"fmt"
 
+	aznetwork "github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-06-01/network"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	armconst "github.com/openshift/openshift-azure/pkg/fakerp/arm/const"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/network"
-)
-
-const (
-	// DefaultBaseURI is the default URI used for the service Network
-	DefaultBaseURI = "https://management.azure.com"
 )
 
 type networkManager struct {
@@ -39,27 +37,65 @@ func newNetworkManager(ctx context.Context, log *logrus.Entry, subscriptionID, r
 	}, nil
 }
 
-func (nm *networkManager) deletePLSPE(ctx context.Context, resourceGroupname, resourceName string) error {
-	pls, err := nm.plsc.Get(ctx, resourceGroupname, resourceName, "")
+// getPrivateEndpointIP wraps networkManager creation and getPrivateEndpointIP so it could be called in short form.
+func getPrivateEndpointIP(ctx context.Context, log *logrus.Entry, subscriptionID, managementResourceGroupName, resourceGroupName string) (*string, error) {
+	nm, err := newNetworkManager(ctx, log, subscriptionID, managementResourceGroupName)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	for _, pe := range *pls.PrivateEndpointConnections {
-		resources, err := azure.ParseResourceID(*pe.PrivateEndpointConnectionProperties.PrivateEndpoint.ID)
+	exist := nm.privateEndpointExists(ctx, fmt.Sprintf("%s-%s", armconst.PrivateEndpointNamePrefix, resourceGroupName))
+	if exist {
+		peIP, err := nm.getPrivateEndpointIP(ctx, fmt.Sprintf("%s-%s", armconst.PrivateEndpointNamePrefix, resourceGroupName))
 		if err != nil {
-			return err
+			return nil, err
 		}
-
-		_, err = nm.pec.Delete(ctx, nm.managementResourceGroup, resources.ResourceName)
-		if err != nil {
-			return err
-		}
+		log.Debugf("PE IP Address %s ", peIP)
+		return &peIP, nil
 	}
-
-	return err
+	return nil, nil
 }
 
-func (nm *networkManager) getPrivateEndpointIP(ctx context.Context, resourceName string) (*string, error) {
+func (nm *networkManager) deletePEs(ctx context.Context, resourceName string) error {
+	exits := nm.privateEndpointExists(ctx, resourceName)
+	if exits {
+		_, err := nm.pec.Delete(ctx, nm.managementResourceGroup, resourceName)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (nm *networkManager) getPrivateEndpointIP(ctx context.Context, resourceName string) (string, error) {
+	nic, err := nm.getPrivateEndpointNIC(ctx, resourceName)
+	if err != nil {
+		return "", err
+	}
+	for _, ip := range *nic.IPConfigurations {
+		if ip.PrivateIPAddress != nil {
+			return *ip.PrivateIPAddress, nil
+		}
+	}
+
+	return "", fmt.Errorf("failed to get private endpoint %s", resourceName)
+}
+
+func (nm *networkManager) privateEndpointExists(ctx context.Context, resourceName string) bool {
+	nic, err := nm.getPrivateEndpointNIC(ctx, resourceName)
+	if err != nil {
+		return false
+	}
+	for _, ip := range *nic.IPConfigurations {
+		if ip.PrivateIPAddress != nil {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (nm *networkManager) getPrivateEndpointNIC(ctx context.Context, resourceName string) (*aznetwork.Interface, error) {
 	pe, err := nm.pec.Get(ctx, nm.managementResourceGroup, resourceName, "")
 	if err != nil {
 		return nil, err
@@ -74,12 +110,8 @@ func (nm *networkManager) getPrivateEndpointIP(ctx context.Context, resourceName
 		if err != nil {
 			return nil, err
 		}
-		for _, ip := range *ni.IPConfigurations {
-			if ip.PrivateIPAddress != nil {
-				return ip.PrivateIPAddress, nil
-			}
-		}
+		return &ni, nil
 	}
 
-	return nil, err
+	return nil, fmt.Errorf("no private endpoint found: %s", resourceName)
 }

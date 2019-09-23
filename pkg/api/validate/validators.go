@@ -108,6 +108,10 @@ func validateNetworkProfile(path string, np *api.NetworkProfile) (errs []error) 
 		errs = append(errs, fmt.Errorf("invalid %s.vnetCidr %q", path, np.VnetCIDR))
 	}
 
+	if np.ManagementSubnetCIDR != nil && !isValidIPV4CIDR(*np.ManagementSubnetCIDR) {
+		errs = append(errs, fmt.Errorf("invalid %s.managementSubnetCIDR %q", path, *np.ManagementSubnetCIDR))
+	}
+
 	if np.VnetID != "" && !rxVNetID.MatchString(np.VnetID) {
 		errs = append(errs, fmt.Errorf("invalid %s.vnetId %q", path, np.VnetID))
 	}
