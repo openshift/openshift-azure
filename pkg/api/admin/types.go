@@ -108,6 +108,7 @@ type NetworkProfile struct {
 
 // MonitorProfile configuration for Azure Monitor log analytics.
 type MonitorProfile struct {
+	Enabled             *bool   `json:"enabled,omitempty"`
 	WorkspaceResourceID *string `json:"workspaceResourceId,omitempty"`
 }
 

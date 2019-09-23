@@ -153,6 +153,7 @@ type AgentPoolProfile struct {
 
 // MonitorProfile configuration for Azure Monitor log analytics.
 type MonitorProfile struct {
+	Enabled             bool   `json:"enabled"`
 	WorkspaceResourceID string `json:"workspaceResourceId,omitempty"`
 	WorkspaceID         string `json:"workspaceId,omitempty"`
 	WorkspaceKey        string `json:"workspaceKey,omitempty"`

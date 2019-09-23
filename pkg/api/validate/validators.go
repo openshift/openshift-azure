@@ -1,6 +1,7 @@
 package validate
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net"
 
@@ -82,6 +83,8 @@ func validateProperties(p *api.Properties, location string, externalOnly bool) (
 
 	errs = append(errs, validateAuthProfile("properties.authProfile", &p.AuthProfile)...)
 
+	errs = append(errs, validateMonitorProfile("properties.monitorProfile", &p.MonitorProfile, externalOnly)...)
+
 	if !externalOnly {
 		errs = append(errs, validateServicePrincipalProfile("properties.masterServicePrincipalProfile", &p.MasterServicePrincipalProfile)...)
 
@@ -111,6 +114,42 @@ func validateNetworkProfile(path string, np *api.NetworkProfile) (errs []error) 
 
 	if np.PeerVnetID != nil && !rxVNetID.MatchString(*np.PeerVnetID) {
 		errs = append(errs, fmt.Errorf("invalid %s.peerVnetId %q", path, *np.PeerVnetID))
+	}
+
+	return
+}
+
+func validateMonitorProfile(path string, mp *api.MonitorProfile, externalOnly bool) (errs []error) {
+	if mp.WorkspaceResourceID != "" && !rxWorkspaceResourceID.MatchString(mp.WorkspaceResourceID) {
+		errs = append(errs, fmt.Errorf("invalid %s.workspaceResourceId %q", path, mp.WorkspaceResourceID))
+	}
+
+	if mp.Enabled {
+		if mp.WorkspaceResourceID == "" {
+			errs = append(errs, fmt.Errorf("%s.workspaceResourceID cannot be empty if %[1]s.enabled = true", path))
+		}
+	}
+
+	if !externalOnly {
+		if mp.WorkspaceID != "" && !isValidUUID(mp.WorkspaceID) {
+			errs = append(errs, fmt.Errorf("invalid %s.workspaceId %q", path, mp.WorkspaceID))
+		}
+
+		if len(mp.WorkspaceKey) > 256 {
+			errs = append(errs, fmt.Errorf("invalid %s.workspaceKey", path))
+		} else if _, err := base64.StdEncoding.DecodeString(mp.WorkspaceKey); err != nil {
+			errs = append(errs, fmt.Errorf("invalid %s.workspaceKey", path))
+		}
+
+		if mp.Enabled {
+			if mp.WorkspaceID == "" {
+				errs = append(errs, fmt.Errorf("%s.workspaceID cannot be empty if %[1]s.enabled = true", path))
+			}
+
+			if mp.WorkspaceKey == "" {
+				errs = append(errs, fmt.Errorf("%s.workspaceKey cannot be empty if %[1]s.enabled = true", path))
+			}
+		}
 	}
 
 	return

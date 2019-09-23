@@ -52,6 +52,11 @@ properties:
   masterServicePrincipalProfile:
     clientID: 00000000-0000-0000-0000-000000000000
     secret: secret
+  monitorProfile:
+    enabled: true
+    workspaceResourceID: /subscriptions/foo/resourceGroups/bar/providers/Microsoft.OperationalInsights/workspaces/baz
+    workspaceID: 00000000-0000-0000-0000-000000000000
+    workspaceKey: a2V5Cg==
   networkProfile:
     vnetCidr: 10.0.0.0/8
   openShiftVersion: v3.11
@@ -555,6 +560,42 @@ func TestValidate(t *testing.T) {
 				oc.Properties.APICertProfile.KeyVaultSecretURL = "bad"
 			},
 			expectedErrs: []error{errors.New(`invalid properties.apiCertProfile.keyVaultSecretURL "bad"`)},
+		},
+		"monitorProfile missing configs when enabled": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.MonitorProfile.WorkspaceID = ""
+				oc.Properties.MonitorProfile.WorkspaceKey = ""
+				oc.Properties.MonitorProfile.WorkspaceResourceID = ""
+			},
+			expectedErrs: []error{
+				errors.New(`properties.monitorProfile.workspaceResourceID cannot be empty if properties.monitorProfile.enabled = true`),
+				errors.New(`properties.monitorProfile.workspaceID cannot be empty if properties.monitorProfile.enabled = true`),
+				errors.New(`properties.monitorProfile.workspaceKey cannot be empty if properties.monitorProfile.enabled = true`),
+			},
+		},
+		"monitorProfile bad resource id": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.MonitorProfile.WorkspaceResourceID = "bad!"
+			},
+			expectedErrs: []error{
+				errors.New(`invalid properties.monitorProfile.workspaceResourceId "bad!"`),
+			},
+		},
+		"monitorProfile bad workspace id": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.MonitorProfile.WorkspaceID = "bad!"
+			},
+			expectedErrs: []error{
+				errors.New(`invalid properties.monitorProfile.workspaceId "bad!"`),
+			},
+		},
+		"monitorProfile bad workspace key": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.MonitorProfile.WorkspaceKey = "bad!"
+			},
+			expectedErrs: []error{
+				errors.New(`invalid properties.monitorProfile.workspaceKey`),
+			},
 		},
 	}
 
