@@ -30,6 +30,13 @@ var (
 		`/virtualNetworks/[^/]+` +
 		`$`)
 
+	rxWorkspaceResourceID = regexp.MustCompile(`(?i)^` +
+		`/subscriptions/[^/]+` +
+		`/resourceGroups/[^/]+` +
+		`/providers/Microsoft\.OperationalInsights` +
+		`/workspaces/[^/]+` +
+		`$`)
+
 	rxAgentPoolProfileName = regexp.MustCompile(`^[a-z0-9]{1,12}$`)
 
 	rxRouterProfileName = rxAgentPoolProfileName

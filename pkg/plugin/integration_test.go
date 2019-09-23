@@ -635,8 +635,10 @@ func TestHowUserConfigChangesCausesRotations(t *testing.T) {
 			name:           "change MonitorProfile",
 			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: true, rotationCompute: false},
 			change: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.MonitorProfile.WorkspaceID = "new"
-				oc.Properties.MonitorProfile.WorkspaceKey = "new"
+				oc.Properties.MonitorProfile.Enabled = true
+				oc.Properties.MonitorProfile.WorkspaceResourceID = "/subscriptions/foo/resourceGroups/bar/providers/Microsoft.OperationalInsights/workspaces/baz"
+				oc.Properties.MonitorProfile.WorkspaceID = "00000000-0000-0000-0000-000000000000"
+				oc.Properties.MonitorProfile.WorkspaceKey = "a2V5Cg=="
 			},
 		},
 	}

@@ -324,13 +324,8 @@ var translations = map[string][]struct {
 	},
 	"DaemonSet.apps/openshift-azure-logging/log-analytics-node-agent": {
 		{
-			Path: jsonpath.MustCompile("$.metadata.labels['azure.openshift.io/sync-pod-optionally-apply']"),
-			F: func(cs *api.OpenShiftManagedCluster, o interface{}) (interface{}, error) {
-				if cs.Properties.MonitorProfile.WorkspaceID != "" && cs.Properties.MonitorProfile.WorkspaceKey != "" {
-					return "true", nil
-				}
-				return "false", nil
-			},
+			Path:     jsonpath.MustCompile("$.metadata.labels['azure.openshift.io/sync-pod-optionally-apply']"),
+			Template: "{{ .ContainerService.Properties.MonitorProfile.Enabled }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
@@ -379,13 +374,8 @@ var translations = map[string][]struct {
 	},
 	"Deployment.apps/openshift-azure-logging/log-analytics-cluster-agent": {
 		{
-			Path: jsonpath.MustCompile("$.metadata.labels['azure.openshift.io/sync-pod-optionally-apply']"),
-			F: func(cs *api.OpenShiftManagedCluster, o interface{}) (interface{}, error) {
-				if cs.Properties.MonitorProfile.WorkspaceID != "" && cs.Properties.MonitorProfile.WorkspaceKey != "" {
-					return "true", nil
-				}
-				return "false", nil
-			},
+			Path:     jsonpath.MustCompile("$.metadata.labels['azure.openshift.io/sync-pod-optionally-apply']"),
+			Template: "{{ .ContainerService.Properties.MonitorProfile.Enabled }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),

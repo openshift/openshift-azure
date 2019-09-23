@@ -33,6 +33,7 @@ spec:
         - name: NODE_IP
           valueFrom:
             fieldRef:
+              apiVersion: v1
               fieldPath: status.hostIP
         image: '*** GENERATED ***'
         livenessProbe:
