@@ -71,6 +71,7 @@ var marshalled = []byte(`{
 			]
 		},
 		"monitorProfile": {
+			"workspaceId": "Properties.MonitorProfile.WorkspaceID"
 			"workspaceResourceId": "Properties.MonitorProfile.WorkspaceResourceID"
 		}
 	},
@@ -336,6 +337,7 @@ func TestAPIParity(t *testing.T) {
 	notInInternal := []*regexp.Regexp{
 		regexp.MustCompile(`^\.Response$`),
 		regexp.MustCompile(`^\.Properties\.MasterPoolProfile\.`),
+		regexp.MustCompile(`^\.Properties\.MonitorProfile\.Workspace(ID|Key)`),
 	}
 
 	// TODO: why don't we just include all of these in the admin type?

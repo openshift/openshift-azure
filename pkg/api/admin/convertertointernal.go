@@ -101,6 +101,9 @@ func mergePropertiesAdmin(oc *OpenShiftManagedCluster, cs *api.OpenShiftManagedC
 	}
 
 	if oc.Properties.MonitorProfile != nil {
+		if oc.Properties.MonitorProfile.WorkspaceID != nil {
+			cs.Properties.MonitorProfile.WorkspaceID = *oc.Properties.MonitorProfile.WorkspaceID
+		}
 		if oc.Properties.MonitorProfile.WorkspaceResourceID != nil {
 			cs.Properties.MonitorProfile.WorkspaceResourceID = *oc.Properties.MonitorProfile.WorkspaceResourceID
 		}
