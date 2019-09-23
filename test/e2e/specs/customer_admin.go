@@ -127,6 +127,31 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Ev
 		Expect(len(crbUpdated.Subjects)).To(Equal(len(crb.Subjects)))
 	})
 
+	It("should be possible to edit the azure monitors' prometheus data collection config", func() {
+		azureMonitorNamespace := "openshift-azure-logging"
+
+		config, err := sanity.Checker.Client.CustomerAdmin.CoreV1.ConfigMaps(azureMonitorNamespace).Get("container-azm-ms-agentconfig", metav1.GetOptions{})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(config).NotTo(BeNil())
+
+		config.Annotations = map[string]string{
+			"openshift.io/reconcile-protect": "true",
+		}
+
+		_, err = sanity.Checker.Client.CustomerAdmin.CoreV1.ConfigMaps(azureMonitorNamespace).Update(config)
+		Expect(err).NotTo(HaveOccurred())
+
+		// make sure customer-admins cannot access any of the other log analytics agent configmaps
+		_, err = sanity.Checker.Client.CustomerAdmin.CoreV1.ConfigMaps(azureMonitorNamespace).Get("log-analytics-cluster-agent-config", metav1.GetOptions{})
+		Expect(err).To(HaveOccurred())
+
+		_, err = sanity.Checker.Client.CustomerAdmin.CoreV1.ConfigMaps(azureMonitorNamespace).Get("log-analytics-rsyslog-config", metav1.GetOptions{})
+		Expect(err).To(HaveOccurred())
+
+		_, err = sanity.Checker.Client.CustomerAdmin.CoreV1.ConfigMaps(azureMonitorNamespace).Get("log-analytics-agent-entrypoint", metav1.GetOptions{})
+		Expect(err).To(HaveOccurred())
+	})
+
 	It("should not be able to edit system namespaces", func() {
 		_, err := sanity.Checker.Client.CustomerAdmin.CoreV1.Namespaces().Get("openshift-infra", metav1.GetOptions{})
 		Expect(kerrors.ReasonForError(err)).To(Equal(metav1.StatusReasonForbidden))
