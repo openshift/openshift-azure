@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    azure.openshift.io/sync-pod-optionally-apply: '*** GENERATED ***'
+    azure.openshift.io/sync-pod-wait-for-readiness: "false"
+  name: log-analytics-cluster-agent
+  namespace: openshift-azure-logging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-analytics-cluster-agent
+  template:
+    metadata:
+      labels:
+        agentVersion: 1.10.0.1
+        app: log-analytics-cluster-agent
+        dockerProviderVersion: 6.0.0-0
+        rsName: log-analytics-cluster-agent
+    spec:
+      containers:
+      - command:
+        - /opt/main-wrapper.sh
+        env:
+        - name: WSID
+          value: '*** GENERATED ***'
+        - name: KEY
+          value: '*** GENERATED ***'
+        - name: ACS_RESOURCE_NAME
+          value: '*** GENERATED ***'
+        - name: CONTROLLER_TYPE
+          value: ReplicaSet
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        image: '*** GENERATED ***'
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - /opt/livenessprobe.sh
+          initialDelaySeconds: 60
+          periodSeconds: 60
+        name: log-analytics-cluster-agent
+        ports:
+        - containerPort: 25226
+        - containerPort: 25225
+        - containerPort: 25224
+          protocol: UDP
+        resources:
+          limits:
+            cpu: 150m
+            memory: 600Mi
+          requests:
+            cpu: 75m
+            memory: 225Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /hostfs
+          name: host-root
+          readOnly: true
+        - mountPath: /var/run/host
+          name: var-run
+        - mountPath: /var/log
+          name: host-log
+        - mountPath: /var/lib/docker/containers
+          name: containerlog-path
+        - mountPath: /etc/kubernetes/host
+          name: azure-json-path
+        - mountPath: /etc/config
+          name: log-analytics-cluster-agent-config
+        - mountPath: /etc/config/settings
+          name: settings-vol-config
+          readOnly: true
+        - mountPath: /opt/main-wrapper.sh
+          name: log-analytics-agent-entrypoint
+          subPath: main-wrapper.sh
+      nodeSelector:
+        beta.kubernetes.io/os: linux
+        node-role.kubernetes.io/infra: "true"
+      serviceAccountName: log-analytics-agent
+      tolerations:
+      - effect: NoExecute
+        operator: Exists
+      - effect: NoSchedule
+        operator: Exists
+      volumes:
+      - hostPath:
+          path: /
+        name: host-root
+      - hostPath:
+          path: /var/run
+        name: var-run
+      - hostPath:
+          path: /etc/hostname
+        name: container-hostname
+      - hostPath:
+          path: /var/log
+        name: host-log
+      - hostPath:
+          path: /var/lib/docker/containers
+        name: containerlog-path
+      - hostPath:
+          path: /etc/kubernetes
+        name: azure-json-path
+      - configMap:
+          name: log-analytics-cluster-agent-config
+        name: log-analytics-cluster-agent-config
+      - configMap:
+          name: container-azm-ms-agentconfig
+          optional: true
+        name: settings-vol-config
+      - configMap:
+          defaultMode: 509
+          name: log-analytics-agent-entrypoint
+        name: log-analytics-agent-entrypoint
