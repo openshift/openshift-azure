@@ -130,13 +130,13 @@ versions:
       genevaLogging: osarpint.azurecr.io/acs/mdsd:master.20190228.1
       genevaStatsd: osarpint.azurecr.io/acs/mdm:git-a909a2e76
       genevaTDAgent: osarpint.azurecr.io/acs/td-agent:master.20190228.1
-      azureControllers: quay.io/openshift-on-azure/azure:v9.0
-      canary: quay.io/openshift-on-azure/azure:v9.0
-      etcdBackup: quay.io/openshift-on-azure/azure:v9.0
-      metricsBridge: quay.io/openshift-on-azure/azure:v9.0
-      startup: quay.io/openshift-on-azure/azure:v9.0
-      sync: quay.io/openshift-on-azure/azure:v9.0
-      tlsProxy: quay.io/openshift-on-azure/azure:v9.0
+      azureControllers: quay.io/openshift-on-azure/azure:latest
+      canary: quay.io/openshift-on-azure/azure:latest
+      etcdBackup: quay.io/openshift-on-azure/azure:latest
+      metricsBridge: quay.io/openshift-on-azure/azure:latest
+      startup: quay.io/openshift-on-azure/azure:latest
+      sync: quay.io/openshift-on-azure/azure:latest
+      tlsProxy: quay.io/openshift-on-azure/azure:latest
       logAnalyticsAgent: mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod07092019
 ## certificates, used to authenticate to external systems
 ## Red Hat CDN client certificates
