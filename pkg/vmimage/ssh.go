@@ -49,7 +49,7 @@ func (builder *Builder) scp(files []string) error {
 		}
 
 		builder.Log.Infof("download %s", file)
-		f, err := os.OpenFile(file, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+		f, err := os.OpenFile(file, os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0600)
 		if err != nil {
 			return err
 		}
