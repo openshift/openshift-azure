@@ -108,7 +108,7 @@ objects:
           - name: OPENSHIFT_DNS_PING_SERVICE_PORT
             value: "8888"
           - name: X509_CA_BUNDLE
-            value: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+            value: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
           - name: JGROUPS_CLUSTER_PASSWORD
             value: ${JGROUPS_CLUSTER_PASSWORD}
           - name: SSO_ADMIN_USERNAME
