@@ -86,9 +86,8 @@ func (u *Upgrade) WriteStartupBlobs() error {
 				NodeBootstrap: u.Cs.Config.Certificates.NodeBootstrap,
 			},
 			Images: api.ImageConfig{
-				Format:          u.Cs.Config.Images.Format,
-				Node:            u.Cs.Config.Images.Node,
-				ImagePullSecret: u.Cs.Config.Images.ImagePullSecret,
+				Format: u.Cs.Config.Images.Format,
+				Node:   u.Cs.Config.Images.Node,
 			},
 			NodeBootstrapKubeconfig:              u.Cs.Config.NodeBootstrapKubeconfig,
 			SDNKubeconfig:                        u.Cs.Config.SDNKubeconfig,

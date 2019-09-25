@@ -1,7 +1,7 @@
 # ARO usefull alias
 
 
-## Upload, download privte secrets
+## Upload, download private secrets
 ```
 alias azure-downloads-private-secrets="oc extract secret/cluster-secrets-azure --to=./secrets --confirm -n azure-private"
 alias azure-upload-private-secrets="oc create secret generic cluster-secrets-azure \

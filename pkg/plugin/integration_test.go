@@ -46,6 +46,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
+	"github.com/openshift/openshift-azure/test/util/populate"
 	testtls "github.com/openshift/openshift-azure/test/util/tls"
 )
 
@@ -224,8 +225,8 @@ func setupNewCluster(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftMa
 	template.Certificates.GenevaMetrics.Key = testtls.DummyPrivateKey
 	template.Certificates.PackageRepository.Cert = testtls.DummyCertificate
 	template.Certificates.PackageRepository.Key = testtls.DummyPrivateKey
-	template.GenevaImagePullSecret = []byte("pullSecret")
-	template.ImagePullSecret = []byte("imagePullSecret")
+	template.ImagePullSecret = populate.DummyImagePullSecret("registry.redhat.io")
+	template.GenevaImagePullSecret = populate.DummyImagePullSecret("osarpint.azurecr.io")
 
 	cli := fake.NewSimpleClientset()
 	cli.PrependReactor("get", "deployments", func(action k8stesting.Action) (bool, runtime.Object, error) {

@@ -6,7 +6,7 @@ AZURE_IMAGE ?= quay.io/openshift-on-azure/azure:$(GITCOMMIT)
 AZURE_IMAGE_ACR ?= osarpint.azurecr.io/openshift-on-azure/azure:$(GITCOMMIT)
 LATEST_PLUGIN_VERSION=$(shell go run hack/dev-version/dev-version.go)
 
-.PHONY: all artifacts azure-image azure-push clean create delete e2e generate monitoring monitoring-run monitoring-stop secrets sync-run test testinsights unit upgrade verify vmimage
+.PHONY: all artifacts azure-image azure-push clean create delete e2e generate monitoring monitoring-run monitoring-stop secrets private-secrets azure-push-acr sync-run test testinsights unit upgrade verify vmimage
 
 all: azure
 
@@ -49,12 +49,15 @@ azure-image: azure
 
 azure-push: azure-image
 	docker push $(AZURE_IMAGE)
+
+azure-push-acr: azure-image private-secrets
 	if [ -a private-secrets/acr-docker-pull-push-secret ] ; \
 	then \
 		docker tag $(AZURE_IMAGE) $(AZURE_IMAGE_ACR) ; \
 		cp private-secrets/acr-docker-pull-push-secret private-secrets/config.json ; \
 		docker --config private-secrets/ push $(AZURE_IMAGE_ACR) ; \
-	fi;
+	fi; \
+	make private-secrets-clean
 
 azure: generate
 	go build -ldflags ${LDFLAGS} ./cmd/$@
