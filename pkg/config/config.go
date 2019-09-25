@@ -30,6 +30,8 @@ func New(cs *api.OpenShiftManagedCluster) (Interface, error) {
 		return v71.New(cs), nil
 	case "v9.0":
 		return v9.New(cs), nil
+	case "v10.0":
+		return v9.New(cs), nil
 	}
 
 	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)

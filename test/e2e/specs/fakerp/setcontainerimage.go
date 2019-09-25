@@ -72,7 +72,7 @@ var _ = Describe("Change a single image to latest E2E tests [ChangeImage][LongRu
 		By("checking running webconsole image")
 		webconsole, err := sanity.Checker.Client.Admin.AppsV1.Deployments("openshift-web-console").Get("webconsole", metav1.GetOptions{})
 		Expect(err).NotTo(HaveOccurred())
-		Expect(webconsole.Spec.Template.Spec.Containers[0].Image).To(Equal(template.Versions[template.PluginVersion].Images.WebConsole))
+		Expect(webconsole.Spec.Template.Spec.Containers[0].Image).To(Equal(newImage))
 
 		By("Reading the update blob after the update")
 		after, err := ubs.Read()

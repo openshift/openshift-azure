@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    openshift.io/description: Grants the right to pull images from within a project.
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  name: system:image-puller
+rules:
+- apiGroups:
+  - ""
+  - image.openshift.io
+  resources:
+  - imagestreams/layers
+  verbs:
+  - get
