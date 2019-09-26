@@ -91,8 +91,9 @@ var _ = Describe("Change a single image to latest E2E tests [ChangeImage][LongRu
 			Expect(val).To(Equal(after.ScalesetHashes[key]))
 		}
 
-		By("Validating the cluster")
-		errs := sanity.Checker.ValidateCluster(context.Background())
-		Expect(errs).To(BeEmpty())
+		By("Checking that we can still access the console")
+		// Note: wait a bit longer for the console to respond as we are bouncing it (reties=20).
+		err = sanity.Checker.CheckCanAccessConsole(context.Background(), 20)
+		Expect(err).NotTo(HaveOccurred())
 	})
 })

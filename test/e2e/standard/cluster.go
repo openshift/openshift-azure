@@ -270,6 +270,21 @@ func (sc *SanityChecker) checkCanCreateLB(ctx context.Context) error {
 	return nil
 }
 
+func (sc *SanityChecker) CheckCanAccessConsole(ctx context.Context, retries int) error {
+	url := "https://console." + sc.cs.Properties.RouterProfiles[0].PublicSubdomain + "/health"
+	cert := sc.cs.Config.Certificates.Router.Certs[len(sc.cs.Config.Certificates.Router.Certs)-1]
+
+	resp, err := sc.checkCanAccessService(ctx, url, cert, retries)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code %d", resp.StatusCode)
+	}
+
+	return nil
+}
+
 func (sc *SanityChecker) checkCanAccessServices(ctx context.Context) error {
 	for _, svc := range []struct {
 		url  string
@@ -292,25 +307,7 @@ func (sc *SanityChecker) checkCanAccessServices(ctx context.Context) error {
 			cert: sc.cs.Config.Certificates.Router.Certs[len(sc.cs.Config.Certificates.Router.Certs)-1],
 		},
 	} {
-		pool := x509.NewCertPool()
-		pool.AddCert(svc.cert)
-
-		cli := &http.Client{
-			Transport: &kubeclient.RetryingRoundTripper{
-				Log: sc.Log,
-				RoundTripper: &http.Transport{
-					TLSClientConfig: &tls.Config{
-						RootCAs: pool,
-					},
-				},
-				Retries:    5,
-				GetTimeout: 30 * time.Second,
-			},
-			Timeout: 10 * time.Second,
-		}
-
-		By(fmt.Sprintf("checking %s", svc.url))
-		resp, err := cli.Get(svc.url)
+		resp, err := sc.checkCanAccessService(ctx, svc.url, svc.cert, 5)
 		if err != nil {
 			return err
 		}
@@ -320,6 +317,28 @@ func (sc *SanityChecker) checkCanAccessServices(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (sc *SanityChecker) checkCanAccessService(ctx context.Context, url string, cert *x509.Certificate, retries int) (*http.Response, error) {
+	pool := x509.NewCertPool()
+	pool.AddCert(cert)
+
+	cli := &http.Client{
+		Transport: &kubeclient.RetryingRoundTripper{
+			Log: sc.Log,
+			RoundTripper: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					RootCAs: pool,
+				},
+			},
+			Retries:    retries,
+			GetTimeout: 30 * time.Second,
+		},
+		Timeout: 10 * time.Second,
+	}
+
+	By(fmt.Sprintf("checking %s", url))
+	return cli.Get(url)
 }
 
 func (sc *SanityChecker) checkCanUseAzureFileStorage(ctx context.Context) error {
