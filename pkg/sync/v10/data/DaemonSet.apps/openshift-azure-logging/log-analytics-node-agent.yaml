@@ -23,9 +23,15 @@ spec:
         - /opt/main-wrapper.sh
         env:
         - name: WSID
-          value: '*** GENERATED ***'
+          valueFrom:
+            secretKeyRef:
+              key: WSID
+              name: log-analytics
         - name: KEY
-          value: '*** GENERATED ***'
+          valueFrom:
+            secretKeyRef:
+              key: KEY
+              name: log-analytics
         - name: ACS_RESOURCE_NAME
           value: '*** GENERATED ***'
         - name: CONTROLLER_TYPE
@@ -123,3 +129,7 @@ spec:
       - configMap:
           name: log-analytics-rsyslog-config
         name: log-analytics-rsyslog-config
+      - name: log-analytics
+        secret:
+          defaultMode: 288
+          secretName: log-analytics

@@ -332,14 +332,6 @@ var translations = map[string][]struct {
 			Template: "{{ .Config.Images.LogAnalyticsAgent }}",
 		},
 		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='WSID')].value"),
-			Template: "{{ .ContainerService.Properties.MonitorProfile.WorkspaceID }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='KEY')].value"),
-			Template: "{{ .ContainerService.Properties.MonitorProfile.WorkspaceKey }}",
-		},
-		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='ACS_RESOURCE_NAME')].value"),
 			Template: "{{ .ContainerService.Name }}",
 		},
@@ -380,14 +372,6 @@ var translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
 			Template: "{{ .Config.Images.LogAnalyticsAgent }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='WSID')].value"),
-			Template: "{{ .ContainerService.Properties.MonitorProfile.WorkspaceID }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='KEY')].value"),
-			Template: "{{ .ContainerService.Properties.MonitorProfile.WorkspaceKey }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='ACS_RESOURCE_NAME')].value"),
@@ -589,6 +573,16 @@ var translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'.dockerconfigjson'"),
 			Template: "{{ String .Config.Images.ImagePullSecret }}",
+		},
+	},
+	"Secret/openshift-azure-logging/log-analytics": {
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'WSID'"),
+			Template: "{{ .ContainerService.Properties.MonitorProfile.WorkspaceID }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'KEY'"),
+			Template: "{{ .ContainerService.Properties.MonitorProfile.WorkspaceKey }}",
 		},
 	},
 	"Secret/openshift-azure-monitoring/azure-registry": {
