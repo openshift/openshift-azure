@@ -16,6 +16,7 @@ properties:
 {{- end }}
   networkProfile:
     vnetCidr: 10.0.0.0/8
+    managementSubnetCidr: 10.255.255.0/24
   masterPoolProfile:
     count: 3
     vmSize: Standard_D4s_v3

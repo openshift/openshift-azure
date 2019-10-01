@@ -102,15 +102,18 @@ func validateNetworkProfile(path string, np *api.NetworkProfile) (errs []error) 
 
 	if !isValidIPV4CIDR(np.VnetCIDR) {
 		errs = append(errs, fmt.Errorf("invalid %s.vnetCidr %q", path, np.VnetCIDR))
+		return
 	}
 
-	if np.ManagementSubnetCIDR != nil && !isValidIPV4CIDR(*np.ManagementSubnetCIDR) {
-		errs = append(errs, fmt.Errorf("invalid %s.managementSubnetCIDR %q", path, *np.ManagementSubnetCIDR))
-	}
-
-	if isValidIPV4CIDR(np.VnetCIDR) && isValidIPV4CIDR(*np.ManagementSubnetCIDR) {
+	// We dont enforce ManagementSubnetCIDR, but if it set - require valid value
+	if np.ManagementSubnetCIDR != nil {
+		if !isValidIPV4CIDR(*np.ManagementSubnetCIDR) {
+			errs = append(errs, fmt.Errorf("invalid %s.managementSubnetCIDR %q", path, *np.ManagementSubnetCIDR))
+			return
+		}
 		_, managementSubnet, _ := net.ParseCIDR(*np.ManagementSubnetCIDR)
 		_, vnet, _ := net.ParseCIDR(np.VnetCIDR)
+
 		if !vnetContainsSubnet(vnet, managementSubnet) {
 			errs = append(errs, fmt.Errorf("invalid %s.managementSubnetCIDR %q: not contained in properties.networkProfile.vnetCidr %q", path, *np.ManagementSubnetCIDR, np.VnetCIDR))
 		}
@@ -279,7 +282,6 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile, np *api.NetworkProfile)
 	// we can disregard any error below because we are already going to fail
 	// validation if VnetCIDR does not parse correctly.
 	_, vnet, _ := net.ParseCIDR(np.VnetCIDR)
-	_, managementSubnet, _ := net.ParseCIDR(*np.ManagementSubnetCIDR)
 
 	switch app.Role {
 	case api.AgentPoolProfileRoleCompute:
@@ -331,7 +333,8 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile, np *api.NetworkProfile)
 		if vnetContainsSubnet(clusterNetworkCIDR, subnet) || vnetContainsSubnet(subnet, clusterNetworkCIDR) {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].subnetCidr %q: overlaps with cluster network %q", app.Name, app.SubnetCIDR, clusterNetworkCIDR.String()))
 		}
-		if isValidIPV4CIDR(np.VnetCIDR) && isValidIPV4CIDR(*np.ManagementSubnetCIDR) {
+		if np.ManagementSubnetCIDR != nil && isValidIPV4CIDR(np.VnetCIDR) && isValidIPV4CIDR(*np.ManagementSubnetCIDR) {
+			_, managementSubnet, _ := net.ParseCIDR(*np.ManagementSubnetCIDR)
 			if vnetContainsSubnet(managementSubnet, subnet) || vnetContainsSubnet(subnet, managementSubnet) {
 				errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].subnetCidr %q: overlaps with cluster managementSubnetCidr %q", app.Name, app.SubnetCIDR, managementSubnet.String()))
 			}

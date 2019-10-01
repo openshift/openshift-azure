@@ -279,6 +279,12 @@ func TestValidate(t *testing.T) {
 			},
 			expectedErrs: []error{errors.New(`invalid properties.networkProfile.managementSubnetCIDR "foo"`)},
 		},
+		"network profile managementSubnetCIDR - nil - allowed": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.NetworkProfile.ManagementSubnetCIDR = nil
+			},
+			expectedErrs: nil,
+		},
 		"router profile duplicate names": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Properties.RouterProfiles =

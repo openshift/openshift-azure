@@ -6,7 +6,7 @@ import (
 
 const (
 	// APIVersion is the version of this API
-	APIVersion = "2019-09-30-preview"
+	APIVersion = "2019-10-27-preview"
 )
 
 // OpenShiftManagedCluster complies with the ARM model of resource definition in

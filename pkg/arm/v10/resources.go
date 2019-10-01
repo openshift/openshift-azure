@@ -572,7 +572,10 @@ func vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 					armconst.LbAPIServerName,
 				) + "/backendAddressPools/" + armconst.LbAPIServerBackendPoolName),
 			},
-			{
+		}
+		if features.PrivateLinkEnabled(cs) {
+			pool := *(*(*vmss.VirtualMachineProfile.NetworkProfile.NetworkInterfaceConfigurations)[0].VirtualMachineScaleSetNetworkConfigurationProperties.IPConfigurations)[0].LoadBalancerBackendAddressPools
+			pool = append(pool, compute.SubResource{
 				ID: to.StringPtr(resourceid.ResourceID(
 					cs.Properties.AzProfile.SubscriptionID,
 					cs.Properties.AzProfile.ResourceGroup,
@@ -580,6 +583,8 @@ func vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 					armconst.IlbAPIServerName,
 				) + "/backendAddressPools/" + armconst.LbAPIServerBackendPoolName),
 			},
+			)
+			(*(*vmss.VirtualMachineProfile.NetworkProfile.NetworkInterfaceConfigurations)[0].VirtualMachineScaleSetNetworkConfigurationProperties.IPConfigurations)[0].LoadBalancerBackendAddressPools = &pool
 		}
 		(*vmss.VirtualMachineProfile.NetworkProfile.NetworkInterfaceConfigurations)[0].VirtualMachineScaleSetNetworkConfigurationProperties.NetworkSecurityGroup = &compute.SubResource{
 			ID: to.StringPtr(resourceid.ResourceID(
