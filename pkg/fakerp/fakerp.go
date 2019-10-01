@@ -17,7 +17,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api/features"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/fakerp/arm"
-	armconst "github.com/openshift/openshift-azure/pkg/fakerp/arm/const"
+	armconst "github.com/openshift/openshift-azure/pkg/fakerp/arm/constants"
 	"github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
@@ -136,6 +136,7 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, conf *clien
 		exist := nm.privateEndpointExists(ctx, fmt.Sprintf("%s-%s", armconst.PrivateEndpointNamePrefix, cs.Name))
 
 		// If we dont check plugin version prefix, code gets triggered on v9 single image updates
+		// TODO remove when v9 goes away
 		if strings.HasPrefix(cs.Config.PluginVersion, "v1") {
 			if !exist && features.PrivateLinkEnabled(cs) {
 				log.Info("applying PLS deployment")

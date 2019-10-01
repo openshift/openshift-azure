@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
-	armconst "github.com/openshift/openshift-azure/pkg/fakerp/arm/const"
+	armconst "github.com/openshift/openshift-azure/pkg/fakerp/arm/constants"
 	"github.com/openshift/openshift-azure/pkg/fakerp/client"
 )
 
@@ -77,7 +77,7 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 		}
 	} else {
 		s.log.Info("customer request")
-		cs, err = s.read20190430Request(req.Body, oldCs)
+		cs, err = s.read20191027Request(req.Body, oldCs)
 		if err == nil {
 			cs.Properties.ProvisioningState = internalapi.Updating
 			s.store.Put(cs)

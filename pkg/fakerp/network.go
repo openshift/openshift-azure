@@ -9,7 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	armconst "github.com/openshift/openshift-azure/pkg/fakerp/arm/const"
+	armconst "github.com/openshift/openshift-azure/pkg/fakerp/arm/constants"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/network"
 )

@@ -11,9 +11,9 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
 
-	armconst "github.com/openshift/openshift-azure/pkg/arm/const"
+	armconst "github.com/openshift/openshift-azure/pkg/arm/constants"
 	fakerparm "github.com/openshift/openshift-azure/pkg/fakerp/arm"
-	farmconst "github.com/openshift/openshift-azure/pkg/fakerp/arm/const"
+	farmconst "github.com/openshift/openshift-azure/pkg/fakerp/arm/constants"
 	"github.com/openshift/openshift-azure/pkg/util/arm"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"

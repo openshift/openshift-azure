@@ -1,4 +1,4 @@
-package arm
+package constants
 
 const (
 	// main pluging ARM names/constants

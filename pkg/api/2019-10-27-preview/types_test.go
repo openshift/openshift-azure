@@ -1,4 +1,4 @@
-package v20190930preview
+package v20191027preview
 
 import (
 	"bytes"
@@ -29,6 +29,7 @@ var marshalled = []byte(`{
 		"fqdn": "Properties.FQDN",
 		"networkProfile": {
 			"vnetCidr": "Properties.NetworkProfile.VnetCIDR",
+			"managementSubnetCidr": "Properties.NetworkProfile.ManagementSubnetCIDR",
 			"vnetId": "Properties.NetworkProfile.VnetID",
 			"peerVnetId": "Properties.NetworkProfile.PeerVnetID"
 		},
@@ -204,7 +205,6 @@ func TestAPIParity(t *testing.T) {
 	notInExternal := []*regexp.Regexp{
 		regexp.MustCompile(`^\.Properties\.NetworkProfile\.PrivateEndpoint$`),
 		regexp.MustCompile(`^\.Properties\.NetworkProfile\.ManagementSubnetID$`),
-		regexp.MustCompile(`^\.Properties\.NetworkProfile\.ManagementSubnetCIDR$`),
 		regexp.MustCompile(`^\.Properties\.NetworkProfile\.InternalLoadBalancerFrontendIPID$`),
 		regexp.MustCompile(`^\.Properties\.MasterServicePrincipalProfile`),
 		regexp.MustCompile(`^\.Properties\.WorkerServicePrincipalProfile`),

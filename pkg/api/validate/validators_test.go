@@ -59,7 +59,7 @@ properties:
     workspaceKey: a2V5Cg==
   networkProfile:
     vnetCidr: 10.0.0.0/8
-    managementSubnetCIDR: 10.0.1.0/24
+    managementSubnetCidr: 10.0.1.0/24
   openShiftVersion: v3.11
   publicHostname: test.example.com
   routerProfiles:
@@ -251,6 +251,7 @@ func TestValidate(t *testing.T) {
 				oc.Properties.NetworkProfile.VnetCIDR = "192.168.0.0/16"
 			},
 			expectedErrs: []error{
+				errors.New(`invalid properties.networkProfile.managementSubnetCIDR "10.0.1.0/24": not contained in properties.networkProfile.vnetCidr "192.168.0.0/16"`),
 				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "10.0.0.0/24": not contained in properties.networkProfile.vnetCidr "192.168.0.0/16"`),
 				errors.New(`invalid properties.agentPoolProfiles["infra"].subnetCidr "10.0.0.0/24": not contained in properties.networkProfile.vnetCidr "192.168.0.0/16"`),
 				errors.New(`invalid properties.agentPoolProfiles["mycompute"].subnetCidr "10.0.0.0/24": not contained in properties.networkProfile.vnetCidr "192.168.0.0/16"`),
@@ -403,9 +404,9 @@ func TestValidate(t *testing.T) {
 		},
 		"agent pool unmatched subnet cidr": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.AgentPoolProfiles[2].SubnetCIDR = "10.0.1.0/24"
+				oc.Properties.AgentPoolProfiles[2].SubnetCIDR = "10.0.2.0/24"
 			},
-			expectedErrs: []error{errors.New(`invalid properties.agentPoolProfiles.subnetCidr "10.0.1.0/24": all subnetCidrs must match`)},
+			expectedErrs: []error{errors.New(`invalid properties.agentPoolProfiles.subnetCidr "10.0.2.0/24": all subnetCidrs must match`)},
 		},
 		"agent pool bad subnet cidr": {
 			f: func(oc *api.OpenShiftManagedCluster) {
@@ -436,6 +437,7 @@ func TestValidate(t *testing.T) {
 				}
 			},
 			expectedErrs: []error{
+				errors.New(`invalid properties.networkProfile.managementSubnetCIDR "10.0.1.0/24": not contained in properties.networkProfile.vnetCidr "172.0.0.0/8"`),
 				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "172.30.0.0/16": overlaps with service network "172.30.0.0/16"`),
 				errors.New(`invalid properties.agentPoolProfiles["infra"].subnetCidr "172.30.0.0/16": overlaps with service network "172.30.0.0/16"`),
 				errors.New(`invalid properties.agentPoolProfiles["mycompute"].subnetCidr "172.30.0.0/16": overlaps with service network "172.30.0.0/16"`),

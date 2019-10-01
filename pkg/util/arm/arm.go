@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	armconst "github.com/openshift/openshift-azure/pkg/arm/const"
+	armconst "github.com/openshift/openshift-azure/pkg/arm/constants"
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 )

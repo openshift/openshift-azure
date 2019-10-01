@@ -75,11 +75,7 @@ func validateProperties(p *api.Properties, location string, externalOnly bool) (
 
 	errs = append(errs, validateRouterProfiles("properties.routerProfiles", p.RouterProfiles, location, externalOnly)...)
 
-	// we can disregard any error below because we are already going to fail
-	// validation if VnetCIDR does not parse correctly.
-	_, vnet, _ := net.ParseCIDR(p.NetworkProfile.VnetCIDR)
-
-	errs = append(errs, validateAgentPoolProfiles(p.AgentPoolProfiles, vnet)...)
+	errs = append(errs, validateAgentPoolProfiles(p.AgentPoolProfiles, &p.NetworkProfile)...)
 
 	errs = append(errs, validateAuthProfile("properties.authProfile", &p.AuthProfile)...)
 
@@ -110,6 +106,14 @@ func validateNetworkProfile(path string, np *api.NetworkProfile) (errs []error) 
 
 	if np.ManagementSubnetCIDR != nil && !isValidIPV4CIDR(*np.ManagementSubnetCIDR) {
 		errs = append(errs, fmt.Errorf("invalid %s.managementSubnetCIDR %q", path, *np.ManagementSubnetCIDR))
+	}
+
+	if isValidIPV4CIDR(np.VnetCIDR) && isValidIPV4CIDR(*np.ManagementSubnetCIDR) {
+		_, managementSubnet, _ := net.ParseCIDR(*np.ManagementSubnetCIDR)
+		_, vnet, _ := net.ParseCIDR(np.VnetCIDR)
+		if !vnetContainsSubnet(vnet, managementSubnet) {
+			errs = append(errs, fmt.Errorf("invalid %s.managementSubnetCIDR %q: not contained in properties.networkProfile.vnetCidr %q", path, *np.ManagementSubnetCIDR, np.VnetCIDR))
+		}
 	}
 
 	if np.VnetID != "" && !rxVNetID.MatchString(np.VnetID) {
@@ -234,7 +238,7 @@ func validateCertProfile(path string, cp *api.CertProfile) (errs []error) {
 	return
 }
 
-func validateAgentPoolProfiles(apps []api.AgentPoolProfile, vnet *net.IPNet) (errs []error) {
+func validateAgentPoolProfiles(apps []api.AgentPoolProfile, np *api.NetworkProfile) (errs []error) {
 	appmap := map[api.AgentPoolProfileRole]api.AgentPoolProfile{}
 
 	for i, app := range apps {
@@ -251,7 +255,7 @@ func validateAgentPoolProfiles(apps []api.AgentPoolProfile, vnet *net.IPNet) (er
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles.subnetCidr %q: all subnetCidrs must match", app.SubnetCIDR))
 		}
 
-		errs = append(errs, validateAgentPoolProfile(&app, vnet)...)
+		errs = append(errs, validateAgentPoolProfile(&app, np)...)
 	}
 
 	for role := range validAgentPoolProfileRoles {
@@ -267,11 +271,15 @@ func validateAgentPoolProfiles(apps []api.AgentPoolProfile, vnet *net.IPNet) (er
 	return
 }
 
-func validateAgentPoolProfile(app *api.AgentPoolProfile, vnet *net.IPNet) (errs []error) {
+func validateAgentPoolProfile(app *api.AgentPoolProfile, np *api.NetworkProfile) (errs []error) {
 	if app == nil {
 		errs = append(errs, fmt.Errorf("agentPoolProfile cannot be nil"))
 		return
 	}
+	// we can disregard any error below because we are already going to fail
+	// validation if VnetCIDR does not parse correctly.
+	_, vnet, _ := net.ParseCIDR(np.VnetCIDR)
+	_, managementSubnet, _ := net.ParseCIDR(*np.ManagementSubnetCIDR)
 
 	switch app.Role {
 	case api.AgentPoolProfileRoleCompute:
@@ -322,6 +330,11 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile, vnet *net.IPNet) (errs 
 		}
 		if vnetContainsSubnet(clusterNetworkCIDR, subnet) || vnetContainsSubnet(subnet, clusterNetworkCIDR) {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].subnetCidr %q: overlaps with cluster network %q", app.Name, app.SubnetCIDR, clusterNetworkCIDR.String()))
+		}
+		if isValidIPV4CIDR(np.VnetCIDR) && isValidIPV4CIDR(*np.ManagementSubnetCIDR) {
+			if vnetContainsSubnet(managementSubnet, subnet) || vnetContainsSubnet(subnet, managementSubnet) {
+				errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].subnetCidr %q: overlaps with cluster managementSubnetCidr %q", app.Name, app.SubnetCIDR, managementSubnet.String()))
+			}
 		}
 	}
 

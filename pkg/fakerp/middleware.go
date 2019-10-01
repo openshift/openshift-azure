@@ -67,8 +67,8 @@ func (s *Server) context(handler http.Handler) http.Handler {
 		ctx = context.WithValue(ctx, api.ContextKeyVaultClientAuthorizer, vaultauthorizer)
 
 		// we ignore errors, as those are handled by code using the object
+		// we set this into the context post PE patch happens
 		cs, _ := s.store.Get()
-		ctx = context.WithValue(ctx, contextKeyContainerService, cs)
 
 		// we use context object config for all methods, except CREATE PUT.
 		// at the creation time cs does not exist in the store/context
@@ -80,12 +80,13 @@ func (s *Server) context(handler http.Handler) http.Handler {
 			}
 			ctx = context.WithValue(ctx, contextKeyConfig, conf)
 
-			peIP, err := getPrivateEndpointIP(ctx, s.log, cs.Properties.AzProfile.SubscriptionID, conf.ManagementResourceGroup, cs.Properties.AzProfile.ResourceGroup)
+			cs.Properties.NetworkProfile.PrivateEndpoint, err = getPrivateEndpointIP(ctx, s.log, cs.Properties.AzProfile.SubscriptionID, conf.ManagementResourceGroup, cs.Properties.AzProfile.ResourceGroup)
 			if err != nil {
 				s.adminreply(w, err, nil)
 			}
-			ctx = context.WithValue(ctx, contextKeyPrivateEndpointIP, peIP)
 		}
+
+		ctx = context.WithValue(ctx, contextKeyContainerService, cs)
 
 		handler.ServeHTTP(w, r.WithContext(ctx))
 	})

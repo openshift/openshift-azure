@@ -14,7 +14,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api/features"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
 	"github.com/openshift/openshift-azure/pkg/api/validate"
-	armconst "github.com/openshift/openshift-azure/pkg/arm/const"
+	armconst "github.com/openshift/openshift-azure/pkg/arm/constants"
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/config"
@@ -115,14 +115,6 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 	err = configInterface.Generate(p.pluginConfig, setVersionFields)
 	if err != nil {
 		return err
-	}
-
-	// These values are used in the PrivateLink setup.
-	// Values set here, because callback function will need them
-	cs.Properties.NetworkProfile.VnetID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/virtualNetworks", armconst.VnetName)
-	if features.PrivateLinkEnabled(cs) {
-		cs.Properties.NetworkProfile.ManagementSubnetID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/virtualNetworks", armconst.VnetName+"/subnets/"+armconst.VnetManagementSubnetName)
-		cs.Properties.NetworkProfile.InternalLoadBalancerFrontendIPID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/loadBalancers", armconst.IlbAPIServerName+"/frontendIPConfigurations/"+armconst.IlbAPIServerFrontendConfigurationName)
 	}
 
 	return nil
@@ -256,6 +248,16 @@ func (p *plugin) createOrUpdateExt(ctx context.Context, cs *api.OpenShiftManaged
 	azuretemplate, err := clusterUpgrader.GenerateARM(ctx, "", isUpdate, suffix)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
+	}
+
+	// set VnetID based on VnetName, do this before writing the blobs so that
+	// they are exactly correct
+	cs.Properties.NetworkProfile.VnetID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/virtualNetworks", armconst.VnetName)
+	// These values are used in the PrivateLink setup.
+	// Values set here, because callback function will need them
+	if features.PrivateLinkEnabled(cs) {
+		cs.Properties.NetworkProfile.ManagementSubnetID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/virtualNetworks", armconst.VnetName+"/subnets/"+armconst.VnetManagementSubnetName)
+		cs.Properties.NetworkProfile.InternalLoadBalancerFrontendIPID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/loadBalancers", armconst.IlbAPIServerName+"/frontendIPConfigurations/"+armconst.IlbAPIServerFrontendConfigurationName)
 	}
 
 	// blobs must exist before deploy

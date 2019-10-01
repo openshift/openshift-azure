@@ -1,4 +1,4 @@
-package arm
+package constants
 
 // FakeRP side names/constants
 const (

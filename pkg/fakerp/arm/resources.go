@@ -8,8 +8,8 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	armconst "github.com/openshift/openshift-azure/pkg/arm/const"
-	farmconst "github.com/openshift/openshift-azure/pkg/fakerp/arm/const"
+	armconst "github.com/openshift/openshift-azure/pkg/arm/constants"
+	farmconst "github.com/openshift/openshift-azure/pkg/fakerp/arm/constants"
 	"github.com/openshift/openshift-azure/pkg/fakerp/client"
 	pl "github.com/openshift/openshift-azure/pkg/util/azureclient/network/privatelink"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"

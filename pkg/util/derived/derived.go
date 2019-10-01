@@ -5,7 +5,7 @@ import (
 	"github.com/ghodss/yaml"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	armconst "github.com/openshift/openshift-azure/pkg/arm/const"
+	armconst "github.com/openshift/openshift-azure/pkg/arm/constants"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 )
 

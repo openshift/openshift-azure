@@ -3,8 +3,6 @@ package fakerp
 import (
 	"net/http"
 
-	"github.com/openshift/openshift-azure/pkg/api/features"
-
 	"github.com/go-chi/chi"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -17,9 +15,6 @@ func (s *Server) handleBackup(w http.ResponseWriter, req *http.Request) {
 
 	backupName := chi.URLParam(req, "backupName")
 
-	if features.PrivateLinkEnabled(cs) {
-		cs.Properties.NetworkProfile.PrivateEndpoint = req.Context().Value(contextKeyPrivateEndpointIP).(*string)
-	}
 	err := s.plugin.BackupEtcdCluster(req.Context(), cs, backupName)
 	s.adminreply(w, err, nil)
 }
@@ -28,9 +23,6 @@ func (s *Server) handleBackup(w http.ResponseWriter, req *http.Request) {
 func (s *Server) handleGetControlPlanePods(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
 
-	if features.PrivateLinkEnabled(cs) {
-		cs.Properties.NetworkProfile.PrivateEndpoint = req.Context().Value(contextKeyPrivateEndpointIP).(*string)
-	}
 	pods, err := s.plugin.GetControlPlanePods(req.Context(), cs)
 	s.adminreply(w, err, pods)
 }
@@ -39,9 +31,6 @@ func (s *Server) handleGetControlPlanePods(w http.ResponseWriter, req *http.Requ
 func (s *Server) handleListClusterVMs(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
 
-	if features.PrivateLinkEnabled(cs) {
-		cs.Properties.NetworkProfile.PrivateEndpoint = req.Context().Value(contextKeyPrivateEndpointIP).(*string)
-	}
 	vms, err := s.plugin.ListClusterVMs(req.Context(), cs)
 	s.adminreply(w, err, vms)
 }
@@ -51,9 +40,6 @@ func (s *Server) handleReimage(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
 	hostname := chi.URLParam(req, "hostname")
 
-	if features.PrivateLinkEnabled(cs) {
-		cs.Properties.NetworkProfile.PrivateEndpoint = req.Context().Value(contextKeyPrivateEndpointIP).(*string)
-	}
 	err := s.plugin.Reimage(req.Context(), cs, hostname)
 	s.adminreply(w, err, nil)
 }
@@ -62,9 +48,6 @@ func (s *Server) handleReimage(w http.ResponseWriter, req *http.Request) {
 func (s *Server) handleListBackups(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
 
-	if features.PrivateLinkEnabled(cs) {
-		cs.Properties.NetworkProfile.PrivateEndpoint = req.Context().Value(contextKeyPrivateEndpointIP).(*string)
-	}
 	backups, pluginErr := s.plugin.ListEtcdBackups(req.Context(), cs)
 	var err error
 	if pluginErr != nil {
@@ -81,9 +64,6 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 
 	backupName := chi.URLParam(req, "backupName")
 
-	if features.PrivateLinkEnabled(cs) {
-		cs.Properties.NetworkProfile.PrivateEndpoint = req.Context().Value(contextKeyPrivateEndpointIP).(*string)
-	}
 	pluginErr := s.plugin.RecoverEtcdCluster(req.Context(), cs, GetDeployer(s.log, cs, config, s.testConfig), backupName)
 	var err error
 	if pluginErr != nil {
@@ -98,9 +78,6 @@ func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
 	config := req.Context().Value(contextKeyConfig).(*client.Config)
 
-	if features.PrivateLinkEnabled(cs) {
-		cs.Properties.NetworkProfile.PrivateEndpoint = req.Context().Value(contextKeyPrivateEndpointIP).(*string)
-	}
 	pluginErr := s.plugin.RotateClusterSecrets(req.Context(), cs, GetDeployer(s.log, cs, config, s.testConfig))
 	if pluginErr != nil {
 		s.badRequest(w, pluginErr.Error())
@@ -117,9 +94,6 @@ func (s *Server) handleRotateCertificates(w http.ResponseWriter, req *http.Reque
 	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
 	config := req.Context().Value(contextKeyConfig).(*client.Config)
 
-	if features.PrivateLinkEnabled(cs) {
-		cs.Properties.NetworkProfile.PrivateEndpoint = req.Context().Value(contextKeyPrivateEndpointIP).(*string)
-	}
 	pluginErr := s.plugin.RotateClusterCertificates(req.Context(), cs, GetDeployer(s.log, cs, config, s.testConfig))
 	if pluginErr != nil {
 		s.badRequest(w, pluginErr.Error())
@@ -135,9 +109,6 @@ func (s *Server) handleRotateCertificatesAndSecrets(w http.ResponseWriter, req *
 	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
 	config := req.Context().Value(contextKeyConfig).(*client.Config)
 
-	if features.PrivateLinkEnabled(cs) {
-		cs.Properties.NetworkProfile.PrivateEndpoint = req.Context().Value(contextKeyPrivateEndpointIP).(*string)
-	}
 	pluginErr := s.plugin.RotateClusterCertificatesAndSecrets(req.Context(), cs, GetDeployer(s.log, cs, config, s.testConfig))
 	if pluginErr != nil {
 		s.badRequest(w, pluginErr.Error())
@@ -154,9 +125,6 @@ func (s *Server) handleForceUpdate(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
 	config := req.Context().Value(contextKeyConfig).(*client.Config)
 
-	if features.PrivateLinkEnabled(cs) {
-		cs.Properties.NetworkProfile.PrivateEndpoint = req.Context().Value(contextKeyPrivateEndpointIP).(*string)
-	}
 	pluginErr := s.plugin.ForceUpdate(req.Context(), cs, GetDeployer(s.log, cs, config, s.testConfig))
 	var err error
 	if pluginErr != nil {
@@ -173,9 +141,6 @@ func (s *Server) handleRunCommand(w http.ResponseWriter, req *http.Request) {
 	hostname := chi.URLParam(req, "hostname")
 	command := chi.URLParam(req, "command")
 
-	if features.PrivateLinkEnabled(cs) {
-		cs.Properties.NetworkProfile.PrivateEndpoint = req.Context().Value(contextKeyPrivateEndpointIP).(*string)
-	}
 	err := s.plugin.RunCommand(req.Context(), cs, hostname, api.Command(command))
 	s.adminreply(w, err, nil)
 }

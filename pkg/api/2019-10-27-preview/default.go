@@ -1,4 +1,4 @@
-package v20190930preview
+package v20191027preview
 
 import (
 	"github.com/Azure/go-autorest/autorest/to"
@@ -36,6 +36,7 @@ func setDefaults(oc *OpenShiftManagedCluster) {
 		if oc.Properties.AgentPoolProfiles[i].OSType == nil {
 			oc.Properties.AgentPoolProfiles[i].OSType = (*OSType)(to.StringPtr("Linux"))
 		}
+
 	}
 
 	if len(oc.Properties.RouterProfiles) == 0 {
