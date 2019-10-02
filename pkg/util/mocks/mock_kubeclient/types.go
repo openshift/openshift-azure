@@ -10,6 +10,8 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	v1 "k8s.io/api/core/v1"
+
+	api "github.com/openshift/openshift-azure/pkg/api"
 )
 
 // MockInterface is a mock of Interface interface
@@ -75,6 +77,20 @@ func (m *MockInterface) DrainAndDeleteWorker(arg0 context.Context, arg1 string) 
 func (mr *MockInterfaceMockRecorder) DrainAndDeleteWorker(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DrainAndDeleteWorker", reflect.TypeOf((*MockInterface)(nil).DrainAndDeleteWorker), arg0, arg1)
+}
+
+// EnablePrivateEndpointRoundTripper mocks base method
+func (m *MockInterface) EnablePrivateEndpointRoundTripper(arg0 *api.OpenShiftManagedCluster) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EnablePrivateEndpointRoundTripper", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// EnablePrivateEndpointRoundTripper indicates an expected call of EnablePrivateEndpointRoundTripper
+func (mr *MockInterfaceMockRecorder) EnablePrivateEndpointRoundTripper(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnablePrivateEndpointRoundTripper", reflect.TypeOf((*MockInterface)(nil).EnablePrivateEndpointRoundTripper), arg0)
 }
 
 // EnsureSyncPod mocks base method

@@ -1,7 +1,10 @@
 package kubeclient
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"errors"
+	"fmt"
 	"net"
 	"net/http"
 	"syscall"
@@ -12,6 +15,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	v1 "k8s.io/client-go/tools/clientcmd/api/v1"
 
+	"github.com/openshift/openshift-azure/pkg/api"
 	utilerrors "github.com/openshift/openshift-azure/pkg/util/errors"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
@@ -167,8 +171,54 @@ func NewKubeclient(log *logrus.Entry, config *v1.Config, disableKeepAlives bool)
 	}
 
 	return &Kubeclientset{
-		Log:    log,
-		Client: cli,
-		Seccli: seccli,
+		Log:        log,
+		Client:     cli,
+		Seccli:     seccli,
+		restconfig: restconfig,
 	}, nil
+}
+
+// EnablePrivateEndpointRoundTripper will override dialers to call
+// API server via PrivateEndpoint while keeping certificate trust
+func (u *Kubeclientset) EnablePrivateEndpointRoundTripper(cs *api.OpenShiftManagedCluster) error {
+	if cs.Properties.NetworkProfile.PrivateEndpoint == nil {
+		return fmt.Errorf("enablePrivateEndpointRoundTripper failed. privateEndpoint is not set")
+	}
+	u.Log.Debugf("override kubeClient roundtripper with PrivateEndpoint dialer")
+	restconfig := u.restconfig
+	pool := x509.NewCertPool()
+	pool.AddCert(cs.Config.Certificates.Ca.Cert)
+
+	restconfig.WrapTransport = func(rt http.RoundTripper) http.RoundTripper {
+		return &http.Transport{
+			DialTLS: func(network, addr string) (net.Conn, error) {
+				host, port, err := net.SplitHostPort(addr)
+				if err != nil {
+					return nil, err
+				}
+				c, err := net.Dial(network, net.JoinHostPort(*cs.Properties.NetworkProfile.PrivateEndpoint, port))
+				if err != nil {
+					return nil, err
+				}
+				return tls.Client(c, &tls.Config{
+					RootCAs:    pool,
+					ServerName: host,
+				}), nil
+			},
+		}
+	}
+
+	cli, err := kubernetes.NewForConfig(restconfig)
+	if err != nil {
+		return err
+	}
+
+	seccli, err := security.NewForConfig(restconfig)
+	if err != nil {
+		return err
+	}
+
+	u.Client = cli
+	u.Seccli = seccli
+	return nil
 }

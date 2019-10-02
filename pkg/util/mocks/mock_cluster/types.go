@@ -108,6 +108,20 @@ func (mr *MockUpgraderMockRecorder) DrainAndDeleteWorker(arg0, arg1 interface{})
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DrainAndDeleteWorker", reflect.TypeOf((*MockUpgrader)(nil).DrainAndDeleteWorker), arg0, arg1)
 }
 
+// EnablePrivateEndpointRoundTripper mocks base method
+func (m *MockUpgrader) EnablePrivateEndpointRoundTripper(arg0 *api.OpenShiftManagedCluster) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EnablePrivateEndpointRoundTripper", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// EnablePrivateEndpointRoundTripper indicates an expected call of EnablePrivateEndpointRoundTripper
+func (mr *MockUpgraderMockRecorder) EnablePrivateEndpointRoundTripper(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnablePrivateEndpointRoundTripper", reflect.TypeOf((*MockUpgrader)(nil).EnablePrivateEndpointRoundTripper), arg0)
+}
+
 // EnrichCertificatesFromVault mocks base method
 func (m *MockUpgrader) EnrichCertificatesFromVault(arg0 context.Context) error {
 	m.ctrl.T.Helper()
