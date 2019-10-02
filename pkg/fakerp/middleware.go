@@ -7,6 +7,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
@@ -66,7 +67,25 @@ func (s *Server) context(handler http.Handler) http.Handler {
 		ctx = context.WithValue(ctx, api.ContextKeyVaultClientAuthorizer, vaultauthorizer)
 
 		// we ignore errors, as those are handled by code using the object
+		// we set this into the context post PE patch happens
 		cs, _ := s.store.Get()
+
+		// we use context object config for all methods, except CREATE PUT.
+		// at the creation time cs does not exist in the store/context
+		var conf *client.Config
+		if cs != nil {
+			conf, err = client.NewServerConfig(s.log, cs)
+			if err != nil {
+				return
+			}
+			ctx = context.WithValue(ctx, contextKeyConfig, conf)
+
+			cs.Properties.NetworkProfile.PrivateEndpoint, err = getPrivateEndpointIP(ctx, s.log, cs.Properties.AzProfile.SubscriptionID, conf.ManagementResourceGroup, cs.Properties.AzProfile.ResourceGroup)
+			if err != nil {
+				s.adminreply(w, err, nil)
+			}
+		}
+
 		ctx = context.WithValue(ctx, contextKeyContainerService, cs)
 
 		handler.ServeHTTP(w, r.WithContext(ctx))

@@ -5,6 +5,7 @@ import (
 	"sort"
 	"strings"
 
+	armconst "github.com/openshift/openshift-azure/pkg/arm/constants"
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 )
@@ -103,4 +104,25 @@ func FixupDepends(subscriptionID, resourceGroup string, template map[string]inte
 			jsonpath.MustCompile("$.dependsOn").Set(resource, depends)
 		}
 	}
+}
+
+// FixupSDKMismatch adds missing configurations and objects into the generated template
+func FixupSDKMismatch(template map[string]interface{}) error {
+	for _, resource := range jsonpath.MustCompile("$.resources.*").Get(template) {
+		typ := jsonpath.MustCompile("$.type").MustGetString(resource)
+		name := jsonpath.MustCompile("$.name").MustGetString(resource)
+		// inject management vnet conigurations into the VNET config
+		if typ == "Microsoft.Network/virtualNetworks" && name == armconst.VnetName {
+			jsonpath.MustCompile("$.apiVersion").Set(resource, "2019-04-01")
+			for _, subnet := range jsonpath.MustCompile("$.properties.subnets.*").Get(resource) {
+				name := jsonpath.MustCompile("$.name").MustGetString(subnet)
+				if name == armconst.VnetManagementSubnetName {
+					jsonpath.MustCompile("$.properties.privateEndpointNetworkPolicies").Set(subnet, "Disabled")
+					jsonpath.MustCompile("$.properties.privateLinkServiceNetworkPolicies").Set(subnet, "Disabled")
+				}
+			}
+		}
+
+	}
+	return nil
 }

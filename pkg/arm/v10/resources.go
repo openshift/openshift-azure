@@ -10,6 +10,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	armconst "github.com/openshift/openshift-azure/pkg/arm/constants"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 	"github.com/openshift/openshift-azure/pkg/util/template"
@@ -26,33 +27,8 @@ var (
 	}
 )
 
-const (
-	vnetName                                      = "vnet"
-	vnetSubnetName                                = "default"
-	ipAPIServerName                               = "ip-apiserver"
-	ipOutboundName                                = "ip-outbound"
-	lbAPIServerName                               = "lb-apiserver"
-	lbAPIServerFrontendConfigurationName          = "frontend"
-	lbAPIServerBackendPoolName                    = "backend"
-	lbAPIServerLoadBalancingRuleName              = "port-443"
-	lbAPIServerProbeName                          = "port-443"
-	lbKubernetesName                              = "kubernetes" // must match KubeCloudSharedConfiguration ClusterName
-	lbKubernetesOutboundFrontendConfigurationName = "outbound"
-	lbKubernetesOutboundRuleName                  = "outbound"
-	lbKubernetesBackendPoolName                   = "kubernetes" // must match KubeCloudSharedConfiguration ClusterName
-	nsgMasterName                                 = "nsg-master"
-	nsgMasterAllowSSHRuleName                     = "allow_ssh"
-	nsgMasterAllowHTTPSRuleName                   = "allow_https"
-	nsgWorkerName                                 = "nsg-worker"
-	vmssNicName                                   = "nic"
-	vmssNicPublicIPConfigurationName              = "ip"
-	vmssIPConfigurationName                       = "ipconfig"
-	vmssCSEName                                   = "cse"
-	vmssAdminUsername                             = "cloud-user"
-)
-
 func (g *simpleGenerator) vnet() *network.VirtualNetwork {
-	return &network.VirtualNetwork{
+	vn := &network.VirtualNetwork{
 		VirtualNetworkPropertiesFormat: &network.VirtualNetworkPropertiesFormat{
 			AddressSpace: &network.AddressSpace{
 				AddressPrefixes: &[]string{
@@ -64,14 +40,23 @@ func (g *simpleGenerator) vnet() *network.VirtualNetwork {
 					SubnetPropertiesFormat: &network.SubnetPropertiesFormat{
 						AddressPrefix: to.StringPtr(g.cs.Properties.AgentPoolProfiles[0].SubnetCIDR),
 					},
-					Name: to.StringPtr(vnetSubnetName),
+					Name: to.StringPtr(armconst.VnetSubnetName),
 				},
 			},
 		},
-		Name:     to.StringPtr(vnetName),
+		Name:     to.StringPtr(armconst.VnetName),
 		Type:     to.StringPtr("Microsoft.Network/virtualNetworks"),
 		Location: to.StringPtr(g.cs.Location),
 	}
+	if g.cs.Properties.PrivateAPIServer {
+		*vn.VirtualNetworkPropertiesFormat.Subnets = append(*vn.VirtualNetworkPropertiesFormat.Subnets, network.Subnet{
+			SubnetPropertiesFormat: &network.SubnetPropertiesFormat{
+				AddressPrefix: g.cs.Properties.NetworkProfile.ManagementSubnetCIDR,
+			},
+			Name: to.StringPtr(armconst.VnetManagementSubnetName),
+		})
+	}
+	return vn
 }
 
 func (g *simpleGenerator) ipAPIServer() *network.PublicIPAddress {
@@ -86,7 +71,7 @@ func (g *simpleGenerator) ipAPIServer() *network.PublicIPAddress {
 			},
 			IdleTimeoutInMinutes: to.Int32Ptr(15),
 		},
-		Name:     to.StringPtr(ipAPIServerName),
+		Name:     to.StringPtr(armconst.IPAPIServerName),
 		Type:     to.StringPtr("Microsoft.Network/publicIPAddresses"),
 		Location: to.StringPtr(g.cs.Location),
 	}
@@ -101,7 +86,7 @@ func (g *simpleGenerator) ipOutbound() *network.PublicIPAddress {
 			PublicIPAllocationMethod: network.Static,
 			IdleTimeoutInMinutes:     to.Int32Ptr(15),
 		},
-		Name:     to.StringPtr(ipOutboundName),
+		Name:     to.StringPtr(armconst.IPOutboundName),
 		Type:     to.StringPtr("Microsoft.Network/publicIPAddresses"),
 		Location: to.StringPtr(g.cs.Location),
 	}
@@ -122,16 +107,16 @@ func (g *simpleGenerator) lbAPIServer() *network.LoadBalancer {
 								g.cs.Properties.AzProfile.SubscriptionID,
 								g.cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/publicIPAddresses",
-								ipAPIServerName,
+								armconst.IPAPIServerName,
 							)),
 						},
 					},
-					Name: to.StringPtr(lbAPIServerFrontendConfigurationName),
+					Name: to.StringPtr(armconst.LbAPIServerFrontendConfigurationName),
 				},
 			},
 			BackendAddressPools: &[]network.BackendAddressPool{
 				{
-					Name: to.StringPtr(lbAPIServerBackendPoolName),
+					Name: to.StringPtr(armconst.LbAPIServerBackendPoolName),
 				},
 			},
 			LoadBalancingRules: &[]network.LoadBalancingRule{
@@ -142,24 +127,24 @@ func (g *simpleGenerator) lbAPIServer() *network.LoadBalancer {
 								g.cs.Properties.AzProfile.SubscriptionID,
 								g.cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/loadBalancers",
-								lbAPIServerName,
-							) + "/frontendIPConfigurations/" + lbAPIServerFrontendConfigurationName),
+								armconst.LbAPIServerName,
+							) + "/frontendIPConfigurations/" + armconst.LbAPIServerFrontendConfigurationName),
 						},
 						BackendAddressPool: &network.SubResource{
 							ID: to.StringPtr(resourceid.ResourceID(
 								g.cs.Properties.AzProfile.SubscriptionID,
 								g.cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/loadBalancers",
-								lbAPIServerName,
-							) + "/backendAddressPools/" + lbAPIServerBackendPoolName),
+								armconst.LbAPIServerName,
+							) + "/backendAddressPools/" + armconst.LbAPIServerBackendPoolName),
 						},
 						Probe: &network.SubResource{
 							ID: to.StringPtr(resourceid.ResourceID(
 								g.cs.Properties.AzProfile.SubscriptionID,
 								g.cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/loadBalancers",
-								lbAPIServerName,
-							) + "/probes/" + lbAPIServerProbeName),
+								armconst.LbAPIServerName,
+							) + "/probes/" + armconst.LbAPIServerProbeName),
 						},
 						Protocol:             network.TransportProtocolTCP,
 						LoadDistribution:     network.Default,
@@ -168,7 +153,7 @@ func (g *simpleGenerator) lbAPIServer() *network.LoadBalancer {
 						IdleTimeoutInMinutes: to.Int32Ptr(15),
 						EnableFloatingIP:     to.BoolPtr(false),
 					},
-					Name: to.StringPtr(lbAPIServerLoadBalancingRuleName),
+					Name: to.StringPtr(armconst.LbAPIServerLoadBalancingRuleName),
 				},
 			},
 			Probes: &[]network.Probe{
@@ -180,14 +165,102 @@ func (g *simpleGenerator) lbAPIServer() *network.LoadBalancer {
 						NumberOfProbes:    to.Int32Ptr(2),
 						RequestPath:       to.StringPtr("/healthz"),
 					},
-					Name: to.StringPtr(lbAPIServerProbeName),
+					Name: to.StringPtr(armconst.LbAPIServerProbeName),
 				},
 			},
 			InboundNatRules: &[]network.InboundNatRule{},
 			InboundNatPools: &[]network.InboundNatPool{},
 			OutboundRules:   &[]network.OutboundRule{},
 		},
-		Name:     to.StringPtr(lbAPIServerName),
+		Name:     to.StringPtr(armconst.LbAPIServerName),
+		Type:     to.StringPtr("Microsoft.Network/loadBalancers"),
+		Location: to.StringPtr(g.cs.Location),
+	}
+
+	return lb
+}
+
+func (g *simpleGenerator) ilbAPIServer() *network.LoadBalancer {
+	lb := &network.LoadBalancer{
+		Sku: &network.LoadBalancerSku{
+			Name: network.LoadBalancerSkuNameStandard,
+		},
+		LoadBalancerPropertiesFormat: &network.LoadBalancerPropertiesFormat{
+			FrontendIPConfigurations: &[]network.FrontendIPConfiguration{
+				{
+					FrontendIPConfigurationPropertiesFormat: &network.FrontendIPConfigurationPropertiesFormat{
+						PrivateIPAllocationMethod: network.Dynamic,
+						Subnet: &network.Subnet{
+							ID: to.StringPtr(resourceid.ResourceID(
+								g.cs.Properties.AzProfile.SubscriptionID,
+								g.cs.Properties.AzProfile.ResourceGroup,
+								"Microsoft.Network/virtualNetworks",
+								armconst.VnetName,
+							) + "/subnets/" + armconst.VnetSubnetName),
+						},
+					},
+					Name: to.StringPtr(armconst.IlbAPIServerFrontendConfigurationName),
+				},
+			},
+			BackendAddressPools: &[]network.BackendAddressPool{
+				{
+					Name: to.StringPtr(armconst.LbAPIServerBackendPoolName),
+				},
+			},
+			LoadBalancingRules: &[]network.LoadBalancingRule{
+				{
+					LoadBalancingRulePropertiesFormat: &network.LoadBalancingRulePropertiesFormat{
+						FrontendIPConfiguration: &network.SubResource{
+							ID: to.StringPtr(resourceid.ResourceID(
+								g.cs.Properties.AzProfile.SubscriptionID,
+								g.cs.Properties.AzProfile.ResourceGroup,
+								"Microsoft.Network/loadBalancers",
+								armconst.IlbAPIServerName,
+							) + "/frontendIPConfigurations/" + armconst.IlbAPIServerFrontendConfigurationName),
+						},
+						BackendAddressPool: &network.SubResource{
+							ID: to.StringPtr(resourceid.ResourceID(
+								g.cs.Properties.AzProfile.SubscriptionID,
+								g.cs.Properties.AzProfile.ResourceGroup,
+								"Microsoft.Network/loadBalancers",
+								armconst.IlbAPIServerName,
+							) + "/backendAddressPools/" + armconst.LbAPIServerBackendPoolName),
+						},
+						Probe: &network.SubResource{
+							ID: to.StringPtr(resourceid.ResourceID(
+								g.cs.Properties.AzProfile.SubscriptionID,
+								g.cs.Properties.AzProfile.ResourceGroup,
+								"Microsoft.Network/loadBalancers",
+								armconst.IlbAPIServerName,
+							) + "/probes/" + armconst.LbAPIServerProbeName),
+						},
+						Protocol:             network.TransportProtocolTCP,
+						LoadDistribution:     network.Default,
+						FrontendPort:         to.Int32Ptr(443),
+						BackendPort:          to.Int32Ptr(443),
+						IdleTimeoutInMinutes: to.Int32Ptr(15),
+						EnableFloatingIP:     to.BoolPtr(false),
+					},
+					Name: to.StringPtr(armconst.LbAPIServerLoadBalancingRuleName),
+				},
+			},
+			Probes: &[]network.Probe{
+				{
+					ProbePropertiesFormat: &network.ProbePropertiesFormat{
+						Protocol:          network.ProbeProtocolHTTPS,
+						Port:              to.Int32Ptr(443),
+						IntervalInSeconds: to.Int32Ptr(5),
+						NumberOfProbes:    to.Int32Ptr(2),
+						RequestPath:       to.StringPtr("/healthz"),
+					},
+					Name: to.StringPtr(armconst.LbAPIServerProbeName),
+				},
+			},
+			InboundNatRules: &[]network.InboundNatRule{},
+			InboundNatPools: &[]network.InboundNatPool{},
+			OutboundRules:   &[]network.OutboundRule{},
+		},
+		Name:     to.StringPtr(armconst.IlbAPIServerName),
 		Type:     to.StringPtr("Microsoft.Network/loadBalancers"),
 		Location: to.StringPtr(g.cs.Location),
 	}
@@ -210,21 +283,21 @@ func (g *simpleGenerator) lbKubernetes() *network.LoadBalancer {
 								g.cs.Properties.AzProfile.SubscriptionID,
 								g.cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/publicIPAddresses",
-								ipOutboundName,
+								armconst.IPOutboundName,
 							)),
 						},
 					},
-					Name: to.StringPtr(lbKubernetesOutboundFrontendConfigurationName),
+					Name: to.StringPtr(armconst.LbKubernetesOutboundFrontendConfigurationName),
 				},
 			},
 			BackendAddressPools: &[]network.BackendAddressPool{
 				{
-					Name: to.StringPtr(lbKubernetesBackendPoolName),
+					Name: to.StringPtr(armconst.LbKubernetesBackendPoolName),
 				},
 			},
 			OutboundRules: &[]network.OutboundRule{
 				{
-					Name: to.StringPtr(lbKubernetesOutboundRuleName),
+					Name: to.StringPtr(armconst.LbKubernetesOutboundRuleName),
 					OutboundRulePropertiesFormat: &network.OutboundRulePropertiesFormat{
 						FrontendIPConfigurations: &[]network.SubResource{
 							{
@@ -232,8 +305,8 @@ func (g *simpleGenerator) lbKubernetes() *network.LoadBalancer {
 									g.cs.Properties.AzProfile.SubscriptionID,
 									g.cs.Properties.AzProfile.ResourceGroup,
 									"Microsoft.Network/loadBalancers",
-									lbKubernetesName,
-								) + "/frontendIPConfigurations/" + lbKubernetesOutboundFrontendConfigurationName),
+									armconst.LbKubernetesName,
+								) + "/frontendIPConfigurations/" + armconst.LbKubernetesOutboundFrontendConfigurationName),
 							},
 						},
 						BackendAddressPool: &network.SubResource{
@@ -241,8 +314,8 @@ func (g *simpleGenerator) lbKubernetes() *network.LoadBalancer {
 								g.cs.Properties.AzProfile.SubscriptionID,
 								g.cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/loadBalancers",
-								lbKubernetesName,
-							) + "/backendAddressPools/" + lbKubernetesBackendPoolName),
+								armconst.LbKubernetesName,
+							) + "/backendAddressPools/" + armconst.LbKubernetesBackendPoolName),
 						},
 						Protocol:             network.Protocol1All,
 						IdleTimeoutInMinutes: to.Int32Ptr(15),
@@ -250,7 +323,7 @@ func (g *simpleGenerator) lbKubernetes() *network.LoadBalancer {
 				},
 			},
 		},
-		Name:     to.StringPtr(lbKubernetesName),
+		Name:     to.StringPtr(armconst.LbKubernetesName),
 		Type:     to.StringPtr("Microsoft.Network/loadBalancers"),
 		Location: to.StringPtr(g.cs.Location),
 	}
@@ -290,7 +363,7 @@ func (g *simpleGenerator) nsgMaster() *network.SecurityGroup {
 						Priority:                 to.Int32Ptr(101),
 						Direction:                network.SecurityRuleDirectionInbound,
 					},
-					Name: to.StringPtr(nsgMasterAllowSSHRuleName),
+					Name: to.StringPtr(armconst.NsgMasterAllowSSHRuleName),
 				},
 				{
 					SecurityRulePropertiesFormat: &network.SecurityRulePropertiesFormat{
@@ -304,11 +377,11 @@ func (g *simpleGenerator) nsgMaster() *network.SecurityGroup {
 						Priority:                 to.Int32Ptr(102),
 						Direction:                network.SecurityRuleDirectionInbound,
 					},
-					Name: to.StringPtr(nsgMasterAllowHTTPSRuleName),
+					Name: to.StringPtr(armconst.NsgMasterAllowHTTPSRuleName),
 				},
 			},
 		},
-		Name:     to.StringPtr(nsgMasterName),
+		Name:     to.StringPtr(armconst.NsgMasterName),
 		Type:     to.StringPtr("Microsoft.Network/networkSecurityGroups"),
 		Location: to.StringPtr(g.cs.Location),
 	}
@@ -319,7 +392,7 @@ func (g *simpleGenerator) nsgWorker() *network.SecurityGroup {
 		SecurityGroupPropertiesFormat: &network.SecurityGroupPropertiesFormat{
 			SecurityRules: &[]network.SecurityRule{},
 		},
-		Name:     to.StringPtr(nsgWorkerName),
+		Name:     to.StringPtr(armconst.NsgWorkerName),
 		Type:     to.StringPtr("Microsoft.Network/networkSecurityGroups"),
 		Location: to.StringPtr(g.cs.Location),
 	}
@@ -387,13 +460,13 @@ func vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 			VirtualMachineProfile: &compute.VirtualMachineScaleSetVMProfile{
 				OsProfile: &compute.VirtualMachineScaleSetOSProfile{
 					ComputerNamePrefix: to.StringPtr(names.GetHostnamePrefix(app, suffix)),
-					AdminUsername:      to.StringPtr(vmssAdminUsername),
+					AdminUsername:      to.StringPtr(armconst.VmssAdminUsername),
 					LinuxConfiguration: &compute.LinuxConfiguration{
 						DisablePasswordAuthentication: to.BoolPtr(true),
 						SSH: &compute.SSHConfiguration{
 							PublicKeys: &[]compute.SSHPublicKey{
 								{
-									Path:    to.StringPtr("/home/" + vmssAdminUsername + "/.ssh/authorized_keys"),
+									Path:    to.StringPtr("/home/" + armconst.VmssAdminUsername + "/.ssh/authorized_keys"),
 									KeyData: to.StringPtr(sshPublicKey),
 								},
 							},
@@ -418,20 +491,20 @@ func vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 				NetworkProfile: &compute.VirtualMachineScaleSetNetworkProfile{
 					NetworkInterfaceConfigurations: &[]compute.VirtualMachineScaleSetNetworkConfiguration{
 						{
-							Name: to.StringPtr(vmssNicName),
+							Name: to.StringPtr(armconst.VmssNicName),
 							VirtualMachineScaleSetNetworkConfigurationProperties: &compute.VirtualMachineScaleSetNetworkConfigurationProperties{
 								Primary: to.BoolPtr(true),
 								IPConfigurations: &[]compute.VirtualMachineScaleSetIPConfiguration{
 									{
-										Name: to.StringPtr(vmssIPConfigurationName),
+										Name: to.StringPtr(armconst.VmssIPConfigurationName),
 										VirtualMachineScaleSetIPConfigurationProperties: &compute.VirtualMachineScaleSetIPConfigurationProperties{
 											Subnet: &compute.APIEntityReference{
 												ID: to.StringPtr(resourceid.ResourceID(
 													cs.Properties.AzProfile.SubscriptionID,
 													cs.Properties.AzProfile.ResourceGroup,
 													"Microsoft.Network/virtualNetworks",
-													vnetName,
-												) + "/subnets/" + vnetSubnetName),
+													armconst.VnetName,
+												) + "/subnets/" + armconst.VnetSubnetName),
 											},
 											Primary: to.BoolPtr(true),
 										},
@@ -451,7 +524,7 @@ func vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 				ExtensionProfile: &compute.VirtualMachineScaleSetExtensionProfile{
 					Extensions: &[]compute.VirtualMachineScaleSetExtension{
 						{
-							Name: to.StringPtr(vmssCSEName),
+							Name: to.StringPtr(armconst.VmssCSEName),
 							VirtualMachineScaleSetExtensionProperties: &compute.VirtualMachineScaleSetExtensionProperties{
 								Publisher:               to.StringPtr("Microsoft.Azure.Extensions"),
 								Type:                    to.StringPtr("CustomScript"),
@@ -484,7 +557,7 @@ func vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 			},
 		}
 		(*(*vmss.VirtualMachineProfile.NetworkProfile.NetworkInterfaceConfigurations)[0].VirtualMachineScaleSetNetworkConfigurationProperties.IPConfigurations)[0].PublicIPAddressConfiguration = &compute.VirtualMachineScaleSetPublicIPAddressConfiguration{
-			Name: to.StringPtr(vmssNicPublicIPConfigurationName),
+			Name: to.StringPtr(armconst.VmssNicPublicIPConfigurationName),
 			VirtualMachineScaleSetPublicIPAddressConfigurationProperties: &compute.VirtualMachineScaleSetPublicIPAddressConfigurationProperties{
 				IdleTimeoutInMinutes: to.Int32Ptr(15),
 			},
@@ -495,16 +568,29 @@ func vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 					cs.Properties.AzProfile.SubscriptionID,
 					cs.Properties.AzProfile.ResourceGroup,
 					"Microsoft.Network/loadBalancers",
-					lbAPIServerName,
-				) + "/backendAddressPools/" + lbAPIServerBackendPoolName),
+					armconst.LbAPIServerName,
+				) + "/backendAddressPools/" + armconst.LbAPIServerBackendPoolName),
 			},
+		}
+		if cs.Properties.PrivateAPIServer {
+			pool := *(*(*vmss.VirtualMachineProfile.NetworkProfile.NetworkInterfaceConfigurations)[0].VirtualMachineScaleSetNetworkConfigurationProperties.IPConfigurations)[0].LoadBalancerBackendAddressPools
+			pool = append(pool, compute.SubResource{
+				ID: to.StringPtr(resourceid.ResourceID(
+					cs.Properties.AzProfile.SubscriptionID,
+					cs.Properties.AzProfile.ResourceGroup,
+					"Microsoft.Network/loadBalancers",
+					armconst.IlbAPIServerName,
+				) + "/backendAddressPools/" + armconst.LbAPIServerBackendPoolName),
+			},
+			)
+			(*(*vmss.VirtualMachineProfile.NetworkProfile.NetworkInterfaceConfigurations)[0].VirtualMachineScaleSetNetworkConfigurationProperties.IPConfigurations)[0].LoadBalancerBackendAddressPools = &pool
 		}
 		(*vmss.VirtualMachineProfile.NetworkProfile.NetworkInterfaceConfigurations)[0].VirtualMachineScaleSetNetworkConfigurationProperties.NetworkSecurityGroup = &compute.SubResource{
 			ID: to.StringPtr(resourceid.ResourceID(
 				cs.Properties.AzProfile.SubscriptionID,
 				cs.Properties.AzProfile.ResourceGroup,
 				"Microsoft.Network/networkSecurityGroups",
-				nsgMasterName,
+				armconst.NsgMasterName,
 			)),
 		}
 	} else {
@@ -514,8 +600,8 @@ func vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 					cs.Properties.AzProfile.SubscriptionID,
 					cs.Properties.AzProfile.ResourceGroup,
 					"Microsoft.Network/loadBalancers",
-					lbKubernetesName,
-				) + "/backendAddressPools/" + lbKubernetesBackendPoolName),
+					armconst.LbKubernetesName,
+				) + "/backendAddressPools/" + armconst.LbKubernetesBackendPoolName),
 			},
 		}
 		(*vmss.VirtualMachineProfile.NetworkProfile.NetworkInterfaceConfigurations)[0].VirtualMachineScaleSetNetworkConfigurationProperties.NetworkSecurityGroup = &compute.SubResource{
@@ -523,7 +609,7 @@ func vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 				cs.Properties.AzProfile.SubscriptionID,
 				cs.Properties.AzProfile.ResourceGroup,
 				"Microsoft.Network/networkSecurityGroups",
-				nsgWorkerName,
+				armconst.NsgWorkerName,
 			)),
 		}
 	}

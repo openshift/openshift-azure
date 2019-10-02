@@ -55,7 +55,7 @@ const (
 )
 
 func getFakeDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) api.DeployFn {
-	return func(ctx context.Context, azuretemplate map[string]interface{}) error {
+	return func(ctx context.Context, azuretemplate map[string]interface{}) (*string, error) {
 		log.Info("applying arm template deployment")
 
 		err := az.DeploymentsClient.CreateOrUpdateAndWait(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
@@ -66,10 +66,10 @@ func getFakeDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, az *fak
 		})
 		if err != nil {
 			log.Warnf("deployment failed: %#v", err)
-			return err
+			return nil, err
 		}
 
-		return nil
+		return nil, nil
 	}
 }
 
@@ -421,7 +421,10 @@ func newTestCs() *api.OpenShiftManagedCluster {
 				{Role: api.AgentPoolProfileRoleCompute, Count: 1, Name: "compute", VMSize: "Standard_D2s_v3", SubnetCIDR: "10.0.0.0/24", OSType: "Linux"},
 				{Role: api.AgentPoolProfileRoleInfra, Count: 3, Name: "infra", VMSize: "Standard_D2s_v3", SubnetCIDR: "10.0.0.0/24", OSType: "Linux"},
 			},
-			NetworkProfile: api.NetworkProfile{VnetCIDR: "10.0.0.0/8"},
+			NetworkProfile: api.NetworkProfile{
+				VnetCIDR:             "10.0.0.0/8",
+				ManagementSubnetCIDR: to.StringPtr("10.0.1.0/24"),
+			},
 		},
 	}
 }

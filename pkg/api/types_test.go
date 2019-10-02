@@ -22,9 +22,11 @@ var marshalled = []byte(`{
 		"openShiftVersion": "Properties.OpenShiftVersion",
 		"clusterVersion": "Properties.ClusterVersion",
 		"publicHostname": "Properties.PublicHostname",
+		"privateApiServer": true,
 		"fqdn": "Properties.FQDN",
 		"networkProfile": {
 			"vnetCidr": "Properties.NetworkProfile.VnetCIDR",
+			"managementSubnetCidr": "Properties.NetworkProfile.ManagementSubnetCIDR",
 			"vnetId": "Properties.NetworkProfile.VnetID",
 			"peerVnetId": "Properties.NetworkProfile.PeerVnetID"
 		},
@@ -315,6 +317,11 @@ func TestUnmarshal(t *testing.T) {
 	populatedOc.Config.RegistryStorageAccountKey = ""
 	populatedOc.Config.MasterStartupSASURI = ""
 	populatedOc.Config.WorkerStartupSASURI = ""
+
+	// we dont serialize these fields into the json
+	populatedOc.Properties.NetworkProfile.PrivateEndpoint = nil
+	populatedOc.Properties.NetworkProfile.ManagementSubnetID = ""
+	populatedOc.Properties.NetworkProfile.InternalLoadBalancerFrontendIPID = ""
 
 	var unmarshalledOc OpenShiftManagedCluster
 	err := json.Unmarshal(marshalled, &unmarshalledOc)

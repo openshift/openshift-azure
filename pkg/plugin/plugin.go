@@ -13,6 +13,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
 	"github.com/openshift/openshift-azure/pkg/api/validate"
+	armconst "github.com/openshift/openshift-azure/pkg/arm/constants"
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/config"
@@ -114,6 +115,7 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -174,7 +176,7 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 	if err := clusterUpgrader.EtcdRestoreDeleteMasterScaleSet(ctx); err != nil {
 		return err
 	}
-	err = deployFn(ctx, azuretemplate)
+	cs.Properties.NetworkProfile.PrivateEndpoint, err = deployFn(ctx, azuretemplate)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
 	}
@@ -249,7 +251,13 @@ func (p *plugin) createOrUpdateExt(ctx context.Context, cs *api.OpenShiftManaged
 
 	// set VnetID based on VnetName, do this before writing the blobs so that
 	// they are exactly correct
-	cs.Properties.NetworkProfile.VnetID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/virtualNetworks", "vnet") // TODO: should be using const
+	cs.Properties.NetworkProfile.VnetID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/virtualNetworks", armconst.VnetName)
+	// These values are used in the PrivateLink setup.
+	// Values set here, because callback function will need them
+	if cs.Properties.PrivateAPIServer {
+		cs.Properties.NetworkProfile.ManagementSubnetID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/virtualNetworks", armconst.VnetName+"/subnets/"+armconst.VnetManagementSubnetName)
+		cs.Properties.NetworkProfile.InternalLoadBalancerFrontendIPID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/loadBalancers", armconst.IlbAPIServerName+"/frontendIPConfigurations/"+armconst.IlbAPIServerFrontendConfigurationName)
+	}
 
 	// blobs must exist before deploy
 	err = clusterUpgrader.WriteStartupBlobs()
@@ -263,7 +271,7 @@ func (p *plugin) createOrUpdateExt(ctx context.Context, cs *api.OpenShiftManaged
 		p.log.Info("starting deploy")
 	}
 
-	err = deployFn(ctx, azuretemplate)
+	cs.Properties.NetworkProfile.PrivateEndpoint, err = deployFn(ctx, azuretemplate)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
 	}

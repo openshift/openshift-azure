@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/fakerp/client"
 )
 
 // handleBackup handles admin requests to backup an etcd cluster
@@ -37,7 +38,6 @@ func (s *Server) handleListClusterVMs(w http.ResponseWriter, req *http.Request) 
 // handleReimage handles reimaging a vm in the cluster
 func (s *Server) handleReimage(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
-
 	hostname := chi.URLParam(req, "hostname")
 
 	err := s.plugin.Reimage(req.Context(), cs, hostname)
@@ -60,10 +60,11 @@ func (s *Server) handleListBackups(w http.ResponseWriter, req *http.Request) {
 // handleRestore handles admin requests to restore an etcd cluster from a backup
 func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
+	config := req.Context().Value(contextKeyConfig).(*client.Config)
 
 	backupName := chi.URLParam(req, "backupName")
 
-	pluginErr := s.plugin.RecoverEtcdCluster(req.Context(), cs, GetDeployer(s.log, cs, s.testConfig), backupName)
+	pluginErr := s.plugin.RecoverEtcdCluster(req.Context(), cs, GetDeployer(s.log, cs, config, s.testConfig), backupName)
 	var err error
 	if pluginErr != nil {
 		// TODO: fix this nastiness: https://golang.org/doc/faq#nil_error
@@ -75,9 +76,9 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 // handleRotateSecrets handles admin requests for the rotation of cluster secrets
 func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
+	config := req.Context().Value(contextKeyConfig).(*client.Config)
 
-	deployer := GetDeployer(s.log, cs, s.testConfig)
-	pluginErr := s.plugin.RotateClusterSecrets(req.Context(), cs, deployer)
+	pluginErr := s.plugin.RotateClusterSecrets(req.Context(), cs, GetDeployer(s.log, cs, config, s.testConfig))
 	if pluginErr != nil {
 		s.badRequest(w, pluginErr.Error())
 		return
@@ -91,9 +92,9 @@ func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 // handleRotateCertificates handles admin requests for the rotation of cluster secrets
 func (s *Server) handleRotateCertificates(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
+	config := req.Context().Value(contextKeyConfig).(*client.Config)
 
-	deployer := GetDeployer(s.log, cs, s.testConfig)
-	pluginErr := s.plugin.RotateClusterCertificates(req.Context(), cs, deployer)
+	pluginErr := s.plugin.RotateClusterCertificates(req.Context(), cs, GetDeployer(s.log, cs, config, s.testConfig))
 	if pluginErr != nil {
 		s.badRequest(w, pluginErr.Error())
 		return
@@ -106,9 +107,9 @@ func (s *Server) handleRotateCertificates(w http.ResponseWriter, req *http.Reque
 // handleRotateCertificatesAndSecrets handles admin requests for the rotation of cluster secrets
 func (s *Server) handleRotateCertificatesAndSecrets(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
+	config := req.Context().Value(contextKeyConfig).(*client.Config)
 
-	deployer := GetDeployer(s.log, cs, s.testConfig)
-	pluginErr := s.plugin.RotateClusterCertificatesAndSecrets(req.Context(), cs, deployer)
+	pluginErr := s.plugin.RotateClusterCertificatesAndSecrets(req.Context(), cs, GetDeployer(s.log, cs, config, s.testConfig))
 	if pluginErr != nil {
 		s.badRequest(w, pluginErr.Error())
 		return
@@ -122,8 +123,9 @@ func (s *Server) handleRotateCertificatesAndSecrets(w http.ResponseWriter, req *
 // handleForceUpdate handles admin requests for the force updates of clusters
 func (s *Server) handleForceUpdate(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
+	config := req.Context().Value(contextKeyConfig).(*client.Config)
 
-	pluginErr := s.plugin.ForceUpdate(req.Context(), cs, GetDeployer(s.log, cs, s.testConfig))
+	pluginErr := s.plugin.ForceUpdate(req.Context(), cs, GetDeployer(s.log, cs, config, s.testConfig))
 	var err error
 	if pluginErr != nil {
 		// TODO: fix this nastiness: https://golang.org/doc/faq#nil_error

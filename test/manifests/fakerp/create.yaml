@@ -15,6 +15,7 @@ properties:
 {{- end }}
   networkProfile:
     vnetCidr: 10.0.0.0/8
+    managementSubnetCidr: 10.255.255.0/24
   masterPoolProfile:
     vmSize: {{ if eq .RunningUnderTest "true" }}Standard_D2s_v3{{ else }}Standard_D4s_v3{{ end }}
     subnetCidr: 10.0.0.0/24

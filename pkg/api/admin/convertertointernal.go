@@ -15,6 +15,7 @@ func ToInternal(oc *OpenShiftManagedCluster, old *api.OpenShiftManagedCluster) (
 	if old != nil {
 		cs = old.DeepCopy()
 	}
+
 	if oc.ID != nil {
 		cs.ID = *oc.ID
 	}
@@ -98,6 +99,7 @@ func mergePropertiesAdmin(oc *OpenShiftManagedCluster, cs *api.OpenShiftManagedC
 			cs.Properties.NetworkProfile.VnetCIDR = *oc.Properties.NetworkProfile.VnetCIDR
 		}
 		cs.Properties.NetworkProfile.PeerVnetID = oc.Properties.NetworkProfile.PeerVnetID
+		cs.Properties.NetworkProfile.ManagementSubnetCIDR = oc.Properties.NetworkProfile.ManagementSubnetCIDR
 	}
 
 	if oc.Properties.MonitorProfile != nil {

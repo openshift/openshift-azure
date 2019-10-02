@@ -16,6 +16,7 @@ import (
 type clients struct {
 	aadMgr           *aadManager
 	dnsMgr           *dnsManager
+	netMgr           *networkManager
 	vaultMgr         *vaultManager
 	groupClient      resources.GroupsClient
 	workspacesClient operationalinsights.WorkspacesClient
@@ -32,6 +33,11 @@ func newClients(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManaged
 	if err != nil {
 		return nil, err
 	}
+	c.netMgr, err = newNetworkManager(ctx, log, cs.Properties.AzProfile.SubscriptionID, conf.ManagementResourceGroup)
+	if err != nil {
+		return nil, err
+	}
+
 	c.vaultMgr, err = newVaultManager(ctx, log, cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.TenantID)
 	if err != nil {
 		return nil, err

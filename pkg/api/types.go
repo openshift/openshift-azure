@@ -48,6 +48,9 @@ type Properties struct {
 	// PublicHostname (out): public hostname of OpenShift API server.
 	PublicHostname string `json:"publicHostname,omitempty"`
 
+	// PrivateAPIServer (internal only): Specifies if API server is public or private
+	PrivateAPIServer bool `json:"privateApiServer,omitempty"`
+
 	// FQDN (out): Auto-allocated internal FQDN for OpenShift API server.
 	FQDN string `json:"fqdn,omitempty"`
 
@@ -106,6 +109,9 @@ type NetworkProfile struct {
 	// VnetCIDR (in): the CIDR with which the OSA cluster's Vnet is configured
 	VnetCIDR string `json:"vnetCidr,omitempty"`
 
+	// ManagementSubnetCIDR (in): the CIDR for OSA management subnet
+	ManagementSubnetCIDR *string `json:"managementSubnetCidr,omitempty"`
+
 	// VnetID (out): the ID of the Vnet created for the OSA cluster
 	VnetID string `json:"vnetId,omitempty"`
 
@@ -116,6 +122,24 @@ type NetworkProfile struct {
 	//   /providers/Microsoft.Network
 	//   /virtualNetworks/[^/]+$`
 	PeerVnetID *string `json:"peerVnetId,omitempty"`
+
+	// PrivateEndpoint contains IP or DNS of PrivateEndpoint
+	// RP sets the endpoint that the plugin should dial before
+	// calling any plugin functions. This value is used based on
+	// cluster type - Private/Public. Depending on cluster type
+	// different endpoint will be used to reach API server -
+	// PrivateEndpoint or FQDN.
+	PrivateEndpoint *string `json:"-"`
+	// ManagementSubnetID is ID of the management subnet.
+	// Plugin ensures these are set to valid values
+	// It be set during Generate plugin phase as they used by
+	// the RP in the deployment callback function
+	ManagementSubnetID string `json:"-"`
+	// InternalLoadBalancerFrontendIPID is ID of the internal loadbalancer.
+	// Plugin ensures these are set to valid values
+	// It be set during Generate plugin phase as they used by
+	// the RP in the deployment callback function
+	InternalLoadBalancerFrontendIPID string `json:"-"`
 }
 
 // RouterProfile represents an OpenShift router.

@@ -198,9 +198,14 @@ func TestAPIParity(t *testing.T) {
 	}
 
 	notInExternal := []*regexp.Regexp{
+		regexp.MustCompile(`^\.Properties\.NetworkProfile\.PrivateEndpoint$`),
+		regexp.MustCompile(`^\.Properties\.NetworkProfile\.ManagementSubnetID$`),
+		regexp.MustCompile(`^\.Properties\.NetworkProfile\.ManagementSubnetCIDR$`),
+		regexp.MustCompile(`^\.Properties\.NetworkProfile\.InternalLoadBalancerFrontendIPID$`),
 		regexp.MustCompile(`^\.Properties\.MasterServicePrincipalProfile`),
 		regexp.MustCompile(`^\.Properties\.WorkerServicePrincipalProfile`),
 		regexp.MustCompile(`^\.Properties\.AzProfile`),
+		regexp.MustCompile(`^\.Properties\.PrivateAPIServer`),
 		regexp.MustCompile(`^\.Properties\.MonitorProfile`),
 		regexp.MustCompile(`^\.Properties\.APICertProfile\.`),
 		regexp.MustCompile(`\.RouterCertProfile\.`),

@@ -32,6 +32,7 @@ var marshalled = []byte(`{
 		"fqdn": "Properties.FQDN",
 		"networkProfile": {
 			"vnetCidr": "Properties.NetworkProfile.VnetCIDR",
+			"managementSubnetCidr": "Properties.NetworkProfile.ManagementSubnetCIDR",
 			"vnetId": "Properties.NetworkProfile.VnetID",
 			"peerVnetId": "Properties.NetworkProfile.PeerVnetID"
 		},
@@ -344,7 +345,11 @@ func TestAPIParity(t *testing.T) {
 		regexp.MustCompile(`^\.Config\.Images\.ImagePullSecret$`),
 		regexp.MustCompile(`^\.Config\.EtcdMetrics`),
 		regexp.MustCompile(`^\.Config\.(Master|Worker)StartupSASURI$`),
+		regexp.MustCompile(`^\.Properties\.NetworkProfile\.PrivateEndpoint$`),
+		regexp.MustCompile(`^\.Properties\.NetworkProfile\.ManagementSubnetID$`),
+		regexp.MustCompile(`^\.Properties\.NetworkProfile\.InternalLoadBalancerFrontendIPID$`),
 		regexp.MustCompile(`^\.Properties\.MonitorProfile\.Workspace(ID|Key)`),
+		regexp.MustCompile(`^\.Properties\.PrivateAPIServer`),
 		regexp.MustCompile(`^\.Properties\.AzProfile\.`),
 		regexp.MustCompile(`^\.Properties\.(Master|Worker)ServicePrincipalProfile\.`),
 		regexp.MustCompile(`^\.Properties\.APICertProfile\.`),

@@ -18,6 +18,7 @@ type contextKey string
 const (
 	contextKeyContainerService      contextKey = "ContainerService"
 	contextKeyGraphClientAuthorizer contextKey = "GraphClientAuthorizer"
+	contextKeyConfig                contextKey = "Config"
 )
 
 func GetTestConfig() api.TestConfig {

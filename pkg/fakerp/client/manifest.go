@@ -5,12 +5,12 @@ import (
 
 	"github.com/ghodss/yaml"
 
-	v20190930preview "github.com/openshift/openshift-azure/pkg/api/2019-09-30-preview"
+	v20191027preview "github.com/openshift/openshift-azure/pkg/api/2019-10-27-preview"
 	utiltemplate "github.com/openshift/openshift-azure/pkg/util/template"
 )
 
 // WriteClusterConfigToManifest write to file
-func WriteClusterConfigToManifest(oc *v20190930preview.OpenShiftManagedCluster, manifestFile string) error {
+func WriteClusterConfigToManifest(oc *v20191027preview.OpenShiftManagedCluster, manifestFile string) error {
 	out, err := yaml.Marshal(oc)
 	if err != nil {
 		return err
