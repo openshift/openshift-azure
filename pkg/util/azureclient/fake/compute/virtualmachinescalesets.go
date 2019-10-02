@@ -97,6 +97,11 @@ func (s *FakeVirtualMachineScaleSetsClient) Get(ctx context.Context, resourceGro
 	return compute.VirtualMachineScaleSet{}, nil
 }
 
+// GetInstanceView return instance status
+func (s *FakeVirtualMachineScaleSetsClient) GetInstanceView(ctx context.Context, resourceGroupName string, VMScaleSetName string) (result compute.VirtualMachineScaleSetInstanceView, err error) {
+	return compute.VirtualMachineScaleSetInstanceView{}, nil
+}
+
 // List Fakes base method
 func (s *FakeVirtualMachineScaleSetsClient) List(ctx context.Context, resourceGroup string) ([]compute.VirtualMachineScaleSet, error) {
 	s.rp.Calls = append(s.rp.Calls, "VirtualMachineScaleSetsClient:List")
