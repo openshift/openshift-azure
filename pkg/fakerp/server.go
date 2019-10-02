@@ -21,6 +21,8 @@ import (
 	"github.com/openshift/openshift-azure/pkg/plugin"
 )
 
+const latestApiVersion = "2019-10-27-preview"
+
 type Server struct {
 	router *chi.Mux
 	// the server will not process more than a single
