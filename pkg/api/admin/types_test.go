@@ -349,6 +349,7 @@ func TestAPIParity(t *testing.T) {
 		regexp.MustCompile(`^\.Properties\.NetworkProfile\.ManagementSubnetID$`),
 		regexp.MustCompile(`^\.Properties\.NetworkProfile\.InternalLoadBalancerFrontendIPID$`),
 		regexp.MustCompile(`^\.Properties\.MonitorProfile\.Workspace(ID|Key)`),
+		regexp.MustCompile(`^\.Properties\.PrivateAPIServer`),
 		regexp.MustCompile(`^\.Properties\.AzProfile\.`),
 		regexp.MustCompile(`^\.Properties\.(Master|Worker)ServicePrincipalProfile\.`),
 		regexp.MustCompile(`^\.Properties\.APICertProfile\.`),

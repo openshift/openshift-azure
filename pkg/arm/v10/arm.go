@@ -16,7 +16,6 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/api/features"
 	"github.com/openshift/openshift-azure/pkg/util/arm"
 )
 
@@ -54,7 +53,7 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 	if !isUpdate {
 		t.Resources = append(t.Resources, g.ipOutbound(), g.lbKubernetes(), g.nsgWorker())
 	}
-	if features.PrivateLinkEnabled(g.cs) {
+	if g.cs.Properties.PrivateAPIServer {
 		t.Resources = append(t.Resources, g.ilbAPIServer())
 	}
 	for _, app := range g.cs.Properties.AgentPoolProfiles {

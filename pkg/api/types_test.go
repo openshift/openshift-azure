@@ -22,6 +22,7 @@ var marshalled = []byte(`{
 		"openShiftVersion": "Properties.OpenShiftVersion",
 		"clusterVersion": "Properties.ClusterVersion",
 		"publicHostname": "Properties.PublicHostname",
+		"privateApiServer": true,
 		"fqdn": "Properties.FQDN",
 		"networkProfile": {
 			"vnetCidr": "Properties.NetworkProfile.VnetCIDR",

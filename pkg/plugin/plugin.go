@@ -11,7 +11,6 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/api/features"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
 	"github.com/openshift/openshift-azure/pkg/api/validate"
 	armconst "github.com/openshift/openshift-azure/pkg/arm/constants"
@@ -255,7 +254,7 @@ func (p *plugin) createOrUpdateExt(ctx context.Context, cs *api.OpenShiftManaged
 	cs.Properties.NetworkProfile.VnetID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/virtualNetworks", armconst.VnetName)
 	// These values are used in the PrivateLink setup.
 	// Values set here, because callback function will need them
-	if features.PrivateLinkEnabled(cs) {
+	if cs.Properties.PrivateAPIServer {
 		cs.Properties.NetworkProfile.ManagementSubnetID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/virtualNetworks", armconst.VnetName+"/subnets/"+armconst.VnetManagementSubnetName)
 		cs.Properties.NetworkProfile.InternalLoadBalancerFrontendIPID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/loadBalancers", armconst.IlbAPIServerName+"/frontendIPConfigurations/"+armconst.IlbAPIServerFrontendConfigurationName)
 	}

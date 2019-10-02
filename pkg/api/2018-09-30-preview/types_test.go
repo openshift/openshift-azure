@@ -204,6 +204,7 @@ func TestAPIParity(t *testing.T) {
 		regexp.MustCompile(`^\.Properties\.NetworkProfile\.InternalLoadBalancerFrontendIPID$`),
 		regexp.MustCompile(`^\.Properties\.MasterServicePrincipalProfile`),
 		regexp.MustCompile(`^\.Properties\.WorkerServicePrincipalProfile`),
+		regexp.MustCompile(`^\.Properties\.PrivateAPIServer`),
 		regexp.MustCompile(`^\.Properties\.AzProfile`),
 		regexp.MustCompile(`^\.Properties\.MonitorProfile`),
 		regexp.MustCompile(`^\.Properties\.APICertProfile\.`),

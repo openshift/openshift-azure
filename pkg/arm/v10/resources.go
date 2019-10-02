@@ -10,7 +10,6 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/api/features"
 	armconst "github.com/openshift/openshift-azure/pkg/arm/constants"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
@@ -49,7 +48,7 @@ func (g *simpleGenerator) vnet() *network.VirtualNetwork {
 		Type:     to.StringPtr("Microsoft.Network/virtualNetworks"),
 		Location: to.StringPtr(g.cs.Location),
 	}
-	if features.PrivateLinkEnabled(g.cs) {
+	if g.cs.Properties.PrivateAPIServer {
 		*vn.VirtualNetworkPropertiesFormat.Subnets = append(*vn.VirtualNetworkPropertiesFormat.Subnets, network.Subnet{
 			SubnetPropertiesFormat: &network.SubnetPropertiesFormat{
 				AddressPrefix: g.cs.Properties.NetworkProfile.ManagementSubnetCIDR,
@@ -573,7 +572,7 @@ func vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 				) + "/backendAddressPools/" + armconst.LbAPIServerBackendPoolName),
 			},
 		}
-		if features.PrivateLinkEnabled(cs) {
+		if cs.Properties.PrivateAPIServer {
 			pool := *(*(*vmss.VirtualMachineProfile.NetworkProfile.NetworkInterfaceConfigurations)[0].VirtualMachineScaleSetNetworkConfigurationProperties.IPConfigurations)[0].LoadBalancerBackendAddressPools
 			pool = append(pool, compute.SubResource{
 				ID: to.StringPtr(resourceid.ResourceID(
