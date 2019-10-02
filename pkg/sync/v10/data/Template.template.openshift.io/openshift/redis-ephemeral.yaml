@@ -8,16 +8,16 @@ message: |-
          Password: ${REDIS_PASSWORD}
    Connection URL: redis://${DATABASE_SERVICE_NAME}:6379/
 
-  For more information about using this template, including OpenShift considerations, see https://github.com/sclorg/redis-container/blob/master/3.2.
+  For more information about using this template, including OpenShift considerations, see https://github.com/sclorg/redis-container/blob/master/5.
 metadata:
   annotations:
     description: |-
-      Redis in-memory data structure store, without persistent storage. For more information about using this template, including OpenShift considerations, see https://github.com/sclorg/redis-container/blob/master/3.2.
+      Redis in-memory data structure store, without persistent storage. For more information about using this template, including OpenShift considerations, see https://github.com/sclorg/redis-container/blob/master/5.
 
       WARNING: Any data stored will be lost upon pod destruction. Only use this template for testing
     iconClass: icon-redis
     openshift.io/display-name: Redis (Ephemeral)
-    openshift.io/documentation-url: https://github.com/sclorg/redis-container/tree/master/3.2
+    openshift.io/documentation-url: https://github.com/sclorg/redis-container/tree/master/5
     openshift.io/long-description: This template provides a standalone Redis server.  The
       data is not stored on persistent storage, so any restart of the service will
       result in all data being lost.
@@ -149,8 +149,8 @@ parameters:
   generate: expression
   name: REDIS_PASSWORD
   required: true
-- description: Version of Redis image to be used (3.2 or latest).
+- description: Version of Redis image to be used (5 or latest).
   displayName: Version of Redis Image
   name: REDIS_VERSION
   required: true
-  value: "3.2"
+  value: "5"
