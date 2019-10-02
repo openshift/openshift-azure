@@ -1,9 +1,6 @@
 package openshift
 
 import (
-	"net/http"
-	"time"
-
 	servicecatalogv1beta1client "github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1beta1"
 	oappsv1client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	buildv1client "github.com/openshift/client-go/build/clientset/versioned/typed/build/v1"
@@ -21,11 +18,9 @@ import (
 	policyv1beta1client "k8s.io/client-go/kubernetes/typed/policy/v1beta1"
 	rbacv1client "k8s.io/client-go/kubernetes/typed/rbac/v1"
 	"k8s.io/client-go/rest"
-	v1 "k8s.io/client-go/tools/clientcmd/api/v1"
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
 type Client struct {
@@ -70,55 +65,43 @@ func newClientFromRestConfig(config *rest.Config) *Client {
 	}
 }
 
-func newClientFromKubeConfig(log *logrus.Entry, kc *v1.Config) (*Client, error) {
-	restconfig, err := managedcluster.RestConfigFromV1Config(kc)
-	if err != nil {
-		return nil, err
-	}
-
-	restconfig.WrapTransport = func(rt http.RoundTripper) http.RoundTripper {
-		// first, tweak values on the incoming RoundTripper, which we are
-		// relying on being an *http.Transport.
-
-		rt.(*http.Transport).DisableKeepAlives = true
-
-		// now wrap our retryingRoundTripper around the incoming RoundTripper.
-		return &kubeclient.RetryingRoundTripper{
-			Log:          log,
-			RoundTripper: rt,
-			Retries:      5,
-			GetTimeout:   30 * time.Second,
-		}
-	}
-
-	return newClientFromRestConfig(restconfig), nil
-}
-
-func NewAdminClient(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
+func NewAdminClient(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster, testConfig internalapi.TestConfig) (*Client, error) {
 	kc, err := login("admin", cs)
 	if err != nil {
 		return nil, err
 	}
 
-	return newClientFromKubeConfig(log, kc)
+	restconfig, err := kubeclient.NewRestConfig(log, kc, cs, true, testConfig)
+	if err != nil {
+		return nil, err
+	}
+	return newClientFromRestConfig(restconfig), nil
 }
 
-func NewCustomerAdminClient(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
+func NewCustomerAdminClient(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster, testConfig internalapi.TestConfig) (*Client, error) {
 	kc, err := login("customer-cluster-admin", cs)
 	if err != nil {
 		return nil, err
 	}
 
-	return newClientFromKubeConfig(log, kc)
+	restconfig, err := kubeclient.NewRestConfig(log, kc, cs, true, testConfig)
+	if err != nil {
+		return nil, err
+	}
+	return newClientFromRestConfig(restconfig), nil
 }
 
-func NewEndUserClient(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
+func NewEndUserClient(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster, testConfig internalapi.TestConfig) (*Client, error) {
 	kc, err := login("enduser", cs)
 	if err != nil {
 		return nil, err
 	}
 
-	return newClientFromKubeConfig(log, kc)
+	restconfig, err := kubeclient.NewRestConfig(log, kc, cs, true, testConfig)
+	if err != nil {
+		return nil, err
+	}
+	return newClientFromRestConfig(restconfig), nil
 }
 
 type ClientSet struct {
@@ -129,18 +112,18 @@ type ClientSet struct {
 
 // NewClientSet creates a new set of openshift clients scoped for different levels
 // of access
-func NewClientSet(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster) (*ClientSet, error) {
+func NewClientSet(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster, testConfig internalapi.TestConfig) (*ClientSet, error) {
 	c := &ClientSet{}
 	var err error
-	c.Admin, err = NewAdminClient(log, cs)
+	c.Admin, err = NewAdminClient(log, cs, testConfig)
 	if err != nil {
 		return nil, err
 	}
-	c.CustomerAdmin, err = NewCustomerAdminClient(log, cs)
+	c.CustomerAdmin, err = NewCustomerAdminClient(log, cs, testConfig)
 	if err != nil {
 		return nil, err
 	}
-	c.EndUser, err = NewEndUserClient(log, cs)
+	c.EndUser, err = NewEndUserClient(log, cs, testConfig)
 	if err != nil {
 		return nil, err
 	}

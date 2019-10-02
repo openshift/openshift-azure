@@ -7,6 +7,8 @@ package sync
 import (
 	"context"
 	"crypto/sha256"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -34,10 +36,10 @@ import (
 	kaggregator "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/healthcheck"
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
+	"github.com/openshift/openshift-azure/pkg/util/roundtrippers"
 	utilwait "github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
@@ -247,8 +249,15 @@ func (s *sync) calculateReadiness() (errs []error) {
 		case "Route.route.openshift.io":
 			url := "https://" + jsonpath.MustCompile("$.spec.host").MustGetString(o.Object) + o.GetAnnotations()[syncPodReadinessPathAnnotationKey]
 			cert := s.cs.Config.Certificates.Router.Certs
-			cli := http.Client{
-				Transport: healthcheck.RoundTripper(s.cs.Properties.RouterProfiles[0].FQDN, cert[len(cert)-1]),
+			pool := x509.NewCertPool()
+			pool.AddCert(cert[len(cert)-1])
+			tlsConfig := tls.Config{
+				RootCAs:    pool,
+				ServerName: s.cs.Properties.RouterProfiles[0].FQDN,
+			}
+
+			cli := &http.Client{
+				Transport: roundtrippers.HealthCheck(s.cs.Properties.RouterProfiles[0].FQDN, s.cs.Location, nil, api.TestConfig{RunningUnderTest: false}, &tlsConfig),
 				Timeout:   5 * time.Second,
 			}
 			resp, err := cli.Get(url)

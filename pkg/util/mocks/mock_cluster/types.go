@@ -280,6 +280,20 @@ func (mr *MockUpgraderMockRecorder) Reimage(arg0, arg1, arg2 interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Reimage", reflect.TypeOf((*MockUpgrader)(nil).Reimage), arg0, arg1, arg2)
 }
 
+// ReloadKubeClient mocks base method
+func (m *MockUpgrader) ReloadKubeClient(arg0 bool) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ReloadKubeClient", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ReloadKubeClient indicates an expected call of ReloadKubeClient
+func (mr *MockUpgraderMockRecorder) ReloadKubeClient(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReloadKubeClient", reflect.TypeOf((*MockUpgrader)(nil).ReloadKubeClient), arg0)
+}
+
 // ResetUpdateBlob mocks base method
 func (m *MockUpgrader) ResetUpdateBlob() error {
 	m.ctrl.T.Helper()

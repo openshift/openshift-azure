@@ -13,6 +13,9 @@ import (
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+
+	"github.com/openshift/openshift-azure/pkg/api"
 )
 
 // Interface interface to utility kubenetes functions
@@ -31,6 +34,13 @@ type Kubeclientset struct {
 	Client kubernetes.Interface
 	Seccli security.Interface
 	Log    *logrus.Entry
+
+	// for internal reuse
+	restconfig        *rest.Config
+	disableKeepAlives bool
+
+	// for test only
+	testConfig api.TestConfig
 }
 
 var _ Interface = &Kubeclientset{}
