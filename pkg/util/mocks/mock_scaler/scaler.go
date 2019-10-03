@@ -6,6 +6,7 @@ package mock_scaler
 
 import (
 	context "context"
+	rsa "crypto/rsa"
 	reflect "reflect"
 
 	compute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
@@ -42,17 +43,17 @@ func (m *MockFactory) EXPECT() *MockFactoryMockRecorder {
 }
 
 // New mocks base method
-func (m *MockFactory) New(log *logrus.Entry, ssc compute0.VirtualMachineScaleSetsClient, vmc compute0.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Interface, resourceGroup string, ss *compute.VirtualMachineScaleSet, testConfig api.TestConfig) scaler.Scaler {
+func (m *MockFactory) New(log *logrus.Entry, ssc compute0.VirtualMachineScaleSetsClient, vmc compute0.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Interface, resourceGroup string, ss *compute.VirtualMachineScaleSet, testConfig api.TestConfig, sshkey *rsa.PrivateKey) scaler.Scaler {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "New", log, ssc, vmc, kubeclient, resourceGroup, ss, testConfig)
+	ret := m.ctrl.Call(m, "New", log, ssc, vmc, kubeclient, resourceGroup, ss, testConfig, sshkey)
 	ret0, _ := ret[0].(scaler.Scaler)
 	return ret0
 }
 
 // New indicates an expected call of New
-func (mr *MockFactoryMockRecorder) New(log, ssc, vmc, kubeclient, resourceGroup, ss, testConfig interface{}) *gomock.Call {
+func (mr *MockFactoryMockRecorder) New(log, ssc, vmc, kubeclient, resourceGroup, ss, testConfig, sshkey interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "New", reflect.TypeOf((*MockFactory)(nil).New), log, ssc, vmc, kubeclient, resourceGroup, ss, testConfig)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "New", reflect.TypeOf((*MockFactory)(nil).New), log, ssc, vmc, kubeclient, resourceGroup, ss, testConfig, sshkey)
 }
 
 // MockScaler is a mock of Scaler interface

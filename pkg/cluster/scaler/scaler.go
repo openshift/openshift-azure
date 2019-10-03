@@ -8,9 +8,8 @@ package scaler
 
 import (
 	"context"
-	"fmt"
+	"crypto/rsa"
 	"strings"
-	"time"
 
 	azcompute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
@@ -18,17 +17,18 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/compute"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient/insights"
+	"github.com/openshift/openshift-azure/test/util/diagnostics"
 )
 
 // Factory interface is to create new Scaler instances.
 type Factory interface {
-	New(log *logrus.Entry, ssc compute.VirtualMachineScaleSetsClient, vmc compute.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Interface, resourceGroup string, ss *azcompute.VirtualMachineScaleSet, testConfig api.TestConfig) Scaler
+	New(log *logrus.Entry, ssc compute.VirtualMachineScaleSetsClient, vmc compute.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Interface, resourceGroup string, ss *azcompute.VirtualMachineScaleSet, testConfig api.TestConfig, sshkey *rsa.PrivateKey) Scaler
 }
 
 type scalerFactory struct{}
+
+var _ Factory = &scalerFactory{}
 
 // NewFactory create a new Factory instance.
 func NewFactory() Factory {
@@ -59,12 +59,13 @@ type workerScaler struct {
 	vmMap map[string]struct{}
 
 	testConfig api.TestConfig
+	sshkey     *rsa.PrivateKey
 }
 
 var _ Scaler = &workerScaler{}
 
-func (sf *scalerFactory) New(log *logrus.Entry, ssc compute.VirtualMachineScaleSetsClient, vmc compute.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Interface, resourceGroup string, ss *azcompute.VirtualMachineScaleSet, testConfig api.TestConfig) Scaler {
-	return &workerScaler{log: log, ssc: ssc, vmc: vmc, kubeclient: kubeclient, resourceGroup: resourceGroup, ss: ss, testConfig: testConfig}
+func (sf *scalerFactory) New(log *logrus.Entry, ssc compute.VirtualMachineScaleSetsClient, vmc compute.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Interface, resourceGroup string, ss *azcompute.VirtualMachineScaleSet, testConfig api.TestConfig, sshkey *rsa.PrivateKey) Scaler {
+	return &workerScaler{log: log, ssc: ssc, vmc: vmc, kubeclient: kubeclient, resourceGroup: resourceGroup, ss: ss, testConfig: testConfig, sshkey: sshkey}
 }
 
 // initializeCache fetches the scale set's VMs from the Azure API and updates
@@ -110,7 +111,6 @@ func (ws *workerScaler) Scale(ctx context.Context, count int64) *api.PluginError
 // instances and waits for them to become ready.
 func (ws *workerScaler) scaleUp(ctx context.Context, count int64) *api.PluginError {
 	ws.log.Infof("scaling %s capacity up from %d to %d", *ws.ss.Name, *ws.ss.Sku.Capacity, count)
-	startTime := time.Now()
 
 	if ws.vms == nil {
 		if err := ws.initializeCache(ctx); err != nil {
@@ -123,9 +123,18 @@ func (ws *workerScaler) scaleUp(ctx context.Context, count int64) *api.PluginErr
 			Capacity: to.Int64Ptr(count),
 		},
 	})
-	if ws.testConfig.RunningUnderTest && err != nil {
+	if err != nil && ws.testConfig.RunningUnderTest && ws.testConfig.ArtifactDir != "" {
 		// this is tempory whilst investigating: https://github.com/openshift/openshift-azure/issues/1410
-		ws.logDiagnositicInfo(ctx, startTime)
+		subscriptionID := ""
+		if ws.ss.ID != nil {
+			subscriptionID = strings.Split(*ws.ss.ID, "/")[2]
+		}
+		ssd := diagnostics.NewScalesetDebugger(ws.log, subscriptionID, ws.resourceGroup, ws.testConfig, ws.ssc)
+		ssd.GatherStatuses(ctx, *ws.ss.Name)
+		ssd.GatherActivityLogs(ctx)
+		if ws.sshkey != nil {
+			ssd.GatherHostLogs(ctx, *ws.ss.Name, count, ws.sshkey)
+		}
 	}
 
 	if err != nil {
@@ -152,64 +161,6 @@ func (ws *workerScaler) scaleUp(ctx context.Context, count int64) *api.PluginErr
 	ws.updateCache(vms)
 
 	return nil
-}
-
-func (ws *workerScaler) logDiagnositicInfo(ctx context.Context, startTime time.Time) {
-	ss, err := ws.ssc.Get(ctx, ws.resourceGroup, *ws.ss.Name)
-	if err != nil {
-		ws.log.Warnf("ssc.Get err %v", err)
-		return
-	}
-	ws.log.Debugf("%s status:%s, provisioning state:%s", *ss.Name, ss.Status, *ss.VirtualMachineScaleSetProperties.ProvisioningState)
-	instView, err := ws.ssc.GetInstanceView(ctx, ws.resourceGroup, *ss.Name)
-	if err == nil {
-		if instView.Statuses != nil {
-			for _, status := range *instView.Statuses {
-				var ds, msg string
-				if status.DisplayStatus != nil {
-					ds = *status.DisplayStatus
-				}
-				if status.Message != nil {
-					msg = *status.Message
-				}
-				ws.log.Debugf("InstanceView: displayStatus:%s, msg:%s", ds, msg)
-			}
-		}
-		if instView.VirtualMachine != nil {
-			for _, status := range *instView.VirtualMachine.StatusesSummary {
-				ws.log.Debugf("VMStatus: code:%s count:%d", *status.Code, *status.Count)
-			}
-		}
-		if instView.Extensions != nil {
-			for _, extView := range *instView.Extensions {
-				for _, status := range *extView.StatusesSummary {
-					ws.log.Debugf("ExtensionView: %s, status: %s %d", *extView.Name, *status.Code, *status.Count)
-				}
-			}
-		}
-	}
-
-	subscriptionID := strings.Split(*ss.ID, "/")[2]
-	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
-	if err != nil {
-		ws.log.Warnf("authorizer err %v", err)
-		return
-	}
-	alc := insights.NewActivityLogsClient(ctx, ws.log, subscriptionID, authorizer)
-	logs, err := alc.List(ctx, fmt.Sprintf("eventTimestamp ge '%s' and resourceGroupName eq '%s'", startTime.Format(time.RFC3339), ws.resourceGroup), "eventName,id,operationName,status")
-	if err != nil {
-		ws.log.Warnf("alc.List err %v", err)
-		return
-	}
-	for logs.NotDone() {
-		for _, log := range logs.Values() {
-			ws.log.Debugf("ActivityLog: %s %s %s %s", *log.EventName.Value, *log.ID, *log.OperationName.Value, *log.Status.Value)
-		}
-		err = logs.Next()
-		if err != nil {
-			break
-		}
-	}
 }
 
 // scaleDown decreases the scale set capacity to count by individually deleting

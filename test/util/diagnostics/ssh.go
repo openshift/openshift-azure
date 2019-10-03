@@ -1,7 +1,8 @@
-package fakerp
+package diagnostics
 
 import (
 	"context"
+	"crypto/rsa"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -19,22 +20,22 @@ import (
 
 type ssher struct {
 	pipcli    network.PublicIPAddressesClient
-	cs        *api.OpenShiftManagedCluster
 	masterIPs []string
+	sshkey    *rsa.PrivateKey
 }
 
-func NewSSHer(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster) (*ssher, error) {
+func NewSSHer(ctx context.Context, log *logrus.Entry, subscriptionID, resourceGroup string, sshkey *rsa.PrivateKey) (*ssher, error) {
 	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 	if err != nil {
 		return nil, err
 	}
 
 	s := &ssher{
-		pipcli: network.NewPublicIPAddressesClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
-		cs:     cs,
+		pipcli: network.NewPublicIPAddressesClient(ctx, log, subscriptionID, authorizer),
+		sshkey: sshkey,
 	}
 
-	ips, err := s.pipcli.ListVirtualMachineScaleSetPublicIPAddressesComplete(ctx, s.cs.Properties.AzProfile.ResourceGroup, "ss-master")
+	ips, err := s.pipcli.ListVirtualMachineScaleSetPublicIPAddressesComplete(ctx, resourceGroup, "ss-master")
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +65,7 @@ func (s *ssher) dialViaMaster(ctx context.Context, config *ssh.ClientConfig, add
 }
 
 func (s *ssher) Dial(ctx context.Context, hostname string) (*ssh.Client, error) {
-	signer, err := ssh.NewSignerFromKey(s.cs.Config.SSHKey)
+	signer, err := ssh.NewSignerFromKey(s.sshkey)
 	if err != nil {
 		return nil, err
 	}
