@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Azure/azure-sdk-for-go/profiles/latest/compute/mgmt/compute"
-	azcompute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/sirupsen/logrus"
 )
@@ -13,8 +12,8 @@ import (
 type ComputeRP struct {
 	Log   *logrus.Entry
 	Calls []string
-	Vms   map[string][]azcompute.VirtualMachineScaleSetVM
-	Ssc   []azcompute.VirtualMachineScaleSet
+	Vms   map[string][]compute.VirtualMachineScaleSetVM
+	Ssc   []compute.VirtualMachineScaleSet
 }
 
 type FakeVirtualMachineScaleSetVMsClient struct {
@@ -51,7 +50,7 @@ func (v *FakeVirtualMachineScaleSetVMsClient) Delete(ctx context.Context, resour
 }
 
 // List Fakes base method
-func (v *FakeVirtualMachineScaleSetVMsClient) List(ctx context.Context, resourceGroupName, VMScaleSetName, filter, selectParameter, expand string) ([]azcompute.VirtualMachineScaleSetVM, error) {
+func (v *FakeVirtualMachineScaleSetVMsClient) List(ctx context.Context, resourceGroupName, VMScaleSetName, filter, selectParameter, expand string) ([]compute.VirtualMachineScaleSetVM, error) {
 	v.rp.Calls = append(v.rp.Calls, "VirtualMachineScaleSetVMsClient:List:"+VMScaleSetName)
 	return v.rp.Vms[VMScaleSetName], nil
 }
@@ -79,7 +78,7 @@ func (v *FakeVirtualMachineScaleSetVMsClient) Restart(ctx context.Context, resou
 }
 
 // RunCommand Fakes base method
-func (v *FakeVirtualMachineScaleSetVMsClient) RunCommand(ctx context.Context, resourceGroupName string, VMScaleSetName string, instanceID string, parameters azcompute.RunCommandInput) error {
+func (v *FakeVirtualMachineScaleSetVMsClient) RunCommand(ctx context.Context, resourceGroupName string, VMScaleSetName string, instanceID string, parameters compute.RunCommandInput) error {
 	v.rp.Calls = append(v.rp.Calls, "VirtualMachineScaleSetVMsClient:RunCommand:"+VMScaleSetName+":"+instanceID)
 	return nil
 }
