@@ -33,6 +33,7 @@ var (
 	imageResourceGroup         = flag.String("imageResourceGroup", "images", "image resource group")
 	imageStorageAccount        = flag.String("imageStorageAccount", "openshiftimages", "image storage account")
 	imageContainer             = flag.String("imageContainer", "images", "image container")
+	metadataContainer          = flag.String("metadataContainer", "metadata", "image metadata container")
 	imageSku                   = flag.String("imageSku", "", "image SKU")
 	imageVersion               = flag.String("imageVersion", "", "image version")
 	clientKey                  = flag.String("clientKey", "secrets/client-key.pem", "cdn client key")
@@ -100,6 +101,7 @@ func run(ctx context.Context, log *logrus.Entry) error {
 		ImageResourceGroup:         *imageResourceGroup,
 		ImageStorageAccount:        *imageStorageAccount,
 		ImageContainer:             *imageContainer,
+		MetadataContainer:          *metadataContainer,
 		ImageSku:                   *imageSku,
 		ImageVersion:               *imageVersion,
 		SSHKey:                     sshkey,

@@ -42,6 +42,7 @@ type Builder struct {
 	ImageResourceGroup         string
 	ImageStorageAccount        string
 	ImageContainer             string
+	MetadataContainer          string
 	ImageSku                   string
 	ImageVersion               string
 	SSHKey                     *rsa.PrivateKey
