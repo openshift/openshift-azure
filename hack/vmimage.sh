@@ -28,7 +28,6 @@ export IMAGE_STORAGEACCOUNT="${IMAGE_STORAGEACCOUNT:-openshiftimages}"
 PHASE=image_build
 go run -ldflags "-X main.gitCommit=$GITCOMMIT" ./cmd/vmimage -imageResourceGroup "$IMAGE_RESOURCEGROUP" -image "$IMAGE_RESOURCENAME" -imageStorageAccount "$IMAGE_STORAGEACCOUNT"
 
-export AZURE_REGIONS=eastus
 if [[ -z "$RESOURCEGROUP" ]]; then
   export RESOURCEGROUP="${IMAGE_RESOURCENAME//./}-e2e"
 fi
