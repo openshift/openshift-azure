@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/Azure/azure-sdk-for-go/profiles/latest/network/mgmt/network"
+	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-10-01/network"
 	azresources "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/kelseyhightower/envconfig"

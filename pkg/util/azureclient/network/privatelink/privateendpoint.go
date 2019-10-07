@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/Azure/azure-sdk-for-go/profiles/latest/network/mgmt/network"
+	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-10-01/network"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure"
 )
