@@ -64,6 +64,14 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 
 	isAdmin := isAdminRequest(req)
 
+	var apiVersion string
+	keys, ok := req.URL.Query()["api-version"]
+	if !ok || len(keys[0]) < 1 {
+		apiVersion = latestApiVersion
+	} else {
+		apiVersion = keys[0]
+	}
+
 	// convert the external API manifest into the internal API representation
 	s.log.Info("read request and convert to internal")
 	var cs *internalapi.OpenShiftManagedCluster
@@ -76,16 +84,29 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 			s.store.Put(cs)
 		}
 	} else {
-		s.log.Info("customer request")
-		cs, err = s.read20191027Request(req.Body, oldCs)
-		if err == nil {
-			cs.Properties.ProvisioningState = internalapi.Updating
-			s.store.Put(cs)
+		switch apiVersion {
+		case "2019-10-27-preview":
+			cs, err = s.read20191027Request(req.Body, oldCs)
+			if err == nil {
+				cs.Properties.ProvisioningState = internalapi.Updating
+				s.store.Put(cs)
+			}
+		case "2019-04-30":
+			cs, err = s.read20190430Request(req.Body, oldCs)
+			if err == nil {
+				cs.Properties.ProvisioningState = internalapi.Updating
+				s.store.Put(cs)
+			}
+		case "2019-09-30-preview":
+			cs, err = s.read20190930Request(req.Body, oldCs)
+			if err == nil {
+				cs.Properties.ProvisioningState = internalapi.Updating
+				s.store.Put(cs)
+			}
+		default:
+			s.badRequest(w, fmt.Sprintf("Not supported APIVersion %s", apiVersion))
+			return
 		}
-	}
-	if err != nil {
-		s.badRequest(w, fmt.Sprintf("Failed to convert to internal type: %v", err))
-		return
 	}
 
 	config, err := client.NewServerConfig(s.log, cs)
