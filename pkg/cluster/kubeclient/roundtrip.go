@@ -212,7 +212,7 @@ func (u *Kubeclientset) EnablePrivateEndpointRoundTripper(cs *api.OpenShiftManag
 
 		rt.(*http.Transport).DisableKeepAlives = u.disableKeepAlives
 
-		// New RT with existing existing certificates and new dialing location
+		// new ty with existing certificates and new dialing location
 		rtNew := &http.Transport{
 			DialTLS: func(network, addr string) (net.Conn, error) {
 				host, port, err := net.SplitHostPort(addr)
@@ -249,5 +249,6 @@ func (u *Kubeclientset) EnablePrivateEndpointRoundTripper(cs *api.OpenShiftManag
 
 	u.Client = cli
 	u.Seccli = seccli
+	u.restconfig = restconfig
 	return nil
 }

@@ -305,9 +305,9 @@ func (c Client) Create(ctx context.Context) (string, error) {
 			return "", err
 		}
 		consoleURL = *oc.Properties.PublicHostname
-	// case "2019-10-27-preview" forward to default
+	// case "2019-09-30-preview" forward to default
 	default:
-		oc, err := c.createOrUpdatev20191027preview(ctx)
+		oc, err := c.createOrUpdatev20190930preview(ctx)
 		if err != nil {
 			return "", err
 		}
