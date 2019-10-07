@@ -2,8 +2,6 @@ package cluster
 
 import (
 	"context"
-
-	"github.com/openshift/openshift-azure/pkg/api/features"
 )
 
 // CreateOrUpdateSyncPod creates or updates the sync pod.
@@ -20,7 +18,7 @@ func (u *Upgrade) CreateOrUpdateSyncPod(ctx context.Context) error {
 		return err
 	}
 
-	if features.PrivateLinkEnabled(u.Cs) {
+	if u.Cs.Properties.PrivateAPIServer {
 		u.Interface.EnablePrivateEndpointRoundTripper(u.Cs)
 	}
 

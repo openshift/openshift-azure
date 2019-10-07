@@ -38,7 +38,8 @@ type Kubeclientset struct {
 	Log    *logrus.Entry
 
 	// for internal reuse
-	restconfig *rest.Config
+	restconfig        *rest.Config
+	disableKeepAlives bool
 }
 
 var _ Interface = &Kubeclientset{}
