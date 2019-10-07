@@ -102,8 +102,8 @@ func TestUpdateWorkerAgentPool(t *testing.T) {
 			ublob.ScalesetHashes[*sss[0].Name] = []byte("updated")
 			c = ubs.EXPECT().Read().Return(ublob, nil).After(c)
 			c = ssc.EXPECT().List(ctx, tt.cs.Properties.AzProfile.ResourceGroup).Return(sss, nil).After(c)
-			c = scalerFactory.EXPECT().New(log, ssc, vmc, kc, tt.cs.Properties.AzProfile.ResourceGroup, &sss[0], api.TestConfig{}).Return(targetScaler).After(c)
-			c = scalerFactory.EXPECT().New(log, ssc, vmc, kc, tt.cs.Properties.AzProfile.ResourceGroup, &sss[1], api.TestConfig{}).Return(sourceScaler).After(c)
+			c = scalerFactory.EXPECT().New(log, ssc, vmc, kc, tt.cs.Properties.AzProfile.ResourceGroup, &sss[0], api.TestConfig{}, tt.cs.Config.SSHKey).Return(targetScaler).After(c)
+			c = scalerFactory.EXPECT().New(log, ssc, vmc, kc, tt.cs.Properties.AzProfile.ResourceGroup, &sss[1], api.TestConfig{}, tt.cs.Config.SSHKey).Return(sourceScaler).After(c)
 			// scaling
 			c = sourceScaler.EXPECT().Scale(ctx, int64(1)).After(c).DoAndReturn(
 				func(ctx context.Context, count int64) *api.PluginError {

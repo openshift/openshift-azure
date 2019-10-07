@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -19,14 +18,20 @@ import (
 	armconst "github.com/openshift/openshift-azure/pkg/fakerp/arm/constants"
 	"github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/compute"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
 	"github.com/openshift/openshift-azure/pkg/util/enrich"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
+	"github.com/openshift/openshift-azure/test/util/diagnostics"
 )
 
-func debugDeployerError(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, err error, testConfig api.TestConfig) error {
+func debugDeployerError(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) error {
+	if testConfig.ArtifactDir == "" {
+		log.Debugf("skipping debug deployer as ArtifactDir is empty")
+		return nil
+	}
 	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 	if err != nil {
 		return err
@@ -40,6 +45,8 @@ func debugDeployerError(ctx context.Context, log *logrus.Entry, cs *api.OpenShif
 		return err
 	}
 
+	ssc := compute.NewVirtualMachineScaleSetsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer)
+	ssd := diagnostics.NewScalesetDebugger(log, cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, testConfig, ssc)
 	for _, op := range operations {
 		if *op.Properties.ProvisioningState == "Succeeded" {
 			continue
@@ -47,47 +54,15 @@ func debugDeployerError(ctx context.Context, log *logrus.Entry, cs *api.OpenShif
 
 		b, _ := json.MarshalIndent(op, "", "  ")
 		log.Debug(string(b))
-
-		if testConfig.ArtifactDir != "" &&
-			op.Properties.TargetResource != nil &&
+		if op.Properties.TargetResource != nil &&
 			*op.Properties.TargetResource.ResourceType == "Microsoft.Compute/virtualMachineScaleSets" {
-			s, err := NewSSHer(ctx, log, cs)
-			if err != nil {
-				log.Warnf("NewSSHer failed: %v", err)
-				continue
-			}
-
+			ssd.GatherActivityLogs(ctx)
 			for _, app := range cs.Properties.AgentPoolProfiles {
 				prefix := names.GetScalesetName(&app, "")
-				if !strings.HasPrefix(*op.Properties.TargetResource.ResourceName, prefix) {
-					continue
-				}
-
-				for i := int64(0); i < app.Count; i++ {
-					hostname := (*op.Properties.TargetResource.ResourceName)[3:] + fmt.Sprintf("-%06s", strconv.FormatInt(i, 36))
-					cli, err := s.Dial(ctx, hostname)
-					if err != nil {
-						log.Warnf("Dial failed: %v", err)
-						continue
-					}
-
-					err = s.RunRemoteCommandAndSaveToFile(cli, "sudo journalctl", testConfig.ArtifactDir+"/"+hostname+"-early-journal")
-					if err != nil {
-						log.Warnf("RunRemoteCommandAndSaveToFile failed: %v", err)
-						continue
-					}
-
-					err = s.RunRemoteCommandAndSaveToFile(cli, "sudo cat /var/lib/waagent/custom-script/download/1/stdout", testConfig.ArtifactDir+"/"+hostname+"-waagent-stdout")
-					if err != nil {
-						log.Warnf("RunRemoteCommandAndSaveToFile failed: %v", err)
-						continue
-					}
-
-					err = s.RunRemoteCommandAndSaveToFile(cli, "sudo cat /var/lib/waagent/custom-script/download/1/stderr", testConfig.ArtifactDir+"/"+hostname+"-waagent-stderr")
-					if err != nil {
-						log.Warnf("RunRemoteCommandAndSaveToFile failed: %v", err)
-						continue
-					}
+				ssName := *op.Properties.TargetResource.ResourceName
+				if strings.HasPrefix(ssName, prefix) {
+					ssd.GatherStatuses(ctx, ssName)
+					ssd.GatherHostLogs(ctx, ssName, app.Count, cs.Config.SSHKey)
 				}
 			}
 		}
@@ -126,7 +101,7 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, conf *clien
 		err = future.WaitForCompletionRef(ctx, deployments.Client())
 		if err != nil {
 			log.Warnf("deployment failed: %#v", err)
-			debugDeployerError(ctx, log, cs, err, testConfig)
+			debugDeployerError(ctx, log, cs, testConfig)
 		}
 
 		// we check if PE exists and get IP
@@ -158,7 +133,7 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, conf *clien
 				err = future.WaitForCompletionRef(ctx, deployments.Client())
 				if err != nil {
 					log.Warnf("deployment failed: %#v", err)
-					debugDeployerError(ctx, log, cs, err, testConfig)
+					debugDeployerError(ctx, log, cs, testConfig)
 				}
 
 				log.Info("applying PE deployment")
@@ -181,7 +156,7 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, conf *clien
 				err = future.WaitForCompletionRef(ctx, deployments.Client())
 				if err != nil {
 					log.Warnf("deployment failed: %#v", err)
-					debugDeployerError(ctx, log, cs, err, testConfig)
+					debugDeployerError(ctx, log, cs, testConfig)
 				}
 			}
 			if cs.Properties.PrivateAPIServer {

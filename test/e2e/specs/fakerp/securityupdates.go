@@ -14,10 +14,10 @@ import (
 	"github.com/ghodss/yaml"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/fakerp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/sanity"
+	"github.com/openshift/openshift-azure/test/util/diagnostics"
 	logger "github.com/openshift/openshift-azure/test/util/log"
 )
 
@@ -59,7 +59,7 @@ var _ = Describe("Apply security updates E2E tests [ApplySecurityUpdates][LongRu
 		By("Creating ssh client connection to sample vm")
 		authorizer, err := azureclient.NewAuthorizerFromEnvironment("")
 		ctx = context.WithValue(ctx, api.ContextKeyClientAuthorizer, authorizer)
-		ssher, err := fakerp.NewSSHer(ctx, log, internal)
+		ssher, err := diagnostics.NewSSHer(ctx, log, internal.Properties.AzProfile.SubscriptionID, internal.Properties.AzProfile.ResourceGroup, internal.Config.SSHKey)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(ssher).NotTo(BeNil())
 		sshcli, err := ssher.Dial(ctx, sampleVm)
