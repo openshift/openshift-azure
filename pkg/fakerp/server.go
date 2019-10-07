@@ -21,7 +21,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/plugin"
 )
 
-const latestApiVersion = "2019-10-27-preview"
+const latestApiVersion = "2019-09-30-preview"
 
 type Server struct {
 	router *chi.Mux
