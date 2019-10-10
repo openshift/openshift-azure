@@ -564,28 +564,19 @@ func vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 				IdleTimeoutInMinutes: to.Int32Ptr(15),
 			},
 		}
+		lbName := armconst.LbAPIServerName
+		if cs.Properties.PrivateAPIServer {
+			lbName = armconst.IlbAPIServerName
+		}
 		(*(*vmss.VirtualMachineProfile.NetworkProfile.NetworkInterfaceConfigurations)[0].VirtualMachineScaleSetNetworkConfigurationProperties.IPConfigurations)[0].LoadBalancerBackendAddressPools = &[]compute.SubResource{
 			{
 				ID: to.StringPtr(resourceid.ResourceID(
 					cs.Properties.AzProfile.SubscriptionID,
 					cs.Properties.AzProfile.ResourceGroup,
 					"Microsoft.Network/loadBalancers",
-					armconst.LbAPIServerName,
+					lbName,
 				) + "/backendAddressPools/" + armconst.LbAPIServerBackendPoolName),
 			},
-		}
-		if cs.Properties.PrivateAPIServer {
-			pool := *(*(*vmss.VirtualMachineProfile.NetworkProfile.NetworkInterfaceConfigurations)[0].VirtualMachineScaleSetNetworkConfigurationProperties.IPConfigurations)[0].LoadBalancerBackendAddressPools
-			pool = append(pool, compute.SubResource{
-				ID: to.StringPtr(resourceid.ResourceID(
-					cs.Properties.AzProfile.SubscriptionID,
-					cs.Properties.AzProfile.ResourceGroup,
-					"Microsoft.Network/loadBalancers",
-					armconst.IlbAPIServerName,
-				) + "/backendAddressPools/" + armconst.LbAPIServerBackendPoolName),
-			},
-			)
-			(*(*vmss.VirtualMachineProfile.NetworkProfile.NetworkInterfaceConfigurations)[0].VirtualMachineScaleSetNetworkConfigurationProperties.IPConfigurations)[0].LoadBalancerBackendAddressPools = &pool
 		}
 		(*vmss.VirtualMachineProfile.NetworkProfile.NetworkInterfaceConfigurations)[0].VirtualMachineScaleSetNetworkConfigurationProperties.NetworkSecurityGroup = &compute.SubResource{
 			ID: to.StringPtr(resourceid.ResourceID(

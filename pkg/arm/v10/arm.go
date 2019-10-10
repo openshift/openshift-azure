@@ -39,8 +39,6 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 		ContentVersion: "1.0.0.0",
 		Resources: []interface{}{
 			g.vnet(),
-			g.ipAPIServer(),
-			g.lbAPIServer(),
 			g.storageAccount(g.cs.Config.RegistryStorageAccount, map[string]*string{
 				"type": to.StringPtr("registry"),
 			}),
@@ -50,12 +48,15 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 			g.nsgMaster(),
 		},
 	}
+	if g.cs.Properties.PrivateAPIServer {
+		t.Resources = append(t.Resources, g.ilbAPIServer())
+	} else {
+		t.Resources = append(t.Resources, g.ipAPIServer(), g.lbAPIServer())
+	}
 	if !isUpdate {
 		t.Resources = append(t.Resources, g.ipOutbound(), g.lbKubernetes(), g.nsgWorker())
 	}
-	if g.cs.Properties.PrivateAPIServer {
-		t.Resources = append(t.Resources, g.ilbAPIServer())
-	}
+
 	for _, app := range g.cs.Properties.AgentPoolProfiles {
 		if app.Role == api.AgentPoolProfileRoleMaster || !isUpdate {
 			vmss, err := g.Vmss(&app, backupBlob, suffix)
