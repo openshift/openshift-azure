@@ -3,6 +3,7 @@ package api
 
 import (
 	"context"
+	"crypto/tls"
 )
 
 type contextKey string
@@ -94,6 +95,7 @@ type TestConfig struct {
 	ImageResourceGroup string
 	ImageResourceName  string
 	ArtifactDir        string
+	ProxyCertificate   tls.Certificate
 }
 
 // Plugin is the main interface to openshift-azure

@@ -2,7 +2,9 @@ package fakerp
 
 import (
 	"crypto/rsa"
+	"crypto/tls"
 	"crypto/x509"
+	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -10,7 +12,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
-	"github.com/openshift/openshift-azure/pkg/util/tls"
+	tlsutil "github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
 type contextKey string
@@ -22,12 +24,19 @@ const (
 )
 
 func GetTestConfig() api.TestConfig {
+	// load proxy configuration for tests
+	cert, err := tls.LoadX509KeyPair("secrets/proxy-client.pem", "secrets/proxy-client.key")
+	if err != nil {
+		panic(fmt.Sprintf("server: loadkeys: %s", err))
+	}
+
 	return api.TestConfig{
 		RunningUnderTest:   os.Getenv("RUNNING_UNDER_TEST") == "true",
 		DebugHashFunctions: os.Getenv("DEBUG_HASH_FUNCTIONS") == "true",
 		ImageResourceGroup: os.Getenv("IMAGE_RESOURCEGROUP"),
 		ImageResourceName:  os.Getenv("IMAGE_RESOURCENAME"),
 		ArtifactDir:        os.Getenv("ARTIFACTS"),
+		ProxyCertificate:   cert,
 	}
 }
 
@@ -117,7 +126,7 @@ func readCert(path string) (*x509.Certificate, error) {
 	if err != nil {
 		return nil, err
 	}
-	return tls.ParseCert(b)
+	return tlsutil.ParseCert(b)
 }
 
 func readKey(path string) (*rsa.PrivateKey, error) {
@@ -125,5 +134,5 @@ func readKey(path string) (*rsa.PrivateKey, error) {
 	if err != nil {
 		return nil, err
 	}
-	return tls.ParsePrivateKey(b)
+	return tlsutil.ParsePrivateKey(b)
 }

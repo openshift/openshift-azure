@@ -40,6 +40,9 @@ type Kubeclientset struct {
 	// for internal reuse
 	restconfig        *rest.Config
 	disableKeepAlives bool
+
+	// for test only
+	testConfig api.TestConfig
 }
 
 var _ Interface = &Kubeclientset{}
