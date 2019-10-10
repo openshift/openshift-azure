@@ -333,7 +333,7 @@ var translations = map[string][]struct {
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='AKS_RESOURCE_ID')].value"),
-			Template: "/subscriptions/{{ .ContainerService.Properties.AzProfile.SubscriptionID }}/resourceGroups/{{ .ContainerService.Properties.AzProfile.ResourceGroup }}/providers/Microsoft.ContainerService/openShiftManagedClusters/{{ .ContainerService.Name }}",
+			Template: "{{ .ContainerService.ID }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='AKS_REGION')].value"),
