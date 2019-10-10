@@ -332,8 +332,12 @@ var translations = map[string][]struct {
 			Template: "{{ .Config.Images.LogAnalyticsAgent }}",
 		},
 		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='ACS_RESOURCE_NAME')].value"),
-			Template: "{{ .ContainerService.Name }}",
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='AKS_RESOURCE_ID')].value"),
+			Template: "/subscriptions/{{ .ContainerService.Properties.AzProfile.SubscriptionID }}/resourceGroups/{{ .ContainerService.Properties.AzProfile.ResourceGroup }}/providers/Microsoft.ContainerService/openShiftManagedClusters/{{ .ContainerService.Name }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='AKS_REGION')].value"),
+			Template: "{{ .ContainerService.Location }}",
 		},
 	},
 	"DaemonSet.apps/openshift-template-service-broker/apiserver": {
@@ -374,8 +378,12 @@ var translations = map[string][]struct {
 			Template: "{{ .Config.Images.LogAnalyticsAgent }}",
 		},
 		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='ACS_RESOURCE_NAME')].value"),
-			Template: "{{ .ContainerService.Name }}",
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='AKS_RESOURCE_ID')].value"),
+			Template: "/subscriptions/{{ .ContainerService.Properties.AzProfile.SubscriptionID }}/resourceGroups/{{ .ContainerService.Properties.AzProfile.ResourceGroup }}/providers/Microsoft.ContainerService/openShiftManagedClusters/{{ .ContainerService.Name }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='AKS_REGION')].value"),
+			Template: "{{ .ContainerService.Location }}",
 		},
 	},
 	"Deployment.apps/default/registry-console": {
