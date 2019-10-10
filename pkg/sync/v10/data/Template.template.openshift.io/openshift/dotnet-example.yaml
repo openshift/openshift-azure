@@ -74,6 +74,10 @@ objects:
           value: ${DOTNET_RESTORE_SOURCES}
         - name: DOTNET_TOOLS
           value: ${DOTNET_TOOLS}
+        - name: DOTNET_PUBLISH_READYTORUN
+          value: ${DOTNET_PUBLISH_READYTORUN}
+        - name: DOTNET_RESTORE_CONFIGFILE
+          value: ${DOTNET_RESTORE_CONFIGFILE}
         from:
           kind: ImageStreamTag
           name: ${DOTNET_IMAGE_STREAM_TAG}
@@ -154,7 +158,7 @@ parameters:
   displayName: .NET builder
   name: DOTNET_IMAGE_STREAM_TAG
   required: true
-  value: dotnet:2.2
+  value: dotnet:3.0
 - description: The OpenShift Namespace where the ImageStream resides.
   displayName: Namespace
   name: NAMESPACE
@@ -169,7 +173,7 @@ parameters:
     are not using the default branch.
   displayName: Git Reference
   name: SOURCE_REPOSITORY_REF
-  value: dotnetcore-2.2
+  value: dotnetcore-3.0
 - description: Set this to use a subdirectory of the source code repository
   displayName: Context Directory
   name: CONTEXT_DIR
@@ -192,6 +196,9 @@ parameters:
   displayName: Startup Project
   name: DOTNET_STARTUP_PROJECT
   value: app
+- description: Set this to 'true' to perform an ahead-of-time compilation.
+  displayName: Ahead-of-time compilation
+  name: DOTNET_PUBLISH_READYTORUN
 - description: Set this when the assembly name is overridden in the project file.
   displayName: Startup Assembly
   name: DOTNET_ASSEMBLY_NAME
@@ -208,6 +215,10 @@ parameters:
   displayName: Configuration
   name: DOTNET_CONFIGURATION
   value: Release
-- description: Set this to override the NuGet.config sources.
+- description: Set this to override the NuGet.config sources. Cannot be combined with
+    DOTNET_RESTORE_CONFIGFILE.
   displayName: NuGet package sources
   name: DOTNET_RESTORE_SOURCES
+- description: Set this to a Nuget.Config file. Cannot be combined with DOTNET_RESTORE_SOURCES.
+  displayName: NuGet.Config file
+  name: DOTNET_RESTORE_CONFIGFILE
