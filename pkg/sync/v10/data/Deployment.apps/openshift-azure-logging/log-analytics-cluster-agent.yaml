@@ -33,7 +33,9 @@ spec:
             secretKeyRef:
               key: KEY
               name: log-analytics
-        - name: ACS_RESOURCE_NAME
+        - name: AKS_RESOURCE_ID
+          value: '*** GENERATED ***'
+        - name: AKS_REGION
           value: '*** GENERATED ***'
         - name: CONTROLLER_TYPE
           value: ReplicaSet
