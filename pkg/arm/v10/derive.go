@@ -29,11 +29,11 @@ func (derivedType) CombinedImagePullSecret(cfg *api.Config) ([]byte, error) {
 	var config DockerConfigJson
 	err := json.Unmarshal(cfg.Images.ImagePullSecret, &config)
 	if err != nil {
-		return []byte{}, err
+		return nil, err
 	}
 	err = json.Unmarshal(cfg.Images.GenevaImagePullSecret, &config)
 	if err != nil {
-		return []byte{}, err
+		return nil, err
 	}
 
 	return json.Marshal(config)

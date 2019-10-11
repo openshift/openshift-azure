@@ -28,7 +28,7 @@ yum clean all
 rm -rf /var/lib/yum/client-cert.pem /var/lib/yum/client-key.pem
 {{end}}
 
-# create container pull secret 
+# create container pull secret
 mkdir -p /var/lib/origin/.docker
 cat >/var/lib/origin/.docker/config.json <<'EOF'
 {{ .Derived.CombinedImagePullSecret .Config | String }}
@@ -185,6 +185,3 @@ shutdown --reboot +2
 {{else}}
 systemctl start atomic-openshift-node.service || true
 {{end}}
-
-# destroy yourself
-rm -rf /var/lib/waagent/custom-script/download/*/script.sh

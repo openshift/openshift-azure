@@ -1,7 +1,7 @@
 package arm
 
 import (
-	"reflect"
+	"bytes"
 	"testing"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -30,8 +30,8 @@ func TestCombinedImagePullSecret(t *testing.T) {
 	if err != nil {
 		t.Errorf("derived.CombinedImagePullSecret() error %v", err)
 	}
-	if !reflect.DeepEqual(expected, b) {
-		t.Errorf("derived.CombinedImagePullSecret() = lenght \"%v\", want \"%v\"", len(b), len(expected))
+	if !bytes.Equal(expected, b) {
+		t.Errorf("derived.CombinedImagePullSecret(): got %q, expected %q", string(b), string(expected))
 	}
 
 }
