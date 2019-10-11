@@ -67,11 +67,11 @@ func GetPluginTemplate() (*pluginapi.Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	pullSecret, err := ioutil.ReadFile("secrets/.dockerconfigjson")
+	genevaPullSecret, err := ioutil.ReadFile("secrets/acr-docker-pull-secert")
 	if err != nil {
 		return nil, err
 	}
-	imagePullSecret, err := ioutil.ReadFile("secrets/system-docker-config.json")
+	rhPullSecret, err := ioutil.ReadFile("secrets/rh-docker-pull-secret")
 	if err != nil {
 		return nil, err
 	}
@@ -81,8 +81,8 @@ func GetPluginTemplate() (*pluginapi.Config, error) {
 	template.Certificates.GenevaMetrics.Key = metKey
 	template.Certificates.PackageRepository.Cert = yumRepoCert
 	template.Certificates.PackageRepository.Key = yumRepoKey
-	template.GenevaImagePullSecret = pullSecret
-	template.ImagePullSecret = imagePullSecret
+	template.GenevaImagePullSecret = genevaPullSecret
+	template.ImagePullSecret = rhPullSecret
 
 	return template, nil
 }

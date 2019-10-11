@@ -56,7 +56,6 @@
 // data/master/etc/pki/ca-trust/source/anchors/openshift-ca.crt
 // data/master/etc/sysconfig/atomic-openshift-node
 // data/master/root/.kube/config
-// data/master/var/lib/origin/.docker/config.json
 // data/worker/etc/origin/cloudprovider/azure.conf
 // data/worker/etc/origin/node/bootstrap.kubeconfig
 // data/worker/etc/origin/node/ca.crt
@@ -70,7 +69,6 @@
 // data/worker/etc/origin/node/volume-config.yaml
 // data/worker/etc/pki/ca-trust/source/anchors/openshift-ca.crt
 // data/worker/etc/sysconfig/atomic-openshift-node
-// data/worker/var/lib/origin/.docker/config.json
 package startup
 
 import (
@@ -1267,26 +1265,6 @@ func masterRootKubeConfig() (*asset, error) {
 	return a, nil
 }
 
-var _masterVarLibOriginDockerConfigJson = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xaa\xae\x56\xd0\x73\xce\xcf\x4b\xcb\x4c\xd7\xf3\xcc\x4d\x4c\x4f\x2d\x86\x50\x01\xa5\x39\x39\xc1\xa9\xc9\x45\xa9\x25\x0a\x35\x0a\xc1\x25\x45\x99\x79\xe9\x0a\xb5\xb5\x5c\x80\x00\x00\x00\xff\xff\x02\xd2\xee\x96\x2e\x00\x00\x00")
-
-func masterVarLibOriginDockerConfigJsonBytes() ([]byte, error) {
-	return bindataRead(
-		_masterVarLibOriginDockerConfigJson,
-		"master/var/lib/origin/.docker/config.json",
-	)
-}
-
-func masterVarLibOriginDockerConfigJson() (*asset, error) {
-	bytes, err := masterVarLibOriginDockerConfigJsonBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "master/var/lib/origin/.docker/config.json", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
 var _workerEtcOriginCloudproviderAzureConf = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xaa\xae\x56\xd0\x73\x49\x2d\xca\x2c\x4b\x4d\xd1\x0b\xcf\x2f\xca\x4e\x2d\x72\xce\xc9\x2f\x4d\x09\x28\xca\x2f\xcb\x4c\x49\x2d\x72\xce\xcf\x4b\x53\xd0\x73\xce\xcf\x2b\x49\xcc\xcc\x4b\x2d\x0a\x4e\x2d\x2a\xcb\x4c\x4e\x55\xa8\x51\x08\x2e\x29\xca\xcc\x4b\x57\xa8\xad\xe5\x02\x04\x00\x00\xff\xff\x73\xa7\x88\x79\x42\x00\x00\x00")
 
 func workerEtcOriginCloudproviderAzureConfBytes() ([]byte, error) {
@@ -1547,26 +1525,6 @@ func workerEtcSysconfigAtomicOpenshiftNode() (*asset, error) {
 	return a, nil
 }
 
-var _workerVarLibOriginDockerConfigJson = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xaa\xae\x56\xd0\x73\xce\xcf\x4b\xcb\x4c\xd7\xf3\xcc\x4d\x4c\x4f\x2d\x86\x50\x01\xa5\x39\x39\xc1\xa9\xc9\x45\xa9\x25\x0a\x35\x0a\xc1\x25\x45\x99\x79\xe9\x0a\xb5\xb5\x5c\x80\x00\x00\x00\xff\xff\x02\xd2\xee\x96\x2e\x00\x00\x00")
-
-func workerVarLibOriginDockerConfigJsonBytes() ([]byte, error) {
-	return bindataRead(
-		_workerVarLibOriginDockerConfigJson,
-		"worker/var/lib/origin/.docker/config.json",
-	)
-}
-
-func workerVarLibOriginDockerConfigJson() (*asset, error) {
-	bytes, err := workerVarLibOriginDockerConfigJsonBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "worker/var/lib/origin/.docker/config.json", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
 // Asset loads and returns the asset for the given name.
 // It returns an error if the asset could not be found or
 // could not be loaded.
@@ -1675,7 +1633,6 @@ var _bindata = map[string]func() (*asset, error){
 	"master/etc/pki/ca-trust/source/anchors/openshift-ca.crt": masterEtcPkiCaTrustSourceAnchorsOpenshiftCaCrt,
 	"master/etc/sysconfig/atomic-openshift-node":              masterEtcSysconfigAtomicOpenshiftNode,
 	"master/root/.kube/config":                                masterRootKubeConfig,
-	"master/var/lib/origin/.docker/config.json":               masterVarLibOriginDockerConfigJson,
 	"worker/etc/origin/cloudprovider/azure.conf":              workerEtcOriginCloudproviderAzureConf,
 	"worker/etc/origin/node/bootstrap.kubeconfig":             workerEtcOriginNodeBootstrapKubeconfig,
 	"worker/etc/origin/node/ca.crt":                           workerEtcOriginNodeCaCrt,
@@ -1689,7 +1646,6 @@ var _bindata = map[string]func() (*asset, error){
 	"worker/etc/origin/node/volume-config.yaml":               workerEtcOriginNodeVolumeConfigYaml,
 	"worker/etc/pki/ca-trust/source/anchors/openshift-ca.crt": workerEtcPkiCaTrustSourceAnchorsOpenshiftCaCrt,
 	"worker/etc/sysconfig/atomic-openshift-node":              workerEtcSysconfigAtomicOpenshiftNode,
-	"worker/var/lib/origin/.docker/config.json":               workerVarLibOriginDockerConfigJson,
 }
 
 // AssetDir returns the file names below a certain
@@ -1834,15 +1790,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 				"config": {masterRootKubeConfig, map[string]*bintree{}},
 			}},
 		}},
-		"var": {nil, map[string]*bintree{
-			"lib": {nil, map[string]*bintree{
-				"origin": {nil, map[string]*bintree{
-					".docker": {nil, map[string]*bintree{
-						"config.json": {masterVarLibOriginDockerConfigJson, map[string]*bintree{}},
-					}},
-				}},
-			}},
-		}},
 	}},
 	"worker": {nil, map[string]*bintree{
 		"etc": {nil, map[string]*bintree{
@@ -1876,15 +1823,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			}},
 			"sysconfig": {nil, map[string]*bintree{
 				"atomic-openshift-node": {workerEtcSysconfigAtomicOpenshiftNode, map[string]*bintree{}},
-			}},
-		}},
-		"var": {nil, map[string]*bintree{
-			"lib": {nil, map[string]*bintree{
-				"origin": {nil, map[string]*bintree{
-					".docker": {nil, map[string]*bintree{
-						"config.json": {workerVarLibOriginDockerConfigJson, map[string]*bintree{}},
-					}},
-				}},
 			}},
 		}},
 	}},

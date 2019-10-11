@@ -71,6 +71,12 @@ Branching model
    with the appropriate version on quay.io. (Note: only members of the
    `openshift-on-azure` quay.io team have access.)
 
+   Images for production are released to ACR. This can be done by people,
+   who have ACR root secrets. These images can be built by checking out 
+   `release-vX` branch and running command `make azure-push`. For this command
+   to publish images to quay.io.
+   Publishing to ACR is a manual process for now.
+
 2. Create a release branch from master and push it.
 
 ```

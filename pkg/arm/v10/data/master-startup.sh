@@ -28,6 +28,13 @@ yum clean all
 rm -rf /var/lib/yum/client-cert.pem /var/lib/yum/client-key.pem
 {{end}}
 
+# create container pull secret
+mkdir -p /var/lib/origin/.docker
+cat >/var/lib/origin/.docker/config.json <<'EOF'
+{{ .Derived.CombinedImagePullSecret .Config | String }}
+EOF
+ln -s /var/lib/origin/.docker /root/
+
 # TODO: delete the following group creation after it is baked into our VM images
 groupadd -f docker
 
@@ -178,4 +185,3 @@ shutdown --reboot +2
 {{else}}
 systemctl start atomic-openshift-node.service || true
 {{end}}
-

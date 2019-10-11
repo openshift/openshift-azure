@@ -25,6 +25,10 @@ func TestGenerate(t *testing.T) {
 					Ca:            api.CertKeyPair{Cert: tls.DummyCertificate, Key: tls.DummyPrivateKey},
 					NodeBootstrap: api.CertKeyPair{Cert: tls.DummyCertificate, Key: tls.DummyPrivateKey},
 				},
+				Images: api.ImageConfig{
+					GenevaImagePullSecret: populate.DummyImagePullSecret("acr.azure.io"),
+					ImagePullSecret:       populate.DummyImagePullSecret("registry.redhat.io"),
+				},
 			},
 		},
 	}
@@ -68,6 +72,8 @@ func TestHash(t *testing.T) {
 			VMSize: api.StandardD2sV3,
 		},
 	}
+	cs.Config.Images.GenevaImagePullSecret = populate.DummyImagePullSecret("acr.azure.io")
+	cs.Config.Images.ImagePullSecret = populate.DummyImagePullSecret("registry.redhat.io")
 
 	for _, role := range []api.AgentPoolProfileRole{api.AgentPoolProfileRoleMaster, api.AgentPoolProfileRoleCompute} {
 		sg := simpleGenerator{
