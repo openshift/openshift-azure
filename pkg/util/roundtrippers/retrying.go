@@ -7,8 +7,6 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"os"
-	"strings"
 	"syscall"
 	"time"
 
@@ -97,11 +95,9 @@ func NewPrivateEndpoint(log *logrus.Entry, location, privateEndpoint string, dis
 
 			// get proxy URL
 			// Test settings to use proxy instead of DialTLS
-			proxyURL := os.Getenv(fmt.Sprintf("PROXYURL_%s", strings.ToUpper(location)))
-
 			rtNew = &http.Transport{
 				Proxy: func(*http.Request) (*url.URL, error) {
-					return url.Parse(fmt.Sprintf("https://%s:8443/", proxyURL))
+					return url.Parse(fmt.Sprintf("https://%s:8443/", testConfig.ProxyURL))
 				},
 				TLSClientConfig:     tlsConfig,
 				TLSHandshakeTimeout: 10 * time.Second,

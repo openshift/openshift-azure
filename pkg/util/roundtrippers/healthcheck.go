@@ -6,8 +6,6 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"os"
-	"strings"
 	"time"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -23,11 +21,9 @@ func HealthCheck(dialHost string, location string, privateEndpoint *string, test
 	if testConfig.RunningUnderTest && privateEndpoint != nil {
 		tlsConfig.Certificates = append(tlsConfig.Certificates, testConfig.ProxyCertificate)
 		tlsConfig.InsecureSkipVerify = true
-		proxyURL := os.Getenv(fmt.Sprintf("PROXYURL_%s", strings.ToUpper(location)))
-
 		return &http.Transport{
 			Proxy: func(*http.Request) (*url.URL, error) {
-				return url.Parse(fmt.Sprintf("https://%s:8443/", proxyURL))
+				return url.Parse(fmt.Sprintf("https://%s:8443/", testConfig.ProxyURL))
 			},
 			TLSClientConfig:     tlsConfig,
 			TLSHandshakeTimeout: 10 * time.Second,

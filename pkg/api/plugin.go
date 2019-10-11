@@ -95,6 +95,7 @@ type TestConfig struct {
 	ImageResourceGroup string
 	ImageResourceName  string
 	ArtifactDir        string
+	ProxyURL           string
 	ProxyCertificate   tls.Certificate
 }
 
