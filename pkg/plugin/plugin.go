@@ -176,10 +176,18 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 	if err := clusterUpgrader.EtcdRestoreDeleteMasterScaleSet(ctx); err != nil {
 		return err
 	}
+	oldPE := cs.Properties.NetworkProfile.PrivateEndpoint
 	cs.Properties.NetworkProfile.PrivateEndpoint, err = deployFn(ctx, azuretemplate)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
 	}
+	if oldPE != cs.Properties.NetworkProfile.PrivateEndpoint {
+		err = clusterUpgrader.ReloadKubeClient(true)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+		}
+	}
+
 	if err := clusterUpgrader.EtcdRestoreDeleteMasterScaleSetHashes(ctx); err != nil {
 		return err
 	}
@@ -223,18 +231,18 @@ func (p *plugin) createOrUpdateExt(ctx context.Context, cs *api.OpenShiftManaged
 		isUpdate = false
 	}
 
-	if backupEtcd && isUpdate {
-		path := fmt.Sprintf("pre-update-%s", time.Now().UTC().Format("2006-01-02T15-04-05"))
-		err := p.BackupEtcdCluster(ctx, cs, path)
-		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepEtcdBackup}
-		}
-	}
-
 	p.log.Info("creating clients")
 	clusterUpgrader, err := p.upgraderFactory(ctx, p.log, cs, false, true, p.testConfig)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+	}
+	if backupEtcd && isUpdate && !(cs.Properties.PrivateAPIServer && cs.Properties.NetworkProfile.PrivateEndpoint != nil) {
+		p.log.Infof("backing up cluster")
+		path := fmt.Sprintf("pre-update-%s", time.Now().UTC().Format("2006-01-02T15-04-05"))
+		err = clusterUpgrader.BackupCluster(ctx, path)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepEtcdBackup}
+		}
 	}
 
 	p.log.Info("creating Config storage")
@@ -271,9 +279,16 @@ func (p *plugin) createOrUpdateExt(ctx context.Context, cs *api.OpenShiftManaged
 		p.log.Info("starting deploy")
 	}
 
+	oldPE := cs.Properties.NetworkProfile.PrivateEndpoint
 	cs.Properties.NetworkProfile.PrivateEndpoint, err = deployFn(ctx, azuretemplate)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
+	}
+	if oldPE != cs.Properties.NetworkProfile.PrivateEndpoint {
+		err = clusterUpgrader.ReloadKubeClient(true)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+		}
 	}
 
 	// enrich is required for the hash functions which are used below

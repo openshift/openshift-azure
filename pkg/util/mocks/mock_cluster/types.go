@@ -281,7 +281,7 @@ func (mr *MockUpgraderMockRecorder) Reimage(arg0, arg1, arg2 interface{}) *gomoc
 }
 
 // ReloadKubeClient mocks base method
-func (m *MockUpgrader) ReloadKubeClient(arg0 *api.OpenShiftManagedCluster) error {
+func (m *MockUpgrader) ReloadKubeClient(arg0 bool) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ReloadKubeClient", arg0)
 	ret0, _ := ret[0].(error)

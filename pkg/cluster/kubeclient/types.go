@@ -28,8 +28,6 @@ type Interface interface {
 	WaitForReadyMaster(ctx context.Context, hostname string) error
 	WaitForReadyWorker(ctx context.Context, hostname string) error
 	WaitForReadySyncPod(ctx context.Context) error
-
-	ReloadKubeClient(cs *api.OpenShiftManagedCluster) error
 }
 
 type Kubeclientset struct {

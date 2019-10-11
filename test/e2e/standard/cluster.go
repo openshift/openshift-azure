@@ -23,8 +23,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
+	"github.com/openshift/openshift-azure/pkg/util/roundtrippers"
 )
 
 func (sc *SanityChecker) checkMonitoringStackHealth(ctx context.Context) error {
@@ -324,7 +324,7 @@ func (sc *SanityChecker) checkCanAccessService(ctx context.Context, url string, 
 	pool.AddCert(cert)
 
 	cli := &http.Client{
-		Transport: &kubeclient.RetryingRoundTripper{
+		Transport: &roundtrippers.RetryingRoundTripper{
 			Log: sc.Log,
 			RoundTripper: &http.Transport{
 				TLSClientConfig: &tls.Config{

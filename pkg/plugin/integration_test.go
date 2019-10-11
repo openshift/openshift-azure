@@ -160,7 +160,7 @@ func newFakeResponseWrapper(raw []byte) restclient.ResponseWrapper {
 
 type fakeResponseWrapper []byte
 
-func getFakeHTTPClient(cs *api.OpenShiftManagedCluster) wait.SimpleHTTPClient {
+func getFakeHTTPClient(cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) wait.SimpleHTTPClient {
 	return wait.NewFakeHTTPClient()
 }
 

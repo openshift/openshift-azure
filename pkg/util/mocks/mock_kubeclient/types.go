@@ -10,8 +10,6 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	v1 "k8s.io/api/core/v1"
-
-	api "github.com/openshift/openshift-azure/pkg/api"
 )
 
 // MockInterface is a mock of Interface interface
@@ -106,20 +104,6 @@ func (m *MockInterface) GetControlPlanePods(arg0 context.Context) ([]v1.Pod, err
 func (mr *MockInterfaceMockRecorder) GetControlPlanePods(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetControlPlanePods", reflect.TypeOf((*MockInterface)(nil).GetControlPlanePods), arg0)
-}
-
-// ReloadKubeClient mocks base method
-func (m *MockInterface) ReloadKubeClient(arg0 *api.OpenShiftManagedCluster) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ReloadKubeClient", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// ReloadKubeClient indicates an expected call of ReloadKubeClient
-func (mr *MockInterfaceMockRecorder) ReloadKubeClient(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReloadKubeClient", reflect.TypeOf((*MockInterface)(nil).ReloadKubeClient), arg0)
 }
 
 // WaitForReadyMaster mocks base method

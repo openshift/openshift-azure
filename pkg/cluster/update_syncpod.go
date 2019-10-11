@@ -18,9 +18,5 @@ func (u *Upgrade) CreateOrUpdateSyncPod(ctx context.Context) error {
 		return err
 	}
 
-	if u.Cs.Properties.PrivateAPIServer {
-		u.Interface.ReloadKubeClient(u.Cs)
-	}
-
 	return u.Interface.EnsureSyncPod(ctx, u.Cs.Config.Images.Sync, hash)
 }
