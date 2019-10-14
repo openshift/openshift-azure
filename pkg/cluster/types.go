@@ -97,7 +97,7 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 		return nil, err
 	}
 
-	kubeclient, err := kubeclient.NewKubeclient(log, cs.Config.AdminKubeconfig, disableKeepAlives, testConfig)
+	kubeclient, err := kubeclient.NewKubeclient(log, cs.Config.AdminKubeconfig, cs, disableKeepAlives, testConfig)
 	if err != nil {
 		return nil, err
 	}

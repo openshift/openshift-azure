@@ -19,7 +19,7 @@ func (u *Upgrade) CreateOrUpdateSyncPod(ctx context.Context) error {
 	}
 
 	if u.Cs.Properties.PrivateAPIServer {
-		u.Interface.EnablePrivateEndpointRoundTripper(u.Cs)
+		u.Interface.ReloadKubeClient(u.Cs)
 	}
 
 	return u.Interface.EnsureSyncPod(ctx, u.Cs.Config.Images.Sync, hash)

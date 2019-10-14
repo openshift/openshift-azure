@@ -29,7 +29,7 @@ type Interface interface {
 	WaitForReadyWorker(ctx context.Context, hostname string) error
 	WaitForReadySyncPod(ctx context.Context) error
 
-	EnablePrivateEndpointRoundTripper(cs *api.OpenShiftManagedCluster) error
+	ReloadKubeClient(cs *api.OpenShiftManagedCluster) error
 }
 
 type Kubeclientset struct {

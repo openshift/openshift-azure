@@ -25,9 +25,19 @@ const (
 
 func GetTestConfig() api.TestConfig {
 	// load proxy configuration for tests
-	cert, err := tls.LoadX509KeyPair("secrets/proxy-client.pem", "secrets/proxy-client.key")
-	if err != nil {
-		panic(fmt.Sprintf("server: loadkeys: %s", err))
+	var cert tls.Certificate
+
+	// TODO: improve this
+	if _, err := os.Stat("secrets/proxy-client.pem"); os.IsNotExist(err) {
+		cert, err = tls.LoadX509KeyPair("../../secrets/proxy-client.pem", "../../secrets/proxy-client.key")
+		if err != nil {
+			panic(fmt.Sprintf("server: loadkeys: %s", err))
+		}
+	} else {
+		cert, err = tls.LoadX509KeyPair("secrets/proxy-client.pem", "secrets/proxy-client.key")
+		if err != nil {
+			panic(fmt.Sprintf("server: loadkeys: %s", err))
+		}
 	}
 
 	return api.TestConfig{

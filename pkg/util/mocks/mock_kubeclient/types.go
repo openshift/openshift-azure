@@ -79,20 +79,6 @@ func (mr *MockInterfaceMockRecorder) DrainAndDeleteWorker(arg0, arg1 interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DrainAndDeleteWorker", reflect.TypeOf((*MockInterface)(nil).DrainAndDeleteWorker), arg0, arg1)
 }
 
-// EnablePrivateEndpointRoundTripper mocks base method
-func (m *MockInterface) EnablePrivateEndpointRoundTripper(arg0 *api.OpenShiftManagedCluster) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "EnablePrivateEndpointRoundTripper", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// EnablePrivateEndpointRoundTripper indicates an expected call of EnablePrivateEndpointRoundTripper
-func (mr *MockInterfaceMockRecorder) EnablePrivateEndpointRoundTripper(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnablePrivateEndpointRoundTripper", reflect.TypeOf((*MockInterface)(nil).EnablePrivateEndpointRoundTripper), arg0)
-}
-
 // EnsureSyncPod mocks base method
 func (m *MockInterface) EnsureSyncPod(arg0 context.Context, arg1 string, arg2 []byte) error {
 	m.ctrl.T.Helper()
@@ -120,6 +106,20 @@ func (m *MockInterface) GetControlPlanePods(arg0 context.Context) ([]v1.Pod, err
 func (mr *MockInterfaceMockRecorder) GetControlPlanePods(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetControlPlanePods", reflect.TypeOf((*MockInterface)(nil).GetControlPlanePods), arg0)
+}
+
+// ReloadKubeClient mocks base method
+func (m *MockInterface) ReloadKubeClient(arg0 *api.OpenShiftManagedCluster) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ReloadKubeClient", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ReloadKubeClient indicates an expected call of ReloadKubeClient
+func (mr *MockInterfaceMockRecorder) ReloadKubeClient(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReloadKubeClient", reflect.TypeOf((*MockInterface)(nil).ReloadKubeClient), arg0)
 }
 
 // WaitForReadyMaster mocks base method

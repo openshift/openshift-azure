@@ -143,14 +143,126 @@ func (rt *RetryingRoundTripper) RoundTrip(req *http.Request) (resp *http.Respons
 }
 
 // NewKubeclient creates a new kubeclient
-func NewKubeclient(log *logrus.Entry, config *v1.Config, disableKeepAlives bool, testConfig api.TestConfig) (Interface, error) {
-	return newKubeclient(log, config, disableKeepAlives, nil, testConfig)
+func NewKubeclient(log *logrus.Entry, config *v1.Config, cs *api.OpenShiftManagedCluster, disableKeepAlives bool, testConfig api.TestConfig) (Interface, error) {
+	return newKubeclient(log, config, cs, disableKeepAlives, testConfig)
+}
+
+// NewRestConfig returns restconfig, based on configuration
+func NewRestConfig(log *logrus.Entry, config *v1.Config, cs *api.OpenShiftManagedCluster, disableKeepAlives bool, testConfig api.TestConfig) (*rest.Config, error) {
+	restconfig, err := managedcluster.RestConfigFromV1Config(config)
+	if err != nil {
+		return nil, err
+	}
+
+	// if we running in PE case - configure RT to use privateEndpoint/proxy
+	// newPrivateEndpoint will check if this is runningUnderTest or not
+	if cs.Properties.NetworkProfile.PrivateEndpoint != nil {
+		log.Debugf("override kubeClient roundtripper with PrivateEndpoint dialer")
+
+		tlsConfig, err := restclient.TLSConfigFor(restconfig)
+		if err != nil {
+			return nil, err
+		}
+
+		restconfig.WrapTransport = newPrivateEndpoint(log, cs, disableKeepAlives, testConfig, tlsConfig)
+		if testConfig.RunningUnderTest {
+			//override dialer in manual mode
+			restconfig.Host = *cs.Properties.NetworkProfile.PrivateEndpoint
+		}
+
+	} else {
+		restconfig.WrapTransport = func(rt http.RoundTripper) http.RoundTripper {
+			// first, tweak values on the incoming RoundTripper, which we are
+			// relying on being an *http.Transport.
+
+			rt.(*http.Transport).DisableKeepAlives = disableKeepAlives
+
+			// now wrap our RetryingRoundTripper around the incoming RoundTripper.
+			return &RetryingRoundTripper{
+				Log:          log,
+				RoundTripper: rt,
+				Retries:      5,
+				GetTimeout:   30 * time.Second,
+			}
+		}
+	}
+	return restconfig, nil
+}
+
+// newKubeclient creates a new kubeclient.
+// If PrivateEndpointIp is not nil - kubeclient roundtripper will point PrivateEndpoint IP address
+func newKubeclient(log *logrus.Entry, config *v1.Config, cs *api.OpenShiftManagedCluster, disableKeepAlives bool, testConfig api.TestConfig) (Interface, error) {
+	restconfig, err := NewRestConfig(log, config, cs, disableKeepAlives, testConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	return newKubeclientFromRestConfig(log, restconfig, disableKeepAlives, testConfig)
+}
+
+// newPrivateEndpoint new RoundTripper for private endpoint
+func newPrivateEndpoint(log *logrus.Entry, cs *api.OpenShiftManagedCluster, disableKeepAlives bool, testConfig api.TestConfig, tlsConfig *tls.Config) func(rt http.RoundTripper) http.RoundTripper {
+	return func(rt http.RoundTripper) http.RoundTripper {
+		var rtNew *http.Transport
+
+		// This is development code. This should never ever run in production
+		if testConfig.RunningUnderTest {
+			tlsConfig.Certificates = append(tlsConfig.Certificates, testConfig.ProxyCertificate)
+			tlsConfig.InsecureSkipVerify = true
+
+			// get proxy URL
+			// Test settings to use proxy instead of DialTLS
+			proxyURL := os.Getenv(fmt.Sprintf("PROXYURL_%s", strings.ToUpper(cs.Location)))
+
+			rtNew = &http.Transport{
+				Proxy: func(*http.Request) (*url.URL, error) {
+					return url.Parse(fmt.Sprintf("https://%s:8443/", proxyURL))
+				},
+				TLSClientConfig:     tlsConfig,
+				TLSHandshakeTimeout: 10 * time.Second,
+			}
+
+			rtNew.DisableKeepAlives = disableKeepAlives
+
+			return &RetryingRoundTripper{
+				Log:          log,
+				RoundTripper: rtNew,
+				Retries:      5,
+				GetTimeout:   30 * time.Second,
+			}
+		}
+
+		rtNew = &http.Transport{
+			DialTLS: func(network, addr string) (net.Conn, error) {
+				host, port, err := net.SplitHostPort(addr)
+				if err != nil {
+					return nil, err
+				}
+				c, err := net.Dial(network, net.JoinHostPort(*cs.Properties.NetworkProfile.PrivateEndpoint, port))
+				if err != nil {
+					return nil, err
+				}
+				tlsConfig.ServerName = host
+				return tls.Client(c, tlsConfig), nil
+			},
+		}
+
+		rtNew.DisableKeepAlives = disableKeepAlives
+
+		// now wrap our RetryingRoundTripper around the incoming RoundTripper.
+		return &RetryingRoundTripper{
+			Log:          log,
+			RoundTripper: rtNew,
+			Retries:      5,
+			GetTimeout:   30 * time.Second,
+		}
+	}
 }
 
 // newKubeclient creates a new kubeclient.
 // If PrivateEndpointIp is not nil - kubeclient roundtripper
 // will dial PrivateEndpoint IP address instead of public API
-func newKubeclientFromRestConfig(log *logrus.Entry, restconfig *rest.Config, disableKeepAlives bool, privateEndpointIP *string, testConfig api.TestConfig) (Interface, error) {
+func newKubeclientFromRestConfig(log *logrus.Entry, restconfig *rest.Config, disableKeepAlives bool, testConfig api.TestConfig) (Interface, error) {
 	cli, err := kubernetes.NewForConfig(restconfig)
 	if err != nil {
 		return nil, err
@@ -171,35 +283,9 @@ func newKubeclientFromRestConfig(log *logrus.Entry, restconfig *rest.Config, dis
 	}, nil
 }
 
-// newKubeclient creates a new kubeclient.
-// If PrivateEndpointIp is not nil - kubeclient roundtripper will point PrivateEndpoint IP address
-func newKubeclient(log *logrus.Entry, config *v1.Config, disableKeepAlives bool, privateEndpointIP *string, testConfig api.TestConfig) (Interface, error) {
-	restconfig, err := managedcluster.RestConfigFromV1Config(config)
-	if err != nil {
-		return nil, err
-	}
-
-	restconfig.WrapTransport = func(rt http.RoundTripper) http.RoundTripper {
-		// first, tweak values on the incoming RoundTripper, which we are
-		// relying on being an *http.Transport.
-
-		rt.(*http.Transport).DisableKeepAlives = disableKeepAlives
-
-		// now wrap our RetryingRoundTripper around the incoming RoundTripper.
-		return &RetryingRoundTripper{
-			Log:          log,
-			RoundTripper: rt,
-			Retries:      5,
-			GetTimeout:   30 * time.Second,
-		}
-	}
-
-	return newKubeclientFromRestConfig(log, restconfig, disableKeepAlives, privateEndpointIP, testConfig)
-}
-
-// EnablePrivateEndpointRoundTripper will override dialers to call
+// ReloadKubeClient will override dialers to call
 // API server via PrivateEndpoint while keeping certificate trust
-func (u *Kubeclientset) EnablePrivateEndpointRoundTripper(cs *api.OpenShiftManagedCluster) error {
+func (u *Kubeclientset) ReloadKubeClient(cs *api.OpenShiftManagedCluster) error {
 	if cs.Properties.NetworkProfile.PrivateEndpoint == nil {
 		return fmt.Errorf("enablePrivateEndpointRoundTripper failed. privateEndpoint is not set")
 	}
@@ -210,61 +296,7 @@ func (u *Kubeclientset) EnablePrivateEndpointRoundTripper(cs *api.OpenShiftManag
 		return err
 	}
 
-	restconfig.WrapTransport = func(rt http.RoundTripper) http.RoundTripper {
-		var rtNew *http.Transport
-
-		// This is development code. This should never ever run in production
-		if u.testConfig.RunningUnderTest {
-			tlsConfig.Certificates = append(tlsConfig.Certificates, u.testConfig.ProxyCertificate)
-			tlsConfig.InsecureSkipVerify = true
-
-			// get proxy URL
-			proxyURL := os.Getenv(fmt.Sprintf("PROXYURL_%s", strings.ToUpper(cs.Location)))
-
-			rtNew = &http.Transport{
-				Proxy: func(*http.Request) (*url.URL, error) {
-					return url.Parse(fmt.Sprintf("https://%s:8443/", proxyURL))
-				},
-				TLSClientConfig:     tlsConfig,
-				TLSHandshakeTimeout: 10 * time.Second,
-			}
-
-			rtNew.DisableKeepAlives = u.disableKeepAlives
-
-			return &RetryingRoundTripper{
-				Log:          u.Log,
-				RoundTripper: rtNew,
-				Retries:      5,
-				GetTimeout:   30 * time.Second,
-			}
-		}
-
-		// Test settings to use proxy instead of DialTLS
-		rtNew = &http.Transport{
-			DialTLS: func(network, addr string) (net.Conn, error) {
-				host, port, err := net.SplitHostPort(addr)
-				if err != nil {
-					return nil, err
-				}
-				c, err := net.Dial(network, net.JoinHostPort(*cs.Properties.NetworkProfile.PrivateEndpoint, port))
-				if err != nil {
-					return nil, err
-				}
-				tlsConfig.ServerName = host
-				return tls.Client(c, tlsConfig), nil
-			},
-		}
-
-		rtNew.DisableKeepAlives = u.disableKeepAlives
-
-		// now wrap our RetryingRoundTripper around the incoming RoundTripper.
-		return &RetryingRoundTripper{
-			Log:          u.Log,
-			RoundTripper: rtNew,
-			Retries:      5,
-			GetTimeout:   30 * time.Second,
-		}
-	}
+	restconfig.WrapTransport = newPrivateEndpoint(u.Log, cs, u.disableKeepAlives, u.testConfig, tlsConfig)
 	if u.testConfig.RunningUnderTest {
 		//override dialer in manual mode
 		restconfig.Host = *cs.Properties.NetworkProfile.PrivateEndpoint

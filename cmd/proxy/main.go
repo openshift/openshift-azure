@@ -33,7 +33,10 @@ func init() {
 }
 
 func run() error {
-	_, subnet, _ := net.ParseCIDR(*subnet)
+	_, subnet, err := net.ParseCIDR(*subnet)
+	if err != nil {
+		return err
+	}
 
 	// Create a CA certificate pool and add cert.pem to it
 	caCert, err := ioutil.ReadFile(*ca)
@@ -48,7 +51,6 @@ func run() error {
 		ClientCAs:  caCertPool,
 		ClientAuth: tls.RequireAndVerifyClientCert,
 	}
-	tlsConfig.BuildNameToCertificate()
 
 	server := &http.Server{
 		Addr:      ":8443",
@@ -64,14 +66,14 @@ func run() error {
 			ip, _, err := net.SplitHostPort(r.Host)
 			if err != nil {
 				log.Errorf(err.Error())
-				http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+				http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 				return
 			}
 			host := net.ParseIP(ip)
 
 			if !subnet.Contains(host) {
 				log.Errorf("host %s not in %s", host.String(), subnet.String())
-				http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+				http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
 				return
 			}
 
@@ -90,7 +92,7 @@ func handleTunneling(w http.ResponseWriter, r *http.Request) {
 	dConn, err := net.DialTimeout("tcp", r.Host, 10*time.Second)
 	if err != nil {
 		log.Error(err.Error())
-		http.Error(w, "ups", http.StatusServiceUnavailable)
+		http.Error(w, "ups", http.StatusBadRequest)
 		return
 	}
 
@@ -102,19 +104,31 @@ func handleTunneling(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cConn, _, err := hijacker.Hijack()
+	cConn, buf, err := hijacker.Hijack()
 	if err != nil {
 		log.Error(err.Error())
 		http.Error(w, "ups", http.StatusServiceUnavailable)
 	}
-	go transfer(dConn, cConn)
-	go transfer(cConn, dConn)
-}
+	// empty buffer if something was sent already
+	go func() {
+		_, err := io.Copy(dConn, buf)
+		if err != nil {
+			log.Error(err)
+		}
+		err = dConn.(*net.TCPConn).CloseWrite()
+		if err != nil {
+			log.Error(err)
+		}
+	}()
 
-func transfer(destination io.WriteCloser, source io.ReadCloser) {
-	defer destination.Close()
-	defer source.Close()
-	io.Copy(destination, source)
+	_, err = io.Copy(cConn, dConn)
+	if err != nil {
+		log.Error(err)
+	}
+	err = cConn.(*net.TCPConn).CloseWrite()
+	if err != nil {
+		log.Error(err)
+	}
 }
 
 func main() {
