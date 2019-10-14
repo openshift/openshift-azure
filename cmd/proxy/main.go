@@ -125,7 +125,7 @@ func handleTunneling(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Error(err)
 	}
-	err = cConn.(*net.TCPConn).CloseWrite()
+	err = cConn.(*tls.Conn).CloseWrite()
 	if err != nil {
 		log.Error(err)
 	}

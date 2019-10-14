@@ -234,9 +234,6 @@ func (p *plugin) createOrUpdateExt(ctx context.Context, cs *api.OpenShiftManaged
 	if p.testConfig.RunningUnderTest && p.testConfig.ProxyURL == "" {
 		proxyEnvName := fmt.Sprintf("PROXYURL_%s", strings.ToUpper(cs.Location))
 		p.testConfig.ProxyURL = os.Getenv(proxyEnvName)
-		if p.testConfig.ProxyURL == "" {
-			return &api.PluginError{Err: fmt.Errorf("%s is not set", proxyEnvName), Step: api.PluginStepClientCreation}
-		}
 		p.log.Debugf("%s is %s", proxyEnvName, p.testConfig.ProxyURL)
 	}
 

@@ -27,7 +27,13 @@ func getConsoleClient(cs *api.OpenShiftManagedCluster, testConfig api.TestConfig
 // HealthCheck function to verify cluster health
 func (u *Upgrade) HealthCheck(ctx context.Context) *api.PluginError {
 	u.Log.Info("checking developer console health")
-	_, err := wait.ForHTTPStatusOk(ctx, u.Log, u.GetConsoleClient(u.Cs, u.TestConfig), "https://"+u.Cs.Properties.PublicHostname+"/console/", time.Second)
+
+	url := "https://" + u.Cs.Properties.PublicHostname + "/console/"
+	if u.Cs.Properties.NetworkProfile.PrivateEndpoint != nil {
+		url = "https://" + *u.Cs.Properties.NetworkProfile.PrivateEndpoint + "/console/"
+	}
+
+	_, err := wait.ForHTTPStatusOk(ctx, u.Log, u.GetConsoleClient(u.Cs, u.TestConfig), url, time.Second)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepWaitForConsoleHealth}
 	}
@@ -48,6 +54,10 @@ func getAPIServerClient(cs *api.OpenShiftManagedCluster, testConfig api.TestConf
 
 func (u *Upgrade) WaitForHealthzStatusOk(ctx context.Context) error {
 	u.Log.Infof("waiting for API server healthz")
-	_, err := wait.ForHTTPStatusOk(ctx, u.Log, u.GetAPIServerClient(u.Cs, u.TestConfig), "https://"+u.Cs.Properties.FQDN+"/healthz", time.Second)
+	url := "https://" + u.Cs.Properties.FQDN + "/healthz"
+	if u.Cs.Properties.NetworkProfile.PrivateEndpoint != nil {
+		url = "https://" + *u.Cs.Properties.NetworkProfile.PrivateEndpoint + "/healthz"
+	}
+	_, err := wait.ForHTTPStatusOk(ctx, u.Log, u.GetAPIServerClient(u.Cs, u.TestConfig), url, time.Second)
 	return err
 }
