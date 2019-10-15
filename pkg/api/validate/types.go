@@ -143,6 +143,14 @@ func isValidCloudAppHostname(h, location string) bool {
 	return strings.HasSuffix(h, "."+location+".cloudapp.azure.com") && strings.Count(h, ".") == 4
 }
 
+func isIPWithinSubnet(ip, subnetCIDR string) bool {
+	_, ipSubnet, err := net.ParseCIDR(subnetCIDR)
+	if err != nil {
+		return false
+	}
+	return ipSubnet.Contains(net.ParseIP(ip))
+}
+
 func isValidIPV4CIDR(cidr string) bool {
 	ip, net, err := net.ParseCIDR(cidr)
 	if err != nil {

@@ -67,6 +67,30 @@ func (g *simpleGenerator) Generate(template *pluginapi.Config, setVersionFields 
 		}
 	}
 
+	masterParams := tls.CertParams{
+		Subject: pkix.Name{
+			CommonName: g.cs.Properties.FQDN,
+		},
+		DNSNames: []string{
+			"master-000000",
+			"master-000001",
+			"master-000002",
+			"kubernetes",
+			"kubernetes.default",
+			"kubernetes.default.svc",
+			"kubernetes.default.svc.cluster.local",
+		},
+		IPAddresses: []net.IP{
+			net.ParseIP("172.30.0.1"),
+		},
+		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+	}
+	if g.cs.Properties.PrivateAPIServer {
+		masterParams.IPAddresses = append(masterParams.IPAddresses, net.ParseIP(g.cs.Properties.FQDN))
+	} else {
+		masterParams.DNSNames = append(masterParams.DNSNames, g.cs.Properties.FQDN)
+	}
+
 	certs := []struct {
 		params tls.CertParams
 		key    **rsa.PrivateKey
@@ -156,25 +180,9 @@ func (g *simpleGenerator) Generate(template *pluginapi.Config, setVersionFields 
 			cert: &c.Certificates.MasterProxyClient.Cert,
 		},
 		{
-			params: tls.CertParams{
-				Subject: pkix.Name{
-					CommonName: g.cs.Properties.FQDN,
-				},
-				DNSNames: []string{
-					g.cs.Properties.FQDN,
-					"master-000000",
-					"master-000001",
-					"master-000002",
-					"kubernetes",
-					"kubernetes.default",
-					"kubernetes.default.svc",
-					"kubernetes.default.svc.cluster.local",
-				},
-				IPAddresses: []net.IP{net.ParseIP("172.30.0.1")},
-				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-			},
-			key:  &c.Certificates.MasterServer.Key,
-			cert: &c.Certificates.MasterServer.Cert,
+			params: masterParams,
+			key:    &c.Certificates.MasterServer.Key,
+			cert:   &c.Certificates.MasterServer.Cert,
 		},
 		{
 			params: tls.CertParams{

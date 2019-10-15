@@ -56,18 +56,28 @@ func validateProperties(p *api.Properties, location string, externalOnly bool) (
 	}
 
 	if !externalOnly {
-		// TODO: consider ensuring that PublicSubdomain is of the form
-		// openshift.<random>.<location>.azmosa.io
-		if !isValidHostname(p.PublicHostname) {
-			errs = append(errs, fmt.Errorf("invalid properties.publicHostname %q", p.PublicHostname))
-		}
+		if p.PrivateAPIServer {
+			// In private cluster mode FQDN and PublicHostname are set to an IP
+			if p.FQDN != p.PublicHostname {
+				errs = append(errs, fmt.Errorf("invalid properties.fqdn %q: must be equal to properties.publicHostname", p.FQDN))
+			}
+			if !isIPWithinSubnet(p.FQDN, p.AgentPoolProfiles[0].SubnetCIDR) {
+				errs = append(errs, fmt.Errorf("invalid properties.fqdn %q: must be in Master's subnet", p.FQDN))
+			}
+		} else {
+			// TODO: consider ensuring that PublicSubdomain is of the form
+			// openshift.<random>.<location>.azmosa.io
+			if !isValidHostname(p.PublicHostname) {
+				errs = append(errs, fmt.Errorf("invalid properties.publicHostname %q", p.PublicHostname))
+			}
 
-		if !isValidCloudAppHostname(p.FQDN, location) {
-			errs = append(errs, fmt.Errorf("invalid properties.fqdn %q", p.FQDN))
-		}
+			if !isValidCloudAppHostname(p.FQDN, location) {
+				errs = append(errs, fmt.Errorf("invalid properties.fqdn %q", p.FQDN))
+			}
 
-		if p.FQDN == p.PublicHostname {
-			errs = append(errs, fmt.Errorf("invalid properties.fqdn %q: must differ from properties.publicHostname", p.FQDN))
+			if p.FQDN == p.PublicHostname {
+				errs = append(errs, fmt.Errorf("invalid properties.fqdn %q: must differ from properties.publicHostname", p.FQDN))
+			}
 		}
 	}
 

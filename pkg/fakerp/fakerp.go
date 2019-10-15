@@ -185,7 +185,7 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 	isUpdate := (oldCs != nil) // this is until we have called writeHelpers()
 
 	log.Info("enrich")
-	err := enrichCs(cs, conf)
+	err := enrichCs(p, cs, conf)
 	if err != nil {
 		return nil, err
 	}
@@ -316,7 +316,7 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 	return cs, nil
 }
 
-func enrichCs(cs *api.OpenShiftManagedCluster, conf *client.Config) error {
+func enrichCs(p api.Plugin, cs *api.OpenShiftManagedCluster, conf *client.Config) error {
 	cs.Properties.AzProfile = api.AzProfile{
 		TenantID:       conf.TenantID,
 		SubscriptionID: conf.SubscriptionID,
@@ -343,16 +343,25 @@ func enrichCs(cs *api.OpenShiftManagedCluster, conf *client.Config) error {
 	cs.Properties.APICertProfile.KeyVaultSecretURL = vaultURL + "/secrets/" + vaultKeyNamePublicHostname
 	cs.Properties.RouterProfiles[0].RouterCertProfile.KeyVaultSecretURL = vaultURL + "/secrets/" + vaultKeyNameRouter
 
-	cs.Properties.PublicHostname = "openshift." + conf.ResourceGroup + "." + conf.DNSDomain
-	cs.Properties.RouterProfiles[0].PublicSubdomain = "apps." + conf.ResourceGroup + "." + conf.DNSDomain
-
-	if cs.Properties.FQDN == "" {
-		cs.Properties.FQDN, err = random.FQDN(cs.Location+".cloudapp.azure.com", 20)
+	if cs.Properties.PrivateAPIServer {
+		// In private mode we just set FQDN and PublicHostname to a static IP.
+		apiServerIP, err := p.GetPrivateAPIServerIPAddress(cs)
 		if err != nil {
 			return err
 		}
+		cs.Properties.PublicHostname = apiServerIP
+		cs.Properties.FQDN = apiServerIP
+	} else {
+		cs.Properties.PublicHostname = "openshift." + conf.ResourceGroup + "." + conf.DNSDomain
+		if cs.Properties.FQDN == "" {
+			cs.Properties.FQDN, err = random.FQDN(cs.Location+".cloudapp.azure.com", 20)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
+	cs.Properties.RouterProfiles[0].PublicSubdomain = "apps." + conf.ResourceGroup + "." + conf.DNSDomain
 	if cs.Properties.RouterProfiles[0].FQDN == "" {
 		cs.Properties.RouterProfiles[0].FQDN, err = random.FQDN(cs.Location+".cloudapp.azure.com", 20)
 		if err != nil {

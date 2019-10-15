@@ -284,7 +284,11 @@ func TestValidate(t *testing.T) {
 				oc.Properties.NetworkProfile.ManagementSubnetCIDR = nil
 				oc.Properties.PrivateAPIServer = true
 			},
-			expectedErrs: []error{errors.New(`properties.networkProfile.managementSubnetCIDR cannot be nil with privateAPIServer enabled`)},
+			expectedErrs: []error{
+				errors.New(`invalid properties.fqdn "example.eastus.cloudapp.azure.com": must be equal to properties.publicHostname`),
+				errors.New(`invalid properties.fqdn "example.eastus.cloudapp.azure.com": must be in Master's subnet`),
+				errors.New(`properties.networkProfile.managementSubnetCIDR cannot be nil with privateAPIServer enabled`),
+			},
 		},
 		"network profile managementSubnetCIDR - nil - allowed": {
 			f: func(oc *api.OpenShiftManagedCluster) {
