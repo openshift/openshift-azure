@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/apparentlymart/go-cidr/cidr"
 	uuid "github.com/satori/go.uuid"
 	v1 "k8s.io/client-go/tools/clientcmd/api/v1"
 
@@ -17,6 +18,19 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
+func getLastUsableIP(subnet string) (string, error) {
+	_, ipSubnet, err := net.ParseCIDR(subnet)
+	if err != nil {
+		return "", err
+	}
+	count := cidr.AddressCount(ipSubnet)
+	managementIP, err := cidr.Host(ipSubnet, int(count-2))
+	if err != nil {
+		return "", err
+	}
+	return managementIP.String(), nil
+}
+
 func (g *simpleGenerator) Generate(template *pluginapi.Config, setVersionFields bool) (err error) {
 	config, err := pluginapi.ToInternal(template, &g.cs.Config, setVersionFields)
 	if err != nil {
@@ -25,6 +39,15 @@ func (g *simpleGenerator) Generate(template *pluginapi.Config, setVersionFields 
 
 	g.cs.Config = *config
 	c := &g.cs.Config
+
+	if g.cs.Properties.PrivateAPIServer {
+		managementIP, err := getLastUsableIP(*g.cs.Properties.NetworkProfile.ManagementSubnetCIDR)
+		if err != nil {
+			return err
+		}
+		g.cs.Properties.FQDN = managementIP
+		g.cs.Properties.PublicHostname = managementIP
+	}
 
 	// Generate CAs
 	cas := []struct {
