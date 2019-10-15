@@ -90,3 +90,7 @@ import:
   version: v0.3.0
   subpackages:
   - cmp
+- package: github.com/apparentlymart/go-cidr
+  version: ^1.0.1
+  subpackages:
+  - cidr
