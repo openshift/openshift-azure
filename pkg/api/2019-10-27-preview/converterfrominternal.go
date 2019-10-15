@@ -35,7 +35,10 @@ func FromInternal(cs *api.OpenShiftManagedCluster) *OpenShiftManagedCluster {
 		PublicHostname:    &cs.Properties.PublicHostname,
 		FQDN:              &cs.Properties.FQDN,
 	}
-
+	if cs.Properties.PrivateAPIServer {
+		oc.Properties.FQDN = cs.Properties.NetworkProfile.PrivateEndpoint
+		oc.Properties.PublicHostname = cs.Properties.NetworkProfile.PrivateEndpoint
+	}
 	oc.Properties.NetworkProfile = &NetworkProfile{
 		VnetID:               &cs.Properties.NetworkProfile.VnetID,
 		VnetCIDR:             &cs.Properties.NetworkProfile.VnetCIDR,
