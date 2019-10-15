@@ -87,17 +87,17 @@ func TestHashScaleSetStability(t *testing.T) {
 			{
 				role: api.AgentPoolProfileRoleMaster,
 				// this value should not change
-				expectedHash: "5a95b011d1d39d4a4b98a5617ae18fa0a90dacc884d251280ee9785c89668b56",
+				expectedHash: "e84af7bbabb6acb06fe41a9c0ba171100fa93f280872c36e854472200c23e57b",
 			},
 			{
 				role: api.AgentPoolProfileRoleInfra,
 				// this value should not change
-				expectedHash: "9271c1678f629b0dde716fb696726e8c3eb3431fee7102e3257781c2d05cb254",
+				expectedHash: "b2fdff00935d4ff94ecc9448864e3753b1d911b5d575eaa783041f9cfd298032",
 			},
 			{
 				role: api.AgentPoolProfileRoleCompute,
 				// this value should not change
-				expectedHash: "695fcd5966728dbcb47bf553e1db0ea921934f67414cd912cb627f6822021bd7",
+				expectedHash: "2b5408737a68306367c7f34e3c6aeb21f1e6ebaf6f7a703b092fce948700d968",
 			},
 		},
 	}
@@ -150,6 +150,14 @@ func TestHashScaleSetStability(t *testing.T) {
 	populate.DummyCertsAndKeys(cs)
 
 	for version, tests := range tests {
+		switch version {
+		case "v7.0", "v9.0", "v7.1":
+			cs.Config.Images.ImagePullSecret = []byte{}
+			cs.Config.Images.GenevaImagePullSecret = []byte{}
+		default:
+			cs.Config.Images.ImagePullSecret = populate.DummyImagePullSecret("registry.redhat.io")
+			cs.Config.Images.GenevaImagePullSecret = populate.DummyImagePullSecret("osarpint.azurecr.io")
+		}
 		for _, tt := range tests {
 			cs.Config.PluginVersion = version
 
