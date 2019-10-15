@@ -265,6 +265,13 @@ func (g *simpleGenerator) ilbAPIServer() *network.LoadBalancer {
 		Location: to.StringPtr(g.cs.Location),
 	}
 
+	if g.cs.Properties.PrivateAPIServer {
+		// for Private cluster we need a stable IP address for the API server
+		// that we can use in certifcates.
+		(*lb.LoadBalancerPropertiesFormat.FrontendIPConfigurations)[0].FrontendIPConfigurationPropertiesFormat.PrivateIPAllocationMethod = network.Static
+		(*lb.LoadBalancerPropertiesFormat.FrontendIPConfigurations)[0].FrontendIPConfigurationPropertiesFormat.PrivateIPAddress = &g.cs.Properties.FQDN
+	}
+
 	return lb
 }
 
