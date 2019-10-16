@@ -41,7 +41,7 @@ func (g *simpleGenerator) Generate(template *pluginapi.Config, setVersionFields 
 	c := &g.cs.Config
 
 	if g.cs.Properties.PrivateAPIServer {
-		managementIP, err := getLastUsableIP(*g.cs.Properties.NetworkProfile.ManagementSubnetCIDR)
+		managementIP, err := getLastUsableIP(g.cs.Properties.AgentPoolProfiles[0].SubnetCIDR)
 		if err != nil {
 			return err
 		}
