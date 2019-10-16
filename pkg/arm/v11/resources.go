@@ -60,21 +60,24 @@ func (g *simpleGenerator) vnet() *network.VirtualNetwork {
 }
 
 func (g *simpleGenerator) ipAPIServer() *network.PublicIPAddress {
-	return &network.PublicIPAddress{
+	pipa := network.PublicIPAddress{
 		Sku: &network.PublicIPAddressSku{
 			Name: network.PublicIPAddressSkuNameStandard,
 		},
 		PublicIPAddressPropertiesFormat: &network.PublicIPAddressPropertiesFormat{
 			PublicIPAllocationMethod: network.Static,
-			DNSSettings: &network.PublicIPAddressDNSSettings{
-				DomainNameLabel: to.StringPtr(derived.MasterLBCNamePrefix(g.cs)),
-			},
-			IdleTimeoutInMinutes: to.Int32Ptr(15),
+			IdleTimeoutInMinutes:     to.Int32Ptr(15),
 		},
 		Name:     to.StringPtr(armconst.IPAPIServerName),
 		Type:     to.StringPtr("Microsoft.Network/publicIPAddresses"),
 		Location: to.StringPtr(g.cs.Location),
 	}
+	if !g.cs.Properties.PrivateAPIServer {
+		pipa.PublicIPAddressPropertiesFormat.DNSSettings = &network.PublicIPAddressDNSSettings{
+			DomainNameLabel: to.StringPtr(derived.MasterLBCNamePrefix(g.cs)),
+		}
+	}
+	return &pipa
 }
 
 func (g *simpleGenerator) ipOutbound() *network.PublicIPAddress {
