@@ -279,6 +279,13 @@ func TestValidate(t *testing.T) {
 			},
 			expectedErrs: []error{errors.New(`invalid properties.networkProfile.managementSubnetCIDR "foo"`)},
 		},
+		"network profile managementSubnetCIDR - nil - not allowed for private cluster": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.NetworkProfile.ManagementSubnetCIDR = nil
+				oc.Properties.PrivateAPIServer = true
+			},
+			expectedErrs: []error{errors.New(`properties.networkProfile.managementSubnetCIDR cannot be nil with privateAPIServer enabled`)},
+		},
 		"network profile managementSubnetCIDR - nil - allowed": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Properties.NetworkProfile.ManagementSubnetCIDR = nil

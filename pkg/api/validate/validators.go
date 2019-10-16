@@ -71,7 +71,7 @@ func validateProperties(p *api.Properties, location string, externalOnly bool) (
 		}
 	}
 
-	errs = append(errs, validateNetworkProfile("properties.networkProfile", &p.NetworkProfile)...)
+	errs = append(errs, validateNetworkProfile("properties.networkProfile", &p.NetworkProfile, p.PrivateAPIServer)...)
 
 	errs = append(errs, validateRouterProfiles("properties.routerProfiles", p.RouterProfiles, location, externalOnly)...)
 
@@ -94,7 +94,7 @@ func validateProperties(p *api.Properties, location string, externalOnly bool) (
 	return
 }
 
-func validateNetworkProfile(path string, np *api.NetworkProfile) (errs []error) {
+func validateNetworkProfile(path string, np *api.NetworkProfile, privateAPIServer bool) (errs []error) {
 	if np == nil {
 		errs = append(errs, fmt.Errorf("%s cannot be nil", path))
 		return
@@ -105,7 +105,9 @@ func validateNetworkProfile(path string, np *api.NetworkProfile) (errs []error) 
 		return
 	}
 
-	// We dont enforce ManagementSubnetCIDR, but if it set - require valid value
+	if privateAPIServer && np.ManagementSubnetCIDR == nil {
+		errs = append(errs, fmt.Errorf("%s.managementSubnetCIDR cannot be nil with privateAPIServer enabled", path))
+	}
 	if np.ManagementSubnetCIDR != nil {
 		if !isValidIPV4CIDR(*np.ManagementSubnetCIDR) {
 			errs = append(errs, fmt.Errorf("invalid %s.managementSubnetCIDR %q", path, *np.ManagementSubnetCIDR))
