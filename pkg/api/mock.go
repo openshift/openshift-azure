@@ -36,7 +36,8 @@ func GetInternalMockCluster() *OpenShiftManagedCluster {
 					FQDN:            "Properties.RouterProfiles[0].FQDN",
 				},
 			},
-			FQDN: "Properties.FQDN",
+			FQDN:             "Properties.FQDN",
+			PrivateAPIServer: true,
 			AuthProfile: AuthProfile{
 				IdentityProviders: []IdentityProvider{
 					{
