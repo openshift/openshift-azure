@@ -46,12 +46,13 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 				"type": to.StringPtr("storage"),
 			}),
 			g.nsgMaster(),
+			// TODO: These should move to if statement below, when nodes will be able to talk to ILB
+			g.ipAPIServer(),
+			g.lbAPIServer(),
 		},
 	}
 	if g.cs.Properties.PrivateAPIServer {
 		t.Resources = append(t.Resources, g.ilbAPIServer())
-	} else {
-		t.Resources = append(t.Resources, g.ipAPIServer(), g.lbAPIServer())
 	}
 	if !isUpdate {
 		t.Resources = append(t.Resources, g.ipOutbound(), g.lbKubernetes(), g.nsgWorker())

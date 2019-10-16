@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"strings"
 	"syscall"
 	"time"
 
@@ -66,8 +67,11 @@ func (m *monitor) init(ctx context.Context, log *logrus.Entry) error {
 
 	testConfig := fakerp.GetTestConfig()
 	if testConfig.ProxyURL == "" {
-		// need location
-		//testConfig.ProxyURL = os.Getenv(fmt.Sprintf("PROXYURL_%s", strings.ToUpper(cs.Location)))
+		oc, err := loadOCConfig()
+		if err != nil {
+			return err
+		}
+		testConfig.ProxyURL = os.Getenv(fmt.Sprintf("PROXYURL_%s", strings.ToUpper(oc.Location)))
 	}
 	// we need to know at this point if we need to use the proxy (and to get the private ip addresses)
 	m.pipcli = network.NewPublicIPAddressesClient(ctx, log, m.subscriptionID, authorizer)

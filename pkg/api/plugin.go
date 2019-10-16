@@ -97,6 +97,7 @@ type TestConfig struct {
 	ArtifactDir        string
 	ProxyURL           string
 	ProxyCertificate   tls.Certificate
+	ProxyCa            []byte
 }
 
 // Plugin is the main interface to openshift-azure

@@ -3,10 +3,8 @@ package roundtrippers
 import (
 	"crypto/tls"
 	"errors"
-	"fmt"
 	"net"
 	"net/http"
-	"net/url"
 	"syscall"
 	"time"
 
@@ -15,6 +13,9 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	utilerrors "github.com/openshift/openshift-azure/pkg/util/errors"
 )
+
+// DialHook should not be touched, except in the fake RP
+var DialHook = net.Dial
 
 // The RetryingRoundTripper implementation is customised to help with multiple
 // network connection-related issues seen in CI which we haven't necessarily
@@ -84,42 +85,15 @@ func NewRetryingRoundTripper(log *logrus.Entry, disableKeepAlives bool) func(rt 
 }
 
 // NewPrivateEndpoint new RoundTripper for private endpoint
-func NewPrivateEndpoint(log *logrus.Entry, location, privateEndpoint string, disableKeepAlives bool, testConfig api.TestConfig, tlsConfig *tls.Config) func(rt http.RoundTripper) http.RoundTripper {
+func NewPrivateEndpoint(log *logrus.Entry, cs *api.OpenShiftManagedCluster, disableKeepAlives bool, testConfig api.TestConfig, tlsConfig *tls.Config) func(rt http.RoundTripper) http.RoundTripper {
 	return func(rt http.RoundTripper) http.RoundTripper {
-		var rtNew *http.Transport
-
-		// This is development code. This should never ever run in production
-		if testConfig.RunningUnderTest {
-			tlsConfig.Certificates = append(tlsConfig.Certificates, testConfig.ProxyCertificate)
-			tlsConfig.InsecureSkipVerify = true
-
-			// get proxy URL
-			// Test settings to use proxy instead of DialTLS
-			rtNew = &http.Transport{
-				Proxy: func(*http.Request) (*url.URL, error) {
-					return url.Parse(fmt.Sprintf("https://%s:8443/", testConfig.ProxyURL))
-				},
-				TLSClientConfig:     tlsConfig,
-				TLSHandshakeTimeout: 10 * time.Second,
-			}
-
-			rtNew.DisableKeepAlives = disableKeepAlives
-
-			return &RetryingRoundTripper{
-				Log:          log,
-				RoundTripper: rtNew,
-				Retries:      5,
-				GetTimeout:   30 * time.Second,
-			}
-		}
-
-		rtNew = &http.Transport{
+		rtNew := &http.Transport{
 			DialTLS: func(network, addr string) (net.Conn, error) {
 				host, port, err := net.SplitHostPort(addr)
 				if err != nil {
 					return nil, err
 				}
-				c, err := net.Dial(network, net.JoinHostPort(privateEndpoint, port))
+				c, err := DialHook(network, net.JoinHostPort(*cs.Properties.NetworkProfile.PrivateEndpoint, port))
 				if err != nil {
 					return nil, err
 				}

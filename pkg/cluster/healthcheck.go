@@ -46,7 +46,7 @@ func getAPIServerClient(cs *api.OpenShiftManagedCluster, testConfig api.TestConf
 	pool.AddCert(cs.Config.Certificates.Ca.Cert)
 	tlsConfig := tls.Config{
 		RootCAs:    pool,
-		ServerName: cs.Properties.PublicHostname,
+		ServerName: cs.Properties.FQDN,
 	}
 
 	return &http.Client{Transport: roundtrippers.HealthCheck(cs.Properties.FQDN, cs.Location, cs.Properties.NetworkProfile.PrivateEndpoint, testConfig, &tlsConfig), Timeout: 10 * time.Second}

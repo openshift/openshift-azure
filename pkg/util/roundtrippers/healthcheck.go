@@ -2,11 +2,8 @@ package roundtrippers
 
 import (
 	"crypto/tls"
-	"fmt"
 	"net"
 	"net/http"
-	"net/url"
-	"time"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 )
@@ -18,29 +15,25 @@ import (
 // the former address (i.e. openshift.<random>.osadev.cloud), verifying that the
 // server certificate presented matches cert.
 func HealthCheck(dialHost string, location string, privateEndpoint *string, testConfig api.TestConfig, tlsConfig *tls.Config) http.RoundTripper {
-	if testConfig.RunningUnderTest && privateEndpoint != nil {
-		tlsConfig.Certificates = append(tlsConfig.Certificates, testConfig.ProxyCertificate)
-		tlsConfig.InsecureSkipVerify = true
-		return &http.Transport{
-			Proxy: func(*http.Request) (*url.URL, error) {
-				return url.Parse(fmt.Sprintf("https://%s:8443/", testConfig.ProxyURL))
-			},
-			TLSClientConfig:     tlsConfig,
-			TLSHandshakeTimeout: 10 * time.Second,
-		}
-	}
-
+	var c net.Conn
 	return &http.Transport{
 		DialTLS: func(network, addr string) (net.Conn, error) {
-			host, port, err := net.SplitHostPort(addr)
+			_, port, err := net.SplitHostPort(addr)
 			if err != nil {
 				return nil, err
 			}
-			c, err := net.Dial(network, net.JoinHostPort(dialHost, port))
-			if err != nil {
-				return nil, err
+			// This does the same thing as roundtrippers.NewPrivateEndpoint
+			if privateEndpoint != nil {
+				c, err = DialHook(network, net.JoinHostPort(*privateEndpoint, port))
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				c, err = DialHook(network, net.JoinHostPort(dialHost, port))
+				if err != nil {
+					return nil, err
+				}
 			}
-			tlsConfig.ServerName = host
 			return tls.Client(c, tlsConfig), nil
 		},
 	}

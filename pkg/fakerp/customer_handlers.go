@@ -114,6 +114,11 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	err = s.configureProxyDialer(cs)
+	if err != nil {
+		return
+	}
+
 	// apply the request
 	newCS, err := createOrUpdateWrapper(req.Context(), s.plugin, s.log, cs, oldCs, isAdmin, config, s.testConfig)
 	if err != nil {

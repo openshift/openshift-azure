@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
@@ -231,11 +230,6 @@ func (p *plugin) createOrUpdateExt(ctx context.Context, cs *api.OpenShiftManaged
 	if updateType == updateTypeCreate {
 		isUpdate = false
 	}
-	if p.testConfig.RunningUnderTest && p.testConfig.ProxyURL == "" {
-		proxyEnvName := fmt.Sprintf("PROXYURL_%s", strings.ToUpper(cs.Location))
-		p.testConfig.ProxyURL = os.Getenv(proxyEnvName)
-		p.log.Debugf("%s is %s", proxyEnvName, p.testConfig.ProxyURL)
-	}
 
 	p.log.Info("creating clients")
 	clusterUpgrader, err := p.upgraderFactory(ctx, p.log, cs, false, true, p.testConfig)
@@ -289,9 +283,6 @@ func (p *plugin) createOrUpdateExt(ctx context.Context, cs *api.OpenShiftManaged
 	cs.Properties.NetworkProfile.PrivateEndpoint, err = deployFn(ctx, azuretemplate)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
-	}
-	if p.testConfig.RunningUnderTest && p.testConfig.ProxyURL == "" && cs.Properties.NetworkProfile.PrivateEndpoint != nil {
-		return &api.PluginError{Err: fmt.Errorf("need a proxy, but testConfig.ProxyURL not set"), Step: api.PluginStepClientCreation}
 	}
 
 	if oldPE != cs.Properties.NetworkProfile.PrivateEndpoint {

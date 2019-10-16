@@ -26,6 +26,7 @@ const (
 func GetTestConfig() api.TestConfig {
 	// load proxy configuration for tests
 	var cert tls.Certificate
+	var ca []byte
 
 	// TODO: improve this
 	if _, err := os.Stat("secrets/proxy-client.pem"); os.IsNotExist(err) {
@@ -33,10 +34,18 @@ func GetTestConfig() api.TestConfig {
 		if err != nil {
 			panic(fmt.Sprintf("server: loadkeys: %s", err))
 		}
+		ca, err = ioutil.ReadFile("../../secrets/proxy-ca.pem")
+		if err != nil {
+			panic(fmt.Sprintf("server: loadca: %s", err))
+		}
 	} else {
 		cert, err = tls.LoadX509KeyPair("secrets/proxy-client.pem", "secrets/proxy-client.key")
 		if err != nil {
 			panic(fmt.Sprintf("server: loadkeys: %s", err))
+		}
+		ca, err = ioutil.ReadFile("secrets/proxy-ca.pem")
+		if err != nil {
+			panic(fmt.Sprintf("server: loadca: %s", err))
 		}
 	}
 
@@ -48,6 +57,7 @@ func GetTestConfig() api.TestConfig {
 		ArtifactDir:        os.Getenv("ARTIFACTS"),
 		ProxyURL:           os.Getenv("PROXYURL"),
 		ProxyCertificate:   cert,
+		ProxyCa:            ca,
 	}
 }
 
