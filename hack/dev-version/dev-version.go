@@ -3,19 +3,26 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 
 	"github.com/ghodss/yaml"
 
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
 )
 
-func pluginToDevVersion(pluginVersion string) string {
+func pluginToDevVersion(pluginVersion string, previous int) (string, error) {
 	var major, minor int
 	fmt.Sscanf(pluginVersion, "v%d.%d", &major, &minor)
-	if minor == 0 {
-		return fmt.Sprintf("v%d", major)
+	if minor > 0 {
+		minor -= previous
 	}
-	return fmt.Sprintf("v%d%d", major, minor)
+	if minor == 0 {
+		return fmt.Sprintf("v%d", major), nil
+	}
+	if minor < 0 {
+		return "", fmt.Errorf("no more minor versions to try")
+	}
+	return fmt.Sprintf("v%d%d", major, minor), nil
 }
 
 // Return the latest dev version. This is the way we name the versioned directories.
@@ -31,5 +38,17 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf(pluginToDevVersion(template.PluginVersion))
+
+	count := 0
+	for err == nil {
+		dirVer, err := pluginToDevVersion(template.PluginVersion, count)
+		if err != nil {
+			panic(err)
+		}
+		if _, err := os.Stat("pkg/sync/" + dirVer); !os.IsNotExist(err) {
+			fmt.Printf(dirVer)
+			return
+		}
+		count++
+	}
 }
