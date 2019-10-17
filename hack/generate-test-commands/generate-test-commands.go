@@ -19,6 +19,7 @@ type prow struct {
 }
 
 func get(url string) ([]byte, error) {
+	/* #nosec - this helper is supposed to take an arbitrary url */
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
