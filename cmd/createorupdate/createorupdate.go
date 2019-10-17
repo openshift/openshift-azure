@@ -235,6 +235,7 @@ func main() {
 
 	if isDelete {
 		client.Delete(ctx)
+		return
 	}
 
 	if *restoreFromBlob != "" {
