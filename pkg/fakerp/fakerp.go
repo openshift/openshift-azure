@@ -4,11 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net"
 	"os"
 	"strings"
 	"time"
 
 	azresources "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
+	"github.com/apparentlymart/go-cidr/cidr"
 	"github.com/sirupsen/logrus"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
@@ -313,6 +315,19 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 	return cs, nil
 }
 
+func getLastUsableIP(subnet string) (string, error) {
+	_, ipSubnet, err := net.ParseCIDR(subnet)
+	if err != nil {
+		return "", err
+	}
+	count := cidr.AddressCount(ipSubnet)
+	managementIP, err := cidr.Host(ipSubnet, int(count-2))
+	if err != nil {
+		return "", err
+	}
+	return managementIP.String(), nil
+}
+
 func enrichCs(cs *api.OpenShiftManagedCluster, conf *client.Config) error {
 	cs.Properties.AzProfile = api.AzProfile{
 		TenantID:       conf.TenantID,
@@ -340,16 +355,25 @@ func enrichCs(cs *api.OpenShiftManagedCluster, conf *client.Config) error {
 	cs.Properties.APICertProfile.KeyVaultSecretURL = vaultURL + "/secrets/" + vaultKeyNamePublicHostname
 	cs.Properties.RouterProfiles[0].RouterCertProfile.KeyVaultSecretURL = vaultURL + "/secrets/" + vaultKeyNameRouter
 
-	cs.Properties.PublicHostname = "openshift." + conf.ResourceGroup + "." + conf.DNSDomain
-	cs.Properties.RouterProfiles[0].PublicSubdomain = "apps." + conf.ResourceGroup + "." + conf.DNSDomain
-
-	if cs.Properties.FQDN == "" {
-		cs.Properties.FQDN, err = random.FQDN(cs.Location+".cloudapp.azure.com", 20)
+	if cs.Properties.PrivateAPIServer {
+		// In private mode we just set FQDN and PublicHostname to a static IP.
+		masterIP, err := getLastUsableIP(cs.Properties.AgentPoolProfiles[0].SubnetCIDR)
 		if err != nil {
 			return err
 		}
+		cs.Properties.PublicHostname = masterIP
+		cs.Properties.FQDN = masterIP
+	} else {
+		cs.Properties.PublicHostname = "openshift." + conf.ResourceGroup + "." + conf.DNSDomain
+		if cs.Properties.FQDN == "" {
+			cs.Properties.FQDN, err = random.FQDN(cs.Location+".cloudapp.azure.com", 20)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
+	cs.Properties.RouterProfiles[0].PublicSubdomain = "apps." + conf.ResourceGroup + "." + conf.DNSDomain
 	if cs.Properties.RouterProfiles[0].FQDN == "" {
 		cs.Properties.RouterProfiles[0].FQDN, err = random.FQDN(cs.Location+".cloudapp.azure.com", 20)
 		if err != nil {

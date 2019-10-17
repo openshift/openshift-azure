@@ -55,7 +55,8 @@ func validateProperties(p *api.Properties, location string, externalOnly bool) (
 		errs = append(errs, fmt.Errorf("invalid properties.openShiftVersion %q", p.OpenShiftVersion))
 	}
 
-	if !externalOnly {
+	if !externalOnly && !p.PrivateAPIServer {
+		// In private cluster mode FQDN and PublicHostname are set to an IP
 		// TODO: consider ensuring that PublicSubdomain is of the form
 		// openshift.<random>.<location>.azmosa.io
 		if !isValidHostname(p.PublicHostname) {
