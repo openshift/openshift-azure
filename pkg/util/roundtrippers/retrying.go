@@ -97,7 +97,14 @@ func NewPrivateEndpoint(log *logrus.Entry, cs *api.OpenShiftManagedCluster, disa
 				if err != nil {
 					return nil, err
 				}
-				tlsConfig.ServerName = host
+
+				tlsConfig.InsecureSkipVerify = true
+				if testConfig.RunningUnderTest {
+					tlsConfig.ServerName = "172.30.0.1" // TODO don't hardcode this..
+				} else {
+					tlsConfig.ServerName = host
+				}
+
 				return tls.Client(c, tlsConfig), nil
 			},
 		}

@@ -24,6 +24,10 @@ func HealthCheck(dialHost string, location string, privateEndpoint *string, test
 			}
 			// This does the same thing as roundtrippers.NewPrivateEndpoint
 			if privateEndpoint != nil {
+				tlsConfig.InsecureSkipVerify = true
+				if testConfig.RunningUnderTest {
+					tlsConfig.ServerName = "172.30.0.1" // TODO don't hardcode this..
+				}
 				c, err = DialHook(network, net.JoinHostPort(*privateEndpoint, port))
 				if err != nil {
 					return nil, err
