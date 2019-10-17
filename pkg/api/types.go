@@ -48,11 +48,11 @@ type Properties struct {
 	// PublicHostname (out): public hostname of OpenShift API server.
 	PublicHostname string `json:"publicHostname,omitempty"`
 
-	// PrivateAPIServer (internal only): Specifies if API server is public or private
-	PrivateAPIServer bool `json:"privateApiServer,omitempty"`
-
 	// FQDN (out): Auto-allocated internal FQDN for OpenShift API server.
 	FQDN string `json:"fqdn,omitempty"`
+
+	// PrivateAPIServer (internal only): Specifies if API server is public or private
+	PrivateAPIServer bool `json:"privateApiServer,omitempty"`
 
 	// NetworkProfile (in): Configuration for OpenShift networking.
 	NetworkProfile NetworkProfile `json:"networkProfile,omitempty"`

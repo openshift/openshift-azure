@@ -43,7 +43,8 @@ var marshalled = []byte(`{
 		"masterPoolProfile": {
 			"count": 1,
 			"vmSize": "Properties.MasterPoolProfile.VMSize",
-			"subnetCidr": "Properties.MasterPoolProfile.SubnetCIDR"
+			"subnetCidr": "Properties.MasterPoolProfile.SubnetCIDR",
+			"privateApiServer": true
 		},
 		"agentPoolProfiles": [
 			{
@@ -162,6 +163,10 @@ func TestStructTypes(t *testing.T) {
 	// every field in MasterPoolProfile should be identical in
 	// AgentPoolProfile
 	for name := range mppFields {
+		switch name {
+		case "PrivateAPIServer":
+			continue
+		}
 		if !reflect.DeepEqual(appFields[name], mppFields[name]) {
 			t.Errorf("mismatch in field %s:\n%#v\n%#v", name, appFields[name], mppFields[name])
 		}
@@ -210,8 +215,8 @@ func TestAPIParity(t *testing.T) {
 		regexp.MustCompile(`^\.Properties\.WorkerServicePrincipalProfile`),
 		regexp.MustCompile(`^\.Properties\.AzProfile`),
 		regexp.MustCompile(`^\.Properties\.MonitorProfile\.Workspace(ID|Key)`),
-		regexp.MustCompile(`^\.Properties\.PrivateAPIServer`),
 		regexp.MustCompile(`^\.Properties\.APICertProfile\.`),
+		regexp.MustCompile(`^\.Properties\.PrivateAPIServer`),
 		regexp.MustCompile(`\.RouterCertProfile\.`),
 		regexp.MustCompile(`^\.Config`),
 	}
