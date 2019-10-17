@@ -10,15 +10,15 @@ yum install git -y
 curl -s https://storage.googleapis.com/golang/go1.11.6.linux-amd64.tar.gz | tar -C /usr/local -xz
 PATH=$PATH:/usr/local/go/bin
 
-go get -u github.com/mjudeikis/openshift-azure/cmd/proxy
+go get -u github.com/openshift/openshift-azure/cmd/proxy
 
 mkdir data
 cat >proxy-cert.pem <<'EOF'
-{{ .Config.ClientCert | CertAsBytes | String }}
+{{ .Config.ServerCert | CertAsBytes | String }}
 EOF
 
 cat >proxy-key.pem <<'EOF'
-{{ .Config.ClientKey | PrivateKeyAsBytes | String }}
+{{ .Config.ServerKey | PrivateKeyAsBytes | String }}
 EOF
 
 cat >proxy-ca.pem <<'EOF'
@@ -30,7 +30,7 @@ cat >/etc/systemd/system/aro-proxy.service <<'EOF'
 Description=aro-proxy
 
 [Service]
-ExecStart=/root/go/bin/proxy -pem /root/proxy-cert.pem -key /root/proxy-key.pem -ca /root/proxy-ca.pem -subnet "{{ .Config.VnetCidr }}"
+ExecStart=/root/go/bin/proxy -cert /root/proxy-cert.pem -key /root/proxy-key.pem -cacert /root/proxy-ca.pem -subnet "{{ .Config.Subnets.Vnet }}"
 
 [Install]
 WantedBy=multi-user.target

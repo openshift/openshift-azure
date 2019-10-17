@@ -1,16 +1,15 @@
 # ARO Testing Proxy
 
-Azure Red Hat OpenShift has 3 test Proxy servers running in
+Azure Red Hat OpenShift has 3 test proxy servers running in
 `australiasoutheast`, `eastus` and `westeurope`.
 
-These Proxy servers are used to test PrivateCluster functionality.
+These proxy servers are used to test PrivateCluster functionality.
 
 ## Management resource groups
 
-Mangement resource groups contains not only Proxy servers,
-but PrivateEndpoint subnets and some reserved ones for 
-future use.
-Networking configuration is defined below:
+Mangement resource groups contains not only proxy servers, but PrivateEndpoint
+subnets and some reserved ones for future use. Networking configuration is
+defined below:
 
 ```
 // subnets split logic:

@@ -2,9 +2,7 @@ package fakerp
 
 import (
 	"crypto/rsa"
-	"crypto/tls"
 	"crypto/x509"
-	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -12,7 +10,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
-	tlsutil "github.com/openshift/openshift-azure/pkg/util/tls"
+	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
 type contextKey string
@@ -24,40 +22,12 @@ const (
 )
 
 func GetTestConfig() api.TestConfig {
-	// load proxy configuration for tests
-	var cert tls.Certificate
-	var ca []byte
-
-	// TODO: improve this
-	if _, err := os.Stat("secrets/proxy-client.pem"); os.IsNotExist(err) {
-		cert, err = tls.LoadX509KeyPair("../../secrets/proxy-client.pem", "../../secrets/proxy-client.key")
-		if err != nil {
-			panic(fmt.Sprintf("server: loadkeys: %s", err))
-		}
-		ca, err = ioutil.ReadFile("../../secrets/proxy-ca.pem")
-		if err != nil {
-			panic(fmt.Sprintf("server: loadca: %s", err))
-		}
-	} else {
-		cert, err = tls.LoadX509KeyPair("secrets/proxy-client.pem", "secrets/proxy-client.key")
-		if err != nil {
-			panic(fmt.Sprintf("server: loadkeys: %s", err))
-		}
-		ca, err = ioutil.ReadFile("secrets/proxy-ca.pem")
-		if err != nil {
-			panic(fmt.Sprintf("server: loadca: %s", err))
-		}
-	}
-
 	return api.TestConfig{
 		RunningUnderTest:   os.Getenv("RUNNING_UNDER_TEST") == "true",
 		DebugHashFunctions: os.Getenv("DEBUG_HASH_FUNCTIONS") == "true",
 		ImageResourceGroup: os.Getenv("IMAGE_RESOURCEGROUP"),
 		ImageResourceName:  os.Getenv("IMAGE_RESOURCENAME"),
 		ArtifactDir:        os.Getenv("ARTIFACTS"),
-		ProxyURL:           os.Getenv("PROXYURL"),
-		ProxyCertificate:   cert,
-		ProxyCa:            ca,
 	}
 }
 
@@ -147,7 +117,7 @@ func readCert(path string) (*x509.Certificate, error) {
 	if err != nil {
 		return nil, err
 	}
-	return tlsutil.ParseCert(b)
+	return tls.ParseCert(b)
 }
 
 func readKey(path string) (*rsa.PrivateKey, error) {
@@ -155,5 +125,5 @@ func readKey(path string) (*rsa.PrivateKey, error) {
 	if err != nil {
 		return nil, err
 	}
-	return tlsutil.ParsePrivateKey(b)
+	return tls.ParsePrivateKey(b)
 }

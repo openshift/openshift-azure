@@ -7,8 +7,6 @@ package sync
 import (
 	"context"
 	"crypto/sha256"
-	"crypto/tls"
-	"crypto/x509"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -250,15 +248,8 @@ func (s *sync) calculateReadiness() (errs []error) {
 		case "Route.route.openshift.io":
 			url := "https://" + jsonpath.MustCompile("$.spec.host").MustGetString(o.Object) + o.GetAnnotations()[syncPodReadinessPathAnnotationKey]
 			cert := s.cs.Config.Certificates.Router.Certs
-			pool := x509.NewCertPool()
-			pool.AddCert(cert[len(cert)-1])
-			tlsConfig := tls.Config{
-				RootCAs:    pool,
-				ServerName: s.cs.Properties.RouterProfiles[0].FQDN,
-			}
-
 			cli := &http.Client{
-				Transport: roundtrippers.HealthCheck(s.cs.Properties.RouterProfiles[0].FQDN, s.cs.Location, nil, api.TestConfig{RunningUnderTest: false}, &tlsConfig),
+				Transport: roundtrippers.HealthCheck(s.cs.Properties.RouterProfiles[0].FQDN, cert[len(cert)-1], s.cs.Location, nil),
 				Timeout:   5 * time.Second,
 			}
 			resp, err := cli.Get(url)
@@ -523,7 +514,7 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (
 			return nil, err
 		}
 		s.restconfig.RateLimiter = flowcontrol.NewFakeAlwaysRateLimiter()
-		s.restconfig.WrapTransport = roundtrippers.NewRetryingRoundTripper(log, true)
+		s.restconfig.WrapTransport = roundtrippers.NewRetryingRoundTripper(log, cs.Location, nil, true)
 
 		s.kc, err = kubernetes.NewForConfig(s.restconfig)
 		if err != nil {

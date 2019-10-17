@@ -1,8 +1,9 @@
-package management
+package proxyinfrastructure
 
 import (
 	"bytes"
 	"compress/gzip"
+	"os"
 
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/network/mgmt/network"
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
@@ -17,19 +18,19 @@ func vnet(conf *Config) *network.VirtualNetwork {
 		VirtualNetworkPropertiesFormat: &network.VirtualNetworkPropertiesFormat{
 			AddressSpace: &network.AddressSpace{
 				AddressPrefixes: &[]string{
-					conf.subnets[cidrVnet],
+					conf.NetDefinition.Vnet,
 				},
 			},
 			Subnets: &[]network.Subnet{
 				{
 					SubnetPropertiesFormat: &network.SubnetPropertiesFormat{
-						AddressPrefix: to.StringPtr(conf.subnets[cidrDefaultSubnet]),
+						AddressPrefix: to.StringPtr(conf.NetDefinition.DefaultSubnet),
 					},
 					Name: to.StringPtr(vnetSubnetName),
 				},
 				{
 					SubnetPropertiesFormat: &network.SubnetPropertiesFormat{
-						AddressPrefix: to.StringPtr(conf.subnets[cidrManagmentSubnet]),
+						AddressPrefix: to.StringPtr(conf.NetDefinition.ManagementSubnet),
 					},
 					Name: to.StringPtr(vnetManagementSubnetName),
 				},
@@ -98,7 +99,7 @@ func nic(conf *Config) *network.Interface {
 		InterfacePropertiesFormat: &network.InterfacePropertiesFormat{
 			NetworkSecurityGroup: &network.SecurityGroup{
 				ID: to.StringPtr(resourceid.ResourceID(
-					conf.SubscriptionID,
+					os.Getenv("AZURE_SUBSCRIPTION_ID"),
 					conf.resourceGroup,
 					"Microsoft.Network/networkSecurityGroups",
 					nsgName,
@@ -110,7 +111,7 @@ func nic(conf *Config) *network.Interface {
 						PrivateIPAllocationMethod: network.Dynamic,
 						Subnet: &network.Subnet{
 							ID: to.StringPtr(resourceid.ResourceID(
-								conf.SubscriptionID,
+								os.Getenv("AZURE_SUBSCRIPTION_ID"),
 								conf.resourceGroup,
 								"Microsoft.Network/virtualNetworks",
 								vnetName,
@@ -118,7 +119,7 @@ func nic(conf *Config) *network.Interface {
 						},
 						PublicIPAddress: &network.PublicIPAddress{
 							ID: to.StringPtr(resourceid.ResourceID(
-								conf.SubscriptionID,
+								os.Getenv("AZURE_SUBSCRIPTION_ID"),
 								conf.resourceGroup,
 								"Microsoft.Network/publicIpAddresses",
 								ipName,
@@ -189,7 +190,7 @@ func vm(conf *Config) *compute.VirtualMachine {
 				NetworkInterfaces: &[]compute.NetworkInterfaceReference{
 					{
 						ID: to.StringPtr(resourceid.ResourceID(
-							conf.SubscriptionID,
+							os.Getenv("AZURE_SUBSCRIPTION_ID"),
 							conf.resourceGroup,
 							"Microsoft.Network/networkInterfaces",
 							nicName,

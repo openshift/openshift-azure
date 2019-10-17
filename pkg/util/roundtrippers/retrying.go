@@ -1,7 +1,6 @@
 package roundtrippers
 
 import (
-	"crypto/tls"
 	"errors"
 	"net"
 	"net/http"
@@ -10,12 +9,12 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/openshift/openshift-azure/pkg/api"
 	utilerrors "github.com/openshift/openshift-azure/pkg/util/errors"
 )
 
-// DialHook should not be touched, except in the fake RP
-var DialHook = net.Dial
+// PrivateEndpointDialHook is overridden in only the fake RP: in this case it
+// connects us via the development proxy infrastructure
+var PrivateEndpointDialHook = func(location string) func(network, address string) (net.Conn, error) { return net.Dial }
 
 // The RetryingRoundTripper implementation is customised to help with multiple
 // network connection-related issues seen in CI which we haven't necessarily
@@ -67,53 +66,28 @@ type RetryingRoundTripper struct {
 	GetTimeout time.Duration
 }
 
-func NewRetryingRoundTripper(log *logrus.Entry, disableKeepAlives bool) func(rt http.RoundTripper) http.RoundTripper {
+// note: we take in location and privateEndpoint separately rather than a cs
+// object.  This allows us to override when we call via the privateEndpoint.
+// For example: always in the RP context, never in the sync pod context.
+func NewRetryingRoundTripper(log *logrus.Entry, location string, privateEndpoint *string, disableKeepAlives bool) func(rt http.RoundTripper) http.RoundTripper {
 	return func(rt http.RoundTripper) http.RoundTripper {
-		// first, tweak values on the incoming RoundTripper, which we are
-		// relying on being an *http.Transport.
+		if privateEndpoint != nil {
+			rt.(*http.Transport).Dial = func(network, addr string) (net.Conn, error) {
+				_, port, err := net.SplitHostPort(addr)
+				if err != nil {
+					return nil, err
+				}
+
+				return PrivateEndpointDialHook(location)(network, net.JoinHostPort(*privateEndpoint, port))
+			}
+		}
 
 		rt.(*http.Transport).DisableKeepAlives = disableKeepAlives
-
-		// now wrap our retryingRoundTripper around the incoming RoundTripper.
-		return &RetryingRoundTripper{
-			Log:          log,
-			RoundTripper: rt,
-			Retries:      5,
-			GetTimeout:   30 * time.Second,
-		}
-	}
-}
-
-func NewPrivateEndpoint(log *logrus.Entry, cs *api.OpenShiftManagedCluster, disableKeepAlives bool, testConfig api.TestConfig, tlsConfig *tls.Config) func(rt http.RoundTripper) http.RoundTripper {
-	return func(rt http.RoundTripper) http.RoundTripper {
-		rtNew := &http.Transport{
-			DialTLS: func(network, addr string) (net.Conn, error) {
-				host, port, err := net.SplitHostPort(addr)
-				if err != nil {
-					return nil, err
-				}
-				c, err := DialHook(network, net.JoinHostPort(*cs.Properties.NetworkProfile.PrivateEndpoint, port))
-				if err != nil {
-					return nil, err
-				}
-
-				tlsConfig.InsecureSkipVerify = true
-				if testConfig.RunningUnderTest {
-					tlsConfig.ServerName = "172.30.0.1" // TODO don't hardcode this..
-				} else {
-					tlsConfig.ServerName = host
-				}
-
-				return tls.Client(c, tlsConfig), nil
-			},
-		}
-
-		rtNew.DisableKeepAlives = disableKeepAlives
 
 		// now wrap our RetryingRoundTripper around the incoming RoundTripper.
 		return &RetryingRoundTripper{
 			Log:          log,
-			RoundTripper: rtNew,
+			RoundTripper: rt,
 			Retries:      5,
 			GetTimeout:   30 * time.Second,
 		}

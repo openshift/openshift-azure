@@ -1,14 +1,10 @@
 package kubeclient
 
 import (
-	"net/http"
-	"time"
-
 	security "github.com/openshift/client-go/security/clientset/versioned"
 	"github.com/sirupsen/logrus"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	restclient "k8s.io/client-go/rest"
 	v1 "k8s.io/client-go/tools/clientcmd/api/v1"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -16,73 +12,13 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/roundtrippers"
 )
 
-// NewKubeclient creates a new kubeclient
-// If PrivateEndpointIp is not nil - kubeclient roundtripper will point PrivateEndpoint IP address
-func NewKubeclient(log *logrus.Entry, config *v1.Config, cs *api.OpenShiftManagedCluster, disableKeepAlives bool, testConfig api.TestConfig) (Interface, error) {
-	restconfig, err := NewRestConfig(log, config, cs, disableKeepAlives, testConfig)
+// NewKubeclient creates a new kubeclient.  Only called in RP/fakerp context
+func NewKubeclient(log *logrus.Entry, config *v1.Config, cs *api.OpenShiftManagedCluster, disableKeepAlives bool) (Interface, error) {
+	restconfig, err := NewRestConfig(log, config, cs, disableKeepAlives)
 	if err != nil {
 		return nil, err
 	}
 
-	if cs.Properties.NetworkProfile.PrivateEndpoint == nil {
-		restconfig.WrapTransport = roundtrippers.NewRetryingRoundTripper(log, disableKeepAlives)
-	} else {
-		tlsConfig, err := restclient.TLSConfigFor(restconfig)
-		if err != nil {
-			return nil, err
-		}
-
-		restconfig.WrapTransport = roundtrippers.NewPrivateEndpoint(log, cs, disableKeepAlives, testConfig, tlsConfig)
-		if testConfig.RunningUnderTest {
-			//override dialer in manual mode
-			restconfig.Host = *cs.Properties.NetworkProfile.PrivateEndpoint
-		}
-	}
-	return newKubeclientFromRestConfig(log, restconfig, disableKeepAlives, testConfig)
-}
-
-// NewRestConfig returns restconfig, based on configuration
-func NewRestConfig(log *logrus.Entry, config *v1.Config, cs *api.OpenShiftManagedCluster, disableKeepAlives bool, testConfig api.TestConfig) (*rest.Config, error) {
-	restconfig, err := managedcluster.RestConfigFromV1Config(config)
-	if err != nil {
-		return nil, err
-	}
-
-	// if we running in PE case - configure RT to use privateEndpoint/proxy
-	// newPrivateEndpoint will check if this is runningUnderTest or not
-	if cs.Properties.NetworkProfile.PrivateEndpoint != nil {
-		log.Debugf("override kubeClient roundtripper with PrivateEndpoint dialer")
-
-		tlsConfig, err := restclient.TLSConfigFor(restconfig)
-		if err != nil {
-			return nil, err
-		}
-
-		restconfig.WrapTransport = roundtrippers.NewPrivateEndpoint(log, cs, disableKeepAlives, testConfig, tlsConfig)
-		restconfig.Host = *cs.Properties.NetworkProfile.PrivateEndpoint
-	} else {
-		restconfig.WrapTransport = func(rt http.RoundTripper) http.RoundTripper {
-			// first, tweak values on the incoming RoundTripper, which we are
-			// relying on being an *http.Transport.
-
-			rt.(*http.Transport).DisableKeepAlives = disableKeepAlives
-
-			// now wrap our RetryingRoundTripper around the incoming RoundTripper.
-			return &roundtrippers.RetryingRoundTripper{
-				Log:          log,
-				RoundTripper: rt,
-				Retries:      5,
-				GetTimeout:   30 * time.Second,
-			}
-		}
-	}
-	return restconfig, nil
-}
-
-// newKubeclient creates a new kubeclient.
-// If PrivateEndpointIp is not nil - kubeclient roundtripper
-// will dial PrivateEndpoint IP address instead of public API
-func newKubeclientFromRestConfig(log *logrus.Entry, restconfig *rest.Config, disableKeepAlives bool, testConfig api.TestConfig) (Interface, error) {
 	cli, err := kubernetes.NewForConfig(restconfig)
 	if err != nil {
 		return nil, err
@@ -94,11 +30,21 @@ func newKubeclientFromRestConfig(log *logrus.Entry, restconfig *rest.Config, dis
 	}
 
 	return &Kubeclientset{
-		Log:               log,
-		Client:            cli,
-		Seccli:            seccli,
-		disableKeepAlives: disableKeepAlives,
-		restconfig:        restconfig,
-		testConfig:        testConfig,
+		Log:    log,
+		Client: cli,
+		Seccli: seccli,
 	}, nil
+}
+
+// NewRestConfig returns restconfig, based on configuration.  Called in
+// RP/fakerp and e2e test context
+func NewRestConfig(log *logrus.Entry, config *v1.Config, cs *api.OpenShiftManagedCluster, disableKeepAlives bool) (*rest.Config, error) {
+	restconfig, err := managedcluster.RestConfigFromV1Config(config)
+	if err != nil {
+		return nil, err
+	}
+
+	restconfig.WrapTransport = roundtrippers.NewRetryingRoundTripper(log, cs.Location, cs.Properties.NetworkProfile.PrivateEndpoint, disableKeepAlives)
+
+	return restconfig, nil
 }

@@ -50,12 +50,13 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 			g.nsgMaster(),
 		},
 	}
-	if !isUpdate {
-		t.Resources = append(t.Resources, g.ipOutbound(), g.lbKubernetes(), g.nsgWorker())
-	}
 	if g.cs.Properties.PrivateAPIServer {
 		t.Resources = append(t.Resources, g.ilbAPIServer())
 	}
+	if !isUpdate {
+		t.Resources = append(t.Resources, g.ipOutbound(), g.lbKubernetes(), g.nsgWorker())
+	}
+
 	for _, app := range g.cs.Properties.AgentPoolProfiles {
 		if app.Role == api.AgentPoolProfileRoleMaster || !isUpdate {
 			vmss, err := g.Vmss(&app, backupBlob, suffix)

@@ -12,7 +12,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/fakerp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/keyvault"
 	"github.com/openshift/openshift-azure/pkg/util/enrich"
@@ -64,12 +63,7 @@ func NewSanityChecker(ctx context.Context, log *logrus.Entry, cs *internalapi.Op
 	if err != nil {
 		return nil, err
 	}
-
-	testConfig := fakerp.GetTestConfig()
-
-	// TODO: Set PE IP here to enable tests to use PE
-
-	scc.Client, err = openshift.NewClientSet(log, cs, testConfig)
+	scc.Client, err = openshift.NewClientSet(log, cs)
 	if err != nil {
 		return nil, err
 	}

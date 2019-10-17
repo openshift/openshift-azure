@@ -39,6 +39,8 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 		ContentVersion: "1.0.0.0",
 		Resources: []interface{}{
 			g.vnet(),
+			g.ipAPIServer(),
+			g.lbAPIServer(),
 			g.storageAccount(g.cs.Config.RegistryStorageAccount, map[string]*string{
 				"type": to.StringPtr("registry"),
 			}),
@@ -46,9 +48,6 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 				"type": to.StringPtr("storage"),
 			}),
 			g.nsgMaster(),
-			// TODO: These should move to if statement below, when nodes will be able to talk to ILB
-			g.ipAPIServer(),
-			g.lbAPIServer(),
 		},
 	}
 	if g.cs.Properties.PrivateAPIServer {

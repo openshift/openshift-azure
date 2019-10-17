@@ -18,6 +18,7 @@ import (
 	policyv1beta1client "k8s.io/client-go/kubernetes/typed/policy/v1beta1"
 	rbacv1client "k8s.io/client-go/kubernetes/typed/rbac/v1"
 	"k8s.io/client-go/rest"
+	v1 "k8s.io/client-go/tools/clientcmd/api/v1"
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
@@ -65,43 +66,40 @@ func newClientFromRestConfig(config *rest.Config) *Client {
 	}
 }
 
-func NewAdminClient(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster, testConfig internalapi.TestConfig) (*Client, error) {
+func newClientFromKubeConfig(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster, kc *v1.Config) (*Client, error) {
+	restconfig, err := kubeclient.NewRestConfig(log, kc, cs, true)
+	if err != nil {
+		return nil, err
+	}
+
+	return newClientFromRestConfig(restconfig), nil
+}
+
+func NewAdminClient(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
 	kc, err := login("admin", cs)
 	if err != nil {
 		return nil, err
 	}
 
-	restconfig, err := kubeclient.NewRestConfig(log, kc, cs, true, testConfig)
-	if err != nil {
-		return nil, err
-	}
-	return newClientFromRestConfig(restconfig), nil
+	return newClientFromKubeConfig(log, cs, kc)
 }
 
-func NewCustomerAdminClient(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster, testConfig internalapi.TestConfig) (*Client, error) {
+func NewCustomerAdminClient(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
 	kc, err := login("customer-cluster-admin", cs)
 	if err != nil {
 		return nil, err
 	}
 
-	restconfig, err := kubeclient.NewRestConfig(log, kc, cs, true, testConfig)
-	if err != nil {
-		return nil, err
-	}
-	return newClientFromRestConfig(restconfig), nil
+	return newClientFromKubeConfig(log, cs, kc)
 }
 
-func NewEndUserClient(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster, testConfig internalapi.TestConfig) (*Client, error) {
+func NewEndUserClient(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
 	kc, err := login("enduser", cs)
 	if err != nil {
 		return nil, err
 	}
 
-	restconfig, err := kubeclient.NewRestConfig(log, kc, cs, true, testConfig)
-	if err != nil {
-		return nil, err
-	}
-	return newClientFromRestConfig(restconfig), nil
+	return newClientFromKubeConfig(log, cs, kc)
 }
 
 type ClientSet struct {
@@ -112,18 +110,18 @@ type ClientSet struct {
 
 // NewClientSet creates a new set of openshift clients scoped for different levels
 // of access
-func NewClientSet(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster, testConfig internalapi.TestConfig) (*ClientSet, error) {
+func NewClientSet(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster) (*ClientSet, error) {
 	c := &ClientSet{}
 	var err error
-	c.Admin, err = NewAdminClient(log, cs, testConfig)
+	c.Admin, err = NewAdminClient(log, cs)
 	if err != nil {
 		return nil, err
 	}
-	c.CustomerAdmin, err = NewCustomerAdminClient(log, cs, testConfig)
+	c.CustomerAdmin, err = NewCustomerAdminClient(log, cs)
 	if err != nil {
 		return nil, err
 	}
-	c.EndUser, err = NewEndUserClient(log, cs, testConfig)
+	c.EndUser, err = NewEndUserClient(log, cs)
 	if err != nil {
 		return nil, err
 	}

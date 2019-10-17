@@ -58,7 +58,6 @@ type Upgrader interface {
 	RunCommand(ctx context.Context, scaleset, instanceID, command string) error
 	WriteStartupBlobs() error
 	GenerateARM(ctx context.Context, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error)
-	ReloadKubeClient(disableKeepAlives bool) error
 
 	kubeclient.Interface
 }
@@ -80,8 +79,8 @@ type Upgrade struct {
 
 	Cs *api.OpenShiftManagedCluster
 
-	GetConsoleClient   func(cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) wait.SimpleHTTPClient
-	GetAPIServerClient func(cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) wait.SimpleHTTPClient
+	GetConsoleClient   func(cs *api.OpenShiftManagedCluster) wait.SimpleHTTPClient
+	GetAPIServerClient func(cs *api.OpenShiftManagedCluster) wait.SimpleHTTPClient
 }
 
 var _ Upgrader = &Upgrade{}
@@ -98,7 +97,7 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 		return nil, err
 	}
 
-	kubeclient, err := kubeclient.NewKubeclient(log, cs.Config.AdminKubeconfig, cs, disableKeepAlives, testConfig)
+	kubeclient, err := kubeclient.NewKubeclient(log, cs.Config.AdminKubeconfig, cs, disableKeepAlives)
 	if err != nil {
 		return nil, err
 	}
@@ -138,15 +137,6 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 	}
 
 	return u, nil
-}
-
-func (u *Upgrade) ReloadKubeClient(disableKeepAlives bool) error {
-	kubeclient, err := kubeclient.NewKubeclient(u.Log, u.Cs.Config.AdminKubeconfig, u.Cs, disableKeepAlives, u.TestConfig)
-	if err != nil {
-		return err
-	}
-	u.Interface = kubeclient
-	return nil
 }
 
 func (u *Upgrade) EnrichCertificatesFromVault(ctx context.Context) error {

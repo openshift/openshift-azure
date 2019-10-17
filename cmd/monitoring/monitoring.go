@@ -11,7 +11,6 @@ import (
 	"os"
 	"os/signal"
 	"path"
-	"strings"
 	"syscall"
 	"time"
 
@@ -21,7 +20,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/fakerp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/network"
 	"github.com/openshift/openshift-azure/pkg/util/blackbox"
@@ -64,16 +62,6 @@ func (m *monitor) init(ctx context.Context, log *logrus.Entry) error {
 	}
 	m.resourceGroup = os.Getenv("RESOURCEGROUP")
 	m.subscriptionID = os.Getenv("AZURE_SUBSCRIPTION_ID")
-
-	testConfig := fakerp.GetTestConfig()
-	if testConfig.ProxyURL == "" {
-		oc, err := loadOCConfig()
-		if err != nil {
-			return err
-		}
-		testConfig.ProxyURL = os.Getenv(fmt.Sprintf("PROXYURL_%s", strings.ToUpper(oc.Location)))
-	}
-	// we need to know at this point if we need to use the proxy (and to get the private ip addresses)
 	m.pipcli = network.NewPublicIPAddressesClient(ctx, log, m.subscriptionID, authorizer)
 
 	if os.Getenv("AZURE_APP_INSIGHTS_KEY") != "" {

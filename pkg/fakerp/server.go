@@ -57,8 +57,6 @@ func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 		s.log.Fatal(err)
 	}
 	overridePluginTemplate(pluginTemplate)
-	// we dont't know the region/location at this point so we can't load PROXYURL_%region
-	// and the plugin keeps the testConfig. We load it when server gets customer request
 	s.plugin, errs = plugin.NewPlugin(s.log, pluginTemplate, s.testConfig)
 	if len(errs) > 0 {
 		s.log.Fatal(errs)
@@ -67,6 +65,11 @@ func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 	if len(errs) > 0 {
 		s.log.Fatal(errs)
 	}
+	err = ConfigureProxyDialer()
+	if err != nil {
+		s.log.Fatal(err)
+	}
+
 	return s
 }
 
