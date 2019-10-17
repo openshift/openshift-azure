@@ -23,6 +23,7 @@ type Config struct {
 	DeployVersion       string `envconfig:"DEPLOY_VERSION" required:"true"`
 	RunningUnderTest    string `envconfig:"RUNNING_UNDER_TEST"`
 	WorkspaceResourceID string `envconfig:"AZURE_WORKSPACE_ID"`
+	PrivateAPIServer    bool   `envconfig:"PRIVATE_API_SERVER"`
 
 	ManagementResourceGroup string
 	Region                  string `envconfig:"AZURE_REGION" required:"false"`
