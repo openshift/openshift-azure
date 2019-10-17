@@ -1,9 +1,6 @@
 package openshift
 
 import (
-	"net/http"
-	"time"
-
 	servicecatalogv1beta1client "github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1beta1"
 	oappsv1client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	buildv1client "github.com/openshift/client-go/build/clientset/versioned/typed/build/v1"
@@ -25,7 +22,6 @@ import (
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
 type Client struct {
@@ -70,25 +66,10 @@ func newClientFromRestConfig(config *rest.Config) *Client {
 	}
 }
 
-func newClientFromKubeConfig(log *logrus.Entry, kc *v1.Config) (*Client, error) {
-	restconfig, err := managedcluster.RestConfigFromV1Config(kc)
+func newClientFromKubeConfig(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster, kc *v1.Config) (*Client, error) {
+	restconfig, err := kubeclient.NewRestConfig(log, kc, cs, true)
 	if err != nil {
 		return nil, err
-	}
-
-	restconfig.WrapTransport = func(rt http.RoundTripper) http.RoundTripper {
-		// first, tweak values on the incoming RoundTripper, which we are
-		// relying on being an *http.Transport.
-
-		rt.(*http.Transport).DisableKeepAlives = true
-
-		// now wrap our retryingRoundTripper around the incoming RoundTripper.
-		return &kubeclient.RetryingRoundTripper{
-			Log:          log,
-			RoundTripper: rt,
-			Retries:      5,
-			GetTimeout:   30 * time.Second,
-		}
 	}
 
 	return newClientFromRestConfig(restconfig), nil
@@ -100,7 +81,7 @@ func NewAdminClient(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster) 
 		return nil, err
 	}
 
-	return newClientFromKubeConfig(log, kc)
+	return newClientFromKubeConfig(log, cs, kc)
 }
 
 func NewCustomerAdminClient(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
@@ -109,7 +90,7 @@ func NewCustomerAdminClient(log *logrus.Entry, cs *internalapi.OpenShiftManagedC
 		return nil, err
 	}
 
-	return newClientFromKubeConfig(log, kc)
+	return newClientFromKubeConfig(log, cs, kc)
 }
 
 func NewEndUserClient(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
@@ -118,7 +99,7 @@ func NewEndUserClient(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster
 		return nil, err
 	}
 
-	return newClientFromKubeConfig(log, kc)
+	return newClientFromKubeConfig(log, cs, kc)
 }
 
 type ClientSet struct {

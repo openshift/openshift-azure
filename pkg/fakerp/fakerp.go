@@ -188,7 +188,7 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 	}
 
 	// TODO: Remove this when APIVersion support lands into fakeRP
-	// and we have more consistatent way to set it
+	// and we have more consistent way to set it
 	// Currently this code part decides if we should deploy
 	// PrivateLinkService and and internal-LB
 	if cs.Properties.NetworkProfile.ManagementSubnetCIDR != nil {

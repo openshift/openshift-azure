@@ -21,7 +21,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/plugin"
 )
 
-const latestApiVersion = "2019-10-27-preview"
+const latestApiVersion = "2019-09-30-preview"
 
 type Server struct {
 	router *chi.Mux
@@ -65,6 +65,11 @@ func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 	if len(errs) > 0 {
 		s.log.Fatal(errs)
 	}
+	err = ConfigureProxyDialer()
+	if err != nil {
+		s.log.Fatal(err)
+	}
+
 	return s
 }
 

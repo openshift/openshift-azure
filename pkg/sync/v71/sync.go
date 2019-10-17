@@ -34,10 +34,10 @@ import (
 	kaggregator "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/healthcheck"
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
+	"github.com/openshift/openshift-azure/pkg/util/roundtrippers"
 	utilwait "github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
@@ -247,8 +247,8 @@ func (s *sync) calculateReadiness() (errs []error) {
 		case "Route.route.openshift.io":
 			url := "https://" + jsonpath.MustCompile("$.spec.host").MustGetString(o.Object) + o.GetAnnotations()[syncPodReadinessPathAnnotationKey]
 			cert := s.cs.Config.Certificates.Router.Certs
-			cli := http.Client{
-				Transport: healthcheck.RoundTripper(s.cs.Properties.RouterProfiles[0].FQDN, cert[len(cert)-1]),
+			cli := &http.Client{
+				Transport: roundtrippers.HealthCheck(s.cs.Properties.RouterProfiles[0].FQDN, cert[len(cert)-1], s.cs.Location, nil),
 				Timeout:   5 * time.Second,
 			}
 			resp, err := cli.Get(url)

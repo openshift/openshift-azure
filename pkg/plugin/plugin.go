@@ -176,10 +176,18 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 	if err := clusterUpgrader.EtcdRestoreDeleteMasterScaleSet(ctx); err != nil {
 		return err
 	}
+
 	cs.Properties.NetworkProfile.PrivateEndpoint, err = deployFn(ctx, azuretemplate)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
 	}
+
+	// refresh clusterUpgrader and its kubernetes client in case the private endpoint IP has changed
+	clusterUpgrader, err = p.upgraderFactory(ctx, p.log, cs, true, true, p.testConfig)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+	}
+
 	if err := clusterUpgrader.EtcdRestoreDeleteMasterScaleSetHashes(ctx); err != nil {
 		return err
 	}
@@ -274,6 +282,12 @@ func (p *plugin) createOrUpdateExt(ctx context.Context, cs *api.OpenShiftManaged
 	cs.Properties.NetworkProfile.PrivateEndpoint, err = deployFn(ctx, azuretemplate)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
+	}
+
+	// refresh clusterUpgrader and its kubernetes client in case the private endpoint IP has changed
+	clusterUpgrader, err = p.upgraderFactory(ctx, p.log, cs, true, true, p.testConfig)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
 
 	// enrich is required for the hash functions which are used below

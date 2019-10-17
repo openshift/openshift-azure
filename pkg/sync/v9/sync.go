@@ -34,11 +34,10 @@ import (
 	kaggregator "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
-	"github.com/openshift/openshift-azure/pkg/util/healthcheck"
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
+	"github.com/openshift/openshift-azure/pkg/util/roundtrippers"
 	utilwait "github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
@@ -249,8 +248,8 @@ func (s *sync) calculateReadiness() (errs []error) {
 		case "Route.route.openshift.io":
 			url := "https://" + jsonpath.MustCompile("$.spec.host").MustGetString(o.Object) + o.GetAnnotations()[syncPodReadinessPathAnnotationKey]
 			cert := s.cs.Config.Certificates.Router.Certs
-			cli := http.Client{
-				Transport: healthcheck.RoundTripper(s.cs.Properties.RouterProfiles[0].FQDN, cert[len(cert)-1]),
+			cli := &http.Client{
+				Transport: roundtrippers.HealthCheck(s.cs.Properties.RouterProfiles[0].FQDN, cert[len(cert)-1], s.cs.Location, nil),
 				Timeout:   5 * time.Second,
 			}
 			resp, err := cli.Get(url)
@@ -515,20 +514,7 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (
 			return nil, err
 		}
 		s.restconfig.RateLimiter = flowcontrol.NewFakeAlwaysRateLimiter()
-		s.restconfig.WrapTransport = func(rt http.RoundTripper) http.RoundTripper {
-			// first, tweak values on the incoming RoundTripper, which we are
-			// relying on being an *http.Transport.
-
-			rt.(*http.Transport).DisableKeepAlives = true
-
-			// now wrap our retryingRoundTripper around the incoming RoundTripper.
-			return &kubeclient.RetryingRoundTripper{
-				Log:          log,
-				RoundTripper: rt,
-				Retries:      5,
-				GetTimeout:   30 * time.Second,
-			}
-		}
+		s.restconfig.WrapTransport = roundtrippers.NewRetryingRoundTripper(log, cs.Location, nil, true)
 
 		s.kc, err = kubernetes.NewForConfig(s.restconfig)
 		if err != nil {

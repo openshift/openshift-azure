@@ -14,6 +14,7 @@ import (
 	"github.com/microsoft/ApplicationInsights-Go/appinsights"
 	"github.com/sirupsen/logrus"
 
+	"github.com/openshift/openshift-azure/pkg/fakerp"
 	_ "github.com/openshift/openshift-azure/test/e2e/specs"
 	_ "github.com/openshift/openshift-azure/test/e2e/specs/fakerp"
 	"github.com/openshift/openshift-azure/test/reporters"
@@ -30,6 +31,11 @@ func TestE2E(t *testing.T) {
 	logrus.SetFormatter(&logrus.TextFormatter{})
 	logrus.SetOutput(GinkgoWriter)
 	logrus.SetReportCaller(true)
+
+	err := fakerp.ConfigureProxyDialer()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	RegisterFailHandler(Fail)
 

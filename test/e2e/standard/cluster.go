@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -23,8 +24,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
+	"github.com/openshift/openshift-azure/pkg/util/roundtrippers"
 )
 
 func (sc *SanityChecker) checkMonitoringStackHealth(ctx context.Context) error {
@@ -274,7 +275,7 @@ func (sc *SanityChecker) CheckCanAccessConsole(ctx context.Context, retries int)
 	url := "https://console." + sc.cs.Properties.RouterProfiles[0].PublicSubdomain + "/health"
 	cert := sc.cs.Config.Certificates.Router.Certs[len(sc.cs.Config.Certificates.Router.Certs)-1]
 
-	resp, err := sc.checkCanAccessService(ctx, url, cert, retries)
+	resp, err := sc.checkCanAccessService(ctx, url, cert, false, retries)
 	if err != nil {
 		return err
 	}
@@ -287,12 +288,14 @@ func (sc *SanityChecker) CheckCanAccessConsole(ctx context.Context, retries int)
 
 func (sc *SanityChecker) checkCanAccessServices(ctx context.Context) error {
 	for _, svc := range []struct {
-		url  string
-		cert *x509.Certificate
+		url   string
+		cert  *x509.Certificate
+		usePE bool
 	}{
 		{
-			url:  "https://" + sc.cs.Properties.PublicHostname + "/healthz",
-			cert: sc.cs.Config.Certificates.OpenShiftConsole.Certs[len(sc.cs.Config.Certificates.OpenShiftConsole.Certs)-1],
+			url:   "https://" + sc.cs.Properties.PublicHostname + "/healthz",
+			cert:  sc.cs.Config.Certificates.OpenShiftConsole.Certs[len(sc.cs.Config.Certificates.OpenShiftConsole.Certs)-1],
+			usePE: true,
 		},
 		{
 			url:  "https://console." + sc.cs.Properties.RouterProfiles[0].PublicSubdomain + "/health",
@@ -307,7 +310,7 @@ func (sc *SanityChecker) checkCanAccessServices(ctx context.Context) error {
 			cert: sc.cs.Config.Certificates.Router.Certs[len(sc.cs.Config.Certificates.Router.Certs)-1],
 		},
 	} {
-		resp, err := sc.checkCanAccessService(ctx, svc.url, svc.cert, 5)
+		resp, err := sc.checkCanAccessService(ctx, svc.url, svc.cert, svc.usePE, 5)
 		if err != nil {
 			return err
 		}
@@ -319,20 +322,33 @@ func (sc *SanityChecker) checkCanAccessServices(ctx context.Context) error {
 	return nil
 }
 
-func (sc *SanityChecker) checkCanAccessService(ctx context.Context, url string, cert *x509.Certificate, retries int) (*http.Response, error) {
+func (sc *SanityChecker) checkCanAccessService(ctx context.Context, url string, cert *x509.Certificate, usePE bool, retries int) (*http.Response, error) {
 	pool := x509.NewCertPool()
 	pool.AddCert(cert)
 
+	inner := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			RootCAs: pool,
+		},
+	}
+
+	if sc.cs.Properties.NetworkProfile.PrivateEndpoint != nil && usePE {
+		inner.Dial = func(network, addr string) (net.Conn, error) {
+			_, port, err := net.SplitHostPort(addr)
+			if err != nil {
+				return nil, err
+			}
+
+			return roundtrippers.PrivateEndpointDialHook(sc.cs.Location)(network, net.JoinHostPort(*sc.cs.Properties.NetworkProfile.PrivateEndpoint, port))
+		}
+	}
+
 	cli := &http.Client{
-		Transport: &kubeclient.RetryingRoundTripper{
-			Log: sc.Log,
-			RoundTripper: &http.Transport{
-				TLSClientConfig: &tls.Config{
-					RootCAs: pool,
-				},
-			},
-			Retries:    retries,
-			GetTimeout: 30 * time.Second,
+		Transport: &roundtrippers.RetryingRoundTripper{
+			Log:          sc.Log,
+			RoundTripper: inner,
+			Retries:      retries,
+			GetTimeout:   30 * time.Second,
 		},
 		Timeout: 10 * time.Second,
 	}
