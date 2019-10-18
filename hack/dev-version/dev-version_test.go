@@ -6,6 +6,8 @@ func TestPluginToDevVersion(t *testing.T) {
 	tests := []struct {
 		pluginVersion string
 		want          string
+		wantErr       bool
+		previous      int
 	}{
 		{
 			pluginVersion: "v9.0",
@@ -23,11 +25,36 @@ func TestPluginToDevVersion(t *testing.T) {
 			pluginVersion: "v12.4",
 			want:          "v124",
 		},
+		{
+			pluginVersion: "v12.4",
+			previous:      1,
+			want:          "v123",
+		},
+		{
+			pluginVersion: "v12.4",
+			previous:      2,
+			want:          "v122",
+		},
+		{
+			pluginVersion: "v12.4",
+			previous:      4,
+			want:          "v12",
+		},
+		{
+			pluginVersion: "v12.4",
+			previous:      5,
+			wantErr:       true,
+			want:          "",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.pluginVersion, func(t *testing.T) {
-			if got := pluginToDevVersion(tt.pluginVersion); got != tt.want {
-				t.Errorf("pluginToDevVersion() = %v, want %v", got, tt.want)
+			got, err := pluginToDevVersion(tt.pluginVersion, tt.previous)
+			if tt.wantErr != (err != nil) {
+				t.Errorf("pluginToDevVersion(%s:%s) = %v, want %v", tt.pluginVersion, tt.want, err, tt.wantErr)
+			}
+			if got != tt.want {
+				t.Errorf("pluginToDevVersion(%s:%s) = %v, want %v", tt.pluginVersion, tt.want, got, tt.want)
 			}
 		})
 	}
