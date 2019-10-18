@@ -102,6 +102,7 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, conf *clien
 		if err != nil {
 			log.Warnf("deployment failed: %#v", err)
 			debugDeployerError(ctx, log, cs, testConfig)
+			return nil, err
 		}
 
 		// we check if PE exists and get IP
@@ -134,6 +135,7 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, conf *clien
 				if err != nil {
 					log.Warnf("deployment failed: %#v", err)
 					debugDeployerError(ctx, log, cs, testConfig)
+					return nil, err
 				}
 
 				log.Info("applying PE deployment")
@@ -157,6 +159,7 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, conf *clien
 				if err != nil {
 					log.Warnf("deployment failed: %#v", err)
 					debugDeployerError(ctx, log, cs, testConfig)
+					return nil, err
 				}
 			}
 			if cs.Properties.PrivateAPIServer {
