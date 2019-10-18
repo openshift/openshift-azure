@@ -4,33 +4,8 @@ OpenShift on Azure project is using a few testing methods.
 Some of the test code base is being reused from other projects.
 
 PR commands to execute tests:
-```
-/test e2e - run native e2e tests
-/test unit - run unit tests
-```
 
-Optional test commands:
-```
-/test upgrade - run upgrade in-place cluster tests
-/test conformance - run origin conformance tests
-/test etcdbackuprecovery - run etcd backup and restore test
-/test keyrotation - run key rotation test
-/test e2e-no-test - no tests
-/test prod - run prod tests (broken)
-/test scaleupdown - run cluster scale-up-down test
-/test upgrade-v1.2 - run upgrade release version v1.2 to PR code test
-/test upgrade-v2.0 - run upgrade release version v2.0 to PR code test
-/test upgrade-v2.1 - run upgrade release version v2.1 to PR code test
-```
-
-We have some optinal jobs, which are artifacts of prow-gen.
-Those can be ignored and `/skip`ed. In example:
-```
-/test e2e-upgrade-v1.2
-/test e2e-upgrade-v2.0
-/test e2e-upgrade-v2.1
-```
-Upstream issue: https://github.com/openshift/ci-operator-prowgen/issues/79 
+[All test commands](commands.md)
 
 ## Verify 
 

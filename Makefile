@@ -60,6 +60,7 @@ releasenotes:
 
 content:
 	go test -timeout=300s -tags=content -run=TestContent ./pkg/sync/$(LATEST_PLUGIN_VERSION)
+	go run ./hack/generate-test-commands >docs/commands.md
 	go generate ./pkg/sync/$(LATEST_PLUGIN_VERSION)
 
 verify:
