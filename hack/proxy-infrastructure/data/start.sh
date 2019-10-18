@@ -30,7 +30,7 @@ cat >/etc/systemd/system/aro-proxy.service <<'EOF'
 Description=aro-proxy
 
 [Service]
-ExecStart=/root/go/bin/proxy -cert /root/proxy-cert.pem -key /root/proxy-key.pem -cacert /root/proxy-ca.pem -subnet "{{ .Config.Subnets.Vnet }}"
+ExecStart=/root/go/bin/proxy -cert /root/proxy-cert.pem -key /root/proxy-key.pem -cacert /root/proxy-ca.pem -subnet "{{ .Config.NetDefinition.Vnet }}"
 
 [Install]
 WantedBy=multi-user.target
