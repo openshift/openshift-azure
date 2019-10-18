@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/openshift/openshift-azure/pkg/util/roundtrippers"
@@ -23,37 +24,26 @@ func (c *conn) Read(b []byte) (int, error) {
 	return c.r.Read(b)
 }
 
-// also called by e2e tests
+// ConfigureProxyDialer also called by e2e tests
 func ConfigureProxyDialer() error {
 	// load proxy configuration for tests
 	var cert tls.Certificate
 	roots := x509.NewCertPool()
 
-	// TODO: improve this
-	if _, err := os.Stat("secrets/proxy-client.pem"); os.IsNotExist(err) {
-		cert, err = tls.LoadX509KeyPair("../../secrets/proxy-client.pem", "../../secrets/proxy-client.key")
-		if err != nil {
-			return err
-		}
-		ca, err := ioutil.ReadFile("../../secrets/proxy-ca.pem")
-		if err != nil {
-			return err
-		}
-		if ok := roots.AppendCertsFromPEM(ca); !ok {
-			return fmt.Errorf("error configuring proxy")
-		}
-	} else {
-		cert, err = tls.LoadX509KeyPair("secrets/proxy-client.pem", "secrets/proxy-client.key")
-		if err != nil {
-			return err
-		}
-		ca, err := ioutil.ReadFile("secrets/proxy-ca.pem")
-		if err != nil {
-			return err
-		}
-		if ok := roots.AppendCertsFromPEM(ca); !ok {
-			return fmt.Errorf("error configuring proxy")
-		}
+	secretsPath := "secrets"
+	if _, err := os.Stat(path.Join(secretsPath, "proxy-client.pem")); os.IsNotExist(err) {
+		secretsPath = "../../secrets"
+	}
+	cert, err := tls.LoadX509KeyPair(path.Join(secretsPath, "proxy-client.pem"), path.Join(secretsPath, "proxy-client.key"))
+	if err != nil {
+		return err
+	}
+	ca, err := ioutil.ReadFile(path.Join(secretsPath, "proxy-ca.pem"))
+	if err != nil {
+		return err
+	}
+	if ok := roots.AppendCertsFromPEM(ca); !ok {
+		return fmt.Errorf("error configuring proxy")
 	}
 
 	roundtrippers.PrivateEndpointDialHook = func(location string) func(network, address string) (net.Conn, error) {
