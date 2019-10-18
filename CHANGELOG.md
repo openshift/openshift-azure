@@ -1,3 +1,8 @@
+## v10.1
+
+- Add PrivateAPIServer field to MasterPoolProfile  ([#2004](https://github.com/openshift/openshift-azure/pull/2004), [@asalkeld](https://github.com/asalkeld), 17/10/2019)
+- Migrate container images to ACR ([@ehashman](https://github.com/ehashman), 17/10/2019)
+
 ## v10.0
 
 - Move ImagePullSecret to ARM and use combined secret ([#1949](https://github.com/openshift/openshift-azure/pull/1949), [@mjudeikis](https://github.com/mjudeikis), 11/10/2019)
