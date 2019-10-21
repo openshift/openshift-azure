@@ -160,7 +160,6 @@ func (g *simpleGenerator) lbAPIServer() *network.LoadBalancer {
 			},
 		},
 	}
-
 	probes := []network.Probe{
 		{
 			ProbePropertiesFormat: &network.ProbePropertiesFormat{
@@ -222,42 +221,6 @@ func (g *simpleGenerator) lbAPIServer() *network.LoadBalancer {
 }
 
 func (g *simpleGenerator) ilbAPIServer() *network.LoadBalancer {
-	sshRule := network.LoadBalancingRule{
-		LoadBalancingRulePropertiesFormat: &network.LoadBalancingRulePropertiesFormat{
-			FrontendIPConfiguration: &network.SubResource{
-				ID: to.StringPtr(resourceid.ResourceID(
-					g.cs.Properties.AzProfile.SubscriptionID,
-					g.cs.Properties.AzProfile.ResourceGroup,
-					"Microsoft.Network/loadBalancers",
-					armconst.IlbAPIServerName,
-				) + "/frontendIPConfigurations/" + armconst.IlbAPIServerFrontendConfigurationName),
-			},
-			BackendAddressPool: &network.SubResource{
-				ID: to.StringPtr(resourceid.ResourceID(
-					g.cs.Properties.AzProfile.SubscriptionID,
-					g.cs.Properties.AzProfile.ResourceGroup,
-					"Microsoft.Network/loadBalancers",
-					armconst.IlbAPIServerName,
-				) + "/backendAddressPools/" + armconst.LbAPIServerBackendPoolName),
-			},
-			Probe: &network.SubResource{
-				ID: to.StringPtr(resourceid.ResourceID(
-					g.cs.Properties.AzProfile.SubscriptionID,
-					g.cs.Properties.AzProfile.ResourceGroup,
-					"Microsoft.Network/loadBalancers",
-					armconst.IlbAPIServerName,
-				) + "/probes/" + armconst.LbAPIServerProbeName),
-			},
-			Protocol:             network.TransportProtocolTCP,
-			LoadDistribution:     network.Default,
-			FrontendPort:         to.Int32Ptr(22),
-			BackendPort:          to.Int32Ptr(22),
-			IdleTimeoutInMinutes: to.Int32Ptr(15),
-			EnableFloatingIP:     to.BoolPtr(false),
-		},
-		Name: to.StringPtr(armconst.LbSSHLoadBalancingRuleName),
-	}
-
 	lb := &network.LoadBalancer{
 		Sku: &network.LoadBalancerSku{
 			Name: network.LoadBalancerSkuNameStandard,
@@ -266,7 +229,8 @@ func (g *simpleGenerator) ilbAPIServer() *network.LoadBalancer {
 			FrontendIPConfigurations: &[]network.FrontendIPConfiguration{
 				{
 					FrontendIPConfigurationPropertiesFormat: &network.FrontendIPConfigurationPropertiesFormat{
-						PrivateIPAllocationMethod: network.Dynamic,
+						PrivateIPAllocationMethod: network.Static,
+						PrivateIPAddress:          &g.cs.Properties.FQDN,
 						Subnet: &network.Subnet{
 							ID: to.StringPtr(resourceid.ResourceID(
 								g.cs.Properties.AzProfile.SubscriptionID,
@@ -320,6 +284,33 @@ func (g *simpleGenerator) ilbAPIServer() *network.LoadBalancer {
 					},
 					Name: to.StringPtr(armconst.LbAPIServerLoadBalancingRuleName),
 				},
+				{
+					LoadBalancingRulePropertiesFormat: &network.LoadBalancingRulePropertiesFormat{
+						FrontendIPConfiguration: &network.SubResource{
+							ID: to.StringPtr(resourceid.ResourceID(
+								g.cs.Properties.AzProfile.SubscriptionID,
+								g.cs.Properties.AzProfile.ResourceGroup,
+								"Microsoft.Network/loadBalancers",
+								armconst.IlbAPIServerName,
+							) + "/frontendIPConfigurations/" + armconst.IlbAPIServerFrontendConfigurationName),
+						},
+						BackendAddressPool: &network.SubResource{
+							ID: to.StringPtr(resourceid.ResourceID(
+								g.cs.Properties.AzProfile.SubscriptionID,
+								g.cs.Properties.AzProfile.ResourceGroup,
+								"Microsoft.Network/loadBalancers",
+								armconst.IlbAPIServerName,
+							) + "/backendAddressPools/" + armconst.LbAPIServerBackendPoolName),
+						},
+						Protocol:             network.TransportProtocolTCP,
+						LoadDistribution:     network.Default,
+						FrontendPort:         to.Int32Ptr(22),
+						BackendPort:          to.Int32Ptr(22),
+						IdleTimeoutInMinutes: to.Int32Ptr(15),
+						EnableFloatingIP:     to.BoolPtr(false),
+					},
+					Name: to.StringPtr(armconst.LbSSHLoadBalancingRuleName),
+				},
 			},
 			Probes: &[]network.Probe{
 				{
@@ -341,16 +332,6 @@ func (g *simpleGenerator) ilbAPIServer() *network.LoadBalancer {
 		Type:     to.StringPtr("Microsoft.Network/loadBalancers"),
 		Location: to.StringPtr(g.cs.Location),
 	}
-
-	if g.cs.Properties.PrivateAPIServer {
-		// for Private cluster we need a stable IP address for the API server
-		// that we can use in certifcates.
-		(*lb.LoadBalancerPropertiesFormat.FrontendIPConfigurations)[0].FrontendIPConfigurationPropertiesFormat.PrivateIPAllocationMethod = network.Static
-		(*lb.LoadBalancerPropertiesFormat.FrontendIPConfigurations)[0].FrontendIPConfigurationPropertiesFormat.PrivateIPAddress = &g.cs.Properties.FQDN
-		// enable ssh
-		(*lb.LoadBalancerPropertiesFormat.LoadBalancingRules) = append((*lb.LoadBalancerPropertiesFormat.LoadBalancingRules), sshRule)
-	}
-
 	return lb
 }
 
