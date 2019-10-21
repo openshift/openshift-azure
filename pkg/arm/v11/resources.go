@@ -222,6 +222,42 @@ func (g *simpleGenerator) lbAPIServer() *network.LoadBalancer {
 }
 
 func (g *simpleGenerator) ilbAPIServer() *network.LoadBalancer {
+	sshRule := network.LoadBalancingRule{
+		LoadBalancingRulePropertiesFormat: &network.LoadBalancingRulePropertiesFormat{
+			FrontendIPConfiguration: &network.SubResource{
+				ID: to.StringPtr(resourceid.ResourceID(
+					g.cs.Properties.AzProfile.SubscriptionID,
+					g.cs.Properties.AzProfile.ResourceGroup,
+					"Microsoft.Network/loadBalancers",
+					armconst.IlbAPIServerName,
+				) + "/frontendIPConfigurations/" + armconst.IlbAPIServerFrontendConfigurationName),
+			},
+			BackendAddressPool: &network.SubResource{
+				ID: to.StringPtr(resourceid.ResourceID(
+					g.cs.Properties.AzProfile.SubscriptionID,
+					g.cs.Properties.AzProfile.ResourceGroup,
+					"Microsoft.Network/loadBalancers",
+					armconst.IlbAPIServerName,
+				) + "/backendAddressPools/" + armconst.LbAPIServerBackendPoolName),
+			},
+			Probe: &network.SubResource{
+				ID: to.StringPtr(resourceid.ResourceID(
+					g.cs.Properties.AzProfile.SubscriptionID,
+					g.cs.Properties.AzProfile.ResourceGroup,
+					"Microsoft.Network/loadBalancers",
+					armconst.IlbAPIServerName,
+				) + "/probes/" + armconst.LbAPIServerProbeName),
+			},
+			Protocol:             network.TransportProtocolTCP,
+			LoadDistribution:     network.Default,
+			FrontendPort:         to.Int32Ptr(22),
+			BackendPort:          to.Int32Ptr(22),
+			IdleTimeoutInMinutes: to.Int32Ptr(15),
+			EnableFloatingIP:     to.BoolPtr(false),
+		},
+		Name: to.StringPtr(armconst.LbSSHLoadBalancingRuleName),
+	}
+
 	lb := &network.LoadBalancer{
 		Sku: &network.LoadBalancerSku{
 			Name: network.LoadBalancerSkuNameStandard,
@@ -311,6 +347,8 @@ func (g *simpleGenerator) ilbAPIServer() *network.LoadBalancer {
 		// that we can use in certifcates.
 		(*lb.LoadBalancerPropertiesFormat.FrontendIPConfigurations)[0].FrontendIPConfigurationPropertiesFormat.PrivateIPAllocationMethod = network.Static
 		(*lb.LoadBalancerPropertiesFormat.FrontendIPConfigurations)[0].FrontendIPConfigurationPropertiesFormat.PrivateIPAddress = &g.cs.Properties.FQDN
+		// enable ssh
+		(*lb.LoadBalancerPropertiesFormat.LoadBalancingRules) = append((*lb.LoadBalancerPropertiesFormat.LoadBalancingRules), sshRule)
 	}
 
 	return lb
