@@ -91,7 +91,7 @@ func (s *ssher) Dial(ctx context.Context, hostname string) (*ssh.Client, error) 
 			return nil, err
 		}
 
-		if int(instance) > len(s.masterIPs) {
+		if int(instance)+1 > len(s.masterIPs) {
 			return nil, fmt.Errorf("couldn't find IP for master")
 		}
 
