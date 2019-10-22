@@ -44,7 +44,9 @@ var marshalled = []byte(`{
 			"count": 1,
 			"vmSize": "Properties.MasterPoolProfile.VMSize",
 			"subnetCidr": "Properties.MasterPoolProfile.SubnetCIDR",
-			"privateApiServer": true
+			"apiProperties": {
+				"privateApiServer": true
+			}
 		},
 		"agentPoolProfiles": [
 			{
@@ -164,7 +166,7 @@ func TestStructTypes(t *testing.T) {
 	// AgentPoolProfile
 	for name := range mppFields {
 		switch name {
-		case "PrivateAPIServer":
+		case "APIProperties":
 			continue
 		}
 		if !reflect.DeepEqual(appFields[name], mppFields[name]) {
