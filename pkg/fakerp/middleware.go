@@ -80,7 +80,7 @@ func (s *Server) context(handler http.Handler) http.Handler {
 			}
 			ctx = context.WithValue(ctx, contextKeyConfig, conf)
 
-			cs.Properties.NetworkProfile.PrivateEndpoint, err = getPrivateEndpointIP(ctx, s.log, cs.Properties.AzProfile.SubscriptionID, conf.ManagementResourceGroup, cs.Properties.AzProfile.ResourceGroup)
+			cs.Properties.NetworkProfile.PrivateEndpoint, err = GetPrivateEndpointIP(ctx, s.log, cs.Properties.AzProfile.SubscriptionID, conf.ManagementResourceGroup, cs.Properties.AzProfile.ResourceGroup)
 			if err != nil {
 				s.adminreply(w, err, nil)
 			}
