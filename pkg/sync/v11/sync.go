@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"sort"
 	"strings"
 	concurrency "sync"
@@ -509,6 +510,13 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (
 
 	if initClients {
 		var err error
+		if cs.Properties.PrivateAPIServer {
+			hostname := os.Getenv("masterNodeName")
+			if hostname == "" {
+				return nil, fmt.Errorf("could not read hostname from env[masterNodeName]")
+			}
+			cs.Config.AdminKubeconfig.Clusters[0].Cluster.Server = "https://" + hostname
+		}
 		s.restconfig, err = managedcluster.RestConfigFromV1Config(cs.Config.AdminKubeconfig)
 		if err != nil {
 			return nil, err

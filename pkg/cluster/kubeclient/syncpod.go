@@ -97,6 +97,15 @@ func (u *Kubeclientset) EnsureSyncPod(ctx context.Context, syncImage string, has
 										ReadOnly:  true,
 									},
 								},
+								Env: []corev1.EnvVar{
+									{
+										Name: "masterNodeName",
+										ValueFrom: &corev1.EnvVarSource{
+											FieldRef: &corev1.ObjectFieldSelector{
+												FieldPath: "spec.nodeName"},
+										},
+									},
+								},
 							},
 						},
 						NodeSelector: map[string]string{
