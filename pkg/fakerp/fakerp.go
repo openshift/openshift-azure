@@ -187,12 +187,19 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 		return nil, err
 	}
 
-	// TODO: Remove this when APIVersion support lands into fakeRP
-	// and we have more consistatent way to set it
-	// Currently this code part decides if we should deploy
-	// PrivateLinkService and and internal-LB
-	if cs.Properties.NetworkProfile.ManagementSubnetCIDR != nil {
-		cs.Properties.PrivateAPIServer = true
+	// Currently this code path decides if we should deploy PrivateLinkService and and internal-LB
+	// but in master branch it means private cluster and it was decided to only
+	// enable private link for private cluster.
+	// There is an update test from v10.0 to top of branch, so for that case we are
+	// keeping the update pathway the same (as the our validate will refuse to remove it).
+	// However for the create case we setting private to off so that we can successfully test
+	// the v10 to master case.
+	if isUpdate {
+		if cs.Properties.NetworkProfile.ManagementSubnetCIDR != nil {
+			cs.Properties.PrivateAPIServer = true
+		}
+	} else {
+		cs.Properties.PrivateAPIServer = false
 	}
 
 	clients, err := newClients(ctx, log, cs, testConfig, conf)
