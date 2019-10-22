@@ -72,6 +72,7 @@ verify:
 	./hack/verify/validate-codecov.sh
 	go run ./hack/validate-imports/validate-imports.go cmd hack pkg test
 	./hack/verify/validate-sec.sh
+	./hack/verify/validate-ocp-version.py
 
 testinsights:
 	go build -ldflags ${LDFLAGS} ./cmd/$@
