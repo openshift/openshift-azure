@@ -133,7 +133,7 @@ func (c Client) createOrUpdatev20190430(ctx context.Context) (*v20190430.OpenShi
 		return nil, fmt.Errorf("failed reading manifest: %v", err)
 	}
 	c.log.Info("creating/updating cluster")
-	resp, err := c.rpcs["2019-10-27-preview"].(v20190430client.OpenShiftManagedClustersClient).CreateOrUpdateAndWait(ctx, c.conf.ResourceGroup, c.conf.ResourceGroup, *oc)
+	resp, err := c.rpcs["2019-04-30"].(v20190430client.OpenShiftManagedClustersClient).CreateOrUpdateAndWait(ctx, c.conf.ResourceGroup, c.conf.ResourceGroup, *oc)
 	if err != nil {
 		return nil, err
 	}
