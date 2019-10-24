@@ -179,6 +179,47 @@ versions:
       sync: quay.io/openshift-on-azure/azure:v10.0
       tlsProxy: quay.io/openshift-on-azure/azure:v10.0
       logAnalyticsAgent: mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod07092019
+  v10.1:
+    imageOffer: osa
+    imagePublisher: redhat
+    imageSku: osa_311
+    imageVersion: 311.146.20190925
+    images:
+      alertManager: registry.access.redhat.com/openshift3/prometheus-alertmanager:v3.11.146
+      ansibleServiceBroker: registry.access.redhat.com/openshift3/ose-ansible-service-broker:v3.11.146
+      clusterMonitoringOperator: registry.access.redhat.com/openshift3/ose-cluster-monitoring-operator:v3.11.146
+      configReloader: registry.access.redhat.com/openshift3/ose-configmap-reloader:v3.11.146
+      console: registry.access.redhat.com/openshift3/ose-console:v3.11.146
+      controlPlane: registry.access.redhat.com/openshift3/ose-control-plane:v3.11.146
+      grafana: registry.access.redhat.com/openshift3/grafana:v3.11.146
+      kubeRbacProxy: registry.access.redhat.com/openshift3/ose-kube-rbac-proxy:v3.11.146
+      kubeStateMetrics: registry.access.redhat.com/openshift3/ose-kube-state-metrics:v3.11.146
+      node: registry.access.redhat.com/openshift3/ose-node:v3.11.146
+      nodeExporter: registry.access.redhat.com/openshift3/prometheus-node-exporter:v3.11.146
+      oAuthProxy: registry.access.redhat.com/openshift3/oauth-proxy:v3.11.146
+      prometheus: registry.access.redhat.com/openshift3/prometheus:v3.11.146
+      prometheusConfigReloader: registry.access.redhat.com/openshift3/ose-prometheus-config-reloader:v3.11.146
+      prometheusOperator: registry.access.redhat.com/openshift3/ose-prometheus-operator:v3.11.146
+      registry: registry.access.redhat.com/openshift3/ose-docker-registry:v3.11.146
+      registryConsole: registry.access.redhat.com/openshift3/registry-console:v3.11.146
+      router: registry.access.redhat.com/openshift3/ose-haproxy-router:v3.11.146
+      serviceCatalog: registry.access.redhat.com/openshift3/ose-service-catalog:v3.11.146
+      templateServiceBroker: registry.access.redhat.com/openshift3/ose-template-service-broker:v3.11.146
+      webConsole: registry.access.redhat.com/openshift3/ose-web-console:v3.11.146
+      format: registry.access.redhat.com/openshift3/ose-${component}:v3.11.146
+      httpd: registry.access.redhat.com/rhscl/httpd-24-rhel7:2.4-104
+      masterEtcd: registry.access.redhat.com/rhel7/etcd:3.2.26-16
+      genevaLogging: osarpint.azurecr.io/acs/mdsd:master.20190228.1
+      genevaStatsd: osarpint.azurecr.io/acs/mdm:git-a909a2e76
+      genevaTDAgent: osarpint.azurecr.io/acs/td-agent:master.20190228.1
+      azureControllers: osarpint.azurecr.io/openshift-on-azure/azure:v10.1
+      canary: osarpint.azurecr.io/openshift-on-azure/azure:v10.1
+      etcdBackup: osarpint.azurecr.io/openshift-on-azure/azure:v10.1
+      metricsBridge: osarpint.azurecr.io/openshift-on-azure/azure:v10.1
+      startup: osarpint.azurecr.io/openshift-on-azure/azure:v10.1
+      sync: osarpint.azurecr.io/openshift-on-azure/azure:v10.1
+      tlsProxy: osarpint.azurecr.io/openshift-on-azure/azure:v10.1
+      logAnalyticsAgent: mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod07092019
   v11.0:
     imageOffer: osa
     imagePublisher: redhat
