@@ -128,10 +128,15 @@ type RouterProfile struct {
 
 // MasterPoolProfile contains configuration for OpenShift master VMs.
 type MasterPoolProfile struct {
-	Count      *int64  `json:"count,omitempty"`
-	VMSize     *VMSize `json:"vmSize,omitempty"`
-	SubnetCIDR *string `json:"subnetCidr,omitempty"`
-	// PrivateAPIServer (temporary): Specifies if API server is public or private
+	Count         *int64         `json:"count,omitempty"`
+	VMSize        *VMSize        `json:"vmSize,omitempty"`
+	SubnetCIDR    *string        `json:"subnetCidr,omitempty"`
+	APIProperties *APIProperties `json:"apiProperties,omitempty"`
+}
+
+// APIProperties defines further properties on the API
+type APIProperties struct {
+	// PrivateAPIServer (in, optional): Specifies if API server is public or private
 	PrivateAPIServer *bool `json:"privateApiServer,omitempty"`
 }
 
