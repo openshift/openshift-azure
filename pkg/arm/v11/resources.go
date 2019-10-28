@@ -315,11 +315,10 @@ func (g *simpleGenerator) ilbAPIServer() *network.LoadBalancer {
 			Probes: &[]network.Probe{
 				{
 					ProbePropertiesFormat: &network.ProbePropertiesFormat{
-						Protocol:          network.ProbeProtocolHTTPS,
+						Protocol:          network.ProbeProtocolTCP,
 						Port:              to.Int32Ptr(443),
 						IntervalInSeconds: to.Int32Ptr(5),
 						NumberOfProbes:    to.Int32Ptr(2),
-						RequestPath:       to.StringPtr("/healthz"),
 					},
 					Name: to.StringPtr(armconst.LbAPIServerProbeName),
 				},
