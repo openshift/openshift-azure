@@ -90,8 +90,10 @@ func mergeProperties(oc *OpenShiftManagedCluster, cs *api.OpenShiftManagedCluste
 	if oc.Properties.FQDN != nil {
 		cs.Properties.FQDN = *oc.Properties.FQDN
 	}
-	if oc.Properties.MasterPoolProfile != nil && oc.Properties.MasterPoolProfile.PrivateAPIServer != nil {
-		cs.Properties.PrivateAPIServer = *oc.Properties.MasterPoolProfile.PrivateAPIServer
+	if oc.Properties.MasterPoolProfile != nil && oc.Properties.MasterPoolProfile.APIProperties != nil {
+		if oc.Properties.MasterPoolProfile.APIProperties.PrivateAPIServer != nil {
+			cs.Properties.PrivateAPIServer = *oc.Properties.MasterPoolProfile.APIProperties.PrivateAPIServer
+		}
 	}
 
 	if oc.Properties.NetworkProfile != nil {

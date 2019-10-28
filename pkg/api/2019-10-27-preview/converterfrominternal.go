@@ -64,10 +64,12 @@ func FromInternal(cs *api.OpenShiftManagedCluster) *OpenShiftManagedCluster {
 
 		if app.Role == api.AgentPoolProfileRoleMaster {
 			oc.Properties.MasterPoolProfile = &MasterPoolProfile{
-				Count:            &app.Count,
-				VMSize:           &vmSize,
-				SubnetCIDR:       &app.SubnetCIDR,
-				PrivateAPIServer: &cs.Properties.PrivateAPIServer,
+				Count:      &app.Count,
+				VMSize:     &vmSize,
+				SubnetCIDR: &app.SubnetCIDR,
+				APIProperties: &APIProperties{
+					PrivateAPIServer: &cs.Properties.PrivateAPIServer,
+				},
 			}
 		} else {
 			osType := OSType(app.OSType)

@@ -21,14 +21,17 @@ else
 fi
 
 export IMAGE_RESOURCEGROUP="${IMAGE_RESOURCEGROUP:-images}"
-export IMAGE_RESOURCENAME="${IMAGE_RESOURCENAME:-rhel7-3.11-$(TZ=Etc/UTC date +%Y%m%d%H%M)}"
 export IMAGE_STORAGEACCOUNT="${IMAGE_STORAGEACCOUNT:-openshiftimages}"
 export AZURE_REGION="${AZURE_REGION:-eastus}"
 export AZURE_REGIONS="${AZURE_REGION}"
 
 [[ -e /var/run/secrets/kubernetes.io ]] || go generate ./...
-PHASE=image_build
-go run -ldflags "-X main.gitCommit=$GITCOMMIT" ./cmd/vmimage -imageResourceGroup "$IMAGE_RESOURCEGROUP" -image "$IMAGE_RESOURCENAME" -imageStorageAccount "$IMAGE_STORAGEACCOUNT" -location "$AZURE_REGION"
+
+if [[ -z "$IMAGE_RESOURCENAME" ]]; then
+  export IMAGE_RESOURCENAME="rhel7-3.11-$(TZ=Etc/UTC date +%Y%m%d%H%M)"
+  PHASE=image_build
+  go run -ldflags "-X main.gitCommit=$GITCOMMIT" ./cmd/vmimage -imageResourceGroup "$IMAGE_RESOURCEGROUP" -image "$IMAGE_RESOURCENAME" -imageStorageAccount "$IMAGE_STORAGEACCOUNT" -location "$AZURE_REGION"
+fi
 
 if [[ -z "$RESOURCEGROUP" ]]; then
   export RESOURCEGROUP="${IMAGE_RESOURCENAME//./}-e2e"
