@@ -50,6 +50,42 @@ spec:
       name: master-pki
     - mountPath: /var/log
       name: master-log
+{{- if .ContainerService.Properties.PrivateAPIServer }}
+  - args:
+    - tlsproxy
+    - --hostname
+    - https://$(HOSTNAME):443
+    - --insecure
+    - "true"
+    - --listen
+    - :8080
+    - --cert
+    - /etc/origin/master/named/console.crt
+    - --key
+    - /etc/origin/master/named/console.key
+    env:
+    - name: HOSTNAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: spec.nodeName
+    image: {{ .Config.Images.TLSProxy | quote }}
+    imagePullPolicy: Always
+    name: http-healthz
+    livenessProbe:
+      httpGet:
+        path: healthz
+        port: 8080
+        scheme: HTTP
+      initialDelaySeconds: 45
+      timeoutSeconds: 10
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - mountPath: /etc/origin/master
+      name: master-config
+      readOnly: true
+{{- end }}
   hostNetwork: true
   priorityClassName: system-node-critical
   volumes:
