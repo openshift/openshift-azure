@@ -86,13 +86,14 @@ func TestDerivedKubeAndSystemReserved(t *testing.T) {
 			wantSRErr: "role anewrole not found",
 		},
 	}
+	d := &derivedType{}
 	for _, tt := range tests {
-		got, err := derived.KubeReserved(&tt.cs, tt.role)
+		got, err := d.KubeReserved(&tt.cs, tt.role)
 		if got != tt.wantKR || (err == nil && tt.wantKRErr != "") || (err != nil && err.Error() != tt.wantKRErr) {
 			t.Errorf("derived.KubeReserved(%s) = %v, %v: wanted %v, %v", tt.role, got, err, tt.wantKR, tt.wantKRErr)
 		}
 
-		got, err = derived.SystemReserved(&tt.cs, tt.role)
+		got, err = d.SystemReserved(&tt.cs, tt.role)
 		if got != tt.wantSR || (err == nil && tt.wantSRErr != "") || (err != nil && err.Error() != tt.wantSRErr) {
 			t.Errorf("derived.SystemReserved(%s) = %v, %v: wanted %v, %v", tt.role, got, err, tt.wantSR, tt.wantSRErr)
 		}
@@ -121,7 +122,8 @@ func TestCaBundle(t *testing.T) {
 			},
 		},
 	}
-	bundle, err := derived.CaBundle(&cs)
+	d := &derivedType{}
+	bundle, err := d.CaBundle(&cs)
 	if err != nil {
 		t.Errorf("derived.CaBundle() error %v", err)
 	}
@@ -129,4 +131,43 @@ func TestCaBundle(t *testing.T) {
 		t.Errorf("derived.CaBundle() = ca-bundle lenght \"%v\", want \"%v\"", len(bundle), len(expected))
 	}
 
+}
+
+func TestGetServerFromDNSConf(t *testing.T) {
+	tests := []struct {
+		name    string
+		content string
+		want    []string
+		wantErr bool
+	}{
+		{
+			name:    "expected",
+			content: "server=168.63.129.16",
+			want:    []string{"168.63.129.16"},
+		},
+		{
+			name:    "bad format",
+			content: "168.63.129.16",
+			wantErr: true,
+		},
+		{
+			name: "complex",
+			want: []string{"168.63.129.16", "1.2.3.4"},
+			content: `dns-forward-max=5000
+server=168.63.129.16
+server=1.2.3.4`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := getServerFromDNSConf(tt.content)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getServerFromDNSConf() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("getServerFromDNSConf() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

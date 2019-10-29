@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/ghodss/yaml"
+	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
@@ -201,8 +202,10 @@ func TestHashScaleSetStability(t *testing.T) {
 			}
 
 			hasher := Hash{
-				StartupFactory: startup.New,
-				Arm:            arm,
+				StartupFactory: func(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (startup.Interface, error) {
+					return startup.New(log, cs, testConfig, "")
+				},
+				Arm: arm,
 			}
 
 			b, err := hasher.HashScaleSet(cs, &api.AgentPoolProfile{Role: tt.role})

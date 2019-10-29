@@ -40,7 +40,7 @@ func runStartup(ctx context.Context, log *logrus.Entry) error {
 		return err
 	}
 
-	s, err := startup.New(log, cs, api.TestConfig{})
+	s, err := startup.New(log, cs, api.TestConfig{}, "")
 	if err != nil {
 		return err
 	}

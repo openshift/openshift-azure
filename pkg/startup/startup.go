@@ -28,7 +28,7 @@ type Interface interface {
 }
 
 // New returns a new startup Interface according to the cluster version running
-func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (Interface, error) {
+func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig, root string) (Interface, error) {
 	switch cs.Config.PluginVersion {
 	case "v7.0":
 		return v7.New(log, cs, testConfig), nil
@@ -41,7 +41,7 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.Test
 	case "v11.0":
 		return v11.New(log, cs, testConfig), nil
 	case "v12.0":
-		return v12.New(log, cs, testConfig), nil
+		return v12.New(log, cs, testConfig, root), nil
 	}
 
 	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)

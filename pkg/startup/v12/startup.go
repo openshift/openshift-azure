@@ -32,11 +32,12 @@ type startup struct {
 	log        *logrus.Entry
 	cs         *api.OpenShiftManagedCluster
 	testConfig api.TestConfig
+	root       string
 }
 
 // New returns a new startup entrypoint
-func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) *startup {
-	return &startup{log: log, cs: cs, testConfig: testConfig}
+func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig, root string) *startup {
+	return &startup{log: log, cs: cs, testConfig: testConfig, root: root}
 }
 
 func (s *startup) WriteFiles(ctx context.Context) error {
@@ -165,7 +166,7 @@ func (s *startup) writeFiles(role api.AgentPoolProfileRole, w writers.Writer, ho
 			}, map[string]interface{}{
 				"ContainerService": s.cs,
 				"Config":           &s.cs.Config,
-				"Derived":          derived,
+				"Derived":          &derivedType{root: s.root},
 				"Role":             role,
 				"Hostname":         hostname,
 				"DomainName":       domainname,

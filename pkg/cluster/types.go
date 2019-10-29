@@ -118,10 +118,12 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 		Log:            log,
 		ScalerFactory:  scaler.NewFactory(),
 		Hasher: &Hash{
-			Log:            log,
-			TestConfig:     testConfig,
-			StartupFactory: startup.New,
-			Arm:            arm,
+			Log:        log,
+			TestConfig: testConfig,
+			StartupFactory: func(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (startup.Interface, error) {
+				return startup.New(log, cs, testConfig, "")
+			},
+			Arm: arm,
 		},
 		Arm:                arm,
 		Cs:                 cs,

@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -164,7 +165,7 @@ func getFakeHTTPClient(cs *api.OpenShiftManagedCluster) wait.SimpleHTTPClient {
 	return wait.NewFakeHTTPClient()
 }
 
-func newFakeUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig, kubeclient kubeclient.Interface, azs *fakecloud.AzureCloud) (cluster.Upgrader, error) {
+func newFakeUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig, kubeclient kubeclient.Interface, azs *fakecloud.AzureCloud, rootDir string) (cluster.Upgrader, error) {
 	arm, err := arm.New(ctx, log, cs, testConfig)
 	if err != nil {
 		return nil, err
@@ -182,10 +183,12 @@ func newFakeUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftMa
 		Log:            log,
 		ScalerFactory:  scaler.NewFactory(),
 		Hasher: &cluster.Hash{
-			Log:            log,
-			TestConfig:     testConfig,
-			StartupFactory: startup.New,
-			Arm:            arm,
+			Log:        log,
+			TestConfig: testConfig,
+			StartupFactory: func(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (startup.Interface, error) {
+				return startup.New(log, cs, testConfig, rootDir)
+			},
+			Arm: arm,
 		},
 		Arm:                arm,
 		GetConsoleClient:   getFakeHTTPClient,
@@ -209,7 +212,7 @@ func newFakeKubeclient(log *logrus.Entry, cli *fake.Clientset, seccli *fakesec.C
 	}
 }
 
-func setupNewCluster(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) (*plugin, *fake.Clientset, error) {
+func setupNewCluster(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud, rootDir string) (*plugin, *fake.Clientset, error) {
 	data, err := ioutil.ReadFile("../../pluginconfig/pluginconfig-311.yaml")
 	if err != nil {
 		return nil, nil, err
@@ -357,7 +360,7 @@ func setupNewCluster(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftMa
 		pluginConfig: template,
 		testConfig:   api.TestConfig{RunningUnderTest: true, DebugHashFunctions: os.Getenv("DEBUG_HASH_FUNCTIONS") == "true"},
 		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
-			return newFakeUpgrader(ctx, log, cs, testConfig, kc, az)
+			return newFakeUpgrader(ctx, log, cs, testConfig, kc, az, rootDir)
 		},
 		configInterfaceFactory: config.New,
 		log:                    log,
@@ -554,14 +557,24 @@ func TestHowAdminConfigChangesCausesRotations(t *testing.T) {
 		},
 	}
 
+	testRootDir, err := ioutil.TempDir("", "aro-test-root")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(testRootDir)
+	if err := createDNSConfig(testRootDir, []string{"168.63.129.16"}); err != nil {
+		t.Fatal(err)
+	}
+
 	log := logrus.NewEntry(logrus.StandardLogger())
 	ctx := context.Background()
 	cs := newTestCs()
 	az := newFakeAzureCloud(log)
-	p, _, err := setupNewCluster(ctx, log, cs, az)
+	p, _, err := setupNewCluster(ctx, log, cs, az, testRootDir)
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			log.Infof("--- Test: %s", tt.name)
@@ -591,6 +604,16 @@ func TestHowAdminConfigChangesCausesRotations(t *testing.T) {
 			}
 		})
 	}
+}
+
+func createDNSConfig(testRootDir string, nameservers []string) error {
+	content := ""
+	for _, server := range nameservers {
+		content += fmt.Sprintf("server=%s\n", server)
+	}
+	tmpfn := filepath.Join(testRootDir, "/etc/dnsmasq.d/origin-upstream-dns.conf")
+	os.MkdirAll(filepath.Dir(tmpfn), 0750)
+	return ioutil.WriteFile(tmpfn, []byte(content), 0666)
 }
 
 func TestHowUserConfigChangesCausesRotations(t *testing.T) {
@@ -646,12 +669,20 @@ func TestHowUserConfigChangesCausesRotations(t *testing.T) {
 			},
 		},
 	}
+	testRootDir, err := ioutil.TempDir("", "aro-test-root")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(testRootDir)
+	if err := createDNSConfig(testRootDir, []string{"168.63.129.16"}); err != nil {
+		t.Fatal(err)
+	}
 
 	log := logrus.NewEntry(logrus.StandardLogger())
 	ctx := context.Background()
 	cs := newTestCs()
 	az := newFakeAzureCloud(log)
-	p, _, err := setupNewCluster(ctx, log, cs, az)
+	p, _, err := setupNewCluster(ctx, log, cs, az, testRootDir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -789,12 +820,20 @@ func TestHowActionsCauseRotations(t *testing.T) {
 		},
 	}
 
+	testRootDir, err := ioutil.TempDir("", "aro-test-root")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(testRootDir)
+	if err := createDNSConfig(testRootDir, []string{"168.63.129.16"}); err != nil {
+		t.Fatal(err)
+	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// for this test we always start with a new cluster (unlike the config change test above)
 			cs := newTestCs()
 			az := newFakeAzureCloud(log)
-			p, _, err := setupNewCluster(ctx, log, cs, az)
+			p, _, err := setupNewCluster(ctx, log, cs, az, testRootDir)
 
 			beforeBlob, beforeSyncChecksum, err := getHashes(az, cs)
 			if err != nil {

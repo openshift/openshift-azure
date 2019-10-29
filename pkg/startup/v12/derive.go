@@ -3,6 +3,9 @@ package startup
 import (
 	"crypto/x509"
 	"fmt"
+	"io/ioutil"
+	"path"
+	"strings"
 
 	"github.com/Azure/go-autorest/autorest/azure"
 
@@ -11,16 +14,18 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
-type derivedType struct{}
+type derivedType struct {
+	root string
+}
 
-var derived = &derivedType{}
+var _ = &derivedType{}
 
 func isSmallVM(vmSize api.VMSize) bool {
 	// TODO: we should only be allowing StandardD2sV3 for test
 	return vmSize == api.StandardD2sV3
 }
 
-func (derivedType) SystemReserved(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) (string, error) {
+func (d *derivedType) SystemReserved(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) (string, error) {
 	for _, app := range cs.Properties.AgentPoolProfiles {
 		if app.Role != role {
 			continue
@@ -44,7 +49,7 @@ func (derivedType) SystemReserved(cs *api.OpenShiftManagedCluster, role api.Agen
 	return "", fmt.Errorf("role %s not found", role)
 }
 
-func (derivedType) KubeReserved(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) (string, error) {
+func (d *derivedType) KubeReserved(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) (string, error) {
 	if role == api.AgentPoolProfileRoleMaster {
 		return "", fmt.Errorf("kubereserved not defined for role %s", role)
 	}
@@ -63,15 +68,40 @@ func (derivedType) KubeReserved(cs *api.OpenShiftManagedCluster, role api.AgentP
 	return "", fmt.Errorf("role %s not found", role)
 }
 
-func (derivedType) MasterCloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
+func (d *derivedType) MasterCloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
 	return derivedpkg.MasterCloudProviderConf(cs, false)
 }
 
-func (derivedType) WorkerCloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
+func (d *derivedType) WorkerCloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
 	return derivedpkg.WorkerCloudProviderConf(cs, false)
 }
 
-func (derivedType) CustomerResourceGroup(ID string) (string, error) {
+func getServerFromDNSConf(content string) ([]string, error) {
+	//  cat /etc/dnsmasq.d/origin-upstream-dns.conf
+	//  server=168.63.129.16
+	servers := []string{}
+	for _, line := range strings.Split(content, "\n") {
+		if !strings.HasPrefix(line, "server=") {
+			continue
+		}
+		servers = append(servers, strings.Split(line, "=")[1])
+	}
+	if len(servers) == 0 {
+		return nil, fmt.Errorf("no servers found in origin-upstream-dns.conf")
+	}
+	return servers, nil
+}
+
+func (d *derivedType) NameServers() ([]string, error) {
+	dnsConfFile := path.Join(d.root, "/etc/dnsmasq.d/origin-upstream-dns.conf")
+	b, err := ioutil.ReadFile(dnsConfFile)
+	if err != nil {
+		return nil, err
+	}
+	return getServerFromDNSConf(string(b))
+}
+
+func (d *derivedType) CustomerResourceGroup(ID string) (string, error) {
 	res, err := azure.ParseResourceID(ID)
 	return res.ResourceGroup, err
 }
@@ -80,7 +110,7 @@ func (derivedType) CustomerResourceGroup(ID string) (string, error) {
 // has only one compute AgentPoolProfile and that no infra VM will require more
 // mounted disks than the maximum number allowed by the compute agent pool.
 // https://docs.microsoft.com/en-us/azure/virtual-machines/windows/sizes
-func (derivedType) MaxDataDisksPerVM(cs *api.OpenShiftManagedCluster) (string, error) {
+func (d *derivedType) MaxDataDisksPerVM(cs *api.OpenShiftManagedCluster) (string, error) {
 	var app *api.AgentPoolProfile
 	for i := range cs.Properties.AgentPoolProfiles {
 		if cs.Properties.AgentPoolProfiles[i].Role != api.AgentPoolProfileRoleCompute {
@@ -129,7 +159,7 @@ func (derivedType) MaxDataDisksPerVM(cs *api.OpenShiftManagedCluster) (string, e
 
 // CaBundle created ca-bundle which includes
 // CA and any external certificates we trust
-func (derivedType) CaBundle(cs *api.OpenShiftManagedCluster) ([]*x509.Certificate, error) {
+func (d *derivedType) CaBundle(cs *api.OpenShiftManagedCluster) ([]*x509.Certificate, error) {
 	caBundle := []*x509.Certificate{cs.Config.Certificates.Ca.Cert}
 
 	// we take only root certificate from the chain (last)
