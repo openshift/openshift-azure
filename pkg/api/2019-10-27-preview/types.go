@@ -103,14 +103,6 @@ type NetworkProfile struct {
 
 	// VnetID (out): the ID of the Vnet created for the OSA cluster
 	VnetID *string `json:"vnetId,omitempty"`
-
-	// PeerVnetID (in, optional): ID of a Vnet with which the OSA cluster Vnet should be peered.
-	// If specified, this should match
-	// `^/subscriptions/[^/]+
-	//   /resourceGroups/[^/]+
-	//   /providers/Microsoft.Network
-	//   /virtualNetworks/[^/]+$`
-	PeerVnetID *string `json:"peerVnetId,omitempty"`
 }
 
 // RouterProfile represents an OpenShift router.
