@@ -67,7 +67,7 @@ func GetPluginTemplate() (*pluginapi.Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	genevaPullSecret, err := ioutil.ReadFile("secrets/acr-docker-pull-secert")
+	genevaPullSecret, err := ioutil.ReadFile("secrets/acr-docker-pull-secret")
 	if err != nil {
 		return nil, err
 	}
