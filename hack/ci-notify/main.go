@@ -164,7 +164,7 @@ func main() {
 	if *jobName == "" {
 		panic("Please specify a job name.")
 	}
-	token := os.Getenv("OPENSHIFT_AZURE_ROBOT_TOKEN")
+	token := os.Getenv("GITHUB_TOKEN")
 	notify := newClient(token)
 	ctx := context.Background()
 
