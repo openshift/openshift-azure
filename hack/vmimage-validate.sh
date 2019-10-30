@@ -15,6 +15,8 @@ PHASE=image_validation
 BUILD_RESOURCE_GROUP="vmimage-$(date +%Y%m%d%H%M)"
 IMAGE_RESOURCEGROUP="${IMAGE_RESOURCEGROUP:-images}"
 IMAGE_STORAGEACCOUNT="${IMAGE_STORAGEACCOUNT:-openshiftimages}"
+AZURE_REGION="${AZURE_REGION:-eastus}"
+AZURE_REGIONS="${AZURE_REGION}"
 
 if [ -z "$IMAGE_RESOURCENAME" ] ;
 then
@@ -27,7 +29,7 @@ then
   CMD_VMIMAGE_ARGS="-imageSku $IMAGE_SKU -imageVersion $IMAGE_VERSION"
 else
   echo "Validating: ${IMAGE_RESOURCENAME} image in ${IMAGE_RESOURCEGROUP} resource group"
-  CMD_VMIMAGE_ARGS="-imageResourceGroup ${IMAGE_RESOURCEGROUP} -image ${IMAGE_RESOURCENAME} -imageStorageAccount ${IMAGE_STORAGEACCOUNT}"
+  CMD_VMIMAGE_ARGS="-imageResourceGroup ${IMAGE_RESOURCEGROUP} -image ${IMAGE_RESOURCENAME} -imageStorageAccount ${IMAGE_STORAGEACCOUNT} -location ${AZURE_REGION}"
 fi
 
 
