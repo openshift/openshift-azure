@@ -124,7 +124,7 @@ func (builder *Builder) generateTemplate() (map[string]interface{}, error) {
 		return nil, err
 	}
 
-	arm.FixupDepends(builder.SubscriptionID, builder.BuildResourceGroup, template)
+	arm.FixupDepends(builder.SubscriptionID, builder.BuildResourceGroup, template, nil)
 
 	return template, nil
 }

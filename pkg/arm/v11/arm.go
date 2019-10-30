@@ -83,7 +83,7 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 		return nil, err
 	}
 
-	arm.FixupDepends(g.cs.Properties.AzProfile.SubscriptionID, g.cs.Properties.AzProfile.ResourceGroup, azuretemplate)
+	arm.FixupDepends(g.cs.Properties.AzProfile.SubscriptionID, g.cs.Properties.AzProfile.ResourceGroup, azuretemplate, nil)
 
 	// HACK: Current SDK version is v24. Private link support comes into the version v28+.
 	// To use PLS/PE we need to set configurables on vnet and create PLS itself

@@ -244,7 +244,7 @@ func generate(ctx context.Context, conf *Config) (map[string]interface{}, error)
 
 	arm.FixupAPIVersions(template, versionMap)
 	arm.FixupSDKMismatch(template)
-	arm.FixupDepends(os.Getenv("AZURE_SUBSCRIPTION_ID"), conf.resourceGroup, template)
+	arm.FixupDepends(os.Getenv("AZURE_SUBSCRIPTION_ID"), conf.resourceGroup, template, nil)
 
 	return template, nil
 }
