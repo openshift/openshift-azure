@@ -68,6 +68,12 @@ type Properties struct {
 
 	// MonitorProfile configures which log analytics workspace to use.
 	MonitorProfile *MonitorProfile `json:"monitorProfile,omitempty"`
+
+	// RefreshCluster (in): if the nameservers are changed on
+	// the vnet then allow the update to cause nodes to rotate.
+	// Note: this is just a safety mechanism so this does not happen unintentionally
+	// but this *must* be done for the nodes to use of the new nameservers.
+	RefreshCluster bool `json:"refreshCluster,omitempty"`
 }
 
 // ProvisioningState represents the current state of the OSA resource.

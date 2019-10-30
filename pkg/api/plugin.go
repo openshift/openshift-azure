@@ -58,6 +58,7 @@ const (
 	PluginStepInvalidateClusterSecrets            PluginStep = "InvalidateClusterSecrets"
 	PluginStepInvalidateClusterCertificates       PluginStep = "InvalidateClusterCertificates"
 	PluginStepRegenerateClusterSecrets            PluginStep = "RegenerateClusterSecrets"
+	PluginStepCheckRefreshCluster                 PluginStep = "CheckRefreshCluster"
 )
 
 type Command string

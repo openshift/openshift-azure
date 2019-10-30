@@ -38,6 +38,16 @@ func TestAdminAPIValidateUpdate(t *testing.T) {
 				oc.Properties.ClusterVersion = "foo"           // the RP is responsible for checking this
 			},
 		},
+		"set refreshcluster": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.RefreshCluster = to.BoolPtr(true)
+			},
+		},
+		"unset refreshcluster": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.RefreshCluster = to.BoolPtr(false)
+			},
+		},
 		"pluginversion is immutable": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Config.PluginVersion = "latest" // the RP does this, but after validation: the user can't do this

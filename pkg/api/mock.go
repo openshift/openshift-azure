@@ -38,6 +38,7 @@ func GetInternalMockCluster() *OpenShiftManagedCluster {
 			},
 			FQDN:             "Properties.FQDN",
 			PrivateAPIServer: true,
+			RefreshCluster:   to.BoolPtr(true),
 			AuthProfile: AuthProfile{
 				IdentityProviders: []IdentityProvider{
 					{

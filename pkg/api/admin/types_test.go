@@ -74,7 +74,8 @@ var marshalled = []byte(`{
 		"monitorProfile": {
 			"enabled": true,
 			"workspaceResourceId": "Properties.MonitorProfile.WorkspaceResourceID"
-		}
+		},
+		"refreshCluster": true
 	},
 	"id": "ID",
 	"name": "Name",
@@ -348,6 +349,7 @@ func TestAPIParity(t *testing.T) {
 		regexp.MustCompile(`^\.Properties\.NetworkProfile\.PrivateEndpoint$`),
 		regexp.MustCompile(`^\.Properties\.NetworkProfile\.ManagementSubnetID$`),
 		regexp.MustCompile(`^\.Properties\.NetworkProfile\.InternalLoadBalancerFrontendIPID$`),
+		regexp.MustCompile(`^\.Properties\.NetworkProfile\.Nameservers$`),
 		regexp.MustCompile(`^\.Properties\.MonitorProfile\.Workspace(ID|Key)`),
 		regexp.MustCompile(`^\.Properties\.PrivateAPIServer`),
 		regexp.MustCompile(`^\.Properties\.AzProfile\.`),
