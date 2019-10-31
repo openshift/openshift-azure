@@ -1,7 +1,7 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  jdv64: 1.6.0
+  jdv64: 1.7.0
   template: datavirt64-ldap-s2i
 message: A new data service has been created in your project.  The username/password
   for accessing the service is ${TEIID_USERNAME}/${TEIID_PASSWORD}.  Please be sure
@@ -21,7 +21,7 @@ metadata:
       to develop Red Hat Data Virtualization based application, configuring security
       domain(s), including a build configuration and application deployment configuration.
     template.openshift.io/support-url: https://access.redhat.com
-    version: 1.6.0
+    version: 1.7.0
   name: datavirt64-ldap-s2i
   namespace: openshift
 objects:
@@ -114,7 +114,7 @@ objects:
         forcePull: true
         from:
           kind: ImageStreamTag
-          name: jboss-datavirt64-openshift:1.6
+          name: jboss-datavirt64-openshift:1.7
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: Source
     triggers:
@@ -154,6 +154,12 @@ objects:
             value: ${APPLICATION_NAME}-ping
           - name: OPENSHIFT_DNS_PING_SERVICE_PORT
             value: "8888"
+          - name: HORNETQ_CLUSTER_PASSWORD
+            value: ${HORNETQ_CLUSTER_PASSWORD}
+          - name: HORNETQ_QUEUES
+            value: ${HORNETQ_QUEUES}
+          - name: HORNETQ_TOPICS
+            value: ${HORNETQ_TOPICS}
           - name: JGROUPS_CLUSTER_PASSWORD
             value: ${JGROUPS_CLUSTER_PASSWORD}
           - name: AUTO_DEPLOY_EXPLODED
@@ -162,10 +168,6 @@ objects:
             value: ${TEIID_USERNAME}
           - name: TEIID_PASSWORD
             value: ${TEIID_PASSWORD}
-          - name: MODESHAPE_USERNAME
-            value: ${MODESHAPE_USERNAME}
-          - name: MODESHAPE_PASSWORD
-            value: ${MODESHAPE_PASSWORD}
           - name: ENV_FILES
             value: /etc/datavirt-environment/*,/etc/datavirt-security-environment/*
           image: ${APPLICATION_NAME}
@@ -263,6 +265,18 @@ parameters:
   displayName: Context Directory
   name: CONTEXT_DIR
   value: datavirt64/dynamicvdb-datafederation/app
+- description: Queue names
+  displayName: Queues
+  name: HORNETQ_QUEUES
+- description: Topic names
+  displayName: Topics
+  name: HORNETQ_TOPICS
+- description: HornetQ cluster admin password
+  displayName: HornetQ Password
+  from: '[a-zA-Z0-9]{8}'
+  generate: expression
+  name: HORNETQ_CLUSTER_PASSWORD
+  required: true
 - description: Username associated with Teiid data service.
   displayName: Teiid Username
   from: '[\a]{8}'
@@ -274,18 +288,6 @@ parameters:
   from: '[\a\A]{8}[\d]{1}[\A]{1}'
   generate: expression
   name: TEIID_PASSWORD
-  required: true
-- description: Username associated with ModeShape.
-  displayName: ModeShape Username
-  from: '[\a]{8}'
-  generate: expression
-  name: MODESHAPE_USERNAME
-  required: true
-- description: Password for ModeShape user.
-  displayName: ModeShape User Password
-  from: '[\a\A]{8}[\d]{1}[\A]{1}'
-  generate: expression
-  name: MODESHAPE_PASSWORD
   required: true
 - description: A secret string used to configure the GitHub webhook.
   displayName: Github Webhook Secret

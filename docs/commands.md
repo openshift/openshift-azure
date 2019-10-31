@@ -14,7 +14,9 @@
 
 /test e2e-create-20190930
 
-/test e2e-create-20191027
+/test e2e-create-20191027-private
+
+/test e2e-create-20191027-public
 
 /test e2e-etcdbackuprecovery
 
@@ -28,7 +30,7 @@
 
 /test unit
 
-/test upgrade-v10.0
+/test upgrade-v10.1.1
 
 /test upgrade-v7.1
 
