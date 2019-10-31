@@ -103,7 +103,6 @@ func mergeProperties(oc *OpenShiftManagedCluster, cs *api.OpenShiftManagedCluste
 		if oc.Properties.NetworkProfile.VnetCIDR != nil {
 			cs.Properties.NetworkProfile.VnetCIDR = *oc.Properties.NetworkProfile.VnetCIDR
 		}
-		cs.Properties.NetworkProfile.PeerVnetID = oc.Properties.NetworkProfile.PeerVnetID
 		// reverse conversion check. If internal fiels is not set - only than we set it
 		if cs.Properties.NetworkProfile.ManagementSubnetCIDR == nil {
 			cs.Properties.NetworkProfile.ManagementSubnetCIDR = oc.Properties.NetworkProfile.ManagementSubnetCIDR
