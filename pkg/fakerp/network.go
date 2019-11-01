@@ -37,8 +37,8 @@ func newNetworkManager(ctx context.Context, log *logrus.Entry, subscriptionID, r
 	}, nil
 }
 
-// getPrivateEndpointIP wraps networkManager creation and getPrivateEndpointIP so it could be called in short form.
-func getPrivateEndpointIP(ctx context.Context, log *logrus.Entry, subscriptionID, managementResourceGroupName, resourceGroupName string) (*string, error) {
+// GetPrivateEndpointIP wraps networkManager creation and getPrivateEndpointIP so it could be called in short form.
+func GetPrivateEndpointIP(ctx context.Context, log *logrus.Entry, subscriptionID, managementResourceGroupName, resourceGroupName string) (*string, error) {
 	nm, err := newNetworkManager(ctx, log, subscriptionID, managementResourceGroupName)
 	if err != nil {
 		return nil, err

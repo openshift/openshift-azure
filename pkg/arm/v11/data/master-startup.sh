@@ -110,6 +110,7 @@ systemctl enable mdsd.service azsecd.service azsecmond.service fluentd.service
 systemctl start mdsd.service azsecd.service azsecmond.service fluentd.service
 
 # Pin kubeconfigs to use local api-server
+sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/master/admin.kubeconfig
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/master/openshift-master.kubeconfig
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/node/node.kubeconfig
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/node/sdn.kubeconfig

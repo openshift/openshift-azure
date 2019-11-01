@@ -112,6 +112,9 @@ type Plugin interface {
 	// ValidatePluginTemplate validates external config request
 	ValidatePluginTemplate(ctx context.Context) []error
 
+	// GetPrivateAPIServerIPAddress returns an IP address must be assigned to FQDN and PublicHostname when privateAPIServer is enabled.
+	GetPrivateAPIServerIPAddress(cs *OpenShiftManagedCluster) (string, error)
+
 	// GenerateConfig ensures all the necessary in-cluster config is generated
 	// for an Openshift cluster.
 	GenerateConfig(ctx context.Context, cs *OpenShiftManagedCluster, isUpdate bool) error

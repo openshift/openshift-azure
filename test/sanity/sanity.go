@@ -8,6 +8,9 @@ import (
 	"github.com/ghodss/yaml"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/fakerp"
+	"github.com/openshift/openshift-azure/pkg/fakerp/client"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/test/e2e/standard"
 	testlogger "github.com/openshift/openshift-azure/test/util/log"
 )
@@ -28,8 +31,26 @@ func init() {
 	if err := yaml.Unmarshal(b, &cs); err != nil {
 		panic(err)
 	}
+	ctx := context.Background()
+	log := testlogger.GetTestLogger()
+	if cs.Properties.PrivateAPIServer {
+		// privateEndpoint is not serialised, so we need to retrieve it.
+		conf, err := client.NewServerConfig(log, cs)
+		if err != nil {
+			panic(err)
+		}
+		authorizer, err := azureclient.NewAuthorizerFromEnvironment("")
+		if err != nil {
+			panic(err)
+		}
+		ctx = context.WithValue(ctx, api.ContextKeyClientAuthorizer, authorizer)
+		cs.Properties.NetworkProfile.PrivateEndpoint, err = fakerp.GetPrivateEndpointIP(ctx, log, cs.Properties.AzProfile.SubscriptionID, conf.ManagementResourceGroup, cs.Properties.AzProfile.ResourceGroup)
+		if err != nil {
+			panic(err)
+		}
+	}
 
-	Checker, err = standard.NewSanityChecker(context.Background(), testlogger.GetTestLogger(), cs)
+	Checker, err = standard.NewSanityChecker(ctx, log, cs)
 	if err != nil {
 		panic(err)
 	}

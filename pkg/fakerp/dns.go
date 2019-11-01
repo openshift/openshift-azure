@@ -42,22 +42,23 @@ func (dm *dnsManager) createOrUpdateDns(ctx context.Context, cs *api.OpenShiftMa
 	consoleDnsRecordSet := "openshift"
 	wildcardRecordSet := "*"
 	clusterRg := cs.Properties.AzProfile.ResourceGroup
-
 	dm.log.Debugf("creating cluster root dns zone %q", clusterRootDnsZone)
 	err := dm.createOrUpdateZone(ctx, clusterRg, clusterRootDnsZone, dm.dnsResourceGroup, dm.dnsDomain)
 	if err != nil {
 		return err
 	}
 
-	dm.log.Debugf("creating CNAME record set %q in dns zone %q", consoleDnsRecordSet, clusterRootDnsZone)
-	_, err = dm.recordSetsClient.CreateOrUpdate(ctx, clusterRg, clusterRootDnsZone, "openshift", azuredns.CNAME, azuredns.RecordSet{
-		RecordSetProperties: &azuredns.RecordSetProperties{
-			CnameRecord: &azuredns.CnameRecord{
-				Cname: &cs.Properties.FQDN,
+	if !cs.Properties.PrivateAPIServer {
+		dm.log.Debugf("creating CNAME record set %q in dns zone %q", consoleDnsRecordSet, clusterRootDnsZone)
+		_, err = dm.recordSetsClient.CreateOrUpdate(ctx, clusterRg, clusterRootDnsZone, "openshift", azuredns.CNAME, azuredns.RecordSet{
+			RecordSetProperties: &azuredns.RecordSetProperties{
+				CnameRecord: &azuredns.CnameRecord{
+					Cname: &cs.Properties.FQDN,
+				},
+				TTL: to.Int64Ptr(60),
 			},
-			TTL: to.Int64Ptr(60),
-		},
-	}, "", "")
+		}, "", "")
+	}
 
 	dm.log.Debugf("creating apps dns zone %q", appsDnsZone)
 	err = dm.createOrUpdateZone(ctx, clusterRg, appsDnsZone, clusterRg, clusterRootDnsZone)

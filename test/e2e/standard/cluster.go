@@ -287,6 +287,11 @@ func (sc *SanityChecker) CheckCanAccessConsole(ctx context.Context, retries int)
 }
 
 func (sc *SanityChecker) checkCanAccessServices(ctx context.Context) error {
+	consoleCert := sc.cs.Config.Certificates.OpenShiftConsole.Certs[len(sc.cs.Config.Certificates.OpenShiftConsole.Certs)-1]
+	if sc.cs.Properties.PrivateAPIServer {
+		consoleCert = sc.cs.Config.Certificates.Ca.Cert
+	}
+
 	for _, svc := range []struct {
 		url   string
 		cert  *x509.Certificate
@@ -294,7 +299,7 @@ func (sc *SanityChecker) checkCanAccessServices(ctx context.Context) error {
 	}{
 		{
 			url:   "https://" + sc.cs.Properties.PublicHostname + "/healthz",
-			cert:  sc.cs.Config.Certificates.OpenShiftConsole.Certs[len(sc.cs.Config.Certificates.OpenShiftConsole.Certs)-1],
+			cert:  consoleCert,
 			usePE: true,
 		},
 		{

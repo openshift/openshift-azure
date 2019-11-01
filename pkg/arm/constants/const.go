@@ -12,6 +12,7 @@ const (
 	LbAPIServerFrontendConfigurationName          = "frontend"
 	IlbAPIServerFrontendConfigurationName         = "lb-frontend-internal"
 	LbAPIServerBackendPoolName                    = "backend"
+	LbSSHLoadBalancingRuleName                    = "port-22"
 	LbAPIServerLoadBalancingRuleName              = "port-443"
 	LbAPIServerProbeName                          = "port-443"
 	LbKubernetesName                              = "kubernetes" // must match KubeCloudSharedConfiguration ClusterName

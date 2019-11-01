@@ -2,6 +2,7 @@ package cluster
 
 import (
 	"context"
+	"crypto/x509"
 	"net/http"
 	"time"
 
@@ -11,8 +12,14 @@ import (
 )
 
 func getConsoleClient(cs *api.OpenShiftManagedCluster) wait.SimpleHTTPClient {
-	cert := cs.Config.Certificates.OpenShiftConsole.Certs
-	return &http.Client{Transport: roundtrippers.HealthCheck(cs.Properties.FQDN, cert[len(cert)-1], cs.Location, cs.Properties.NetworkProfile.PrivateEndpoint), Timeout: 10 * time.Second}
+	var cert *x509.Certificate
+	if cs.Properties.PrivateAPIServer {
+		// private cluster does not have the named serving cert
+		cert = cs.Config.Certificates.Ca.Cert
+	} else {
+		cert = cs.Config.Certificates.OpenShiftConsole.Certs[len(cs.Config.Certificates.OpenShiftConsole.Certs)-1]
+	}
+	return &http.Client{Transport: roundtrippers.HealthCheck(cs.Properties.FQDN, cert, cs.Location, cs.Properties.NetworkProfile.PrivateEndpoint), Timeout: 10 * time.Second}
 }
 
 // HealthCheck function to verify cluster health
