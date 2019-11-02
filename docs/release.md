@@ -63,7 +63,7 @@ Branching model
 
 0. Build and publish the VM image. For major releases, typically this should
    happen at the end of the second week of the sprint. See the [VM building
-   SOP.](https://github.com/openshift/azure-sop/blob/master/release/README.asciidoc)
+   SOP.](https://github.com/openshift/azure-sop/blob/master/SOP/eng/releng.asciidoc)
 
 1. Container images are built hourly from master. When you are ready to release
    the container image, [tag
@@ -72,7 +72,7 @@ Branching model
    `openshift-on-azure` quay.io team have access.)
 
    Images for production are released to ACR. This can be done by people,
-   who have ACR root secrets. These images can be built by checking out 
+   who have ACR root secrets. These images can be built by checking out
    `release-vX` branch and running command `make azure-push`. For this command
    to publish images to quay.io.
    Publishing to ACR is a manual process for now.
