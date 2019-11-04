@@ -253,13 +253,13 @@ versions:
       genevaLogging: osarpint.azurecr.io/acs/mdsd:master.20190228.1
       genevaStatsd: osarpint.azurecr.io/acs/mdm:git-a909a2e76
       genevaTDAgent: osarpint.azurecr.io/acs/td-agent:master.20190228.1
-      azureControllers: quay.io/openshift-on-azure/ci-azure:latest
-      canary: quay.io/openshift-on-azure/ci-azure:latest
-      etcdBackup: quay.io/openshift-on-azure/ci-azure:latest
-      metricsBridge: quay.io/openshift-on-azure/ci-azure:latest
-      startup: quay.io/openshift-on-azure/ci-azure:latest
-      sync: quay.io/openshift-on-azure/ci-azure:latest
-      tlsProxy: quay.io/openshift-on-azure/ci-azure:latest
+      azureControllers: osarpint.azurecr.io/openshift-on-azure/azure:v11.0
+      canary: osarpint.azurecr.io/openshift-on-azure/azure:v11.0
+      etcdBackup: osarpint.azurecr.io/openshift-on-azure/azure:v11.0
+      metricsBridge: osarpint.azurecr.io/openshift-on-azure/azure:v11.0
+      startup: osarpint.azurecr.io/openshift-on-azure/azure:v11.0
+      sync: osarpint.azurecr.io/openshift-on-azure/azure:v11.0
+      tlsProxy: osarpint.azurecr.io/openshift-on-azure/azure:v11.0
       logAnalyticsAgent: mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod07092019
 ## certificates, used to authenticate to external systems
 ## Red Hat CDN client certificates
