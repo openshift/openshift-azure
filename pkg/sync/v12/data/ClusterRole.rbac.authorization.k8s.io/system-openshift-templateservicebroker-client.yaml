@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    authorization.openshift.io/system-only: "true"
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  name: system:openshift:templateservicebroker-client
+rules:
+- nonResourceURLs:
+  - /brokers/template.openshift.io/*
+  verbs:
+  - delete
+  - get
+  - put
+  - update
