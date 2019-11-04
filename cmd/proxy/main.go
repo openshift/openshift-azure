@@ -28,7 +28,7 @@ var (
 	log *logrus.Entry
 )
 
-func init() {
+func initGlobals() {
 	flag.Parse()
 	logger := logrus.New()
 	logger.Formatter = &logrus.TextFormatter{FullTimestamp: true}
@@ -138,6 +138,7 @@ func handleTunneling(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	initGlobals()
 	err := run()
 	if err != nil {
 		panic(err)
