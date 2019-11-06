@@ -39,6 +39,56 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.Test
 	return &startup{log: log, cs: cs, testConfig: testConfig}
 }
 
+func (s *startup) GetWorkerCs() *api.OpenShiftManagedCluster {
+	workerCS := &api.OpenShiftManagedCluster{
+		ID:   s.cs.ID,
+		Name: s.cs.Name,
+		Properties: api.Properties{
+			WorkerServicePrincipalProfile: api.ServicePrincipalProfile{
+				ClientID: s.cs.Properties.WorkerServicePrincipalProfile.ClientID,
+				Secret:   s.cs.Properties.WorkerServicePrincipalProfile.Secret,
+			},
+			AzProfile: api.AzProfile{
+				TenantID:       s.cs.Properties.AzProfile.TenantID,
+				SubscriptionID: s.cs.Properties.AzProfile.SubscriptionID,
+				ResourceGroup:  s.cs.Properties.AzProfile.ResourceGroup,
+			},
+		},
+		Location: s.cs.Location,
+		Config: api.Config{
+			PluginVersion: s.cs.Config.PluginVersion,
+			ComponentLogLevel: api.ComponentLogLevel{
+				Node: s.cs.Config.ComponentLogLevel.Node,
+			},
+			Certificates: api.CertificateConfig{
+				Ca: api.CertKeyPair{
+					Cert: s.cs.Config.Certificates.Ca.Cert,
+				},
+				GenevaLogging: s.cs.Config.Certificates.GenevaLogging,
+				NodeBootstrap: s.cs.Config.Certificates.NodeBootstrap,
+			},
+			Images: api.ImageConfig{
+				Format: s.cs.Config.Images.Format,
+				Node:   s.cs.Config.Images.Node,
+			},
+			NodeBootstrapKubeconfig:              s.cs.Config.NodeBootstrapKubeconfig,
+			SDNKubeconfig:                        s.cs.Config.SDNKubeconfig,
+			GenevaLoggingAccount:                 s.cs.Config.GenevaLoggingAccount,
+			GenevaLoggingNamespace:               s.cs.Config.GenevaLoggingNamespace,
+			GenevaLoggingControlPlaneEnvironment: s.cs.Config.GenevaLoggingControlPlaneEnvironment,
+			GenevaLoggingControlPlaneAccount:     s.cs.Config.GenevaLoggingControlPlaneAccount,
+			GenevaLoggingControlPlaneRegion:      s.cs.Config.GenevaLoggingControlPlaneRegion,
+		},
+	}
+	for _, app := range s.cs.Properties.AgentPoolProfiles {
+		workerCS.Properties.AgentPoolProfiles = append(workerCS.Properties.AgentPoolProfiles, api.AgentPoolProfile{
+			Role:   app.Role,
+			VMSize: app.VMSize,
+		})
+	}
+	return workerCS
+}
+
 func (s *startup) WriteFiles(ctx context.Context) error {
 	hostname, err := os.Hostname()
 	if err != nil {

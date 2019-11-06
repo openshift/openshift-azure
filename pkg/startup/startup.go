@@ -25,6 +25,7 @@ import (
 type Interface interface {
 	WriteFiles(ctx context.Context) error
 	Hash(role api.AgentPoolProfileRole) ([]byte, error)
+	GetWorkerCs() *api.OpenShiftManagedCluster
 }
 
 // New returns a new startup Interface according to the cluster version running
