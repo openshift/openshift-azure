@@ -64,3 +64,17 @@ func (mr *MockInterfaceMockRecorder) Hash(role interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Hash", reflect.TypeOf((*MockInterface)(nil).Hash), role)
 }
+
+// GetWorkerCs mocks base method
+func (m *MockInterface) GetWorkerCs() *api.OpenShiftManagedCluster {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetWorkerCs")
+	ret0, _ := ret[0].(*api.OpenShiftManagedCluster)
+	return ret0
+}
+
+// GetWorkerCs indicates an expected call of GetWorkerCs
+func (mr *MockInterfaceMockRecorder) GetWorkerCs() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetWorkerCs", reflect.TypeOf((*MockInterface)(nil).GetWorkerCs))
+}

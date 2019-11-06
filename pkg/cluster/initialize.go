@@ -11,6 +11,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
+	"github.com/openshift/openshift-azure/pkg/startup"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 )
 
@@ -57,55 +58,11 @@ func (u *Upgrade) WriteStartupBlobs() error {
 	if err != nil {
 		return err
 	}
-
-	workerCS := &api.OpenShiftManagedCluster{
-		ID:   u.Cs.ID,
-		Name: u.Cs.Name,
-		Properties: api.Properties{
-			WorkerServicePrincipalProfile: api.ServicePrincipalProfile{
-				ClientID: u.Cs.Properties.WorkerServicePrincipalProfile.ClientID,
-				Secret:   u.Cs.Properties.WorkerServicePrincipalProfile.Secret,
-			},
-			AzProfile: api.AzProfile{
-				TenantID:       u.Cs.Properties.AzProfile.TenantID,
-				SubscriptionID: u.Cs.Properties.AzProfile.SubscriptionID,
-				ResourceGroup:  u.Cs.Properties.AzProfile.ResourceGroup,
-			},
-		},
-		Location: u.Cs.Location,
-		Config: api.Config{
-			PluginVersion: u.Cs.Config.PluginVersion,
-			ComponentLogLevel: api.ComponentLogLevel{
-				Node: u.Cs.Config.ComponentLogLevel.Node,
-			},
-			Certificates: api.CertificateConfig{
-				Ca: api.CertKeyPair{
-					Cert: u.Cs.Config.Certificates.Ca.Cert,
-				},
-				GenevaLogging: u.Cs.Config.Certificates.GenevaLogging,
-				NodeBootstrap: u.Cs.Config.Certificates.NodeBootstrap,
-			},
-			Images: api.ImageConfig{
-				Format: u.Cs.Config.Images.Format,
-				Node:   u.Cs.Config.Images.Node,
-			},
-			NodeBootstrapKubeconfig:              u.Cs.Config.NodeBootstrapKubeconfig,
-			SDNKubeconfig:                        u.Cs.Config.SDNKubeconfig,
-			GenevaLoggingAccount:                 u.Cs.Config.GenevaLoggingAccount,
-			GenevaLoggingNamespace:               u.Cs.Config.GenevaLoggingNamespace,
-			GenevaLoggingControlPlaneEnvironment: u.Cs.Config.GenevaLoggingControlPlaneEnvironment,
-			GenevaLoggingControlPlaneAccount:     u.Cs.Config.GenevaLoggingControlPlaneAccount,
-			GenevaLoggingControlPlaneRegion:      u.Cs.Config.GenevaLoggingControlPlaneRegion,
-		},
+	sup, err := startup.New(u.Log, u.Cs, u.TestConfig)
+	if err != nil {
+		return err
 	}
-	for _, app := range u.Cs.Properties.AgentPoolProfiles {
-		workerCS.Properties.AgentPoolProfiles = append(workerCS.Properties.AgentPoolProfiles, api.AgentPoolProfile{
-			Role:   app.Role,
-			VMSize: app.VMSize,
-		})
-	}
-
-	return u.writeBlob(WorkerStartupBlobName, workerCS)
+	return u.writeBlob(WorkerStartupBlobName, sup.GetWorkerCs())
 }
 
 // CreateOrUpdateConfigStorageAccount creates a new storage account for config if missing
