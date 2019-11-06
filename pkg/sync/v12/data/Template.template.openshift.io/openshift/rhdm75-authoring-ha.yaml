@@ -1,8 +1,8 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhdm: "1.1"
-  template: rhdm74-authoring-ha
+  rhdm: "7.5"
+  template: rhdm75-authoring-ha
 message: |-
   A new persistent HA Decision Manager application has been created in your project.
   The username/password for accessing the Decision Central interface is
@@ -20,95 +20,25 @@ message: |-
 metadata:
   annotations:
     description: Application template for a HA persistent authoring environment, for
-      Red Hat Decision Manager 7.4
+      Red Hat Decision Manager 7.5 - Deprecated
     iconClass: icon-jboss
-    openshift.io/display-name: Red Hat Decision Manager 7.4 authoring environment
+    openshift.io/display-name: Red Hat Decision Manager 7.5 authoring environment
       (HA, persistent, with https)
     openshift.io/provider-display-name: Red Hat, Inc.
     tags: rhdm,decisionserver,jboss,authoring,ha
     template.openshift.io/bindable: "false"
-    template.openshift.io/documentation-url: https://access.redhat.com/documentation/en-us/red_hat_decision_manager/7.4/html/deploying_a_red_hat_decision_manager_7.4_authoring_environment_on_red_hat_openshift_container_platform/
+    template.openshift.io/documentation-url: https://access.redhat.com/documentation/en-us/red_hat_decision_manager/7.5/html/deploying_a_red_hat_decision_manager_7.5_authoring_environment_on_red_hat_openshift_container_platform/
     template.openshift.io/long-description: This template defines resources needed
-      to develop and execute Rules on Red Hat Decision Manager 7.4 with High Availability
+      to develop and execute Rules on Red Hat Decision Manager 7.5 with High Availability
       enabled as tech preview, including application deployment configuration, secure
       and insecure http communication and persistent volumes to store data that needs
-      to survive a restart.
+      to survive a restart. Deprecated since Red Hat Decision Manager version 7.5;
+      consider using the Red Hat Business Automation Operator.
     template.openshift.io/support-url: https://access.redhat.com
-    version: "1.1"
-  name: rhdm74-authoring-ha
+    version: "7.5"
+  name: rhdm75-authoring-ha
   namespace: openshift
 objects:
-- apiVersion: rbac.authorization.k8s.io/v1
-  kind: Role
-  metadata:
-    labels:
-      application: ${APPLICATION_NAME}
-    name: ${APPLICATION_NAME}-amq-role
-  rules:
-  - apiGroups:
-    - ""
-    resources:
-    - endpoints
-    verbs:
-    - create
-    - delete
-    - deletecollection
-    - get
-    - list
-    - patch
-    - update
-    - watch
-  - apiGroups:
-    - ""
-    resources:
-    - namespaces
-    verbs:
-    - get
-    - list
-- apiVersion: rbac.authorization.k8s.io/v1
-  kind: Role
-  metadata:
-    labels:
-      application: ${APPLICATION_NAME}
-    name: ${APPLICATION_NAME}-amq-scaledown-controller-role
-  rules:
-  - apiGroups:
-    - apps
-    resources:
-    - statefulsets
-    verbs:
-    - get
-    - list
-    - watch
-  - apiGroups:
-    - ""
-    resources:
-    - pods
-    verbs:
-    - get
-    - list
-    - watch
-    - create
-    - delete
-    - patch
-    - update
-  - apiGroups:
-    - ""
-    resources:
-    - persistentvolumeclaims
-    verbs:
-    - get
-    - list
-    - watch
-    - delete
-  - apiGroups:
-    - ""
-    resources:
-    - events
-    verbs:
-    - get
-    - list
-    - watch
 - apiVersion: v1
   kind: ServiceAccount
   metadata:
@@ -143,9 +73,6 @@ objects:
     - name: https
       port: 8443
       targetPort: 8443
-    - name: git-ssh
-      port: 8001
-      targetPort: 8001
     selector:
       deploymentConfig: ${APPLICATION_NAME}-rhdmcentr
 - apiVersion: v1
@@ -397,9 +324,10 @@ objects:
             timeoutSeconds: 10
           resources:
             limits:
+              cpu: ${DATAGRID_CPU_LIMIT}
               memory: ${DATAGRID_MEMORY_LIMIT}
             requests:
-              cpu: "0.5"
+              cpu: ${DATAGRID_CPU_LIMIT}
               memory: ${DATAGRID_MEMORY_LIMIT}
           volumeMounts:
           - mountPath: /opt/datagrid/standalone/data
@@ -454,6 +382,10 @@ objects:
       spec:
         containers:
         - env:
+          - name: APPLICATION_USERS_PROPERTIES
+            value: /opt/kie/data/configuration/application-users.properties
+          - name: APPLICATION_ROLES_PROPERTIES
+            value: /opt/kie/data/configuration/application-roles.properties
           - name: KIE_ADMIN_USER
             value: ${KIE_ADMIN_USER}
           - name: KIE_ADMIN_PWD
@@ -611,20 +543,17 @@ objects:
           - containerPort: 8443
             name: https
             protocol: TCP
-          - containerPort: 8001
-            name: git-ssh
-            protocol: TCP
           - containerPort: 8888
             name: ping
             protocol: TCP
           readinessProbe:
-            failureThreshold: 6
+            failureThreshold: 36
             httpGet:
               path: /rest/ready
               port: 8080
               scheme: HTTP
-            initialDelaySeconds: 60
-            periodSeconds: 30
+            initialDelaySeconds: 30
+            periodSeconds: 5
             timeoutSeconds: 2
           resources:
             limits:
@@ -848,13 +777,13 @@ objects:
             name: https
             protocol: TCP
           readinessProbe:
-            failureThreshold: 6
+            failureThreshold: 36
             httpGet:
               path: /services/rest/server/readycheck
               port: 8080
               scheme: HTTP
-            initialDelaySeconds: 60
-            periodSeconds: 30
+            initialDelaySeconds: 30
+            periodSeconds: 5
             timeoutSeconds: 2
           resources:
             limits:
@@ -880,173 +809,17 @@ objects:
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: ImageChange
     - type: ConfigChange
-- apiVersion: v1
-  kind: DeploymentConfig
-  metadata:
-    annotations:
-      deployment.kubernetes.io/revision: "1"
-      template.alpha.openshift.io/wait-for-ready: "true"
-    labels:
-      application: ${APPLICATION_NAME}
-      service: ${APPLICATION_NAME}-amq-scaledown-controller
-    name: ${APPLICATION_NAME}-amq-scaledown-controller
-  spec:
-    replicas: 1
-    selector:
-      deploymentConfig: ${APPLICATION_NAME}-amq-scaledown-controller
-    strategy:
-      rollingParams:
-        maxSurge: 0
-      type: Rolling
-    template:
-      metadata:
-        labels:
-          application: ${APPLICATION_NAME}
-          deploymentConfig: ${APPLICATION_NAME}-amq-scaledown-controller
-        name: ${APPLICATION_NAME}-amq-scaledown-controller
-      spec:
-        containers:
-        - args:
-          - --localOnly
-          - --v
-          - "3"
-          image: ${AMQ_SCALEDOWN_CONTROLLER_IMAGE_STREAM_NAME}
-          imagePullPolicy: IfNotPresent
-          name: ${APPLICATION_NAME}-amq
-        serviceAccountName: ${APPLICATION_NAME}-amq-scaledown-controller-sa
-        terminationGracePeriodSeconds: 30
-    triggers:
-    - imageChangeParams:
-        automatic: true
-        containerNames:
-        - ${APPLICATION_NAME}-amq
-        from:
-          kind: ImageStreamTag
-          name: ${AMQ_SCALEDOWN_CONTROLLER_IMAGE_STREAM_NAME}:${AMQ_SCALEDOWN_CONTROLLER_IMAGE_STREAM_TAG}
-          namespace: ${AMQ_SCALEDOWN_CONTROLLER_IMAGE_STREAM_NAMESPACE}
-      type: ImageChange
-    - type: ConfigChange
 - apiVersion: apps/v1
   kind: StatefulSet
   metadata:
     annotations:
       alpha.image.policy.openshift.io/resolve-names: '*'
-      statefulsets.kubernetes.io/drainer-pod-template: |
-        {
-          "metadata": {
-            "labels": {
-              "application": "${APPLICATION_NAME}"
-            },
-            "name": "${APPLICATION_NAME}-amq-drainer-pod"
-          },
-          "spec": {
-            "serviceAccount": "${APPLICATION_NAME}-amq-sa",
-            "serviceAccountName": "${APPLICATION_NAME}-amq-sa",
-            "terminationGracePeriodSeconds": 5,
-            "containers": [
-              {
-                "env": [
-                  {
-                    "name": "AMQ_EXTRA_ARGS",
-                    "value": "--no-autotune"
-                  },
-                  {
-                    "name": "AMQ_USER",
-                    "value": "${APPFORMER_JMS_BROKER_USER}"
-                  },
-                  {
-                    "name": "AMQ_PASSWORD",
-                    "value": "${APPFORMER_JMS_BROKER_PASSWORD}"
-                  },
-                  {
-                    "name": "AMQ_ROLE",
-                    "value": "${AMQ_ROLE}"
-                  },
-                  {
-                    "name": "AMQ_NAME",
-                    "value": "${AMQ_NAME}"
-                  },
-                  {
-                    "name": "AMQ_TRANSPORTS",
-                    "value": "openwire"
-                  },
-                  {
-                    "name": "AMQ_QUEUES",
-                    "value": ""
-                  },
-                  {
-                    "name": "AMQ_GLOBAL_MAX_SIZE",
-                    "value": "${AMQ_GLOBAL_MAX_SIZE}"
-                  },
-                  {
-                    "name": "AMQ_ALLOW_ANONYMOUS",
-                    "value": "${AMQ_ALLOW_ANONYMOUS}"
-                  },
-                  {
-                    "name": "AMQ_DATA_DIR",
-                    "value": "/opt/amq/data"
-                  },
-                  {
-                    "name": "AMQ_DATA_DIR_LOGGING",
-                    "value": "true"
-                  },
-                  {
-                    "name": "AMQ_CLUSTERED",
-                    "value": "true"
-                  },
-                  {
-                    "name": "AMQ_REPLICAS",
-                    "value": "2"
-                  },
-                  {
-                    "name": "AMQ_CLUSTER_USER",
-                    "value": "${APPFORMER_JMS_BROKER_USER}"
-                  },
-                  {
-                    "name": "AMQ_CLUSTER_PASSWORD",
-                    "value": "${APPFORMER_JMS_BROKER_PASSWORD}"
-                  },
-                  {
-                    "name": "POD_NAMESPACE",
-                    "valueFrom": {
-                      "fieldRef": {
-                        "fieldPath": "metadata.namespace"
-                      }
-                    }
-                  },
-                  {
-                    "name": "JGROUPS_PING_PROTOCOL",
-                    "value": "openshift.DNS_PING"
-                  },
-                  {
-                    "name": "OPENSHIFT_DNS_PING_SERVICE_NAME",
-                    "value": "ping"
-                  },
-                  {
-                    "name": "OPENSHIFT_DNS_PING_SERVICE_PORT",
-                    "value": "8888"
-                  }
-                ],
-                "image": "${AMQ_BROKER_IMAGE}",
-                "name": "${APPLICATION_NAME}-amq",
-                "command": ["/bin/sh", "-c", "echo \"Starting the drainer\" ; /opt/amq/bin/drain.sh; echo \"Drain completed! Exit code $?\""],
-                "volumeMounts": [
-                  {
-                    "name": "${APPLICATION_NAME}-amq-pvol",
-                    "mountPath": "/opt/amq/data"
-                  }
-                ]
-              }
-            ]
-          }
-        }
-    generation: 3
     labels:
       application: ${APPLICATION_NAME}
     name: ${APPLICATION_NAME}-amq
   spec:
     podManagementPolicy: OrderedReady
-    replicas: 2
+    replicas: ${{AMQ_REPLICAS}}
     revisionHistoryLimit: 10
     selector:
       matchLabels:
@@ -1081,7 +854,7 @@ objects:
           - name: AMQ_CLUSTERED
             value: "true"
           - name: AMQ_REPLICAS
-            value: "0"
+            value: ${AMQ_REPLICAS}
           - name: AMQ_CLUSTER_USER
             value: ${APPFORMER_JMS_BROKER_USER}
           - name: AMQ_CLUSTER_PASSWORD
@@ -1145,44 +918,6 @@ objects:
         resources:
           requests:
             storage: ${AMQ_VOLUME_CAPACITY}
-- apiVersion: rbac.authorization.k8s.io/v1
-  kind: RoleBinding
-  metadata:
-    labels:
-      application: ${APPLICATION_NAME}
-    name: ${APPLICATION_NAME}-amq-scaledown-controller-openshift-rb
-  roleRef:
-    apiGroup: rbac.authorization.k8s.io
-    kind: Role
-    name: ${APPLICATION_NAME}-amq-scaledown-controller-role
-  subjects:
-  - kind: ServiceAccount
-    name: ${APPLICATION_NAME}-amq-scaledown-controller-sa
-- apiVersion: rbac.authorization.k8s.io/v1
-  kind: RoleBinding
-  metadata:
-    labels:
-      application: ${APPLICATION_NAME}
-    name: ${APPLICATION_NAME}-amq-rb
-  roleRef:
-    apiGroup: rbac.authorization.k8s.io
-    kind: Role
-    name: ${APPLICATION_NAME}-amq-role
-  subjects:
-  - kind: ServiceAccount
-    name: ${APPLICATION_NAME}-amq-sa
-- apiVersion: v1
-  kind: ServiceAccount
-  metadata:
-    labels:
-      application: ${APPLICATION_NAME}
-    name: ${APPLICATION_NAME}-amq-sa
-- apiVersion: v1
-  kind: ServiceAccount
-  metadata:
-    labels:
-      application: ${APPLICATION_NAME}
-    name: ${APPLICATION_NAME}-amq-scaledown-controller-sa
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
@@ -1234,8 +969,9 @@ parameters:
   from: '[a-zA-Z]{6}[0-9]{1}!'
   generate: expression
   name: KIE_SERVER_PWD
-- description: Allows the KIE server to bypass the authenticated user for task related
-    operations e.g. queries. (Sets the org.kie.server.bypass.auth.user system property)
+- description: Allows the KIE server to bypass the authenticated user for task-related
+    operations, for example, queries. (Sets the org.kie.server.bypass.auth.user system
+    property)
   displayName: KIE Server Bypass Auth User
   name: KIE_SERVER_BYPASS_AUTH_USER
   value: "false"
@@ -1323,39 +1059,27 @@ parameters:
   displayName: DataGrid Image
   name: DATAGRID_IMAGE
   required: true
-  value: registry.redhat.io/jboss-datagrid-7/datagrid73-openshift:1.1
+  value: registry.redhat.io/jboss-datagrid-7/datagrid73-openshift:1.2
+- description: DataGrid Container cpu limit.
+  displayName: DataGrid Container CPU Limit
+  name: DATAGRID_CPU_LIMIT
+  required: true
+  value: 1000m
 - description: DataGrid Container memory limit.
   displayName: DataGrid Container Memory Limit
   name: DATAGRID_MEMORY_LIMIT
   required: true
-  value: 512Mi
+  value: 2Gi
 - description: Size of the persistent storage for DataGrid's runtime data.
   displayName: DataGrid Volume Capacity
   name: DATAGRID_VOLUME_CAPACITY
   required: true
   value: 1Gi
-- description: Namespace in which the ImageStream for the AMQ Scaledown Controller
-    image is installed. Default is "openshift".
-  displayName: AMQ Scaledown Controller ImageStream Namespace
-  name: AMQ_SCALEDOWN_CONTROLLER_IMAGE_STREAM_NAMESPACE
-  required: true
-  value: openshift
-- description: The name of the image stream to use for the AMQ Scaledown Controller.
-    Default is "amq-broker-72-scaledown-controller-openshift".
-  displayName: AMQ Scaledown Controller ImageStream Name
-  name: AMQ_SCALEDOWN_CONTROLLER_IMAGE_STREAM_NAME
-  required: true
-  value: amq-broker-72-scaledown-controller-openshift
-- description: The AMQ scaledown controller image stream tag. Default is "1.0".
-  displayName: AMQ Scaledown Controller ImageStream Tag
-  name: AMQ_SCALEDOWN_CONTROLLER_IMAGE_STREAM_TAG
-  required: true
-  value: "1.0"
 - description: AMQ Broker Image
   displayName: Image
   name: AMQ_BROKER_IMAGE
   required: true
-  value: registry.redhat.io/amq-broker-7/amq-broker-73-openshift:7.3
+  value: registry.redhat.io/amq7/amq-broker:7.4
 - description: User role for standard broker user.
   displayName: AMQ Role
   name: AMQ_ROLE
@@ -1375,6 +1099,11 @@ parameters:
   name: AMQ_VOLUME_CAPACITY
   required: true
   value: 1Gi
+- description: Number of broker replicas for a cluster
+  displayName: Number of Replicas
+  name: AMQ_REPLICAS
+  required: true
+  value: "2"
 - description: If set to true, turns on KIE server global discovery feature (Sets
     the org.kie.server.controller.openshift.global.discovery.enabled system property)
   displayName: Enable KIE server global discovery
@@ -1392,8 +1121,8 @@ parameters:
   displayName: KIE ServerTemplate Cache TTL
   name: KIE_SERVER_CONTROLLER_TEMPLATE_CACHE_TTL
   value: "60000"
-- description: Namespace in which the ImageStreams for Red Hat Middleware images are
-    installed. These ImageStreams are normally installed in the openshift namespace.
+- description: Namespace in which the ImageStreams for Red Hat Decision Manager images
+    are installed. These ImageStreams are normally installed in the openshift namespace.
     You should only need to modify this if you installed the ImageStreams in a different
     namespace/project.
   displayName: ImageStream Namespace
@@ -1401,21 +1130,21 @@ parameters:
   required: true
   value: openshift
 - description: The name of the image stream to use for Decision Central. Default is
-    "rhdm74-decisioncentral-openshift".
+    "rhdm-decisioncentral-rhel8".
   displayName: Decision Central ImageStream Name
   name: DECISION_CENTRAL_IMAGE_STREAM_NAME
   required: true
-  value: rhdm74-decisioncentral-openshift
-- description: The name of the image stream to use for KIE server. Default is "rhdm74-kieserver-openshift".
+  value: rhdm-decisioncentral-rhel8
+- description: The name of the image stream to use for KIE server. Default is "rhdm-kieserver-rhel8".
   displayName: KIE Server ImageStream Name
   name: KIE_SERVER_IMAGE_STREAM_NAME
   required: true
-  value: rhdm74-kieserver-openshift
-- description: A named pointer to an image in an image stream. Default is "1.1".
+  value: rhdm-kieserver-rhel8
+- description: A named pointer to an image in an image stream. Default is "7.5.0".
   displayName: ImageStream Tag
   name: IMAGE_STREAM_TAG
   required: true
-  value: "1.1"
+  value: 7.5.0
 - description: Maven mirror that Decision Central and KIE server must use. If you
     configure a mirror, this mirror must contain all artifacts that are required for
     building and deploying your services.
