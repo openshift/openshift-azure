@@ -47,10 +47,34 @@ func fromMSGraphGroup(log *logrus.Entry, userV1 userv1client.UserV1Interface, ku
 	return g, !reflect.DeepEqual(kubeGroup, g)
 }
 
+// mailEqual tests for e-mail address equality (before the @ is case-sensitive,
+// after is not)
+func mailEqual(s, t string) bool {
+	a := strings.SplitN(s, "@", 2)
+	sPrefix, sDomain := a[0], a[1]
+
+	a = strings.SplitN(t, "@", 2)
+	tPrefix, tDomain := a[0], a[1]
+
+	return sPrefix == tPrefix && strings.EqualFold(sDomain, tDomain)
+}
+
+// tryOverride checks a given e-mail address against the user list, and if it
+// finds a name in the user list that matches (subject to mailEqual above), it
+// uses it
+func tryOverride(mail string, ocpUserList []v1.User) string {
+	for _, usr := range ocpUserList {
+		if mailEqual(usr.Name, mail) {
+			return usr.Name
+		}
+	}
+	return mail
+}
+
 // reconcileUsers will take an external user reference from AAD
 // match it with already sign-ed in users and updates required metadata.
 // This code is trying to solve 4 usecases for guest accounts:
-// 1. Member owner account - Mail = nil, GiveName = owner@home.com, MailNickname is partial email with owner@home.com#EXT#
+// 1. Member owner account - Mail = nil, GiveName = owner@home.com, MailNickname is partial email with owner_home.com#EXT#
 // 2. Guest user with prefix live.com#user@guest.com in OCP users but not in AAD
 // 3. Guest user with no prefix user@trustedGuest.com
 // 4. Normal user/ other usecases - Default: Mail
@@ -61,8 +85,11 @@ func fromMSGraphGroup(log *logrus.Entry, userV1 userv1client.UserV1Interface, ku
 // https://github.com/aspnet/Security/issues/1717
 // Internal example:
 // https://microsofteur-my.sharepoint.com/:w:/g/personal/b-majude_microsoft_com/EQCfupKCHN9Gi1uEqRAiiuUBnw_MfcDQLyldWEcV6gGzBw?e=bwfW9K
+// There is a further wrinkle where we see the case of the e-mail domain differ
+// from the openshift login name.  If we spot this we match the existing user
+// name's domain name's case.
 func reconcileUsers(log *logrus.Entry, ocpUserList []v1.User, AADUser graphrbac.User) string {
-	// This trys to handle use-case 1
+	// This tries to handle use-case 1
 	if AADUser.GivenName != nil &&
 		AADUser.Mail == nil &&
 		AADUser.MailNickname != nil {
@@ -71,7 +98,7 @@ func reconcileUsers(log *logrus.Entry, ocpUserList []v1.User, AADUser graphrbac.
 			idx := strings.LastIndex(s, "_")
 			email := s[:idx] + "@" + s[idx+1:]
 			if mail.Validate(email) && strings.EqualFold(email, *AADUser.GivenName) {
-				return *AADUser.GivenName
+				return tryOverride(*AADUser.GivenName, ocpUserList)
 			}
 		}
 	}
@@ -83,7 +110,7 @@ func reconcileUsers(log *logrus.Entry, ocpUserList []v1.User, AADUser graphrbac.
 			// if OpenShift user contains # - we need to drop it for checking.
 			if strings.Contains(usr.Name, "#") {
 				loginEmail := strings.SplitN(usr.Name, "#", 2)[1]
-				if strings.EqualFold(loginEmail, *AADUser.Mail) {
+				if mailEqual(loginEmail, *AADUser.Mail) {
 					return usr.Name
 				}
 			}
@@ -92,7 +119,7 @@ func reconcileUsers(log *logrus.Entry, ocpUserList []v1.User, AADUser graphrbac.
 	// returning Mail handles use-case 3-4 here and is default behaviour is none
 	// of the use-cases where matched
 	if AADUser.Mail != nil {
-		return *AADUser.Mail
+		return tryOverride(*AADUser.Mail, ocpUserList)
 	}
 	// default
 	return *AADUser.UserPrincipalName
