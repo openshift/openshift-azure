@@ -10,6 +10,7 @@ import (
 
 	storage "github.com/Azure/azure-sdk-for-go/storage"
 	gomock "github.com/golang/mock/gomock"
+	logrus "github.com/sirupsen/logrus"
 	v1 "k8s.io/api/core/v1"
 
 	api "github.com/openshift/openshift-azure/pkg/api"
@@ -221,6 +222,21 @@ func (m *MockUpgrader) GetControlPlanePods(arg0 context.Context) ([]v1.Pod, erro
 func (mr *MockUpgraderMockRecorder) GetControlPlanePods(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetControlPlanePods", reflect.TypeOf((*MockUpgrader)(nil).GetControlPlanePods), arg0)
+}
+
+// GetNameserversFromVnet mocks base method
+func (m *MockUpgrader) GetNameserversFromVnet(arg0 context.Context, arg1 *logrus.Entry, arg2, arg3 string) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetNameserversFromVnet", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNameserversFromVnet indicates an expected call of GetNameserversFromVnet
+func (mr *MockUpgraderMockRecorder) GetNameserversFromVnet(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNameserversFromVnet", reflect.TypeOf((*MockUpgrader)(nil).GetNameserversFromVnet), arg0, arg1, arg2, arg3)
 }
 
 // HealthCheck mocks base method

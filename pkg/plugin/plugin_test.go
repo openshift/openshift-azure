@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/storage"
+	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/golang/mock/gomock"
 	"github.com/sirupsen/logrus"
 
@@ -27,6 +28,7 @@ func expectUpdate(cs *api.OpenShiftManagedCluster, clusterUpgrader *mock_cluster
 		*c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil).Return(nil).After(*c)
 	}
 	*c = clusterUpgrader.EXPECT().GenerateARM(nil, "", true, gomock.Any()).Return(nil, nil).After(*c)
+	*c = clusterUpgrader.EXPECT().GetNameserversFromVnet(nil, gomock.Any(), cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup).After(*c)
 	*c = clusterUpgrader.EXPECT().WriteStartupBlobs().Return(nil).After(*c)
 	*c = clusterUpgrader.EXPECT().EnrichCertificatesFromVault(nil).Return(nil)
 	*c = clusterUpgrader.EXPECT().EnrichStorageAccountKeys(nil).Return(nil)
@@ -152,8 +154,8 @@ func TestRecoverEtcdCluster(t *testing.T) {
 	}
 
 	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
-
-	c := clusterUpgrader.EXPECT().GenerateARM(nil, gomock.Any(), true, gomock.Any()).Return(nil, nil)
+	c := clusterUpgrader.EXPECT().GetNameserversFromVnet(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes()
+	c = clusterUpgrader.EXPECT().GenerateARM(nil, gomock.Any(), true, gomock.Any()).Return(nil, nil).After(c)
 	c = clusterUpgrader.EXPECT().EtcdListBackups(nil).Return([]storage.Blob{{Name: "test-backup"}}, nil).After(c)
 	c = clusterUpgrader.EXPECT().EtcdRestoreDeleteMasterScaleSet(nil).Return(nil).After(c)
 
@@ -198,7 +200,8 @@ func TestRotateClusterSecrets(t *testing.T) {
 	configInterface := mock_config.NewMockInterface(gmc)
 	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
 
-	c := configInterface.EXPECT().InvalidateSecrets().Return(nil)
+	c := clusterUpgrader.EXPECT().GetNameserversFromVnet(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes()
+	c = configInterface.EXPECT().InvalidateSecrets().Return(nil).After(c)
 	c = configInterface.EXPECT().Generate(gomock.Any(), false).Return(nil).After(c)
 	expectUpdate(cs, clusterUpgrader, &c)
 
@@ -300,7 +303,19 @@ func TestReimage(t *testing.T) {
 			isMaster: false,
 		},
 	}
-
+	cs := &api.OpenShiftManagedCluster{
+		Properties: api.Properties{
+			AzProfile: api.AzProfile{
+				SubscriptionID: "foo",
+				ResourceGroup:  "bar",
+			},
+			NetworkProfile: api.NetworkProfile{
+				Nameservers: []string{"1.2.3.4"},
+			},
+			RefreshCluster: to.BoolPtr(false),
+		},
+	}
+	logger := logrus.NewEntry(logrus.StandardLogger())
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
@@ -309,8 +324,8 @@ func TestReimage(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-
-			c := clusterUpgrader.EXPECT().Reimage(nil, scaleset, instanceID).Return(nil)
+			c := clusterUpgrader.EXPECT().GetNameserversFromVnet(nil, logger, cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup).Return([]string{"1.2.3.4"}, nil)
+			c = clusterUpgrader.EXPECT().Reimage(nil, scaleset, instanceID).Return(nil).After(c)
 
 			if tt.isMaster {
 				c = clusterUpgrader.EXPECT().WaitForReadyMaster(nil, tt.hostname).Return(nil).After(c)
@@ -322,15 +337,16 @@ func TestReimage(t *testing.T) {
 				upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
 					return clusterUpgrader, nil
 				},
-				log: logrus.NewEntry(logrus.StandardLogger()),
+				log: logger,
 			}
 
-			if err := p.Reimage(nil, nil, tt.hostname); err != nil {
+			if err := p.Reimage(nil, cs, tt.hostname); err != nil {
 				t.Errorf("plugin.Reimage(%s) error = %v", tt.hostname, err)
 			}
 		})
 	}
 }
+
 func TestBackupEtcdCluster(t *testing.T) {
 	gmc := gomock.NewController(t)
 	defer gmc.Finish()
@@ -384,10 +400,24 @@ func errorsContains(errs []error, substr string) bool {
 }
 
 func TestValidateUpdateBlock(t *testing.T) {
+	ctx := context.Background()
+	gmc := gomock.NewController(t)
+	defer gmc.Finish()
 	const currentVersion = "current"
-
+	props := api.Properties{
+		AzProfile: api.AzProfile{
+			SubscriptionID: "foo",
+			ResourceGroup:  "bar",
+		},
+		NetworkProfile: api.NetworkProfile{
+			Nameservers: []string{"1.2.3.4"},
+		},
+		RefreshCluster: to.BoolPtr(true),
+	}
+	logger := logrus.NewEntry(logrus.StandardLogger())
+	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
 	p := &plugin{
-		log:          logrus.NewEntry(logrus.StandardLogger()),
+		log:          logger,
 		pluginConfig: &pluginapi.Config{PluginVersion: currentVersion},
 		configInterfaceFactory: func(cs *api.OpenShiftManagedCluster) (c config.Interface, err error) {
 			if cs.Config.PluginVersion != currentVersion {
@@ -395,18 +425,123 @@ func TestValidateUpdateBlock(t *testing.T) {
 			}
 			return
 		},
+		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
+			return clusterUpgrader, nil
+		},
+	}
+	tests := []struct {
+		name      string
+		cs        *api.OpenShiftManagedCluster
+		expectErr bool
+	}{
+		{
+			name: "current",
+			cs: &api.OpenShiftManagedCluster{
+				Config: api.Config{
+					PluginVersion: p.pluginConfig.PluginVersion,
+				},
+				Properties: props,
+			},
+		},
+		{
+			name: "old",
+			cs: &api.OpenShiftManagedCluster{
+				Config: api.Config{
+					PluginVersion: "old",
+				},
+				Properties: props,
+			},
+			expectErr: true,
+		},
 	}
 
-	old := &api.OpenShiftManagedCluster{Config: api.Config{PluginVersion: "old"}}
-	errs := p.Validate(context.Background(), old, old, true)
-	if !errorsContains(errs, "cannot be updated by resource provider") {
-		t.Error("expected old cluster to fail update validation")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			errs := p.Validate(ctx, tt.cs, tt.cs, true)
+			if tt.expectErr != errorsContains(errs, "cannot be updated by resource provider") {
+				if tt.expectErr {
+					t.Errorf("expected %s cluster to fail update validation", tt.name)
+				} else {
+					t.Errorf("expected %s cluster to pass update validation %v", tt.name, errs)
+				}
+			}
+		})
+	}
+}
+
+func TestCheckIfClusterWillRefresh(t *testing.T) {
+	ctx := context.Background()
+	gmc := gomock.NewController(t)
+	defer gmc.Finish()
+	logger := logrus.NewEntry(logrus.StandardLogger())
+	origNS := []string{"1.2.3.4"}
+	oldCs := &api.OpenShiftManagedCluster{
+		Properties: api.Properties{
+			NetworkProfile: api.NetworkProfile{
+				Nameservers: origNS,
+			},
+		},
+	}
+	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
+	p := &plugin{
+		log: logger,
+		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
+			return clusterUpgrader, nil
+		},
+	}
+	tests := []struct {
+		name      string
+		f         func(*api.OpenShiftManagedCluster)
+		expectErr bool
+	}{
+		{
+			name: "no refresh, no nameserver change",
+			f: func(oc *api.OpenShiftManagedCluster) {
+				clusterUpgrader.EXPECT().GetNameserversFromVnet(ctx, logger, oldCs.Properties.AzProfile.SubscriptionID, oldCs.Properties.AzProfile.ResourceGroup).Return(origNS, nil)
+				oc.Properties.RefreshCluster = to.BoolPtr(false)
+			},
+		},
+		{
+			name: "no refresh, nameserver change",
+			f: func(oc *api.OpenShiftManagedCluster) {
+				clusterUpgrader.EXPECT().GetNameserversFromVnet(ctx, logger, oldCs.Properties.AzProfile.SubscriptionID, oldCs.Properties.AzProfile.ResourceGroup).Return([]string{"3.2.4.5"}, nil)
+				oc.Properties.RefreshCluster = to.BoolPtr(false)
+			},
+			expectErr: true,
+		},
+		{
+			name: "refresh, no nameserver change",
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.RefreshCluster = to.BoolPtr(true)
+			},
+		},
+		{
+			name: "refresh, nameserver change",
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.RefreshCluster = to.BoolPtr(true)
+			},
+		},
+		{
+			name: "nil refresh, nameserver change",
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.RefreshCluster = nil
+			},
+		},
 	}
 
-	current := &api.OpenShiftManagedCluster{Config: api.Config{PluginVersion: p.pluginConfig.PluginVersion}}
-	errs = p.Validate(context.Background(), current, current, true)
-	if errorsContains(errs, "cannot be updated by resource provider") {
-		t.Error("expected current cluster to pass update validation")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cs := oldCs.DeepCopy()
+			tt.f(cs)
+			err := p.checkIfClusterWillRefresh(ctx, cs)
+			if tt.expectErr != (err != nil) {
+				if tt.expectErr {
+					t.Errorf("%s] expected cluster to fail update validation %v", tt.name, err)
+				} else {
+					t.Errorf("%s] expected cluster to pass update validation", tt.name)
+				}
+			}
+		})
 	}
 }
 
