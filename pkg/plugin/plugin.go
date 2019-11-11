@@ -525,6 +525,37 @@ func (p *plugin) ListClusterVMs(ctx context.Context, cs *api.OpenShiftManagedClu
 	return &api.GenevaActionListClusterVMs{VMs: &pods}, nil
 }
 
+func (p *plugin) Restart(ctx context.Context, cs *api.OpenShiftManagedCluster, hostname string) error {
+	if !validate.IsValidAgentPoolHostname(hostname) {
+		return fmt.Errorf("invalid hostname %q", hostname)
+	}
+
+	scaleset, instanceID, err := names.GetScaleSetNameAndInstanceID(hostname)
+	if err != nil {
+		return err
+	}
+
+	p.log.Info("creating clients")
+	clusterUpgrader, err := p.upgraderFactory(ctx, p.log, cs, true, true, p.testConfig)
+	if err != nil {
+		return err
+	}
+
+	p.log.Infof("restarting %s", hostname)
+	err = clusterUpgrader.Restart(ctx, scaleset, instanceID)
+	if err != nil {
+		return err
+	}
+
+	p.log.Infof("waiting for %s to be ready", hostname)
+	if strings.HasPrefix(hostname, "master-") {
+		err = clusterUpgrader.WaitForReadyMaster(ctx, hostname)
+	} else {
+		err = clusterUpgrader.WaitForReadyWorker(ctx, hostname)
+	}
+	return err
+}
+
 func (p *plugin) Reimage(ctx context.Context, cs *api.OpenShiftManagedCluster, hostname string) error {
 	if !validate.IsValidAgentPoolHostname(hostname) {
 		return fmt.Errorf("invalid hostname %q", hostname)

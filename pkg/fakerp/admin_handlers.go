@@ -35,6 +35,15 @@ func (s *Server) handleListClusterVMs(w http.ResponseWriter, req *http.Request) 
 	s.adminreply(w, err, vms)
 }
 
+// handleRestart handles restarting a vm in the cluster
+func (s *Server) handleRestart(w http.ResponseWriter, req *http.Request) {
+	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
+	hostname := chi.URLParam(req, "hostname")
+
+	err := s.plugin.Restart(req.Context(), cs, hostname)
+	s.adminreply(w, err, nil)
+}
+
 // handleReimage handles reimaging a vm in the cluster
 func (s *Server) handleReimage(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)

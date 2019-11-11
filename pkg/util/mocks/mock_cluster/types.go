@@ -294,6 +294,20 @@ func (mr *MockUpgraderMockRecorder) ResetUpdateBlob() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetUpdateBlob", reflect.TypeOf((*MockUpgrader)(nil).ResetUpdateBlob))
 }
 
+// Restart mocks base method
+func (m *MockUpgrader) Restart(arg0 context.Context, arg1, arg2 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Restart", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Restart indicates an expected call of Restart
+func (mr *MockUpgraderMockRecorder) Restart(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Restart", reflect.TypeOf((*MockUpgrader)(nil).Restart), arg0, arg1, arg2)
+}
+
 // RunCommand mocks base method
 func (m *MockUpgrader) RunCommand(arg0 context.Context, arg1, arg2, arg3 string) error {
 	m.ctrl.T.Helper()
