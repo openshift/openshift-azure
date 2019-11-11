@@ -153,6 +153,9 @@ type GenevaActions interface {
 	// ListClusterVMs returns the hostnames of all vms in a cluster
 	ListClusterVMs(ctx context.Context, cs *OpenShiftManagedCluster) (*GenevaActionListClusterVMs, error)
 
+	// Restart restarts a virtual machine in the cluster
+	Restart(ctx context.Context, oc *OpenShiftManagedCluster, hostname string) error
+
 	// Reimage reimages a virtual machine in the cluster
 	Reimage(ctx context.Context, oc *OpenShiftManagedCluster, hostname string) error
 

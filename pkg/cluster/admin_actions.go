@@ -8,6 +8,10 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 )
 
+func (u *Upgrade) Restart(ctx context.Context, scaleset, instanceID string) error {
+	return u.Vmc.Restart(ctx, u.Cs.Properties.AzProfile.ResourceGroup, scaleset, instanceID)
+}
+
 func (u *Upgrade) Reimage(ctx context.Context, scaleset, instanceID string) error {
 	return u.Vmc.Reimage(ctx, u.Cs.Properties.AzProfile.ResourceGroup, scaleset, instanceID, nil)
 }
