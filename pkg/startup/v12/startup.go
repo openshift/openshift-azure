@@ -44,6 +44,9 @@ func (s *startup) GetWorkerCs() *api.OpenShiftManagedCluster {
 		ID:   s.cs.ID,
 		Name: s.cs.Name,
 		Properties: api.Properties{
+			NetworkProfile: api.NetworkProfile{
+				Nameservers: s.cs.Properties.NetworkProfile.Nameservers,
+			},
 			WorkerServicePrincipalProfile: api.ServicePrincipalProfile{
 				ClientID: s.cs.Properties.WorkerServicePrincipalProfile.ClientID,
 				Secret:   s.cs.Properties.WorkerServicePrincipalProfile.Secret,

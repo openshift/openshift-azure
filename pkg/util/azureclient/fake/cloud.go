@@ -9,9 +9,11 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/compute"
 	fakecompute "github.com/openshift/openshift-azure/pkg/util/azureclient/fake/compute"
 	fakekeyvault "github.com/openshift/openshift-azure/pkg/util/azureclient/fake/keyvault"
+	fakenetwork "github.com/openshift/openshift-azure/pkg/util/azureclient/fake/network"
 	fakeresources "github.com/openshift/openshift-azure/pkg/util/azureclient/fake/resources"
 	fakestorage "github.com/openshift/openshift-azure/pkg/util/azureclient/fake/storage"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/keyvault"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/network"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 )
@@ -27,6 +29,7 @@ type AzureCloud struct {
 	KeyVaultClient                  keyvault.KeyVaultClient
 	VirtualMachineScaleSetVMsClient compute.VirtualMachineScaleSetVMsClient
 	VirtualMachineScaleSetsClient   compute.VirtualMachineScaleSetsClient
+	VirtualNetworksClient           network.VirtualNetworksClient
 }
 
 func NewFakeAzureCloud(log *logrus.Entry, secrets []azkeyvault.SecretBundle) *AzureCloud {
@@ -55,5 +58,6 @@ func NewFakeAzureCloud(log *logrus.Entry, secrets []azkeyvault.SecretBundle) *Az
 	az.VirtualMachineScaleSetVMsClient = fakecompute.NewFakeVirtualMachineScaleSetVMsClient(&az.ComputeRP)
 	az.VirtualMachineScaleSetsClient = fakecompute.NewFakeVirtualMachineScaleSetsClient(&az.ComputeRP)
 	az.DeploymentsClient = fakeresources.NewFakeDeploymentsClient(az.VirtualMachineScaleSetsClient, &az.StorageRP)
+	az.VirtualNetworksClient = fakenetwork.NewFakeVirtualNetworksClient()
 	return az
 }

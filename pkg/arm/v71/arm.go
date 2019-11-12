@@ -79,7 +79,7 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 		return nil, err
 	}
 
-	arm.FixupDepends(g.cs.Properties.AzProfile.SubscriptionID, g.cs.Properties.AzProfile.ResourceGroup, azuretemplate)
+	arm.FixupDepends(g.cs.Properties.AzProfile.SubscriptionID, g.cs.Properties.AzProfile.ResourceGroup, azuretemplate, nil)
 
 	return azuretemplate, nil
 }

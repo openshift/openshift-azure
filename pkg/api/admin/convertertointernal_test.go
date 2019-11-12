@@ -64,6 +64,7 @@ func TestToInternal(t *testing.T) {
 			name: "router profile update",
 			input: &OpenShiftManagedCluster{
 				Properties: &Properties{
+					RefreshCluster: true,
 					RouterProfiles: []RouterProfile{
 						{
 							Name:            to.StringPtr("Properties.RouterProfiles[0].Name"),
@@ -81,6 +82,7 @@ func TestToInternal(t *testing.T) {
 			name: "missing name in router profile update",
 			input: &OpenShiftManagedCluster{
 				Properties: &Properties{
+					RefreshCluster: true,
 					RouterProfiles: []RouterProfile{
 						{
 							PublicSubdomain: to.StringPtr("NewPublicSubdomain"),
@@ -95,6 +97,7 @@ func TestToInternal(t *testing.T) {
 			name: "new agent pool profile",
 			input: &OpenShiftManagedCluster{
 				Properties: &Properties{
+					RefreshCluster: true,
 					AgentPoolProfiles: []AgentPoolProfile{
 						{
 							Name:       to.StringPtr("NewName"),
@@ -124,6 +127,7 @@ func TestToInternal(t *testing.T) {
 			name: "missing name in agent pool profile update",
 			input: &OpenShiftManagedCluster{
 				Properties: &Properties{
+					RefreshCluster: true,
 					AgentPoolProfiles: []AgentPoolProfile{
 						{
 							Count:      to.Int64Ptr(2),
@@ -142,6 +146,7 @@ func TestToInternal(t *testing.T) {
 			name: "auth profile update",
 			input: &OpenShiftManagedCluster{
 				Properties: &Properties{
+					RefreshCluster: true,
 					AuthProfile: &AuthProfile{
 						IdentityProviders: []IdentityProvider{
 							{
@@ -175,6 +180,7 @@ func TestToInternal(t *testing.T) {
 			name: "auth profile update aad groups",
 			input: &OpenShiftManagedCluster{
 				Properties: &Properties{
+					RefreshCluster: true,
 					AuthProfile: &AuthProfile{
 						IdentityProviders: []IdentityProvider{
 							{
@@ -209,6 +215,7 @@ func TestToInternal(t *testing.T) {
 			name: "invalid auth profile update",
 			input: &OpenShiftManagedCluster{
 				Properties: &Properties{
+					RefreshCluster: true,
 					AuthProfile: &AuthProfile{
 						IdentityProviders: []IdentityProvider{
 							{
@@ -228,6 +235,7 @@ func TestToInternal(t *testing.T) {
 			name: "missing name in auth profile update",
 			input: &OpenShiftManagedCluster{
 				Properties: &Properties{
+					RefreshCluster: true,
 					AuthProfile: &AuthProfile{
 						IdentityProviders: []IdentityProvider{
 							{

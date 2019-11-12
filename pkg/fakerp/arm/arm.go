@@ -48,7 +48,7 @@ func Generate(ctx context.Context, subscriptionID, resourceGroup string, resourc
 		return nil, err
 	}
 
-	arm.FixupDepends(subscriptionID, resourceGroup, azuretemplate)
+	arm.FixupDepends(subscriptionID, resourceGroup, azuretemplate, nil)
 
 	return azuretemplate, nil
 }

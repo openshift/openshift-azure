@@ -21,6 +21,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/compute"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/keyvault"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/network"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/enrich"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
@@ -58,6 +59,7 @@ type Upgrader interface {
 	RunCommand(ctx context.Context, scaleset, instanceID, command string) error
 	WriteStartupBlobs() error
 	GenerateARM(ctx context.Context, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error)
+	GetNameserversFromVnet(ctx context.Context, log *logrus.Entry, subscriptionID, resourceGroup string) ([]string, error)
 
 	kubeclient.Interface
 }
@@ -72,6 +74,7 @@ type Upgrade struct {
 	Vmc               compute.VirtualMachineScaleSetVMsClient
 	Ssc               compute.VirtualMachineScaleSetsClient
 	Kvc               keyvault.KeyVaultClient
+	Vnc               network.VirtualNetworksClient
 	Log               *logrus.Entry
 	ScalerFactory     scaler.Factory
 	Hasher            Hasher
@@ -115,6 +118,7 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 		Vmc:            compute.NewVirtualMachineScaleSetVMsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
 		Ssc:            compute.NewVirtualMachineScaleSetsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
 		Kvc:            keyvault.NewKeyVaultClient(ctx, log, vaultauthorizer),
+		Vnc:            network.NewVirtualNetworkClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
 		Log:            log,
 		ScalerFactory:  scaler.NewFactory(),
 		Hasher: &Hash{

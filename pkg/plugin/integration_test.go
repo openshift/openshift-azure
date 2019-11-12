@@ -179,6 +179,7 @@ func newFakeUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftMa
 		Vmc:            azs.VirtualMachineScaleSetVMsClient,
 		Ssc:            azs.VirtualMachineScaleSetsClient,
 		Kvc:            azs.KeyVaultClient,
+		Vnc:            azs.VirtualNetworksClient,
 		Log:            log,
 		ScalerFactory:  scaler.NewFactory(),
 		Hasher: &cluster.Hash{

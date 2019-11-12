@@ -79,6 +79,16 @@ type Properties struct {
 
 	// APICertProfile (in, optional): configures OpenShift API certificate
 	APICertProfile CertProfile `json:"apiCertProfile,omitempty"`
+
+	// RefreshCluster (in, optional): if the nameservers are changed on
+	// the vnet then allow the update to cause nodes to rotate.
+	// Note:
+	// 1. This is just a safety mechanism so this does not happen unintentionally
+	//    but this *must* be done for the nodes to use of the new nameservers.
+	// 2. This is a pointer and the public fields are not pointers. This is on
+	//    purpose so we know if the request is coming from an older API.
+	// 3. This is really a per request setting, not a cluster configuration.
+	RefreshCluster *bool `json:"refreshCluster,omitempty"`
 }
 
 // ProvisioningState represents the current state of the OSA resource.
@@ -140,6 +150,9 @@ type NetworkProfile struct {
 	// It be set during Generate plugin phase as they used by
 	// the RP in the deployment callback function
 	InternalLoadBalancerFrontendIPID string `json:"-"`
+	// Nameservers is the list of DNS nameservers that the running nodes
+	// are using.
+	Nameservers []string `json:"nameservers,omitempty"`
 }
 
 // RouterProfile represents an OpenShift router.

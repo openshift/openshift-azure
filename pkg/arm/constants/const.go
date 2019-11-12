@@ -30,4 +30,5 @@ const (
 	VmssAdminUsername                             = "cloud-user"
 	VmssType                                      = "vmss"
 	LoadBalancerSku                               = "standard"
+	AzureNameserver                               = "168.63.129.16"
 )

@@ -1,3 +1,4 @@
 # ADMIN_MANIFEST=test/manifests/fakerp/admin-update.yaml hack/upgrade.sh
 properties:
   clusterVersion: latest
+  refreshCluster: true

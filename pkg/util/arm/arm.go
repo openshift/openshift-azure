@@ -36,12 +36,11 @@ func FixupAPIVersions(template map[string]interface{}, versions map[string]strin
 
 // FixupDepends inserts a dependsOn field into the ARM template for each
 // resource that needs it (the field is missing from the internal Azure type).
-func FixupDepends(subscriptionID, resourceGroup string, template map[string]interface{}) {
+func FixupDepends(subscriptionID, resourceGroup string, template map[string]interface{}, ignoreMap map[string]struct{}) {
 	myResources := map[string]struct{}{}
 	for _, resource := range jsonpath.MustCompile("$.resources.*").Get(template) {
 		typ := jsonpath.MustCompile("$.type").MustGetString(resource)
 		name := jsonpath.MustCompile("$.name").MustGetString(resource)
-
 		myResources[resourceid.ResourceID(subscriptionID, resourceGroup, typ, name)] = struct{}{}
 	}
 
@@ -61,7 +60,8 @@ func FixupDepends(subscriptionID, resourceGroup string, template map[string]inte
 					}
 					if len(parts) == 9 {
 						id = strings.Join(parts, "/")
-						if id != myResourceID {
+						_, ignoreIt := ignoreMap[id]
+						if id != myResourceID && !ignoreIt {
 							dependsMap[id] = struct{}{}
 						}
 					}

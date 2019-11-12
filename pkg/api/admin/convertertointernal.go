@@ -90,6 +90,8 @@ func mergePropertiesAdmin(oc *OpenShiftManagedCluster, cs *api.OpenShiftManagedC
 	if oc.Properties.FQDN != nil {
 		cs.Properties.FQDN = *oc.Properties.FQDN
 	}
+	// always set this at it's a per/request action, not a configuration
+	cs.Properties.RefreshCluster = &oc.Properties.RefreshCluster
 
 	if oc.Properties.NetworkProfile != nil {
 		if oc.Properties.NetworkProfile.VnetID != nil {

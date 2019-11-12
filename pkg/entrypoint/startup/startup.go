@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"reflect"
 	"time"
 
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/startup"
+	"github.com/openshift/openshift-azure/pkg/util/cmp"
 	"github.com/openshift/openshift-azure/pkg/util/log"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
@@ -40,6 +42,14 @@ func runStartup(ctx context.Context, log *logrus.Entry) error {
 		return err
 	}
 
+	ns, err := startup.GetNameserversFromDNSConfig("/host")
+	if err != nil {
+		return err
+	}
+	if !reflect.DeepEqual(ns, cs.Properties.NetworkProfile.Nameservers) {
+		log.Warnf("overriding Nameservers with values from host resolver difference %s", cmp.Diff(ns, cs.Properties.NetworkProfile.Nameservers))
+		cs.Properties.NetworkProfile.Nameservers = ns
+	}
 	s, err := startup.New(log, cs, api.TestConfig{})
 	if err != nil {
 		return err

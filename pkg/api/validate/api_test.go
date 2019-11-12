@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/ghodss/yaml"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -24,6 +25,16 @@ func TestAPIValidateUpdate(t *testing.T) {
 		"change compute VMSize": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Properties.AgentPoolProfiles[2].VMSize = api.StandardF16sV2
+			},
+		},
+		"set refreshcluster": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.RefreshCluster = to.BoolPtr(true)
+			},
+		},
+		"unset refreshcluster": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.RefreshCluster = to.BoolPtr(false)
 			},
 		},
 		"invalid change": {

@@ -55,6 +55,7 @@ func (v *APIValidator) validateUpdateContainerService(cs, oldCs *api.OpenShiftMa
 	old.Properties.MonitorProfile.WorkspaceResourceID = cs.Properties.MonitorProfile.WorkspaceResourceID
 	old.Properties.MonitorProfile.WorkspaceID = cs.Properties.MonitorProfile.WorkspaceID
 	old.Properties.MonitorProfile.WorkspaceKey = cs.Properties.MonitorProfile.WorkspaceKey
+	old.Properties.RefreshCluster = cs.Properties.RefreshCluster
 
 	for i, app := range old.Properties.AgentPoolProfiles {
 		for _, newApp := range cs.Properties.AgentPoolProfiles {

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"reflect"
 	"strings"
 	"time"
 
@@ -64,13 +65,22 @@ func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedClu
 	// run Validate() - test can fire on cs.Properties.ClusterVersion
 	// RP sets cs.Properties.ClusterVersion = "aro.123"
 	// RP sets cs.Config.PluginVersion = "latest"
-	// run Validate() - test can fire on cs.Properties.PluginVersion
+	// run Validate() - test can fire on cs.Config.PluginVersion
 	// run GenerateConfig()
 	// run CreateOrUpdate()
 	if old != nil && new.Properties.ClusterVersion != "latest" && new.Config.PluginVersion != "latest" {
 		_, err := p.configInterfaceFactory(new)
 		if err != nil {
 			errs = append(errs, fmt.Errorf(`cluster with version %q cannot be updated by resource provider with version %q`, new.Config.PluginVersion, p.pluginConfig.PluginVersion))
+		}
+	}
+	if len(errs) > 0 {
+		// don't call checkIfClusterWillRefresh() if we already have errors.
+		return
+	}
+	if !externalOnly && old != nil {
+		if err := p.checkIfClusterWillRefresh(ctx, new); err != nil {
+			errs = append(errs, err)
 		}
 	}
 
@@ -88,6 +98,15 @@ func (p *plugin) ValidateAdmin(ctx context.Context, new, old *api.OpenShiftManag
 		_, err := p.configInterfaceFactory(new)
 		if err != nil {
 			errs = append(errs, fmt.Errorf(`cluster with version %q cannot be updated by resource provider with version %q`, new.Config.PluginVersion, p.pluginConfig.PluginVersion))
+		}
+	}
+	if len(errs) > 0 {
+		// don't call checkIfClusterWillRefresh() if we already have errors.
+		return
+	}
+	if old != nil {
+		if err := p.checkIfClusterWillRefresh(ctx, new); err != nil {
+			errs = append(errs, err)
 		}
 	}
 
@@ -168,7 +187,6 @@ func (p *plugin) ListEtcdBackups(ctx context.Context, cs *api.OpenShiftManagedCl
 
 func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn, backupBlob string) *api.PluginError {
 	suffix := fmt.Sprintf("%d", p.now().Unix())
-
 	p.log.Info("creating clients")
 	clusterUpgrader, err := p.upgraderFactory(ctx, p.log, cs, true, true, p.testConfig)
 	if err != nil {
@@ -247,6 +265,28 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 	return p.createOrUpdateExt(ctx, cs, updateTypeCreate, deployFn, false)
 }
 
+func (p *plugin) checkIfClusterWillRefresh(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	if cs.Properties.RefreshCluster == nil || (cs.Properties.RefreshCluster != nil && *cs.Properties.RefreshCluster) {
+		// RefreshCluster is a pointer on the internal API and not a pointer on the external API
+		// this is done so that we can determine when it does not exist on the older external APIs
+		// - in this case we default to RefreshCluster = true
+		return nil
+	}
+	clusterUpgrader, err := p.upgraderFactory(ctx, p.log, cs, false, true, p.testConfig)
+	if err != nil {
+		return err
+	}
+	ns, err := clusterUpgrader.GetNameserversFromVnet(ctx, p.log, cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup)
+	if err != nil {
+		return err
+	}
+
+	if !reflect.DeepEqual(ns, cs.Properties.NetworkProfile.Nameservers) {
+		return fmt.Errorf("DNSServers on the vnet have changed but 'Properties.RefreshCluster' is not set")
+	}
+	return nil
+}
+
 func (p *plugin) createOrUpdateExt(ctx context.Context, cs *api.OpenShiftManagedCluster, updateType int, deployFn api.DeployFn, backupEtcd bool) *api.PluginError {
 	suffix := fmt.Sprintf("%d", p.now().Unix())
 
@@ -290,6 +330,17 @@ func (p *plugin) createOrUpdateExt(ctx context.Context, cs *api.OpenShiftManaged
 		cs.Properties.NetworkProfile.ManagementSubnetID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/virtualNetworks", armconst.VnetName+"/subnets/"+armconst.VnetManagementSubnetName)
 		cs.Properties.NetworkProfile.InternalLoadBalancerFrontendIPID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/loadBalancers", armconst.IlbAPIServerName+"/frontendIPConfigurations/"+armconst.IlbAPIServerFrontendConfigurationName)
 	}
+
+	if !isUpdate {
+		cs.Properties.NetworkProfile.Nameservers = []string{armconst.AzureNameserver}
+	} else {
+		cs.Properties.NetworkProfile.Nameservers, err = clusterUpgrader.GetNameserversFromVnet(ctx, p.log, cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepCheckRefreshCluster}
+		}
+	}
+	// we want the user to explicitly enable this each time, and not persist it.
+	cs.Properties.RefreshCluster = nil
 
 	// blobs must exist before deploy
 	err = clusterUpgrader.WriteStartupBlobs()
@@ -404,6 +455,9 @@ func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftMana
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
+	if err := p.checkIfClusterWillRefresh(ctx, cs); err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepCheckRefreshCluster}
+	}
 
 	err = configInterface.InvalidateSecrets()
 	if err != nil {
@@ -428,6 +482,9 @@ func (p *plugin) RotateClusterCertificates(ctx context.Context, cs *api.OpenShif
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
+	if err := p.checkIfClusterWillRefresh(ctx, cs); err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepCheckRefreshCluster}
+	}
 
 	err = configInterface.InvalidateCertificates()
 	if err != nil {
@@ -451,6 +508,9 @@ func (p *plugin) RotateClusterCertificatesAndSecrets(ctx context.Context, cs *ap
 	configInterface, err := p.configInterfaceFactory(cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+	}
+	if err := p.checkIfClusterWillRefresh(ctx, cs); err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepCheckRefreshCluster}
 	}
 
 	err = configInterface.InvalidateSecrets()
@@ -529,7 +589,9 @@ func (p *plugin) Reimage(ctx context.Context, cs *api.OpenShiftManagedCluster, h
 	if !validate.IsValidAgentPoolHostname(hostname) {
 		return fmt.Errorf("invalid hostname %q", hostname)
 	}
-
+	if err := p.checkIfClusterWillRefresh(ctx, cs); err != nil {
+		return err
+	}
 	scaleset, instanceID, err := names.GetScaleSetNameAndInstanceID(hostname)
 	if err != nil {
 		return err

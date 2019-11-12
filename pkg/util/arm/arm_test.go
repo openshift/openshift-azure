@@ -20,6 +20,7 @@ func TestFixupDepends(t *testing.T) {
 		name      string
 		resources []interface{}
 		expect    []string
+		ignore    map[string]struct{}
 	}{
 		{
 			name: "have deps, but missing resources",
@@ -77,6 +78,37 @@ func TestFixupDepends(t *testing.T) {
 			},
 			expect: []string{"/subscriptions/subscriptionID/resourceGroups/resourceGroup/providers/Microsoft.Network/publicIPAddresses/ip-apiserver"},
 		},
+		{
+			name: "have deps and dependent resources, but ignore",
+			resources: []interface{}{
+				&network.PublicIPAddress{
+					Name: to.StringPtr("ip-apiserver"),
+					Type: to.StringPtr("Microsoft.Network/publicIPAddresses"),
+				},
+				&network.LoadBalancer{
+					LoadBalancerPropertiesFormat: &network.LoadBalancerPropertiesFormat{
+						FrontendIPConfigurations: &[]network.FrontendIPConfiguration{
+							{
+								FrontendIPConfigurationPropertiesFormat: &network.FrontendIPConfigurationPropertiesFormat{
+									PublicIPAddress: &network.PublicIPAddress{
+										ID: to.StringPtr(resourceid.ResourceID(
+											subscriptionID,
+											resourceGroup,
+											"Microsoft.Network/publicIPAddresses",
+											"ip-apiserver",
+										)),
+									},
+								},
+							},
+						},
+					},
+					Name: to.StringPtr("lb-apiserver"),
+					Type: to.StringPtr("Microsoft.Network/loadBalancers"),
+				},
+			},
+			expect: []string{},
+			ignore: map[string]struct{}{"/subscriptions/subscriptionID/resourceGroups/resourceGroup/providers/Microsoft.Network/publicIPAddresses/ip-apiserver": {}},
+		},
 	}
 	for _, tt := range tests {
 		armT := Template{
@@ -95,7 +127,7 @@ func TestFixupDepends(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		FixupDepends(subscriptionID, resourceGroup, azuretemplate)
+		FixupDepends(subscriptionID, resourceGroup, azuretemplate, tt.ignore)
 		res := jsonpath.MustCompile("$.resources[?(@.name='lb-apiserver')]").MustGetObject(azuretemplate)
 		deps, found := res["dependsOn"].([]string)
 		if !found && len(tt.expect) > 0 {

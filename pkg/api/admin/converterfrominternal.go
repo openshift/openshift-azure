@@ -35,6 +35,10 @@ func FromInternal(cs *api.OpenShiftManagedCluster) *OpenShiftManagedCluster {
 		PublicHostname:    &cs.Properties.PublicHostname,
 		FQDN:              &cs.Properties.FQDN,
 	}
+	// This is intentionally reversed as far as pointers go.
+	if cs.Properties.RefreshCluster != nil {
+		oc.Properties.RefreshCluster = *cs.Properties.RefreshCluster
+	}
 
 	oc.Properties.NetworkProfile = &NetworkProfile{
 		VnetID:               &cs.Properties.NetworkProfile.VnetID,

@@ -28,7 +28,10 @@ var marshalled = []byte(`{
 			"vnetCidr": "Properties.NetworkProfile.VnetCIDR",
 			"managementSubnetCidr": "Properties.NetworkProfile.ManagementSubnetCIDR",
 			"vnetId": "Properties.NetworkProfile.VnetID",
-			"peerVnetId": "Properties.NetworkProfile.PeerVnetID"
+			"peerVnetId": "Properties.NetworkProfile.PeerVnetID",
+			"nameservers": [
+				"Properties.NetworkProfile.Nameservers[0]"
+			]
 		},
 		"routerProfiles": [
 			{
@@ -85,7 +88,8 @@ var marshalled = []byte(`{
 		},
 		"apiCertProfile": {
 			"keyVaultSecretURL": "Properties.APICertProfile.KeyVaultSecretURL"
-		}
+		},
+		"refreshCluster": true
 	},
 	"id": "ID",
 	"name": "Name",

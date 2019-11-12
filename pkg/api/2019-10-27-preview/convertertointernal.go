@@ -3,6 +3,8 @@ package v20191027preview
 import (
 	"errors"
 
+	"github.com/Azure/go-autorest/autorest/to"
+
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
@@ -90,6 +92,9 @@ func mergeProperties(oc *OpenShiftManagedCluster, cs *api.OpenShiftManagedCluste
 	if oc.Properties.FQDN != nil {
 		cs.Properties.FQDN = *oc.Properties.FQDN
 	}
+	// always set this at it's a per/request action, not a configuration
+	cs.Properties.RefreshCluster = to.BoolPtr(oc.Properties.RefreshCluster)
+
 	if oc.Properties.MasterPoolProfile != nil && oc.Properties.MasterPoolProfile.APIProperties != nil {
 		if oc.Properties.MasterPoolProfile.APIProperties.PrivateAPIServer != nil {
 			cs.Properties.PrivateAPIServer = *oc.Properties.MasterPoolProfile.APIProperties.PrivateAPIServer

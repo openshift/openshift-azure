@@ -16,7 +16,9 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	armconst "github.com/openshift/openshift-azure/pkg/arm/constants"
 	"github.com/openshift/openshift-azure/pkg/util/arm"
+	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 )
 
 type simpleGenerator struct {
@@ -38,7 +40,6 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 		Schema:         "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
 		ContentVersion: "1.0.0.0",
 		Resources: []interface{}{
-			g.vnet(),
 			g.ipAPIServer(),
 			g.lbAPIServer(),
 			g.storageAccount(g.cs.Config.RegistryStorageAccount, map[string]*string{
@@ -54,7 +55,7 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 		t.Resources = append(t.Resources, g.ilbAPIServer())
 	}
 	if !isUpdate {
-		t.Resources = append(t.Resources, g.ipOutbound(), g.lbKubernetes(), g.nsgWorker())
+		t.Resources = append(t.Resources, g.vnet(), g.ipOutbound(), g.lbKubernetes(), g.nsgWorker())
 	}
 
 	for _, app := range g.cs.Properties.AgentPoolProfiles {
@@ -83,7 +84,12 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 		return nil, err
 	}
 
-	arm.FixupDepends(g.cs.Properties.AzProfile.SubscriptionID, g.cs.Properties.AzProfile.ResourceGroup, azuretemplate)
+	ignoreMap := map[string]struct{}{}
+	if isUpdate {
+		vnetID := resourceid.ResourceID(g.cs.Properties.AzProfile.SubscriptionID, g.cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/virtualNetworks", armconst.VnetName)
+		ignoreMap[vnetID] = struct{}{}
+	}
+	arm.FixupDepends(g.cs.Properties.AzProfile.SubscriptionID, g.cs.Properties.AzProfile.ResourceGroup, azuretemplate, ignoreMap)
 
 	// HACK: Current SDK version is v24. Private link support comes into the version v28+.
 	// To use PLS/PE we need to set configurables on vnet and create PLS itself
