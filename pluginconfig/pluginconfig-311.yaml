@@ -265,7 +265,7 @@ versions:
     imageOffer: osa
     imagePublisher: redhat
     imageSku: osa_311
-    imageVersion: 311.153.20191018
+    imageVersion: 311.153.20191112
     images:
       alertManager: registry.access.redhat.com/openshift3/prometheus-alertmanager:v3.11.153
       ansibleServiceBroker: registry.access.redhat.com/openshift3/ose-ansible-service-broker:v3.11.153
