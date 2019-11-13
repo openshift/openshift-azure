@@ -3,7 +3,7 @@ GITCOMMIT=$(shell git describe --tags HEAD)$(shell [[ $$(git status --porcelain)
 LDFLAGS="-X main.gitCommit=$(GITCOMMIT)"
 
 AZURE_IMAGE ?= quay.io/openshift-on-azure/azure:$(GITCOMMIT)
-LATEST_PLUGIN_VERSION=$(shell go run hack/dev-version/dev-version.go)
+LATEST_PLUGIN_VERSION=$(shell go run hack/devtool/main.go dev-version)
 
 .PHONY: all artifacts azure-image azure-push clean create delete e2e generate monitoring monitoring-run monitoring-stop secrets sync-run test testinsights unit upgrade verify vmimage
 

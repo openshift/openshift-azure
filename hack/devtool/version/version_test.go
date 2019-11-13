@@ -1,4 +1,4 @@
-package main
+package version
 
 import "testing"
 
@@ -49,12 +49,12 @@ func TestPluginToDevVersion(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.pluginVersion, func(t *testing.T) {
-			got, err := pluginToDevVersion(tt.pluginVersion, tt.previous)
+			got, err := nextDevVersion(tt.pluginVersion, tt.previous)
 			if tt.wantErr != (err != nil) {
-				t.Errorf("pluginToDevVersion(%s:%s) = %v, want %v", tt.pluginVersion, tt.want, err, tt.wantErr)
+				t.Errorf("nextDevVersion(%s:%s) = %v, want %v", tt.pluginVersion, tt.want, err, tt.wantErr)
 			}
 			if got != tt.want {
-				t.Errorf("pluginToDevVersion(%s:%s) = %v, want %v", tt.pluginVersion, tt.want, got, tt.want)
+				t.Errorf("nextDevVersion(%s:%s) = %v, want %v", tt.pluginVersion, tt.want, got, tt.want)
 			}
 		})
 	}
