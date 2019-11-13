@@ -12,7 +12,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
 	v10 "github.com/openshift/openshift-azure/pkg/config/v10"
-	v11 "github.com/openshift/openshift-azure/pkg/config/v11"
 	v12 "github.com/openshift/openshift-azure/pkg/config/v12"
 	v13 "github.com/openshift/openshift-azure/pkg/config/v13"
 	v7 "github.com/openshift/openshift-azure/pkg/config/v7"
@@ -36,8 +35,6 @@ func New(cs *api.OpenShiftManagedCluster) (Interface, error) {
 		return v9.New(cs), nil
 	case "v10.0", "v10.1":
 		return v10.New(cs), nil
-	case "v11.0":
-		return v11.New(cs), nil
 	case "v12.0":
 		return v12.New(cs), nil
 	case "v13.0":
