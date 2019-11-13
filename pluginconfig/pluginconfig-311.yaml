@@ -301,7 +301,7 @@ versions:
       startup: quay.io/openshift-on-azure/ci-azure:latest
       sync: quay.io/openshift-on-azure/ci-azure:latest
       tlsProxy: quay.io/openshift-on-azure/ci-azure:latest
-      logAnalyticsAgent: mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod10182019
+      logAnalyticsAgent: mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod11012019
 ## certificates, used to authenticate to external systems
 ## Red Hat CDN client certificates
   #packageRepository:
