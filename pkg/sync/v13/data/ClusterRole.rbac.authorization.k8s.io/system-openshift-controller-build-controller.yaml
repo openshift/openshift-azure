@@ -1,0 +1,104 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    authorization.openshift.io/system-only: "true"
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  name: system:openshift:controller:build-controller
+rules:
+- apiGroups:
+  - ""
+  - build.openshift.io
+  resources:
+  - builds
+  verbs:
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  - build.openshift.io
+  resources:
+  - builds/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - ""
+  - build.openshift.io
+  resources:
+  - buildconfigs
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  - build.openshift.io
+  resources:
+  - builds/custom
+  - builds/docker
+  - builds/jenkinspipeline
+  - builds/optimizeddocker
+  - builds/source
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  - image.openshift.io
+  resources:
+  - imagestreams
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ""
+  - security.openshift.io
+  resources:
+  - podsecuritypolicysubjectreviews
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update

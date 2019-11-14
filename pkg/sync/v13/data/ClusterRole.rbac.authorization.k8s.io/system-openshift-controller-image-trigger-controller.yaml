@@ -1,0 +1,79 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    authorization.openshift.io/system-only: "true"
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  name: system:openshift:controller:image-trigger-controller
+rules:
+- apiGroups:
+  - ""
+  - image.openshift.io
+  resources:
+  - imagestreams
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  resources:
+  - daemonsets
+  verbs:
+  - get
+  - update
+- apiGroups:
+  - apps
+  - extensions
+  resources:
+  - deployments
+  verbs:
+  - get
+  - update
+- apiGroups:
+  - apps
+  resources:
+  - statefulsets
+  verbs:
+  - get
+  - update
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  verbs:
+  - get
+  - update
+- apiGroups:
+  - ""
+  - apps.openshift.io
+  resources:
+  - deploymentconfigs
+  verbs:
+  - get
+  - update
+- apiGroups:
+  - ""
+  - build.openshift.io
+  resources:
+  - buildconfigs/instantiate
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  - build.openshift.io
+  resources:
+  - builds/custom
+  - builds/docker
+  - builds/jenkinspipeline
+  - builds/optimizeddocker
+  - builds/source
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
