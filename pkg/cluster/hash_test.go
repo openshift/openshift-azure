@@ -100,7 +100,7 @@ func TestHashScaleSetStability(t *testing.T) {
 				expectedHash: "2b5408737a68306367c7f34e3c6aeb21f1e6ebaf6f7a703b092fce948700d968",
 			},
 		},
-		"v10.2": {
+		"v10.1": {
 			{
 				role: api.AgentPoolProfileRoleMaster,
 				// this value should not change
@@ -226,7 +226,7 @@ func TestHashSyncPodStability(t *testing.T) {
 			// this value should not change
 			expectedHash: "76a965e10801d086a00f200c4a004ffaaa2b88c25d8451ed6729b85e745a863b",
 		},
-		"v10.2": {
+		"v10.1": {
 			// this value should not change
 			expectedHash: "76a965e10801d086a00f200c4a004ffaaa2b88c25d8451ed6729b85e745a863b",
 		},
