@@ -15,7 +15,7 @@ spec:
     metadata:
       annotations:
         agentVersion: 1.10.0.1
-        dockerProviderVersion: 7.0.0-5
+        dockerProviderVersion: 7.0.0-6
         schema-versions: v1
       labels:
         app: log-analytics-cluster-agent
