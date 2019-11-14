@@ -30,7 +30,11 @@
 
 /test unit
 
+/test upgrade-private-v12.0
+
 /test upgrade-v10.1.1
+
+/test upgrade-v12.0
 
 /test upgrade-v7.1
 
