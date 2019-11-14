@@ -9,7 +9,6 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	v10 "github.com/openshift/openshift-azure/pkg/sync/v10"
-	v11 "github.com/openshift/openshift-azure/pkg/sync/v11"
 	v12 "github.com/openshift/openshift-azure/pkg/sync/v12"
 	v13 "github.com/openshift/openshift-azure/pkg/sync/v13"
 	v7 "github.com/openshift/openshift-azure/pkg/sync/v7"
@@ -34,8 +33,6 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (
 		return v9.New(log, cs, initClients)
 	case "v10.0", "v10.1":
 		return v10.New(log, cs, initClients)
-	case "v11.0":
-		return v11.New(log, cs, initClients)
 	case "v12.0":
 		return v12.New(log, cs, initClients)
 	case "v13.0":
