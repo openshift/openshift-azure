@@ -309,6 +309,38 @@ func TestFromMSGraphGroup(t *testing.T) {
 				Users: []string{"user@home.com"},
 			},
 		},
+		{
+			name:          "domain case can match",
+			kubeGroupName: osaCustomerAdmins,
+			want1:         true,
+			msGroupMembers: []graphrbac.User{
+				{
+					Mail: to.StringPtr("user@Home.com"),
+				},
+			},
+			want: &v1.Group{
+				ObjectMeta: meta_v1.ObjectMeta{
+					Name: osaCustomerAdmins,
+				},
+				Users: []string{"user@home.com"},
+			},
+		},
+		{
+			name:          "user case can't match",
+			kubeGroupName: osaCustomerAdmins,
+			want1:         true,
+			msGroupMembers: []graphrbac.User{
+				{
+					Mail: to.StringPtr("User@home.com"),
+				},
+			},
+			want: &v1.Group{
+				ObjectMeta: meta_v1.ObjectMeta{
+					Name: osaCustomerAdmins,
+				},
+				Users: []string{"User@home.com"},
+			},
+		},
 	}
 
 	for _, tt := range tests {
