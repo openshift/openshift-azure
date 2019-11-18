@@ -55,8 +55,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -365,7 +365,7 @@ func (s *AsymmetricSignResponse) MarshalJSON() ([]byte, error) {
 //             {
 //               "log_type": "DATA_READ",
 //               "exempted_members": [
-//                 "user:foo@gmail.com"
+//                 "user:jose@example.com"
 //               ]
 //             },
 //             {
@@ -377,7 +377,7 @@ func (s *AsymmetricSignResponse) MarshalJSON() ([]byte, error) {
 //           ]
 //         },
 //         {
-//           "service": "fooservice.googleapis.com"
+//           "service": "sampleservice.googleapis.com"
 //           "audit_log_configs": [
 //             {
 //               "log_type": "DATA_READ",
@@ -385,7 +385,7 @@ func (s *AsymmetricSignResponse) MarshalJSON() ([]byte, error) {
 //             {
 //               "log_type": "DATA_WRITE",
 //               "exempted_members": [
-//                 "user:bar@gmail.com"
+//                 "user:aliya@example.com"
 //               ]
 //             }
 //           ]
@@ -393,11 +393,11 @@ func (s *AsymmetricSignResponse) MarshalJSON() ([]byte, error) {
 //       ]
 //     }
 //
-// For fooservice, this policy enables DATA_READ, DATA_WRITE and
+// For sampleservice, this policy enables DATA_READ, DATA_WRITE and
 // ADMIN_READ
-// logging. It also exempts foo@gmail.com from DATA_READ logging,
+// logging. It also exempts jose@example.com from DATA_READ logging,
 // and
-// bar@gmail.com from DATA_WRITE logging.
+// aliya@example.com from DATA_WRITE logging.
 type AuditConfig struct {
 	// AuditLogConfigs: The configuration for logging of each type of
 	// permission.
@@ -443,7 +443,7 @@ func (s *AuditConfig) MarshalJSON() ([]byte, error) {
 //         {
 //           "log_type": "DATA_READ",
 //           "exempted_members": [
-//             "user:foo@gmail.com"
+//             "user:jose@example.com"
 //           ]
 //         },
 //         {
@@ -454,7 +454,7 @@ func (s *AuditConfig) MarshalJSON() ([]byte, error) {
 //
 // This enables 'DATA_READ' and 'DATA_WRITE' logging, while
 // exempting
-// foo@gmail.com from DATA_READ logging.
+// jose@example.com from DATA_READ logging.
 type AuditLogConfig struct {
 	// ExemptedMembers: Specifies the identities that do not cause logging
 	// for this type of
@@ -519,7 +519,7 @@ type Binding struct {
 	//
 	// * `user:{emailid}`: An email address that represents a specific
 	// Google
-	//    account. For example, `alice@gmail.com` .
+	//    account. For example, `alice@example.com` .
 	//
 	//
 	// * `serviceAccount:{emailid}`: An email address that represents a
@@ -618,7 +618,7 @@ type CryptoKey struct {
 	// primary. For other keys, this field will be omitted.
 	Primary *CryptoKeyVersion `json:"primary,omitempty"`
 
-	// Purpose: The immutable purpose of this CryptoKey.
+	// Purpose: Immutable. The immutable purpose of this CryptoKey.
 	//
 	// Possible values:
 	//   "CRYPTO_KEY_PURPOSE_UNSPECIFIED" - Not specified.
@@ -946,8 +946,9 @@ func (s *CryptoKeyVersionTemplate) MarshalJSON() ([]byte, error) {
 
 // DecryptRequest: Request message for KeyManagementService.Decrypt.
 type DecryptRequest struct {
-	// AdditionalAuthenticatedData: Optional data that must match the data
-	// originally supplied in
+	// AdditionalAuthenticatedData: Optional. Optional data that must match
+	// the data originally supplied
+	// in
 	// EncryptRequest.additional_authenticated_data.
 	AdditionalAuthenticatedData string `json:"additionalAuthenticatedData,omitempty"`
 
@@ -1055,8 +1056,8 @@ func (s *Digest) MarshalJSON() ([]byte, error) {
 
 // EncryptRequest: Request message for KeyManagementService.Encrypt.
 type EncryptRequest struct {
-	// AdditionalAuthenticatedData: Optional data that, if specified, must
-	// also be provided during decryption
+	// AdditionalAuthenticatedData: Optional. Optional data that, if
+	// specified, must also be provided during decryption
 	// through DecryptRequest.additional_authenticated_data.
 	//
 	// The maximum size depends on the key version's
@@ -1111,6 +1112,9 @@ type EncryptResponse struct {
 	Ciphertext string `json:"ciphertext,omitempty"`
 
 	// Name: The resource name of the CryptoKeyVersion used in encryption.
+	// Check
+	// this field to verify that the intended resource was used for
+	// encryption.
 	Name string `json:"name,omitempty"`
 
 	// ServerResponse contains the HTTP response code and headers from the
@@ -1257,6 +1261,14 @@ type ImportCryptoKeyVersionRequest struct {
 	//   </li>
 	// </ol>
 	//
+	// If importing symmetric key material, it is expected that the
+	// unwrapped
+	// key contains plain bytes. If importing asymmetric key material, it
+	// is
+	// expected that the unwrapped key is in PKCS#8-encoded DER format
+	// (the
+	// PrivateKeyInfo structure from RFC 5208).
+	//
 	// This format is the same as the format produced by PKCS#11
 	// mechanism
 	// CKM_RSA_AES_KEY_WRAP.
@@ -1354,9 +1366,8 @@ type ImportJob struct {
 	// generated.
 	GenerateTime string `json:"generateTime,omitempty"`
 
-	// ImportMethod: Required and immutable. The wrapping method to be used
-	// for incoming
-	// key material.
+	// ImportMethod: Required. Immutable. The wrapping method to be used for
+	// incoming key material.
 	//
 	// Possible values:
 	//   "IMPORT_METHOD_UNSPECIFIED" - Not specified.
@@ -1389,9 +1400,8 @@ type ImportJob struct {
 	// `projects/*/locations/*/keyRings/*/importJobs/*`.
 	Name string `json:"name,omitempty"`
 
-	// ProtectionLevel: Required and immutable. The protection level of the
-	// ImportJob. This
-	// must match the
+	// ProtectionLevel: Required. Immutable. The protection level of the
+	// ImportJob. This must match the
 	// protection_level of the
 	// version_template on the CryptoKey you
 	// attempt to import into.
@@ -1834,31 +1844,43 @@ func (s *LocationMetadata) MarshalJSON() ([]byte, error) {
 // specify access control policies for Cloud Platform resources.
 //
 //
-// A `Policy` consists of a list of `bindings`. A `binding` binds a list
-// of
-// `members` to a `role`, where the members can be user accounts, Google
-// groups,
-// Google domains, and service accounts. A `role` is a named list of
-// permissions
-// defined by IAM.
+// A `Policy` is a collection of `bindings`. A `binding` binds one or
+// more
+// `members` to a single `role`. Members can be user accounts, service
+// accounts,
+// Google groups, and domains (such as G Suite). A `role` is a named
+// list of
+// permissions (defined by IAM or configured by users). A `binding`
+// can
+// optionally specify a `condition`, which is a logic expression that
+// further
+// constrains the role binding based on attributes about the request
+// and/or
+// target resource.
 //
 // **JSON Example**
 //
 //     {
 //       "bindings": [
 //         {
-//           "role": "roles/owner",
+//           "role": "roles/resourcemanager.organizationAdmin",
 //           "members": [
 //             "user:mike@example.com",
 //             "group:admins@example.com",
 //             "domain:google.com",
 //
-// "serviceAccount:my-other-app@appspot.gserviceaccount.com"
+// "serviceAccount:my-project-id@appspot.gserviceaccount.com"
 //           ]
 //         },
 //         {
-//           "role": "roles/viewer",
-//           "members": ["user:sean@example.com"]
+//           "role": "roles/resourcemanager.organizationViewer",
+//           "members": ["user:eve@example.com"],
+//           "condition": {
+//             "title": "expirable access",
+//             "description": "Does not grant access after Sep 2020",
+//             "expression": "request.time <
+//             timestamp('2020-10-01T00:00:00.000Z')",
+//           }
 //         }
 //       ]
 //     }
@@ -1870,12 +1892,16 @@ func (s *LocationMetadata) MarshalJSON() ([]byte, error) {
 //       - user:mike@example.com
 //       - group:admins@example.com
 //       - domain:google.com
-//       - serviceAccount:my-other-app@appspot.gserviceaccount.com
-//       role: roles/owner
+//       - serviceAccount:my-project-id@appspot.gserviceaccount.com
+//       role: roles/resourcemanager.organizationAdmin
 //     - members:
-//       - user:sean@example.com
-//       role: roles/viewer
-//
+//       - user:eve@example.com
+//       role: roles/resourcemanager.organizationViewer
+//       condition:
+//         title: expirable access
+//         description: Does not grant access after Sep 2020
+//         expression: request.time <
+// timestamp('2020-10-01T00:00:00.000Z')
 //
 // For a description of IAM and its features, see the
 // [IAM developer's guide](https://cloud.google.com/iam/docs).
@@ -1884,7 +1910,9 @@ type Policy struct {
 	// policy.
 	AuditConfigs []*AuditConfig `json:"auditConfigs,omitempty"`
 
-	// Bindings: Associates a list of `members` to a `role`.
+	// Bindings: Associates a list of `members` to a `role`. Optionally may
+	// specify a
+	// `condition` that determines when binding is in effect.
 	// `bindings` with no members will result in an error.
 	Bindings []*Binding `json:"bindings,omitempty"`
 
@@ -1905,10 +1933,32 @@ type Policy struct {
 	//
 	// If no `etag` is provided in the call to `setIamPolicy`, then the
 	// existing
-	// policy is overwritten blindly.
+	// policy is overwritten. Due to blind-set semantics of an etag-less
+	// policy,
+	// 'setIamPolicy' will not fail even if either of incoming or stored
+	// policy
+	// does not meet the version requirements.
 	Etag string `json:"etag,omitempty"`
 
-	// Version: Deprecated.
+	// Version: Specifies the format of the policy.
+	//
+	// Valid values are 0, 1, and 3. Requests specifying an invalid value
+	// will be
+	// rejected.
+	//
+	// Operations affecting conditional bindings must specify version 3.
+	// This can
+	// be either setting a conditional policy, modifying a conditional
+	// binding,
+	// or removing a conditional binding from the stored conditional
+	// policy.
+	// Operations on non-conditional policies may specify any valid value
+	// or
+	// leave the field unset.
+	//
+	// If no etag is provided in the call to `setIamPolicy`, any
+	// version
+	// compliance checks on the incoming and/or stored policy is skipped.
 	Version int64 `json:"version,omitempty"`
 
 	// ServerResponse contains the HTTP response code and headers from the
@@ -2136,8 +2186,8 @@ func (s *TestIamPermissionsResponse) MarshalJSON() ([]byte, error) {
 // UpdateCryptoKeyPrimaryVersionRequest: Request message for
 // KeyManagementService.UpdateCryptoKeyPrimaryVersion.
 type UpdateCryptoKeyPrimaryVersionRequest struct {
-	// CryptoKeyVersionId: The id of the child CryptoKeyVersion to use as
-	// primary.
+	// CryptoKeyVersionId: Required. The id of the child CryptoKeyVersion to
+	// use as primary.
 	CryptoKeyVersionId string `json:"cryptoKeyVersionId,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "CryptoKeyVersionId")
@@ -2257,6 +2307,7 @@ func (c *ProjectsLocationsGetCall) Header() http.Header {
 
 func (c *ProjectsLocationsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2423,6 +2474,7 @@ func (c *ProjectsLocationsListCall) Header() http.Header {
 
 func (c *ProjectsLocationsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2603,6 +2655,7 @@ func (c *ProjectsLocationsKeyRingsCreateCall) Header() http.Header {
 
 func (c *ProjectsLocationsKeyRingsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2757,6 +2810,7 @@ func (c *ProjectsLocationsKeyRingsGetCall) Header() http.Header {
 
 func (c *ProjectsLocationsKeyRingsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2827,7 +2881,7 @@ func (c *ProjectsLocationsKeyRingsGetCall) Do(opts ...googleapi.CallOption) (*Ke
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "The name of the KeyRing to get.",
+	//       "description": "Required. The name of the KeyRing to get.",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/keyRings/[^/]+$",
 	//       "required": true,
@@ -2870,10 +2924,16 @@ func (r *ProjectsLocationsKeyRingsService) GetIamPolicy(resource string) *Projec
 // OptionsRequestedPolicyVersion sets the optional parameter
 // "options.requestedPolicyVersion": The policy format version to be
 // returned.
-// Acceptable values are 0 and 1.
-// If the value is 0, or the field is omitted, policy format version 1
+//
+// Valid values are 0, 1, and 3. Requests specifying an invalid value
 // will be
-// returned.
+// rejected.
+//
+// Requests for policies with any conditional bindings must specify
+// version 3.
+// Policies without any conditional bindings may specify any valid value
+// or
+// leave the field unset.
 func (c *ProjectsLocationsKeyRingsGetIamPolicyCall) OptionsRequestedPolicyVersion(optionsRequestedPolicyVersion int64) *ProjectsLocationsKeyRingsGetIamPolicyCall {
 	c.urlParams_.Set("options.requestedPolicyVersion", fmt.Sprint(optionsRequestedPolicyVersion))
 	return c
@@ -2916,6 +2976,7 @@ func (c *ProjectsLocationsKeyRingsGetIamPolicyCall) Header() http.Header {
 
 func (c *ProjectsLocationsKeyRingsGetIamPolicyCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2986,7 +3047,7 @@ func (c *ProjectsLocationsKeyRingsGetIamPolicyCall) Do(opts ...googleapi.CallOpt
 	//   ],
 	//   "parameters": {
 	//     "options.requestedPolicyVersion": {
-	//       "description": "Optional. The policy format version to be returned.\nAcceptable values are 0 and 1.\nIf the value is 0, or the field is omitted, policy format version 1 will be\nreturned.",
+	//       "description": "Optional. The policy format version to be returned.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nRequests for policies with any conditional bindings must specify version 3.\nPolicies without any conditional bindings may specify any valid value or\nleave the field unset.",
 	//       "format": "int32",
 	//       "location": "query",
 	//       "type": "integer"
@@ -3030,9 +3091,12 @@ func (r *ProjectsLocationsKeyRingsService) List(parent string) *ProjectsLocation
 }
 
 // Filter sets the optional parameter "filter": Only include resources
-// that match the filter in the
-// response
-// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+// that match the filter in the response. For
+// more information, see
+// [Sorting and filtering
+// list
+// results](https://cloud.google.com/kms/docs/sorting-and-filtering)
+// .
 func (c *ProjectsLocationsKeyRingsListCall) Filter(filter string) *ProjectsLocationsKeyRingsListCall {
 	c.urlParams_.Set("filter", filter)
 	return c
@@ -3040,9 +3104,12 @@ func (c *ProjectsLocationsKeyRingsListCall) Filter(filter string) *ProjectsLocat
 
 // OrderBy sets the optional parameter "orderBy": Specify how the
 // results should be sorted. If not specified, the
-// results will be sorted in the default
-// order
-// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+// results will be sorted in the default order.  For more information,
+// see
+// [Sorting and filtering
+// list
+// results](https://cloud.google.com/kms/docs/sorting-and-filtering)
+// .
 func (c *ProjectsLocationsKeyRingsListCall) OrderBy(orderBy string) *ProjectsLocationsKeyRingsListCall {
 	c.urlParams_.Set("orderBy", orderBy)
 	return c
@@ -3106,6 +3173,7 @@ func (c *ProjectsLocationsKeyRingsListCall) Header() http.Header {
 
 func (c *ProjectsLocationsKeyRingsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3176,23 +3244,23 @@ func (c *ProjectsLocationsKeyRingsListCall) Do(opts ...googleapi.CallOption) (*L
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Only include resources that match the filter in the response\n(https://cloud.google.com/kms/docs/sorting-and-filtering).",
+	//       "description": "Optional. Only include resources that match the filter in the response. For\nmore information, see\n[Sorting and filtering list\nresults](https://cloud.google.com/kms/docs/sorting-and-filtering).",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "orderBy": {
-	//       "description": "Optional. Specify how the results should be sorted. If not specified, the\nresults will be sorted in the default order\n(https://cloud.google.com/kms/docs/sorting-and-filtering).",
+	//       "description": "Optional. Specify how the results should be sorted. If not specified, the\nresults will be sorted in the default order.  For more information, see\n[Sorting and filtering list\nresults](https://cloud.google.com/kms/docs/sorting-and-filtering).",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "pageSize": {
-	//       "description": "Optional limit on the number of KeyRings to include in the\nresponse.  Further KeyRings can subsequently be obtained by\nincluding the ListKeyRingsResponse.next_page_token in a subsequent\nrequest.  If unspecified, the server will pick an appropriate default.",
+	//       "description": "Optional. Optional limit on the number of KeyRings to include in the\nresponse.  Further KeyRings can subsequently be obtained by\nincluding the ListKeyRingsResponse.next_page_token in a subsequent\nrequest.  If unspecified, the server will pick an appropriate default.",
 	//       "format": "int32",
 	//       "location": "query",
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional pagination token, returned earlier via\nListKeyRingsResponse.next_page_token.",
+	//       "description": "Optional. Optional pagination token, returned earlier via\nListKeyRingsResponse.next_page_token.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -3251,6 +3319,9 @@ type ProjectsLocationsKeyRingsSetIamPolicyCall struct {
 // SetIamPolicy: Sets the access control policy on the specified
 // resource. Replaces any
 // existing policy.
+//
+// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and
+// PERMISSION_DENIED
 func (r *ProjectsLocationsKeyRingsService) SetIamPolicy(resource string, setiampolicyrequest *SetIamPolicyRequest) *ProjectsLocationsKeyRingsSetIamPolicyCall {
 	c := &ProjectsLocationsKeyRingsSetIamPolicyCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.resource = resource
@@ -3285,6 +3356,7 @@ func (c *ProjectsLocationsKeyRingsSetIamPolicyCall) Header() http.Header {
 
 func (c *ProjectsLocationsKeyRingsSetIamPolicyCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3348,7 +3420,7 @@ func (c *ProjectsLocationsKeyRingsSetIamPolicyCall) Do(opts ...googleapi.CallOpt
 	}
 	return ret, nil
 	// {
-	//   "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy.",
+	//   "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy.\n\nCan return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED",
 	//   "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/keyRings/{keyRingsId}:setIamPolicy",
 	//   "httpMethod": "POST",
 	//   "id": "cloudkms.projects.locations.keyRings.setIamPolicy",
@@ -3435,6 +3507,7 @@ func (c *ProjectsLocationsKeyRingsTestIamPermissionsCall) Header() http.Header {
 
 func (c *ProjectsLocationsKeyRingsTestIamPermissionsCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3599,6 +3672,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysCreateCall) Header() http.Header {
 
 func (c *ProjectsLocationsKeyRingsCryptoKeysCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3751,6 +3825,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysDecryptCall) Header() http.Header {
 
 func (c *ProjectsLocationsKeyRingsCryptoKeysDecryptCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3894,6 +3969,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysEncryptCall) Header() http.Header {
 
 func (c *ProjectsLocationsKeyRingsCryptoKeysEncryptCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4044,6 +4120,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysGetCall) Header() http.Header {
 
 func (c *ProjectsLocationsKeyRingsCryptoKeysGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4114,7 +4191,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysGetCall) Do(opts ...googleapi.CallOp
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "The name of the CryptoKey to get.",
+	//       "description": "Required. The name of the CryptoKey to get.",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/keyRings/[^/]+/cryptoKeys/[^/]+$",
 	//       "required": true,
@@ -4157,10 +4234,16 @@ func (r *ProjectsLocationsKeyRingsCryptoKeysService) GetIamPolicy(resource strin
 // OptionsRequestedPolicyVersion sets the optional parameter
 // "options.requestedPolicyVersion": The policy format version to be
 // returned.
-// Acceptable values are 0 and 1.
-// If the value is 0, or the field is omitted, policy format version 1
+//
+// Valid values are 0, 1, and 3. Requests specifying an invalid value
 // will be
-// returned.
+// rejected.
+//
+// Requests for policies with any conditional bindings must specify
+// version 3.
+// Policies without any conditional bindings may specify any valid value
+// or
+// leave the field unset.
 func (c *ProjectsLocationsKeyRingsCryptoKeysGetIamPolicyCall) OptionsRequestedPolicyVersion(optionsRequestedPolicyVersion int64) *ProjectsLocationsKeyRingsCryptoKeysGetIamPolicyCall {
 	c.urlParams_.Set("options.requestedPolicyVersion", fmt.Sprint(optionsRequestedPolicyVersion))
 	return c
@@ -4203,6 +4286,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysGetIamPolicyCall) Header() http.Head
 
 func (c *ProjectsLocationsKeyRingsCryptoKeysGetIamPolicyCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4273,7 +4357,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysGetIamPolicyCall) Do(opts ...googlea
 	//   ],
 	//   "parameters": {
 	//     "options.requestedPolicyVersion": {
-	//       "description": "Optional. The policy format version to be returned.\nAcceptable values are 0 and 1.\nIf the value is 0, or the field is omitted, policy format version 1 will be\nreturned.",
+	//       "description": "Optional. The policy format version to be returned.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nRequests for policies with any conditional bindings must specify version 3.\nPolicies without any conditional bindings may specify any valid value or\nleave the field unset.",
 	//       "format": "int32",
 	//       "location": "query",
 	//       "type": "integer"
@@ -4317,9 +4401,12 @@ func (r *ProjectsLocationsKeyRingsCryptoKeysService) List(parent string) *Projec
 }
 
 // Filter sets the optional parameter "filter": Only include resources
-// that match the filter in the
-// response
-// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+// that match the filter in the response. For
+// more information, see
+// [Sorting and filtering
+// list
+// results](https://cloud.google.com/kms/docs/sorting-and-filtering)
+// .
 func (c *ProjectsLocationsKeyRingsCryptoKeysListCall) Filter(filter string) *ProjectsLocationsKeyRingsCryptoKeysListCall {
 	c.urlParams_.Set("filter", filter)
 	return c
@@ -4327,9 +4414,12 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysListCall) Filter(filter string) *Pro
 
 // OrderBy sets the optional parameter "orderBy": Specify how the
 // results should be sorted. If not specified, the
-// results will be sorted in the default
-// order
-// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+// results will be sorted in the default order. For more information,
+// see
+// [Sorting and filtering
+// list
+// results](https://cloud.google.com/kms/docs/sorting-and-filtering)
+// .
 func (c *ProjectsLocationsKeyRingsCryptoKeysListCall) OrderBy(orderBy string) *ProjectsLocationsKeyRingsCryptoKeysListCall {
 	c.urlParams_.Set("orderBy", orderBy)
 	return c
@@ -4405,6 +4495,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysListCall) Header() http.Header {
 
 func (c *ProjectsLocationsKeyRingsCryptoKeysListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4475,23 +4566,23 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysListCall) Do(opts ...googleapi.CallO
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Only include resources that match the filter in the response\n(https://cloud.google.com/kms/docs/sorting-and-filtering).",
+	//       "description": "Optional. Only include resources that match the filter in the response. For\nmore information, see\n[Sorting and filtering list\nresults](https://cloud.google.com/kms/docs/sorting-and-filtering).",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "orderBy": {
-	//       "description": "Optional. Specify how the results should be sorted. If not specified, the\nresults will be sorted in the default order\n(https://cloud.google.com/kms/docs/sorting-and-filtering).",
+	//       "description": "Optional. Specify how the results should be sorted. If not specified, the\nresults will be sorted in the default order. For more information, see\n[Sorting and filtering list\nresults](https://cloud.google.com/kms/docs/sorting-and-filtering).",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "pageSize": {
-	//       "description": "Optional limit on the number of CryptoKeys to include in the\nresponse.  Further CryptoKeys can subsequently be obtained by\nincluding the ListCryptoKeysResponse.next_page_token in a subsequent\nrequest.  If unspecified, the server will pick an appropriate default.",
+	//       "description": "Optional. Optional limit on the number of CryptoKeys to include in the\nresponse.  Further CryptoKeys can subsequently be obtained by\nincluding the ListCryptoKeysResponse.next_page_token in a subsequent\nrequest.  If unspecified, the server will pick an appropriate default.",
 	//       "format": "int32",
 	//       "location": "query",
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional pagination token, returned earlier via\nListCryptoKeysResponse.next_page_token.",
+	//       "description": "Optional. Optional pagination token, returned earlier via\nListCryptoKeysResponse.next_page_token.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -4564,8 +4655,8 @@ func (r *ProjectsLocationsKeyRingsCryptoKeysService) Patch(name string, cryptoke
 	return c
 }
 
-// UpdateMask sets the optional parameter "updateMask": Required list of
-// fields to be updated in this request.
+// UpdateMask sets the optional parameter "updateMask": Required. List
+// of fields to be updated in this request.
 func (c *ProjectsLocationsKeyRingsCryptoKeysPatchCall) UpdateMask(updateMask string) *ProjectsLocationsKeyRingsCryptoKeysPatchCall {
 	c.urlParams_.Set("updateMask", updateMask)
 	return c
@@ -4598,6 +4689,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysPatchCall) Header() http.Header {
 
 func (c *ProjectsLocationsKeyRingsCryptoKeysPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4677,7 +4769,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysPatchCall) Do(opts ...googleapi.Call
 	//       "type": "string"
 	//     },
 	//     "updateMask": {
-	//       "description": "Required list of fields to be updated in this request.",
+	//       "description": "Required. List of fields to be updated in this request.",
 	//       "format": "google-fieldmask",
 	//       "location": "query",
 	//       "type": "string"
@@ -4712,6 +4804,9 @@ type ProjectsLocationsKeyRingsCryptoKeysSetIamPolicyCall struct {
 // SetIamPolicy: Sets the access control policy on the specified
 // resource. Replaces any
 // existing policy.
+//
+// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and
+// PERMISSION_DENIED
 func (r *ProjectsLocationsKeyRingsCryptoKeysService) SetIamPolicy(resource string, setiampolicyrequest *SetIamPolicyRequest) *ProjectsLocationsKeyRingsCryptoKeysSetIamPolicyCall {
 	c := &ProjectsLocationsKeyRingsCryptoKeysSetIamPolicyCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.resource = resource
@@ -4746,6 +4841,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysSetIamPolicyCall) Header() http.Head
 
 func (c *ProjectsLocationsKeyRingsCryptoKeysSetIamPolicyCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4809,7 +4905,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysSetIamPolicyCall) Do(opts ...googlea
 	}
 	return ret, nil
 	// {
-	//   "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy.",
+	//   "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy.\n\nCan return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED",
 	//   "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/keyRings/{keyRingsId}/cryptoKeys/{cryptoKeysId}:setIamPolicy",
 	//   "httpMethod": "POST",
 	//   "id": "cloudkms.projects.locations.keyRings.cryptoKeys.setIamPolicy",
@@ -4896,6 +4992,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysTestIamPermissionsCall) Header() htt
 
 func (c *ProjectsLocationsKeyRingsCryptoKeysTestIamPermissionsCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5039,6 +5136,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysUpdatePrimaryVersionCall) Header() h
 
 func (c *ProjectsLocationsKeyRingsCryptoKeysUpdatePrimaryVersionCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5111,7 +5209,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysUpdatePrimaryVersionCall) Do(opts ..
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "The resource name of the CryptoKey to update.",
+	//       "description": "Required. The resource name of the CryptoKey to update.",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/keyRings/[^/]+/cryptoKeys/[^/]+$",
 	//       "required": true,
@@ -5183,6 +5281,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsAsymmetricDecryptCa
 
 func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsAsymmetricDecryptCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5327,6 +5426,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsAsymmetricSignCall)
 
 func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsAsymmetricSignCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5471,6 +5571,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsCreateCall) Header(
 
 func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5623,6 +5724,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsDestroyCall) Header
 
 func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsDestroyCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5695,7 +5797,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsDestroyCall) Do(opt
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "The resource name of the CryptoKeyVersion to destroy.",
+	//       "description": "Required. The resource name of the CryptoKeyVersion to destroy.",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/keyRings/[^/]+/cryptoKeys/[^/]+/cryptoKeyVersions/[^/]+$",
 	//       "required": true,
@@ -5772,6 +5874,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsGetCall) Header() h
 
 func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5842,7 +5945,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsGetCall) Do(opts ..
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "The name of the CryptoKeyVersion to get.",
+	//       "description": "Required. The name of the CryptoKeyVersion to get.",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/keyRings/[^/]+/cryptoKeys/[^/]+/cryptoKeyVersions/[^/]+$",
 	//       "required": true,
@@ -5920,6 +6023,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsGetPublicKeyCall) H
 
 func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsGetPublicKeyCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5990,7 +6094,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsGetPublicKeyCall) D
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "The name of the CryptoKeyVersion public key to\nget.",
+	//       "description": "Required. The name of the CryptoKeyVersion public key to\nget.",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/keyRings/[^/]+/cryptoKeys/[^/]+/cryptoKeyVersions/[^/]+$",
 	//       "required": true,
@@ -6061,6 +6165,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsImportCall) Header(
 
 func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsImportCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6174,9 +6279,12 @@ func (r *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsService) List(paren
 }
 
 // Filter sets the optional parameter "filter": Only include resources
-// that match the filter in the
-// response
-// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+// that match the filter in the response. For
+// more information, see
+// [Sorting and filtering
+// list
+// results](https://cloud.google.com/kms/docs/sorting-and-filtering)
+// .
 func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsListCall) Filter(filter string) *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsListCall {
 	c.urlParams_.Set("filter", filter)
 	return c
@@ -6184,9 +6292,12 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsListCall) Filter(fi
 
 // OrderBy sets the optional parameter "orderBy": Specify how the
 // results should be sorted. If not specified, the
-// results will be sorted in the default
-// order
-// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+// results will be sorted in the default order. For more information,
+// see
+// [Sorting and filtering
+// list
+// results](https://cloud.google.com/kms/docs/sorting-and-filtering)
+// .
 func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsListCall) OrderBy(orderBy string) *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsListCall {
 	c.urlParams_.Set("orderBy", orderBy)
 	return c
@@ -6262,6 +6373,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsListCall) Header() 
 
 func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6332,23 +6444,23 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsListCall) Do(opts .
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Only include resources that match the filter in the response\n(https://cloud.google.com/kms/docs/sorting-and-filtering).",
+	//       "description": "Optional. Only include resources that match the filter in the response. For\nmore information, see\n[Sorting and filtering list\nresults](https://cloud.google.com/kms/docs/sorting-and-filtering).",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "orderBy": {
-	//       "description": "Optional. Specify how the results should be sorted. If not specified, the\nresults will be sorted in the default order\n(https://cloud.google.com/kms/docs/sorting-and-filtering).",
+	//       "description": "Optional. Specify how the results should be sorted. If not specified, the\nresults will be sorted in the default order. For more information, see\n[Sorting and filtering list\nresults](https://cloud.google.com/kms/docs/sorting-and-filtering).",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "pageSize": {
-	//       "description": "Optional limit on the number of CryptoKeyVersions to\ninclude in the response. Further CryptoKeyVersions can\nsubsequently be obtained by including the\nListCryptoKeyVersionsResponse.next_page_token in a subsequent request.\nIf unspecified, the server will pick an appropriate default.",
+	//       "description": "Optional. Optional limit on the number of CryptoKeyVersions to\ninclude in the response. Further CryptoKeyVersions can\nsubsequently be obtained by including the\nListCryptoKeyVersionsResponse.next_page_token in a subsequent request.\nIf unspecified, the server will pick an appropriate default.",
 	//       "format": "int32",
 	//       "location": "query",
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional pagination token, returned earlier via\nListCryptoKeyVersionsResponse.next_page_token.",
+	//       "description": "Optional. Optional pagination token, returned earlier via\nListCryptoKeyVersionsResponse.next_page_token.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -6428,8 +6540,8 @@ func (r *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsService) Patch(name
 	return c
 }
 
-// UpdateMask sets the optional parameter "updateMask": Required list of
-// fields to be updated in this request.
+// UpdateMask sets the optional parameter "updateMask": Required. List
+// of fields to be updated in this request.
 func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsPatchCall) UpdateMask(updateMask string) *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsPatchCall {
 	c.urlParams_.Set("updateMask", updateMask)
 	return c
@@ -6462,6 +6574,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsPatchCall) Header()
 
 func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6541,7 +6654,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsPatchCall) Do(opts 
 	//       "type": "string"
 	//     },
 	//     "updateMask": {
-	//       "description": "Required list of fields to be updated in this request.",
+	//       "description": "Required. List of fields to be updated in this request.",
 	//       "format": "google-fieldmask",
 	//       "location": "query",
 	//       "type": "string"
@@ -6615,6 +6728,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsRestoreCall) Header
 
 func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsRestoreCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6687,7 +6801,7 @@ func (c *ProjectsLocationsKeyRingsCryptoKeysCryptoKeyVersionsRestoreCall) Do(opt
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "The resource name of the CryptoKeyVersion to restore.",
+	//       "description": "Required. The resource name of the CryptoKeyVersion to restore.",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/keyRings/[^/]+/cryptoKeys/[^/]+/cryptoKeyVersions/[^/]+$",
 	//       "required": true,
@@ -6766,6 +6880,7 @@ func (c *ProjectsLocationsKeyRingsImportJobsCreateCall) Header() http.Header {
 
 func (c *ProjectsLocationsKeyRingsImportJobsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6920,6 +7035,7 @@ func (c *ProjectsLocationsKeyRingsImportJobsGetCall) Header() http.Header {
 
 func (c *ProjectsLocationsKeyRingsImportJobsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6990,7 +7106,7 @@ func (c *ProjectsLocationsKeyRingsImportJobsGetCall) Do(opts ...googleapi.CallOp
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "The name of the ImportJob to get.",
+	//       "description": "Required. The name of the ImportJob to get.",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/keyRings/[^/]+/importJobs/[^/]+$",
 	//       "required": true,
@@ -7033,10 +7149,16 @@ func (r *ProjectsLocationsKeyRingsImportJobsService) GetIamPolicy(resource strin
 // OptionsRequestedPolicyVersion sets the optional parameter
 // "options.requestedPolicyVersion": The policy format version to be
 // returned.
-// Acceptable values are 0 and 1.
-// If the value is 0, or the field is omitted, policy format version 1
+//
+// Valid values are 0, 1, and 3. Requests specifying an invalid value
 // will be
-// returned.
+// rejected.
+//
+// Requests for policies with any conditional bindings must specify
+// version 3.
+// Policies without any conditional bindings may specify any valid value
+// or
+// leave the field unset.
 func (c *ProjectsLocationsKeyRingsImportJobsGetIamPolicyCall) OptionsRequestedPolicyVersion(optionsRequestedPolicyVersion int64) *ProjectsLocationsKeyRingsImportJobsGetIamPolicyCall {
 	c.urlParams_.Set("options.requestedPolicyVersion", fmt.Sprint(optionsRequestedPolicyVersion))
 	return c
@@ -7079,6 +7201,7 @@ func (c *ProjectsLocationsKeyRingsImportJobsGetIamPolicyCall) Header() http.Head
 
 func (c *ProjectsLocationsKeyRingsImportJobsGetIamPolicyCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7149,7 +7272,7 @@ func (c *ProjectsLocationsKeyRingsImportJobsGetIamPolicyCall) Do(opts ...googlea
 	//   ],
 	//   "parameters": {
 	//     "options.requestedPolicyVersion": {
-	//       "description": "Optional. The policy format version to be returned.\nAcceptable values are 0 and 1.\nIf the value is 0, or the field is omitted, policy format version 1 will be\nreturned.",
+	//       "description": "Optional. The policy format version to be returned.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nRequests for policies with any conditional bindings must specify version 3.\nPolicies without any conditional bindings may specify any valid value or\nleave the field unset.",
 	//       "format": "int32",
 	//       "location": "query",
 	//       "type": "integer"
@@ -7193,9 +7316,12 @@ func (r *ProjectsLocationsKeyRingsImportJobsService) List(parent string) *Projec
 }
 
 // Filter sets the optional parameter "filter": Only include resources
-// that match the filter in the
-// response
-// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+// that match the filter in the response. For
+// more information, see
+// [Sorting and filtering
+// list
+// results](https://cloud.google.com/kms/docs/sorting-and-filtering)
+// .
 func (c *ProjectsLocationsKeyRingsImportJobsListCall) Filter(filter string) *ProjectsLocationsKeyRingsImportJobsListCall {
 	c.urlParams_.Set("filter", filter)
 	return c
@@ -7203,9 +7329,12 @@ func (c *ProjectsLocationsKeyRingsImportJobsListCall) Filter(filter string) *Pro
 
 // OrderBy sets the optional parameter "orderBy": Specify how the
 // results should be sorted. If not specified, the
-// results will be sorted in the default
-// order
-// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+// results will be sorted in the default order. For more information,
+// see
+// [Sorting and filtering
+// list
+// results](https://cloud.google.com/kms/docs/sorting-and-filtering)
+// .
 func (c *ProjectsLocationsKeyRingsImportJobsListCall) OrderBy(orderBy string) *ProjectsLocationsKeyRingsImportJobsListCall {
 	c.urlParams_.Set("orderBy", orderBy)
 	return c
@@ -7269,6 +7398,7 @@ func (c *ProjectsLocationsKeyRingsImportJobsListCall) Header() http.Header {
 
 func (c *ProjectsLocationsKeyRingsImportJobsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7339,23 +7469,23 @@ func (c *ProjectsLocationsKeyRingsImportJobsListCall) Do(opts ...googleapi.CallO
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Only include resources that match the filter in the response\n(https://cloud.google.com/kms/docs/sorting-and-filtering).",
+	//       "description": "Optional. Only include resources that match the filter in the response. For\nmore information, see\n[Sorting and filtering list\nresults](https://cloud.google.com/kms/docs/sorting-and-filtering).",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "orderBy": {
-	//       "description": "Optional. Specify how the results should be sorted. If not specified, the\nresults will be sorted in the default order\n(https://cloud.google.com/kms/docs/sorting-and-filtering).",
+	//       "description": "Optional. Specify how the results should be sorted. If not specified, the\nresults will be sorted in the default order. For more information, see\n[Sorting and filtering list\nresults](https://cloud.google.com/kms/docs/sorting-and-filtering).",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "pageSize": {
-	//       "description": "Optional limit on the number of ImportJobs to include in the\nresponse. Further ImportJobs can subsequently be obtained by\nincluding the ListImportJobsResponse.next_page_token in a subsequent\nrequest. If unspecified, the server will pick an appropriate default.",
+	//       "description": "Optional. Optional limit on the number of ImportJobs to include in the\nresponse. Further ImportJobs can subsequently be obtained by\nincluding the ListImportJobsResponse.next_page_token in a subsequent\nrequest. If unspecified, the server will pick an appropriate default.",
 	//       "format": "int32",
 	//       "location": "query",
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional pagination token, returned earlier via\nListImportJobsResponse.next_page_token.",
+	//       "description": "Optional. Optional pagination token, returned earlier via\nListImportJobsResponse.next_page_token.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -7414,6 +7544,9 @@ type ProjectsLocationsKeyRingsImportJobsSetIamPolicyCall struct {
 // SetIamPolicy: Sets the access control policy on the specified
 // resource. Replaces any
 // existing policy.
+//
+// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and
+// PERMISSION_DENIED
 func (r *ProjectsLocationsKeyRingsImportJobsService) SetIamPolicy(resource string, setiampolicyrequest *SetIamPolicyRequest) *ProjectsLocationsKeyRingsImportJobsSetIamPolicyCall {
 	c := &ProjectsLocationsKeyRingsImportJobsSetIamPolicyCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.resource = resource
@@ -7448,6 +7581,7 @@ func (c *ProjectsLocationsKeyRingsImportJobsSetIamPolicyCall) Header() http.Head
 
 func (c *ProjectsLocationsKeyRingsImportJobsSetIamPolicyCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7511,7 +7645,7 @@ func (c *ProjectsLocationsKeyRingsImportJobsSetIamPolicyCall) Do(opts ...googlea
 	}
 	return ret, nil
 	// {
-	//   "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy.",
+	//   "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy.\n\nCan return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED",
 	//   "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/keyRings/{keyRingsId}/importJobs/{importJobsId}:setIamPolicy",
 	//   "httpMethod": "POST",
 	//   "id": "cloudkms.projects.locations.keyRings.importJobs.setIamPolicy",
@@ -7598,6 +7732,7 @@ func (c *ProjectsLocationsKeyRingsImportJobsTestIamPermissionsCall) Header() htt
 
 func (c *ProjectsLocationsKeyRingsImportJobsTestIamPermissionsCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

@@ -53,8 +53,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -547,6 +547,138 @@ type ColumnBreak struct {
 
 func (s *ColumnBreak) MarshalJSON() ([]byte, error) {
 	type NoMethod ColumnBreak
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// CreateFooterRequest: Creates a Footer. The new footer will be
+// applied to the DocumentStyle.
+//
+// If a footer of the specified type already exists then a 400 bad
+// request error
+// will be returned.
+type CreateFooterRequest struct {
+	// Type: The type of footer to create.
+	//
+	// Possible values:
+	//   "HEADER_FOOTER_TYPE_UNSPECIFIED" - The header/footer type is
+	// unspecified.
+	//   "DEFAULT" - A default header/footer.
+	Type string `json:"type,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Type") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Type") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *CreateFooterRequest) MarshalJSON() ([]byte, error) {
+	type NoMethod CreateFooterRequest
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// CreateFooterResponse: The result of creating a footer.
+type CreateFooterResponse struct {
+	// FooterId: The ID of the created footer.
+	FooterId string `json:"footerId,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "FooterId") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "FooterId") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *CreateFooterResponse) MarshalJSON() ([]byte, error) {
+	type NoMethod CreateFooterResponse
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// CreateHeaderRequest: Creates a Header. The new header will be
+// applied to the DocumentStyle.
+//
+// If a header of the specified type already exists then a 400 bad
+// request error
+// will be returned.
+type CreateHeaderRequest struct {
+	// Type: The type of header to create.
+	//
+	// Possible values:
+	//   "HEADER_FOOTER_TYPE_UNSPECIFIED" - The header/footer type is
+	// unspecified.
+	//   "DEFAULT" - A default header/footer.
+	Type string `json:"type,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Type") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Type") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *CreateHeaderRequest) MarshalJSON() ([]byte, error) {
+	type NoMethod CreateHeaderRequest
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// CreateHeaderResponse: The result of creating a header.
+type CreateHeaderResponse struct {
+	// HeaderId: The ID of the created header.
+	HeaderId string `json:"headerId,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "HeaderId") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "HeaderId") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *CreateHeaderResponse) MarshalJSON() ([]byte, error) {
+	type NoMethod CreateHeaderResponse
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -3008,6 +3140,49 @@ func (s *Location) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// MergeTableCellsRequest: Merges cells in a Table.
+type MergeTableCellsRequest struct {
+	// TableRange: The table range specifying which cells of the table to
+	// merge.
+	//
+	// Any text in the cells being merged will be concatenated and stored in
+	// the
+	// "head" cell of the range. This is the upper-left cell of the range
+	// when
+	// the content direction is left to right, and the upper-right cell of
+	// the
+	// range otherwise.
+	//
+	// If the range is non-rectangular (which can occur in some cases where
+	// the
+	// range covers cells that are already merged or where the table
+	// is
+	// non-rectangular), a 400 bad request error is returned.
+	TableRange *TableRange `json:"tableRange,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "TableRange") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "TableRange") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *MergeTableCellsRequest) MarshalJSON() ([]byte, error) {
+	type NoMethod MergeTableCellsRequest
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // NamedRange: A collection of Ranges with the same named
 // range
 // ID.
@@ -4489,8 +4664,135 @@ func (s *ReplaceAllTextResponse) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// ReplaceImageRequest: Replaces an existing image with a new
+// image.
+//
+// Replacing an image removes some image effects from the existing image
+// in order to
+// mirror the behavior of the Docs editor.
+type ReplaceImageRequest struct {
+	// ImageObjectId: The ID of the existing image that will be replaced.
+	ImageObjectId string `json:"imageObjectId,omitempty"`
+
+	// ImageReplaceMethod: The replacement method.
+	//
+	// Possible values:
+	//   "IMAGE_REPLACE_METHOD_UNSPECIFIED" - Unspecified image replace
+	// method. This value must not be used.
+	//   "CENTER_CROP" - Scales and centers the image to fill the bounds of
+	// the original image.
+	// The image may be cropped in order to fill the original image's
+	// bounds. The
+	// rendered size of the image will be the same as that of the original
+	// image.
+	ImageReplaceMethod string `json:"imageReplaceMethod,omitempty"`
+
+	// Uri: The URI of the new image.
+	//
+	// The image is fetched once at insertion time and a copy is stored
+	// for
+	// display inside the document. Images must be less than 50MB in size,
+	// cannot
+	// exceed 25 megapixels, and must be in one of PNG, JPEG, or GIF
+	// format.
+	//
+	// The provided URI can be at most 2 kB in length. The URI itself is
+	// saved
+	// with the image, and exposed via the ImageProperties.source_uri field.
+	Uri string `json:"uri,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "ImageObjectId") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "ImageObjectId") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *ReplaceImageRequest) MarshalJSON() ([]byte, error) {
+	type NoMethod ReplaceImageRequest
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// ReplaceNamedRangeContentRequest: Replaces the contents of the
+// specified
+// NamedRange or
+// NamedRanges with the given replacement
+// content.
+//
+// Note that an individual NamedRange may
+// consist of multiple discontinuous
+// ranges. In this case, only the
+// content in the first range will be replaced. The other ranges and
+// their
+// content will be deleted.
+//
+// In cases where replacing or deleting any ranges would result in an
+// invalid
+// document structure, a 400 bad request error is returned.
+type ReplaceNamedRangeContentRequest struct {
+	// NamedRangeId: The ID of the named range whose content will be
+	// replaced.
+	//
+	// If there is no named range with the given ID a 400 bad request error
+	// is
+	// returned.
+	NamedRangeId string `json:"namedRangeId,omitempty"`
+
+	// NamedRangeName: The name of the NamedRanges whose
+	// content will be replaced.
+	//
+	// If there are multiple named ranges with the given name, then
+	// the content of each one will be replaced. If there are no named
+	// ranges
+	// with the given name, then the request will be a no-op.
+	NamedRangeName string `json:"namedRangeName,omitempty"`
+
+	// Text: Replaces the content of the specified named range(s) with the
+	// given text.
+	Text string `json:"text,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "NamedRangeId") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "NamedRangeId") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *ReplaceNamedRangeContentRequest) MarshalJSON() ([]byte, error) {
+	type NoMethod ReplaceNamedRangeContentRequest
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // Request: A single update to apply to a document.
 type Request struct {
+	// CreateFooter: Creates a footer.
+	CreateFooter *CreateFooterRequest `json:"createFooter,omitempty"`
+
+	// CreateHeader: Creates a header.
+	CreateHeader *CreateHeaderRequest `json:"createHeader,omitempty"`
+
 	// CreateNamedRange: Creates a named range.
 	CreateNamedRange *CreateNamedRangeRequest `json:"createNamedRange,omitempty"`
 
@@ -4534,8 +4836,20 @@ type Request struct {
 	// InsertText: Inserts text at the specified location.
 	InsertText *InsertTextRequest `json:"insertText,omitempty"`
 
+	// MergeTableCells: Merges cells in a table.
+	MergeTableCells *MergeTableCellsRequest `json:"mergeTableCells,omitempty"`
+
 	// ReplaceAllText: Replaces all instances of the specified text.
 	ReplaceAllText *ReplaceAllTextRequest `json:"replaceAllText,omitempty"`
+
+	// ReplaceImage: Replaces an image in the document.
+	ReplaceImage *ReplaceImageRequest `json:"replaceImage,omitempty"`
+
+	// ReplaceNamedRangeContent: Replaces the content in a named range.
+	ReplaceNamedRangeContent *ReplaceNamedRangeContentRequest `json:"replaceNamedRangeContent,omitempty"`
+
+	// UnmergeTableCells: Unmerges cells in a table.
+	UnmergeTableCells *UnmergeTableCellsRequest `json:"unmergeTableCells,omitempty"`
 
 	// UpdateDocumentStyle: Updates the style of the document.
 	UpdateDocumentStyle *UpdateDocumentStyleRequest `json:"updateDocumentStyle,omitempty"`
@@ -4557,7 +4871,7 @@ type Request struct {
 	// UpdateTextStyle: Updates the text style at the specified range.
 	UpdateTextStyle *UpdateTextStyleRequest `json:"updateTextStyle,omitempty"`
 
-	// ForceSendFields is a list of field names (e.g. "CreateNamedRange") to
+	// ForceSendFields is a list of field names (e.g. "CreateFooter") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -4565,13 +4879,12 @@ type Request struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "CreateNamedRange") to
-	// include in API requests with the JSON null value. By default, fields
-	// with empty values are omitted from API requests. However, any field
-	// with an empty value appearing in NullFields will be sent to the
-	// server as null. It is an error if a field in this list has a
-	// non-empty value. This may be used to include null fields in Patch
-	// requests.
+	// NullFields is a list of field names (e.g. "CreateFooter") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
 	NullFields []string `json:"-"`
 }
 
@@ -4583,6 +4896,12 @@ func (s *Request) MarshalJSON() ([]byte, error) {
 
 // Response: A single response from an update.
 type Response struct {
+	// CreateFooter: The result of creating a footer.
+	CreateFooter *CreateFooterResponse `json:"createFooter,omitempty"`
+
+	// CreateHeader: The result of creating a header.
+	CreateHeader *CreateHeaderResponse `json:"createHeader,omitempty"`
+
 	// CreateNamedRange: The result of creating a named range.
 	CreateNamedRange *CreateNamedRangeResponse `json:"createNamedRange,omitempty"`
 
@@ -4596,7 +4915,7 @@ type Response struct {
 	// ReplaceAllText: The result of replacing text.
 	ReplaceAllText *ReplaceAllTextResponse `json:"replaceAllText,omitempty"`
 
-	// ForceSendFields is a list of field names (e.g. "CreateNamedRange") to
+	// ForceSendFields is a list of field names (e.g. "CreateFooter") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -4604,13 +4923,12 @@ type Response struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "CreateNamedRange") to
-	// include in API requests with the JSON null value. By default, fields
-	// with empty values are omitted from API requests. However, any field
-	// with an empty value appearing in NullFields will be sent to the
-	// server as null. It is an error if a field in this list has a
-	// non-empty value. This may be used to include null fields in Patch
-	// requests.
+	// NullFields is a list of field names (e.g. "CreateFooter") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
 	NullFields []string `json:"-"`
 }
 
@@ -5624,8 +5942,14 @@ func (s *TableCell) MarshalJSON() ([]byte, error) {
 }
 
 // TableCellBorder: A border around a table cell.
+//
+// Table cell borders cannot be transparent. To hide a table cell
+// border, make
+// its width 0.
 type TableCellBorder struct {
 	// Color: The color of the border.
+	//
+	// This color cannot be transparent.
 	Color *OptionalColor `json:"color,omitempty"`
 
 	// DashStyle: The dash style of the border.
@@ -6440,6 +6764,49 @@ func (s *TextStyleSuggestionState) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// UnmergeTableCellsRequest: Unmerges cells in a Table.
+type UnmergeTableCellsRequest struct {
+	// TableRange: The table range specifying which cells of the table to
+	// unmerge.
+	//
+	// All merged cells in this range will be unmerged, and cells that are
+	// already
+	// unmerged will not be affected. If the range has no merged cells,
+	// the
+	// request will do nothing.
+	//
+	// If there is text in any of the merged cells, the text will remain in
+	// the
+	// "head" cell of the resulting block of unmerged cells. The "head" cell
+	// is
+	// the upper-left cell when the content direction is from left to right,
+	// and
+	// the upper-right otherwise.
+	TableRange *TableRange `json:"tableRange,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "TableRange") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "TableRange") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *UnmergeTableCellsRequest) MarshalJSON() ([]byte, error) {
+	type NoMethod UnmergeTableCellsRequest
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // UpdateDocumentStyleRequest: Updates the DocumentStyle.
 type UpdateDocumentStyleRequest struct {
 	// DocumentStyle: The styles to set on the document.
@@ -6739,7 +7106,10 @@ type UpdateTextStyleRequest struct {
 	//
 	// If the range fully contains a paragraph belonging to a list,
 	// the
-	// paragraph's bullet is also updated with the matching text style.
+	// paragraph's bullet is also updated with the matching text
+	// style.
+	//
+	// Ranges cannot be inserted inside a relative UpdateTextStyleRequest.
 	Range *Range `json:"range,omitempty"`
 
 	// TextStyle: The styles to set on the text.
@@ -6986,6 +7356,7 @@ func (c *DocumentsBatchUpdateCall) Header() http.Header {
 
 func (c *DocumentsBatchUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7128,6 +7499,7 @@ func (c *DocumentsCreateCall) Header() http.Header {
 
 func (c *DocumentsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7283,6 +7655,7 @@ func (c *DocumentsGetCall) Header() http.Header {
 
 func (c *DocumentsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

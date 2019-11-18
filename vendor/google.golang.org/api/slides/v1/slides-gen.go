@@ -53,8 +53,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -4602,7 +4602,7 @@ type ReplaceImageRequest struct {
 	// the image will be the same as that of the original shape.
 	ImageReplaceMethod string `json:"imageReplaceMethod,omitempty"`
 
-	// Url: The URL of the new image.
+	// Url: The image URL.
 	//
 	// The image is fetched once at insertion time and a copy is stored
 	// for
@@ -8135,6 +8135,7 @@ func (c *PresentationsBatchUpdateCall) Header() http.Header {
 
 func (c *PresentationsBatchUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8283,6 +8284,7 @@ func (c *PresentationsCreateCall) Header() http.Header {
 
 func (c *PresentationsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8420,6 +8422,7 @@ func (c *PresentationsGetCall) Header() http.Header {
 
 func (c *PresentationsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8570,6 +8573,7 @@ func (c *PresentationsPagesGetCall) Header() http.Header {
 
 func (c *PresentationsPagesGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8764,6 +8768,7 @@ func (c *PresentationsPagesGetThumbnailCall) Header() http.Header {
 
 func (c *PresentationsPagesGetThumbnailCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

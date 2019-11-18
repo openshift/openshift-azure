@@ -209,7 +209,7 @@
       }
     }
   },
-  "revision": "20190718",
+  "revision": "20191021",
   "rootUrl": "https://docs.googleapis.com/",
   "schemas": {
     "AutoText": {
@@ -412,6 +412,66 @@
         "textStyle": {
           "$ref": "TextStyle",
           "description": "The text style of this ColumnBreak.\n\nSimilar to text content, like text runs and footnote references, the text\nstyle of a column break can affect content layout as well as the styling of\ntext inserted adjacent to it."
+        }
+      },
+      "type": "object"
+    },
+    "CreateFooterRequest": {
+      "description": "Creates a Footer. The new footer will be\napplied to the DocumentStyle.\n\nIf a footer of the specified type already exists then a 400 bad request error\nwill be returned.",
+      "id": "CreateFooterRequest",
+      "properties": {
+        "type": {
+          "description": "The type of footer to create.",
+          "enum": [
+            "HEADER_FOOTER_TYPE_UNSPECIFIED",
+            "DEFAULT"
+          ],
+          "enumDescriptions": [
+            "The header/footer type is unspecified.",
+            "A default header/footer."
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "CreateFooterResponse": {
+      "description": "The result of creating a footer.",
+      "id": "CreateFooterResponse",
+      "properties": {
+        "footerId": {
+          "description": "The ID of the created footer.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "CreateHeaderRequest": {
+      "description": "Creates a Header. The new header will be\napplied to the DocumentStyle.\n\nIf a header of the specified type already exists then a 400 bad request error\nwill be returned.",
+      "id": "CreateHeaderRequest",
+      "properties": {
+        "type": {
+          "description": "The type of header to create.",
+          "enum": [
+            "HEADER_FOOTER_TYPE_UNSPECIFIED",
+            "DEFAULT"
+          ],
+          "enumDescriptions": [
+            "The header/footer type is unspecified.",
+            "A default header/footer."
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "CreateHeaderResponse": {
+      "description": "The result of creating a header.",
+      "id": "CreateHeaderResponse",
+      "properties": {
+        "headerId": {
+          "description": "The ID of the created header.",
+          "type": "string"
         }
       },
       "type": "object"
@@ -1642,6 +1702,17 @@
       },
       "type": "object"
     },
+    "MergeTableCellsRequest": {
+      "description": "Merges cells in a Table.",
+      "id": "MergeTableCellsRequest",
+      "properties": {
+        "tableRange": {
+          "$ref": "TableRange",
+          "description": "The table range specifying which cells of the table to merge.\n\nAny text in the cells being merged will be concatenated and stored in the\n\"head\" cell of the range. This is the upper-left cell of the range when\nthe content direction is left to right, and the upper-right cell of the\nrange otherwise.\n\nIf the range is non-rectangular (which can occur in some cases where the\nrange covers cells that are already merged or where the table is\nnon-rectangular), a 400 bad request error is returned."
+        }
+      },
+      "type": "object"
+    },
     "NamedRange": {
       "description": "A collection of Ranges with the same named range\nID.\n\nNamed ranges allow developers to associate parts of a document with an\narbitrary user-defined label so their contents can be programmatically read\nor edited at a later time. A document can contain multiple named ranges with\nthe same name, but every named range has a unique ID.\n\nA named range is created with a single Range,\nand content inserted inside a named range generally expands that range.\nHowever, certain document changes can cause the range to be split into\nmultiple ranges.\n\nNamed ranges are not private. All applications and collaborators that have\naccess to the document can see its named ranges.",
       "id": "NamedRange",
@@ -2503,10 +2574,64 @@
       },
       "type": "object"
     },
+    "ReplaceImageRequest": {
+      "description": "Replaces an existing image with a new image.\n\nReplacing an image removes some image effects from the existing image in order to\nmirror the behavior of the Docs editor.",
+      "id": "ReplaceImageRequest",
+      "properties": {
+        "imageObjectId": {
+          "description": "The ID of the existing image that will be replaced.",
+          "type": "string"
+        },
+        "imageReplaceMethod": {
+          "description": "The replacement method.",
+          "enum": [
+            "IMAGE_REPLACE_METHOD_UNSPECIFIED",
+            "CENTER_CROP"
+          ],
+          "enumDescriptions": [
+            "Unspecified image replace method. This value must not be used.",
+            "Scales and centers the image to fill the bounds of the original image.\nThe image may be cropped in order to fill the original image's bounds. The\nrendered size of the image will be the same as that of the original image."
+          ],
+          "type": "string"
+        },
+        "uri": {
+          "description": "The URI of the new image.\n\nThe image is fetched once at insertion time and a copy is stored for\ndisplay inside the document. Images must be less than 50MB in size, cannot\nexceed 25 megapixels, and must be in one of PNG, JPEG, or GIF format.\n\nThe provided URI can be at most 2 kB in length. The URI itself is saved\nwith the image, and exposed via the ImageProperties.source_uri field.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ReplaceNamedRangeContentRequest": {
+      "description": "Replaces the contents of the specified\nNamedRange or\nNamedRanges with the given replacement\ncontent.\n\nNote that an individual NamedRange may\nconsist of multiple discontinuous\nranges. In this case, only the\ncontent in the first range will be replaced. The other ranges and their\ncontent will be deleted.\n\nIn cases where replacing or deleting any ranges would result in an invalid\ndocument structure, a 400 bad request error is returned.",
+      "id": "ReplaceNamedRangeContentRequest",
+      "properties": {
+        "namedRangeId": {
+          "description": "The ID of the named range whose content will be replaced.\n\nIf there is no named range with the given ID a 400 bad request error is\nreturned.",
+          "type": "string"
+        },
+        "namedRangeName": {
+          "description": "The name of the NamedRanges whose\ncontent will be replaced.\n\nIf there are multiple named ranges with the given name, then\nthe content of each one will be replaced. If there are no named ranges\nwith the given name, then the request will be a no-op.",
+          "type": "string"
+        },
+        "text": {
+          "description": "Replaces the content of the specified named range(s) with the given text.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "Request": {
       "description": "A single update to apply to a document.",
       "id": "Request",
       "properties": {
+        "createFooter": {
+          "$ref": "CreateFooterRequest",
+          "description": "Creates a footer."
+        },
+        "createHeader": {
+          "$ref": "CreateHeaderRequest",
+          "description": "Creates a header."
+        },
         "createNamedRange": {
           "$ref": "CreateNamedRangeRequest",
           "description": "Creates a named range."
@@ -2563,9 +2688,25 @@
           "$ref": "InsertTextRequest",
           "description": "Inserts text at the specified location."
         },
+        "mergeTableCells": {
+          "$ref": "MergeTableCellsRequest",
+          "description": "Merges cells in a table."
+        },
         "replaceAllText": {
           "$ref": "ReplaceAllTextRequest",
           "description": "Replaces all instances of the specified text."
+        },
+        "replaceImage": {
+          "$ref": "ReplaceImageRequest",
+          "description": "Replaces an image in the document."
+        },
+        "replaceNamedRangeContent": {
+          "$ref": "ReplaceNamedRangeContentRequest",
+          "description": "Replaces the content in a named range."
+        },
+        "unmergeTableCells": {
+          "$ref": "UnmergeTableCellsRequest",
+          "description": "Unmerges cells in a table."
         },
         "updateDocumentStyle": {
           "$ref": "UpdateDocumentStyleRequest",
@@ -2598,6 +2739,14 @@
       "description": "A single response from an update.",
       "id": "Response",
       "properties": {
+        "createFooter": {
+          "$ref": "CreateFooterResponse",
+          "description": "The result of creating a footer."
+        },
+        "createHeader": {
+          "$ref": "CreateHeaderResponse",
+          "description": "The result of creating a header."
+        },
         "createNamedRange": {
           "$ref": "CreateNamedRangeResponse",
           "description": "The result of creating a named range."
@@ -3121,12 +3270,12 @@
       "type": "object"
     },
     "TableCellBorder": {
-      "description": "A border around a table cell.",
+      "description": "A border around a table cell.\n\nTable cell borders cannot be transparent. To hide a table cell border, make\nits width 0.",
       "id": "TableCellBorder",
       "properties": {
         "color": {
           "$ref": "OptionalColor",
-          "description": "The color of the border."
+          "description": "The color of the border.\n\nThis color cannot be transparent."
         },
         "dashStyle": {
           "description": "The dash style of the border.",
@@ -3607,6 +3756,17 @@
       },
       "type": "object"
     },
+    "UnmergeTableCellsRequest": {
+      "description": "Unmerges cells in a Table.",
+      "id": "UnmergeTableCellsRequest",
+      "properties": {
+        "tableRange": {
+          "$ref": "TableRange",
+          "description": "The table range specifying which cells of the table to unmerge.\n\nAll merged cells in this range will be unmerged, and cells that are already\nunmerged will not be affected. If the range has no merged cells, the\nrequest will do nothing.\n\nIf there is text in any of the merged cells, the text will remain in the\n\"head\" cell of the resulting block of unmerged cells. The \"head\" cell is\nthe upper-left cell when the content direction is from left to right, and\nthe upper-right otherwise."
+        }
+      },
+      "type": "object"
+    },
     "UpdateDocumentStyleRequest": {
       "description": "Updates the DocumentStyle.",
       "id": "UpdateDocumentStyleRequest",
@@ -3734,7 +3894,7 @@
         },
         "range": {
           "$ref": "Range",
-          "description": "The range of text to style.\n\nThe range may be extended to include adjacent newlines.\n\nIf the range fully contains a paragraph belonging to a list, the\nparagraph's bullet is also updated with the matching text style."
+          "description": "The range of text to style.\n\nThe range may be extended to include adjacent newlines.\n\nIf the range fully contains a paragraph belonging to a list, the\nparagraph's bullet is also updated with the matching text style.\n\nRanges cannot be inserted inside a relative UpdateTextStyleRequest."
         },
         "textStyle": {
           "$ref": "TextStyle",

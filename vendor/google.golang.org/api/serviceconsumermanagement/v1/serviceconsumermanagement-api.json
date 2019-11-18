@@ -359,7 +359,7 @@
               ]
             },
             "create": {
-              "description": "Creates a tenancy unit with no tenant resources.",
+              "description": "Creates a tenancy unit with no tenant resources.\nIf tenancy unit already exists, it will be returned,\nhowever, in this case, returned TenancyUnit does not have tenant_resources\nfield set and ListTenancyUnit has to be used to get a complete\nTenancyUnit with all fields populated.",
               "flatPath": "v1/services/{servicesId}/{servicesId1}/{servicesId2}/tenancyUnits",
               "httpMethod": "POST",
               "id": "serviceconsumermanagement.services.tenancyUnits.create",
@@ -541,7 +541,7 @@
       }
     }
   },
-  "revision": "20190708",
+  "revision": "20191113",
   "rootUrl": "https://serviceconsumermanagement.googleapis.com/",
   "schemas": {
     "AddTenantProjectRequest": {
@@ -1549,6 +1549,13 @@
           ],
           "type": "string"
         },
+        "monitoredResourceTypes": {
+          "description": "Read-only. If present, then a time\nseries, which is identified partially by\na metric type and a MonitoredResourceDescriptor, that is associated\nwith this metric type can only be associated with one of the monitored\nresource types listed here.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
         "name": {
           "description": "The resource name of the metric descriptor.",
           "type": "string"
@@ -1596,7 +1603,7 @@
           "type": "string"
         },
         "launchStage": {
-          "description": "Deprecated. Please use the MetricDescriptor.launch_stage instead.\nThe launch stage of the metric definition.",
+          "description": "Deprecated. Must use the MetricDescriptor.launch_stage instead.",
           "enum": [
             "LAUNCH_STAGE_UNSPECIFIED",
             "EARLY_ACCESS",
@@ -1890,7 +1897,7 @@
           "type": "string"
         },
         "duration": {
-          "description": "Duration of this limit in textual notation. Example: \"100s\", \"24h\", \"1d\".\nFor duration longer than a day, only multiple of days is supported. We\nsupport only \"100s\" and \"1d\" for now. Additional support will be added in\nthe future. \"0\" indicates indefinite duration.\n\nUsed by group-based quotas only.",
+          "description": "Duration of this limit in textual notation. Must be \"100s\" or \"1d\".\n\nUsed by group-based quotas only.",
           "type": "string"
         },
         "freeTier": {
@@ -2018,7 +2025,7 @@
           "description": "HTTP configuration."
         },
         "id": {
-          "description": "A unique ID for a specific instance of this message, typically assigned\nby the client for tracking purpose. If empty, the server may choose to\ngenerate one instead. Must be no longer than 60 characters.",
+          "description": "A unique ID for a specific instance of this message, typically assigned\nby the client for tracking purpose. Must be no longer than 63 characters\nand only lower case letters, digits, '.', '_' and '-' are allowed. If\nempty, the server may choose to generate one instead.",
           "type": "string"
         },
         "logging": {
@@ -2480,6 +2487,17 @@
       "properties": {},
       "type": "object"
     },
+    "V1Beta1GenerateServiceIdentityResponse": {
+      "description": "Response message for the `GenerateServiceIdentity` method.\n\nThis response message is assigned to the `response` field of the returned\nOperation when that operation is done.",
+      "id": "V1Beta1GenerateServiceIdentityResponse",
+      "properties": {
+        "identity": {
+          "$ref": "V1Beta1ServiceIdentity",
+          "description": "ServiceIdentity that was created or retrieved."
+        }
+      },
+      "type": "object"
+    },
     "V1Beta1ImportProducerOverridesResponse": {
       "description": "Response message for ImportProducerOverrides",
       "id": "V1Beta1ImportProducerOverridesResponse",
@@ -2529,6 +2547,29 @@
       "description": "Response message for the `RefreshConsumer` method.\nThis response message is assigned to the `response` field of the returned\nOperation when that operation is done.",
       "id": "V1Beta1RefreshConsumerResponse",
       "properties": {},
+      "type": "object"
+    },
+    "V1Beta1ServiceIdentity": {
+      "description": "A service identity in the Identity and Access Management API.",
+      "id": "V1Beta1ServiceIdentity",
+      "properties": {
+        "email": {
+          "description": "The email address of the service identity.",
+          "type": "string"
+        },
+        "name": {
+          "description": "P4 service identity resource name.\n\nAn example name would be:\n`services/serviceconsumermanagement.googleapis.com/projects/123/serviceIdentities/default`",
+          "type": "string"
+        },
+        "tag": {
+          "description": "The P4 service identity configuration tag. This must be defined in\nactivation_grants. If not specified when creating the account, the tag is\nset to \"default\".",
+          "type": "string"
+        },
+        "uniqueId": {
+          "description": "The unique and stable id of the service identity.",
+          "type": "string"
+        }
+      },
       "type": "object"
     },
     "V1DisableConsumerResponse": {

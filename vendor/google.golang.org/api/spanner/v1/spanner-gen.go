@@ -55,8 +55,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -225,6 +225,76 @@ type ProjectsInstancesOperationsService struct {
 	s *Service
 }
 
+// BatchCreateSessionsRequest: The request for BatchCreateSessions.
+type BatchCreateSessionsRequest struct {
+	// SessionCount: Required. The number of sessions to be created in this
+	// batch call.
+	// The API may return fewer than the requested number of sessions. If
+	// a
+	// specific number of sessions are desired, the client can make
+	// additional
+	// calls to BatchCreateSessions (adjusting
+	// session_count as necessary).
+	SessionCount int64 `json:"sessionCount,omitempty"`
+
+	// SessionTemplate: Parameters to be applied to each created session.
+	SessionTemplate *Session `json:"sessionTemplate,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "SessionCount") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "SessionCount") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *BatchCreateSessionsRequest) MarshalJSON() ([]byte, error) {
+	type NoMethod BatchCreateSessionsRequest
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// BatchCreateSessionsResponse: The response for BatchCreateSessions.
+type BatchCreateSessionsResponse struct {
+	// Session: The freshly created sessions.
+	Session []*Session `json:"session,omitempty"`
+
+	// ServerResponse contains the HTTP response code and headers from the
+	// server.
+	googleapi.ServerResponse `json:"-"`
+
+	// ForceSendFields is a list of field names (e.g. "Session") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Session") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *BatchCreateSessionsResponse) MarshalJSON() ([]byte, error) {
+	type NoMethod BatchCreateSessionsResponse
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // BeginTransactionRequest: The request for BeginTransaction.
 type BeginTransactionRequest struct {
 	// Options: Required. Options for the new transaction.
@@ -277,7 +347,7 @@ type Binding struct {
 	//
 	// * `user:{emailid}`: An email address that represents a specific
 	// Google
-	//    account. For example, `alice@gmail.com` .
+	//    account. For example, `alice@example.com` .
 	//
 	//
 	// * `serviceAccount:{emailid}`: An email address that represents a
@@ -747,32 +817,43 @@ type Empty struct {
 	googleapi.ServerResponse `json:"-"`
 }
 
-// ExecuteBatchDmlRequest: The request for ExecuteBatchDml
+// ExecuteBatchDmlRequest: The request for ExecuteBatchDml.
 type ExecuteBatchDmlRequest struct {
 	// Seqno: A per-transaction sequence number used to identify this
-	// request. This is
-	// used in the same space as the seqno in
-	// ExecuteSqlRequest. See more details
-	// in ExecuteSqlRequest.
+	// request. This field
+	// makes each request idempotent such that if the request is received
+	// multiple
+	// times, at most one will succeed.
+	//
+	// The sequence number must be monotonically increasing within
+	// the
+	// transaction. If a request arrives for the first time with an
+	// out-of-order
+	// sequence number, the transaction may be aborted. Replays of
+	// previously
+	// handled requests will yield the same response as the first execution.
 	Seqno int64 `json:"seqno,omitempty,string"`
 
 	// Statements: The list of statements to execute in this batch.
 	// Statements are executed
-	// serially, such that the effects of statement i are visible to
+	// serially, such that the effects of statement `i` are visible to
 	// statement
-	// i+1. Each statement must be a DML statement. Execution will stop at
+	// `i+1`. Each statement must be a DML statement. Execution stops at
 	// the
-	// first failed statement; the remaining statements will not
-	// run.
+	// first failed statement; the remaining statements are not
+	// executed.
 	//
-	// REQUIRES: `statements_size()` > 0.
+	// Callers must provide at least one statement.
 	Statements []*Statement `json:"statements,omitempty"`
 
-	// Transaction: The transaction to use. A ReadWrite transaction is
-	// required. Single-use
-	// transactions are not supported (to avoid replay).  The caller must
-	// either
-	// supply an existing transaction ID or begin a new transaction.
+	// Transaction: The transaction to use. Must be a read-write
+	// transaction.
+	//
+	// To protect against replays, single-use transactions are not
+	// supported. The
+	// caller must either supply an existing transaction ID or begin a
+	// new
+	// transaction.
 	Transaction *TransactionSelector `json:"transaction,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Seqno") to
@@ -800,52 +881,55 @@ func (s *ExecuteBatchDmlRequest) MarshalJSON() ([]byte, error) {
 
 // ExecuteBatchDmlResponse: The response for ExecuteBatchDml. Contains a
 // list
-// of ResultSet, one for each DML statement that has successfully
-// executed.
-// If a statement fails, the error is returned as part of the response
-// payload.
-// Clients can determine whether all DML statements have run
-// successfully, or if
-// a statement failed, using one of the following approaches:
+// of ResultSet messages, one for each DML statement that has
+// successfully
+// executed, in the same order as the statements in the request. If a
+// statement
+// fails, the status in the response body identifies the cause of the
+// failure.
 //
-//   1. Check if `'status'` field is `OkStatus`.
-//   2. Check if `result_sets_size()` equals the number of statements
-// in
-//      ExecuteBatchDmlRequest.
+// To check for DML statements that failed, use the following
+// approach:
 //
-// Example 1: A request with 5 DML statements, all executed
+// 1. Check the status in the response message. The google.rpc.Code
+// enum
+//    value `OK` indicates that all statements were executed
 // successfully.
+// 2. If the status was not `OK`, check the number of result sets in
+// the
+//    response. If the response contains `N` ResultSet messages, then
+//    statement `N+1` in the request failed.
 //
-// Result: A response with 5 ResultSets, one for each statement in the
-// same
-// order, and an `OkStatus`.
+// Example 1:
 //
-// Example 2: A request with 5 DML statements. The 3rd statement has a
-// syntax
+// * Request: 5 DML statements, all executed successfully.
+// * Response: 5 ResultSet messages, with the status `OK`.
+//
+// Example 2:
+//
+// * Request: 5 DML statements. The third statement has a syntax
 // error.
-//
-// Result: A response with 2 ResultSets, for the first 2 statements
-// that
-// run successfully, and a syntax error (`INVALID_ARGUMENT`) status.
-// From
-// `result_set_size()` client can determine that the 3rd statement has
-// failed.
+// * Response: 2 ResultSet messages, and a syntax error
+// (`INVALID_ARGUMENT`)
+//   status. The number of ResultSet messages indicates that the third
+//   statement failed, and the fourth and fifth statements were not
+// executed.
 type ExecuteBatchDmlResponse struct {
-	// ResultSets: ResultSets, one for each statement in the request that
-	// ran successfully, in
-	// the same order as the statements in the request. Each ResultSet
-	// will
+	// ResultSets: One ResultSet for each statement in the request that ran
+	// successfully,
+	// in the same order as the statements in the request. Each ResultSet
+	// does
 	// not contain any rows. The ResultSetStats in each ResultSet
-	// will
-	// contain the number of rows modified by the statement.
+	// contain
+	// the number of rows modified by the statement.
 	//
-	// Only the first ResultSet in the response contains a
+	// Only the first ResultSet in the response contains
 	// valid
 	// ResultSetMetadata.
 	ResultSets []*ResultSet `json:"resultSets,omitempty"`
 
-	// Status: If all DML statements are executed successfully, status will
-	// be OK.
+	// Status: If all DML statements are executed successfully, the status
+	// is `OK`.
 	// Otherwise, the error status of the first failed statement.
 	Status *Status `json:"status,omitempty"`
 
@@ -892,24 +976,22 @@ type ExecuteSqlRequest struct {
 	// about SQL types.
 	ParamTypes map[string]Type `json:"paramTypes,omitempty"`
 
-	// Params: The SQL string can contain parameter placeholders. A
-	// parameter
-	// placeholder consists of `'@'` followed by the parameter
-	// name. Parameter names consist of any combination of letters,
-	// numbers, and underscores.
+	// Params: Parameter names and values that bind to placeholders in the
+	// SQL string.
+	//
+	// A parameter placeholder consists of the `@` character followed by
+	// the
+	// parameter name (for example, `@firstName`). Parameter names can
+	// contain
+	// letters, numbers, and underscores.
 	//
 	// Parameters can appear anywhere that a literal value is expected.  The
 	// same
 	// parameter name can be used more than once, for example:
-	//   "WHERE id > @msg_id AND id < @msg_id + 100"
 	//
-	// It is an error to execute an SQL statement with unbound
-	// parameters.
+	// "WHERE id > @msg_id AND id < @msg_id + 100"
 	//
-	// Parameter values are specified using `params`, which is a JSON
-	// object whose keys are parameter names, and whose values are
-	// the
-	// corresponding parameter values.
+	// It is an error to execute a SQL statement with unbound parameters.
 	Params googleapi.RawMessage `json:"params,omitempty"`
 
 	// PartitionToken: If present, results will be restricted to the
@@ -950,7 +1032,7 @@ type ExecuteSqlRequest struct {
 	ResumeToken string `json:"resumeToken,omitempty"`
 
 	// Seqno: A per-transaction sequence number used to identify this
-	// request. This
+	// request. This field
 	// makes each request idempotent such that if the request is received
 	// multiple
 	// times, at most one will succeed.
@@ -970,24 +1052,20 @@ type ExecuteSqlRequest struct {
 	// Sql: Required. The SQL string.
 	Sql string `json:"sql,omitempty"`
 
-	// Transaction: The transaction to use. If none is provided, the default
-	// is a
-	// temporary read-only transaction with strong concurrency.
-	//
-	// The transaction to use.
+	// Transaction: The transaction to use.
 	//
 	// For queries, if none is provided, the default is a temporary
 	// read-only
 	// transaction with strong concurrency.
 	//
-	// Standard DML statements require a ReadWrite transaction.
-	// Single-use
-	// transactions are not supported (to avoid replay).  The caller
-	// must
-	// either supply an existing transaction ID or begin a new
+	// Standard DML statements require a read-write transaction. To
+	// protect
+	// against replays, single-use transactions are not supported.  The
+	// caller
+	// must either supply an existing transaction ID or begin a new
 	// transaction.
 	//
-	// Partitioned DML requires an existing PartitionedDml transaction ID.
+	// Partitioned DML requires an existing Partitioned DML transaction ID.
 	Transaction *TransactionSelector `json:"transaction,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "ParamTypes") to
@@ -1142,6 +1220,73 @@ func (s *GetDatabaseDdlResponse) MarshalJSON() ([]byte, error) {
 
 // GetIamPolicyRequest: Request message for `GetIamPolicy` method.
 type GetIamPolicyRequest struct {
+	// Options: OPTIONAL: A `GetPolicyOptions` object for specifying options
+	// to
+	// `GetIamPolicy`. This field is only used by Cloud IAM.
+	Options *GetPolicyOptions `json:"options,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Options") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Options") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GetIamPolicyRequest) MarshalJSON() ([]byte, error) {
+	type NoMethod GetIamPolicyRequest
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// GetPolicyOptions: Encapsulates settings provided to GetIamPolicy.
+type GetPolicyOptions struct {
+	// RequestedPolicyVersion: Optional. The policy format version to be
+	// returned.
+	//
+	// Valid values are 0, 1, and 3. Requests specifying an invalid value
+	// will be
+	// rejected.
+	//
+	// Requests for policies with any conditional bindings must specify
+	// version 3.
+	// Policies without any conditional bindings may specify any valid value
+	// or
+	// leave the field unset.
+	RequestedPolicyVersion int64 `json:"requestedPolicyVersion,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g.
+	// "RequestedPolicyVersion") to unconditionally include in API requests.
+	// By default, fields with empty values are omitted from API requests.
+	// However, any non-pointer, non-interface field appearing in
+	// ForceSendFields will be sent to the server regardless of whether the
+	// field is empty or not. This may be used to include empty fields in
+	// Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "RequestedPolicyVersion")
+	// to include in API requests with the JSON null value. By default,
+	// fields with empty values are omitted from API requests. However, any
+	// field with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GetPolicyOptions) MarshalJSON() ([]byte, error) {
+	type NoMethod GetPolicyOptions
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
 // Instance: An isolated set of Cloud Spanner resources on which
@@ -1721,6 +1866,11 @@ type Mutation struct {
 	// instead. Unlike insert_or_update, this means any values
 	// not
 	// explicitly written become `NULL`.
+	//
+	// In an interleaved table, if you create the child table with the
+	// `ON DELETE CASCADE` annotation, then replacing a parent row
+	// also deletes the child rows. Otherwise, you must delete the
+	// child rows before you replace the parent row.
 	Replace *Write `json:"replace,omitempty"`
 
 	// Update: Update existing rows in a table. If any of the rows does
@@ -2079,24 +2229,22 @@ type PartitionQueryRequest struct {
 	// about SQL types.
 	ParamTypes map[string]Type `json:"paramTypes,omitempty"`
 
-	// Params: The SQL query string can contain parameter placeholders. A
-	// parameter
-	// placeholder consists of `'@'` followed by the parameter
-	// name. Parameter names consist of any combination of letters,
-	// numbers, and underscores.
+	// Params: Parameter names and values that bind to placeholders in the
+	// SQL string.
+	//
+	// A parameter placeholder consists of the `@` character followed by
+	// the
+	// parameter name (for example, `@firstName`). Parameter names can
+	// contain
+	// letters, numbers, and underscores.
 	//
 	// Parameters can appear anywhere that a literal value is expected.  The
 	// same
 	// parameter name can be used more than once, for example:
-	//   "WHERE id > @msg_id AND id < @msg_id + 100"
 	//
-	// It is an error to execute an SQL query with unbound
-	// parameters.
+	// "WHERE id > @msg_id AND id < @msg_id + 100"
 	//
-	// Parameter values are specified using `params`, which is a JSON
-	// object whose keys are parameter names, and whose values are
-	// the
-	// corresponding parameter values.
+	// It is an error to execute a SQL statement with unbound parameters.
 	Params googleapi.RawMessage `json:"params,omitempty"`
 
 	// PartitionOptions: Additional options that affect how many partitions
@@ -2339,31 +2487,43 @@ func (s *PlanNode) MarshalJSON() ([]byte, error) {
 // specify access control policies for Cloud Platform resources.
 //
 //
-// A `Policy` consists of a list of `bindings`. A `binding` binds a list
-// of
-// `members` to a `role`, where the members can be user accounts, Google
-// groups,
-// Google domains, and service accounts. A `role` is a named list of
-// permissions
-// defined by IAM.
+// A `Policy` is a collection of `bindings`. A `binding` binds one or
+// more
+// `members` to a single `role`. Members can be user accounts, service
+// accounts,
+// Google groups, and domains (such as G Suite). A `role` is a named
+// list of
+// permissions (defined by IAM or configured by users). A `binding`
+// can
+// optionally specify a `condition`, which is a logic expression that
+// further
+// constrains the role binding based on attributes about the request
+// and/or
+// target resource.
 //
 // **JSON Example**
 //
 //     {
 //       "bindings": [
 //         {
-//           "role": "roles/owner",
+//           "role": "roles/resourcemanager.organizationAdmin",
 //           "members": [
 //             "user:mike@example.com",
 //             "group:admins@example.com",
 //             "domain:google.com",
 //
-// "serviceAccount:my-other-app@appspot.gserviceaccount.com"
+// "serviceAccount:my-project-id@appspot.gserviceaccount.com"
 //           ]
 //         },
 //         {
-//           "role": "roles/viewer",
-//           "members": ["user:sean@example.com"]
+//           "role": "roles/resourcemanager.organizationViewer",
+//           "members": ["user:eve@example.com"],
+//           "condition": {
+//             "title": "expirable access",
+//             "description": "Does not grant access after Sep 2020",
+//             "expression": "request.time <
+//             timestamp('2020-10-01T00:00:00.000Z')",
+//           }
 //         }
 //       ]
 //     }
@@ -2375,17 +2535,23 @@ func (s *PlanNode) MarshalJSON() ([]byte, error) {
 //       - user:mike@example.com
 //       - group:admins@example.com
 //       - domain:google.com
-//       - serviceAccount:my-other-app@appspot.gserviceaccount.com
-//       role: roles/owner
+//       - serviceAccount:my-project-id@appspot.gserviceaccount.com
+//       role: roles/resourcemanager.organizationAdmin
 //     - members:
-//       - user:sean@example.com
-//       role: roles/viewer
-//
+//       - user:eve@example.com
+//       role: roles/resourcemanager.organizationViewer
+//       condition:
+//         title: expirable access
+//         description: Does not grant access after Sep 2020
+//         expression: request.time <
+// timestamp('2020-10-01T00:00:00.000Z')
 //
 // For a description of IAM and its features, see the
 // [IAM developer's guide](https://cloud.google.com/iam/docs).
 type Policy struct {
-	// Bindings: Associates a list of `members` to a `role`.
+	// Bindings: Associates a list of `members` to a `role`. Optionally may
+	// specify a
+	// `condition` that determines when binding is in effect.
 	// `bindings` with no members will result in an error.
 	Bindings []*Binding `json:"bindings,omitempty"`
 
@@ -2406,10 +2572,32 @@ type Policy struct {
 	//
 	// If no `etag` is provided in the call to `setIamPolicy`, then the
 	// existing
-	// policy is overwritten blindly.
+	// policy is overwritten. Due to blind-set semantics of an etag-less
+	// policy,
+	// 'setIamPolicy' will not fail even if either of incoming or stored
+	// policy
+	// does not meet the version requirements.
 	Etag string `json:"etag,omitempty"`
 
-	// Version: Deprecated.
+	// Version: Specifies the format of the policy.
+	//
+	// Valid values are 0, 1, and 3. Requests specifying an invalid value
+	// will be
+	// rejected.
+	//
+	// Operations affecting conditional bindings must specify version 3.
+	// This can
+	// be either setting a conditional policy, modifying a conditional
+	// binding,
+	// or removing a conditional binding from the stored conditional
+	// policy.
+	// Operations on non-conditional policies may specify any valid value
+	// or
+	// leave the field unset.
+	//
+	// If no etag is provided in the call to `setIamPolicy`, any
+	// version
+	// compliance checks on the incoming and/or stored policy is skipped.
 	Version int64 `json:"version,omitempty"`
 
 	// ServerResponse contains the HTTP response code and headers from the
@@ -3063,24 +3251,22 @@ type Statement struct {
 	// about SQL types.
 	ParamTypes map[string]Type `json:"paramTypes,omitempty"`
 
-	// Params: The DML string can contain parameter placeholders. A
-	// parameter
-	// placeholder consists of `'@'` followed by the parameter
-	// name. Parameter names consist of any combination of letters,
-	// numbers, and underscores.
+	// Params: Parameter names and values that bind to placeholders in the
+	// DML string.
+	//
+	// A parameter placeholder consists of the `@` character followed by
+	// the
+	// parameter name (for example, `@firstName`). Parameter names can
+	// contain
+	// letters, numbers, and underscores.
 	//
 	// Parameters can appear anywhere that a literal value is expected.
 	// The
 	// same parameter name can be used more than once, for example:
-	//   "WHERE id > @msg_id AND id < @msg_id + 100"
 	//
-	// It is an error to execute an SQL statement with unbound
-	// parameters.
+	// "WHERE id > @msg_id AND id < @msg_id + 100"
 	//
-	// Parameter values are specified using `params`, which is a JSON
-	// object whose keys are parameter names, and whose values are
-	// the
-	// corresponding parameter values.
+	// It is an error to execute a SQL statement with unbound parameters.
 	Params googleapi.RawMessage `json:"params,omitempty"`
 
 	// Sql: Required. The DML string.
@@ -4175,6 +4361,7 @@ func (c *ProjectsInstanceConfigsGetCall) Header() http.Header {
 
 func (c *ProjectsInstanceConfigsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4337,6 +4524,7 @@ func (c *ProjectsInstanceConfigsListCall) Header() http.Header {
 
 func (c *ProjectsInstanceConfigsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4544,6 +4732,7 @@ func (c *ProjectsInstancesCreateCall) Header() http.Header {
 
 func (c *ProjectsInstancesCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4693,6 +4882,7 @@ func (c *ProjectsInstancesDeleteCall) Header() http.Header {
 
 func (c *ProjectsInstancesDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4834,6 +5024,7 @@ func (c *ProjectsInstancesGetCall) Header() http.Header {
 
 func (c *ProjectsInstancesGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -4975,6 +5166,7 @@ func (c *ProjectsInstancesGetIamPolicyCall) Header() http.Header {
 
 func (c *ProjectsInstancesGetIamPolicyCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5169,6 +5361,7 @@ func (c *ProjectsInstancesListCall) Header() http.Header {
 
 func (c *ProjectsInstancesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5389,6 +5582,7 @@ func (c *ProjectsInstancesPatchCall) Header() http.Header {
 
 func (c *ProjectsInstancesPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5534,6 +5728,7 @@ func (c *ProjectsInstancesSetIamPolicyCall) Header() http.Header {
 
 func (c *ProjectsInstancesSetIamPolicyCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5683,6 +5878,7 @@ func (c *ProjectsInstancesTestIamPermissionsCall) Header() http.Header {
 
 func (c *ProjectsInstancesTestIamPermissionsCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5832,6 +6028,7 @@ func (c *ProjectsInstancesDatabasesCreateCall) Header() http.Header {
 
 func (c *ProjectsInstancesDatabasesCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5970,6 +6167,7 @@ func (c *ProjectsInstancesDatabasesDropDatabaseCall) Header() http.Header {
 
 func (c *ProjectsInstancesDatabasesDropDatabaseCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6111,6 +6309,7 @@ func (c *ProjectsInstancesDatabasesGetCall) Header() http.Header {
 
 func (c *ProjectsInstancesDatabasesGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6259,6 +6458,7 @@ func (c *ProjectsInstancesDatabasesGetDdlCall) Header() http.Header {
 
 func (c *ProjectsInstancesDatabasesGetDdlCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6401,6 +6601,7 @@ func (c *ProjectsInstancesDatabasesGetIamPolicyCall) Header() http.Header {
 
 func (c *ProjectsInstancesDatabasesGetIamPolicyCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6567,6 +6768,7 @@ func (c *ProjectsInstancesDatabasesListCall) Header() http.Header {
 
 func (c *ProjectsInstancesDatabasesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6739,6 +6941,7 @@ func (c *ProjectsInstancesDatabasesSetIamPolicyCall) Header() http.Header {
 
 func (c *ProjectsInstancesDatabasesSetIamPolicyCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6886,6 +7089,7 @@ func (c *ProjectsInstancesDatabasesTestIamPermissionsCall) Header() http.Header 
 
 func (c *ProjectsInstancesDatabasesTestIamPermissionsCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7035,6 +7239,7 @@ func (c *ProjectsInstancesDatabasesUpdateDdlCall) Header() http.Header {
 
 func (c *ProjectsInstancesDatabasesUpdateDdlCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7190,6 +7395,7 @@ func (c *ProjectsInstancesDatabasesOperationsCancelCall) Header() http.Header {
 
 func (c *ProjectsInstancesDatabasesOperationsCancelCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7326,6 +7532,7 @@ func (c *ProjectsInstancesDatabasesOperationsDeleteCall) Header() http.Header {
 
 func (c *ProjectsInstancesDatabasesOperationsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7471,6 +7678,7 @@ func (c *ProjectsInstancesDatabasesOperationsGetCall) Header() http.Header {
 
 func (c *ProjectsInstancesDatabasesOperationsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7652,6 +7860,7 @@ func (c *ProjectsInstancesDatabasesOperationsListCall) Header() http.Header {
 
 func (c *ProjectsInstancesDatabasesOperationsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7778,6 +7987,152 @@ func (c *ProjectsInstancesDatabasesOperationsListCall) Pages(ctx context.Context
 	}
 }
 
+// method id "spanner.projects.instances.databases.sessions.batchCreate":
+
+type ProjectsInstancesDatabasesSessionsBatchCreateCall struct {
+	s                          *Service
+	database                   string
+	batchcreatesessionsrequest *BatchCreateSessionsRequest
+	urlParams_                 gensupport.URLParams
+	ctx_                       context.Context
+	header_                    http.Header
+}
+
+// BatchCreate: Creates multiple new sessions.
+//
+// This API can be used to initialize a session cache on the
+// clients.
+// See https://goo.gl/TgSFN2 for best practices on session cache
+// management.
+func (r *ProjectsInstancesDatabasesSessionsService) BatchCreate(database string, batchcreatesessionsrequest *BatchCreateSessionsRequest) *ProjectsInstancesDatabasesSessionsBatchCreateCall {
+	c := &ProjectsInstancesDatabasesSessionsBatchCreateCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.database = database
+	c.batchcreatesessionsrequest = batchcreatesessionsrequest
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsInstancesDatabasesSessionsBatchCreateCall) Fields(s ...googleapi.Field) *ProjectsInstancesDatabasesSessionsBatchCreateCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsInstancesDatabasesSessionsBatchCreateCall) Context(ctx context.Context) *ProjectsInstancesDatabasesSessionsBatchCreateCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsInstancesDatabasesSessionsBatchCreateCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsInstancesDatabasesSessionsBatchCreateCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.batchcreatesessionsrequest)
+	if err != nil {
+		return nil, err
+	}
+	reqHeaders.Set("Content-Type", "application/json")
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/{+database}/sessions:batchCreate")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"database": c.database,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "spanner.projects.instances.databases.sessions.batchCreate" call.
+// Exactly one of *BatchCreateSessionsResponse or error will be non-nil.
+// Any non-2xx status code is an error. Response headers are in either
+// *BatchCreateSessionsResponse.ServerResponse.Header or (if a response
+// was returned at all) in error.(*googleapi.Error).Header. Use
+// googleapi.IsNotModified to check whether the returned error was
+// because http.StatusNotModified was returned.
+func (c *ProjectsInstancesDatabasesSessionsBatchCreateCall) Do(opts ...googleapi.CallOption) (*BatchCreateSessionsResponse, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &BatchCreateSessionsResponse{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Creates multiple new sessions.\n\nThis API can be used to initialize a session cache on the clients.\nSee https://goo.gl/TgSFN2 for best practices on session cache management.",
+	//   "flatPath": "v1/projects/{projectsId}/instances/{instancesId}/databases/{databasesId}/sessions:batchCreate",
+	//   "httpMethod": "POST",
+	//   "id": "spanner.projects.instances.databases.sessions.batchCreate",
+	//   "parameterOrder": [
+	//     "database"
+	//   ],
+	//   "parameters": {
+	//     "database": {
+	//       "description": "Required. The database in which the new sessions are created.",
+	//       "location": "path",
+	//       "pattern": "^projects/[^/]+/instances/[^/]+/databases/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1/{+database}/sessions:batchCreate",
+	//   "request": {
+	//     "$ref": "BatchCreateSessionsRequest"
+	//   },
+	//   "response": {
+	//     "$ref": "BatchCreateSessionsResponse"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/spanner.data"
+	//   ]
+	// }
+
+}
+
 // method id "spanner.projects.instances.databases.sessions.beginTransaction":
 
 type ProjectsInstancesDatabasesSessionsBeginTransactionCall struct {
@@ -7828,6 +8183,7 @@ func (c *ProjectsInstancesDatabasesSessionsBeginTransactionCall) Header() http.H
 
 func (c *ProjectsInstancesDatabasesSessionsBeginTransactionCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7979,6 +8335,7 @@ func (c *ProjectsInstancesDatabasesSessionsCommitCall) Header() http.Header {
 
 func (c *ProjectsInstancesDatabasesSessionsCommitCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8102,10 +8459,9 @@ type ProjectsInstancesDatabasesSessionsCreateCall struct {
 // transaction
 // limit.
 //
-// Cloud Spanner limits the number of sessions that can exist at any
-// given
-// time; thus, it is a good idea to delete idle and/or unneeded
-// sessions.
+// Active sessions use additional server resources, so it is a good idea
+// to
+// delete idle and unneeded sessions.
 // Aside from explicit deletes, Cloud Spanner can delete sessions for
 // which no
 // operations are sent for more than an hour. If a session is
@@ -8149,6 +8505,7 @@ func (c *ProjectsInstancesDatabasesSessionsCreateCall) Header() http.Header {
 
 func (c *ProjectsInstancesDatabasesSessionsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8212,7 +8569,7 @@ func (c *ProjectsInstancesDatabasesSessionsCreateCall) Do(opts ...googleapi.Call
 	}
 	return ret, nil
 	// {
-	//   "description": "Creates a new session. A session can be used to perform\ntransactions that read and/or modify data in a Cloud Spanner database.\nSessions are meant to be reused for many consecutive\ntransactions.\n\nSessions can only execute one transaction at a time. To execute\nmultiple concurrent read-write/write-only transactions, create\nmultiple sessions. Note that standalone reads and queries use a\ntransaction internally, and count toward the one transaction\nlimit.\n\nCloud Spanner limits the number of sessions that can exist at any given\ntime; thus, it is a good idea to delete idle and/or unneeded sessions.\nAside from explicit deletes, Cloud Spanner can delete sessions for which no\noperations are sent for more than an hour. If a session is deleted,\nrequests to it return `NOT_FOUND`.\n\nIdle sessions can be kept alive by sending a trivial SQL query\nperiodically, e.g., `\"SELECT 1\"`.",
+	//   "description": "Creates a new session. A session can be used to perform\ntransactions that read and/or modify data in a Cloud Spanner database.\nSessions are meant to be reused for many consecutive\ntransactions.\n\nSessions can only execute one transaction at a time. To execute\nmultiple concurrent read-write/write-only transactions, create\nmultiple sessions. Note that standalone reads and queries use a\ntransaction internally, and count toward the one transaction\nlimit.\n\nActive sessions use additional server resources, so it is a good idea to\ndelete idle and unneeded sessions.\nAside from explicit deletes, Cloud Spanner can delete sessions for which no\noperations are sent for more than an hour. If a session is deleted,\nrequests to it return `NOT_FOUND`.\n\nIdle sessions can be kept alive by sending a trivial SQL query\nperiodically, e.g., `\"SELECT 1\"`.",
 	//   "flatPath": "v1/projects/{projectsId}/instances/{instancesId}/databases/{databasesId}/sessions",
 	//   "httpMethod": "POST",
 	//   "id": "spanner.projects.instances.databases.sessions.create",
@@ -8291,6 +8648,7 @@ func (c *ProjectsInstancesDatabasesSessionsDeleteCall) Header() http.Header {
 
 func (c *ProjectsInstancesDatabasesSessionsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8394,28 +8752,17 @@ type ProjectsInstancesDatabasesSessionsExecuteBatchDmlCall struct {
 // with
 // ExecuteSql.
 //
-// Statements are executed in order,
-// sequentially.
-// ExecuteBatchDmlResponse will contain a
-// ResultSet for each DML statement that has successfully executed. If
-// a
-// statement fails, its error status will be returned as part of
-// the
-// ExecuteBatchDmlResponse. Execution will
-// stop at the first failed statement; the remaining statements will not
-// run.
-//
-// ExecuteBatchDml is expected to return an OK status with a response
+// Statements are executed in sequential order. A request can succeed
 // even if
-// there was an error while processing one of the DML statements.
+// a statement fails. The ExecuteBatchDmlResponse.status field in
+// the
+// response provides information about the statement that failed.
 // Clients must
-// inspect response.status to determine if there were any errors
-// while
-// processing the request.
+// inspect this field to determine whether an error occurred.
 //
-// See more details in
-// ExecuteBatchDmlRequest and
-// ExecuteBatchDmlResponse.
+// Execution stops after the first failed statement; the remaining
+// statements
+// are not executed.
 func (r *ProjectsInstancesDatabasesSessionsService) ExecuteBatchDml(session string, executebatchdmlrequest *ExecuteBatchDmlRequest) *ProjectsInstancesDatabasesSessionsExecuteBatchDmlCall {
 	c := &ProjectsInstancesDatabasesSessionsExecuteBatchDmlCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.session = session
@@ -8450,6 +8797,7 @@ func (c *ProjectsInstancesDatabasesSessionsExecuteBatchDmlCall) Header() http.He
 
 func (c *ProjectsInstancesDatabasesSessionsExecuteBatchDmlCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8513,7 +8861,7 @@ func (c *ProjectsInstancesDatabasesSessionsExecuteBatchDmlCall) Do(opts ...googl
 	}
 	return ret, nil
 	// {
-	//   "description": "Executes a batch of SQL DML statements. This method allows many statements\nto be run with lower latency than submitting them sequentially with\nExecuteSql.\n\nStatements are executed in order, sequentially.\nExecuteBatchDmlResponse will contain a\nResultSet for each DML statement that has successfully executed. If a\nstatement fails, its error status will be returned as part of the\nExecuteBatchDmlResponse. Execution will\nstop at the first failed statement; the remaining statements will not run.\n\nExecuteBatchDml is expected to return an OK status with a response even if\nthere was an error while processing one of the DML statements. Clients must\ninspect response.status to determine if there were any errors while\nprocessing the request.\n\nSee more details in\nExecuteBatchDmlRequest and\nExecuteBatchDmlResponse.",
+	//   "description": "Executes a batch of SQL DML statements. This method allows many statements\nto be run with lower latency than submitting them sequentially with\nExecuteSql.\n\nStatements are executed in sequential order. A request can succeed even if\na statement fails. The ExecuteBatchDmlResponse.status field in the\nresponse provides information about the statement that failed. Clients must\ninspect this field to determine whether an error occurred.\n\nExecution stops after the first failed statement; the remaining statements\nare not executed.",
 	//   "flatPath": "v1/projects/{projectsId}/instances/{instancesId}/databases/{databasesId}/sessions/{sessionsId}:executeBatchDml",
 	//   "httpMethod": "POST",
 	//   "id": "spanner.projects.instances.databases.sessions.executeBatchDml",
@@ -8603,6 +8951,7 @@ func (c *ProjectsInstancesDatabasesSessionsExecuteSqlCall) Header() http.Header 
 
 func (c *ProjectsInstancesDatabasesSessionsExecuteSqlCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8748,6 +9097,7 @@ func (c *ProjectsInstancesDatabasesSessionsExecuteStreamingSqlCall) Header() htt
 
 func (c *ProjectsInstancesDatabasesSessionsExecuteStreamingSqlCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8901,6 +9251,7 @@ func (c *ProjectsInstancesDatabasesSessionsGetCall) Header() http.Header {
 
 func (c *ProjectsInstancesDatabasesSessionsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -9079,6 +9430,7 @@ func (c *ProjectsInstancesDatabasesSessionsListCall) Header() http.Header {
 
 func (c *ProjectsInstancesDatabasesSessionsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -9269,6 +9621,7 @@ func (c *ProjectsInstancesDatabasesSessionsPartitionQueryCall) Header() http.Hea
 
 func (c *ProjectsInstancesDatabasesSessionsPartitionQueryCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -9431,6 +9784,7 @@ func (c *ProjectsInstancesDatabasesSessionsPartitionReadCall) Header() http.Head
 
 func (c *ProjectsInstancesDatabasesSessionsPartitionReadCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -9586,6 +9940,7 @@ func (c *ProjectsInstancesDatabasesSessionsReadCall) Header() http.Header {
 
 func (c *ProjectsInstancesDatabasesSessionsReadCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -9735,6 +10090,7 @@ func (c *ProjectsInstancesDatabasesSessionsRollbackCall) Header() http.Header {
 
 func (c *ProjectsInstancesDatabasesSessionsRollbackCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -9879,6 +10235,7 @@ func (c *ProjectsInstancesDatabasesSessionsStreamingReadCall) Header() http.Head
 
 func (c *ProjectsInstancesDatabasesSessionsStreamingReadCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10034,6 +10391,7 @@ func (c *ProjectsInstancesOperationsCancelCall) Header() http.Header {
 
 func (c *ProjectsInstancesOperationsCancelCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10170,6 +10528,7 @@ func (c *ProjectsInstancesOperationsDeleteCall) Header() http.Header {
 
 func (c *ProjectsInstancesOperationsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10315,6 +10674,7 @@ func (c *ProjectsInstancesOperationsGetCall) Header() http.Header {
 
 func (c *ProjectsInstancesOperationsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10496,6 +10856,7 @@ func (c *ProjectsInstancesOperationsListCall) Header() http.Header {
 
 func (c *ProjectsInstancesOperationsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

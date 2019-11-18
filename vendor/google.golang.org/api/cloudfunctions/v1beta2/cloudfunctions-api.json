@@ -139,7 +139,7 @@
           "parameterOrder": [],
           "parameters": {
             "filter": {
-              "description": "Required. A filter for matching the requested operations.\u003cbr\u003e\u003cbr\u003e The supported formats of \u003cb\u003efilter\u003c/b\u003e are:\u003cbr\u003e To query for specific function: \u003ccode\u003eproject:*,location:*,function:*\u003c/code\u003e\u003cbr\u003e To query for all of the latest operations for a project: \u003ccode\u003eproject:*,latest:true\u003c/code\u003e",
+              "description": "Required. A filter for matching the requested operations.\u003cbr\u003e\u003cbr\u003e The supported formats of \u003cb\u003efilter\u003c/b\u003e are:\u003cbr\u003e To query for a specific function: \u003ccode\u003eproject:*,location:*,function:*\u003c/code\u003e\u003cbr\u003e To query for all of the latest operations for a project: \u003ccode\u003eproject:*,latest:true\u003c/code\u003e",
               "location": "query",
               "type": "string"
             },
@@ -149,13 +149,13 @@
               "type": "string"
             },
             "pageSize": {
-              "description": "The standard list page size.",
+              "description": "The maximum number of records that should be returned.\u003cbr\u003e Requested page size cannot exceed 100. If not set, the default page size is 100.\u003cbr\u003e\u003cbr\u003e Pagination is only supported when querying for a specific function.",
               "format": "int32",
               "location": "query",
               "type": "integer"
             },
             "pageToken": {
-              "description": "The standard list page token.",
+              "description": "Token identifying which result to start with, which is returned by a previous list call.\u003cbr\u003e\u003cbr\u003e Pagination is only supported when querying for a specific function.",
               "location": "query",
               "type": "string"
             }
@@ -229,7 +229,7 @@
                   ],
                   "parameters": {
                     "name": {
-                      "description": "The name of the function to be called.",
+                      "description": "Required. The name of the function to be called.",
                       "location": "path",
                       "pattern": "^projects/[^/]+/locations/[^/]+/functions/[^/]+$",
                       "required": true,
@@ -257,7 +257,7 @@
                   ],
                   "parameters": {
                     "location": {
-                      "description": "The project and location in which the function should be created, specified\nin the format `projects/*/locations/*`",
+                      "description": "Required. The project and location in which the function should be created, specified\nin the format `projects/*/locations/*`",
                       "location": "path",
                       "pattern": "^projects/[^/]+/locations/[^/]+$",
                       "required": true,
@@ -285,7 +285,7 @@
                   ],
                   "parameters": {
                     "name": {
-                      "description": "The name of the function which should be deleted.",
+                      "description": "Required. The name of the function which should be deleted.",
                       "location": "path",
                       "pattern": "^projects/[^/]+/locations/[^/]+/functions/[^/]+$",
                       "required": true,
@@ -366,7 +366,7 @@
                   ],
                   "parameters": {
                     "name": {
-                      "description": "The name of the function which details should be obtained.",
+                      "description": "Required. The name of the function which details should be obtained.",
                       "location": "path",
                       "pattern": "^projects/[^/]+/locations/[^/]+/functions/[^/]+$",
                       "required": true,
@@ -391,7 +391,7 @@
                   ],
                   "parameters": {
                     "location": {
-                      "description": "The project and location from which the function should be listed,\nspecified in the format `projects/*/locations/*`\nIf you want to list functions in all locations, use \"-\" in place of a\nlocation.",
+                      "description": "Required. The project and location from which the function should be listed,\nspecified in the format `projects/*/locations/*`\nIf you want to list functions in all locations, use \"-\" in place of a\nlocation. When listing functions in all locations, if one or more\nlocation(s) are unreachable, the response will contain functions from all\nreachable locations along with the names of any unreachable locations.",
                       "location": "path",
                       "pattern": "^projects/[^/]+/locations/[^/]+$",
                       "required": true,
@@ -427,7 +427,7 @@
                   ],
                   "parameters": {
                     "name": {
-                      "description": "The name of the function to be updated.",
+                      "description": "Required. The name of the function to be updated.",
                       "location": "path",
                       "pattern": "^projects/[^/]+/locations/[^/]+/functions/[^/]+$",
                       "required": true,
@@ -452,7 +452,7 @@
       }
     }
   },
-  "revision": "20190607",
+  "revision": "20191003",
   "rootUrl": "https://cloudfunctions.googleapis.com/",
   "schemas": {
     "CallFunctionRequest": {
@@ -460,7 +460,7 @@
       "id": "CallFunctionRequest",
       "properties": {
         "data": {
-          "description": "Input to be passed to the function.",
+          "description": "Required. Input to be passed to the function.",
           "type": "string"
         }
       },
@@ -534,15 +534,15 @@
           "type": "string"
         },
         "network": {
-          "description": "The VPC Network that this cloud function can connect to. It can be\neither the fully-qualified URI, or the short name of the network resource.\nIf the short network name is used, the network must belong to the same\nproject. Otherwise, it must belong to a project within the same\norganization. The format of this field is either\n`projects/{project}/global/networks/{network}` or `{network}`, where\n{project} is a project id where the network is defined, and {network} is\nthe short name of the network.\n\nThis field is mutually exclusive with `vpc_connector` and will be replaced\nby it.\n\nSee [the VPC documentation](https://cloud.google.com/compute/docs/vpc) for\nmore information on connecting Cloud projects.\n\nThis feature is currently in alpha, available only for whitelisted users.",
+          "description": "The VPC Network that this cloud function can connect to. It can be\neither the fully-qualified URI, or the short name of the network resource.\nIf the short network name is used, the network must belong to the same\nproject. Otherwise, it must belong to a project within the same\norganization. The format of this field is either\n`projects/{project}/global/networks/{network}` or `{network}`, where\n{project} is a project id where the network is defined, and {network} is\nthe short name of the network.\n\nThis field is mutually exclusive with `vpc_connector` and will be replaced\nby it.\n\nSee [the VPC documentation](https://cloud.google.com/compute/docs/vpc) for\nmore information on connecting Cloud projects.",
           "type": "string"
         },
         "runtime": {
-          "description": "Required. The runtime in which the function is going to run. Choices:\n\n* `nodejs6`: Node.js 6\n* `nodejs8`: Node.js 8\n* `nodejs10`: Node.js 10\n* `python37`: Python 3.7\n* `go111`: Go 1.11",
+          "description": "The runtime in which to run the function. Required when deploying a new\nfunction, optional when updating an existing function. For a complete\nlist of possible choices, see the\n[`gcloud` command\nreference](/sdk/gcloud/reference/functions/deploy#--runtime).",
           "type": "string"
         },
         "serviceAccount": {
-          "description": "The email of the function's service account. If empty, defaults to\n{project_id}@appspot.gserviceaccount.com.",
+          "description": "The email of the function's service account. If empty, defaults to\n`{project_id}@appspot.gserviceaccount.com`.",
           "type": "string"
         },
         "sourceArchiveUrl": {
@@ -590,12 +590,12 @@
           "type": "string"
         },
         "versionId": {
-          "description": "Output only.\nThe version identifier of the Cloud Function. Each deployment attempt\nresults in a new version of a function being created.",
+          "description": "Output only. The version identifier of the Cloud Function. Each deployment attempt\nresults in a new version of a function being created.",
           "format": "int64",
           "type": "string"
         },
         "vpcConnector": {
-          "description": "The VPC Network Connector that this cloud function can connect to. It can\nbe either the fully-qualified URI, or the short name of the network\nconnector resource. The format of this field is\n`projects/*/locations/*/connectors/*`\n\nThis field is mutually exclusive with `network` field and will eventually\nreplace it.\n\nSee [the VPC documentation](https://cloud.google.com/compute/docs/vpc) for\nmore information on connecting Cloud projects.\n\nThis feature is currently in alpha, available only for whitelisted users.",
+          "description": "The VPC Network Connector that this cloud function can connect to. It can\nbe either the fully-qualified URI, or the short name of the network\nconnector resource. The format of this field is\n`projects/*/locations/*/connectors/*`\n\nThis field is mutually exclusive with `network` field and will eventually\nreplace it.\n\nSee [the VPC documentation](https://cloud.google.com/compute/docs/vpc) for\nmore information on connecting Cloud projects.",
           "type": "string"
         }
       },
@@ -700,6 +700,13 @@
         "nextPageToken": {
           "description": "If not empty, indicates that there may be more functions that match\nthe request; this value should be passed in a new\ngoogle.cloud.functions.v1beta2.ListFunctionsRequest\nto get more functions.",
           "type": "string"
+        },
+        "unreachable": {
+          "description": "Locations that could not be reached. The response does not include any\nfunctions from these locations.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         }
       },
       "type": "object"

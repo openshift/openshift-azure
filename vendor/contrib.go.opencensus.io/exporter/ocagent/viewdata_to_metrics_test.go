@@ -135,6 +135,7 @@ func TestExportMetrics_conversionFromViewData(t *testing.T) {
 					},
 				},
 			},
+			Resource: resourceProtoFromEnv(),
 		},
 	}
 

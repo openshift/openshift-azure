@@ -7,6 +7,9 @@
         },
         "https://www.googleapis.com/auth/cloud-identity.groups.readonly": {
           "description": "See any Cloud Identity Groups that you can access, including group members and their emails"
+        },
+        "https://www.googleapis.com/auth/cloud-platform": {
+          "description": "View and manage your data across Google Cloud Platform services"
         }
       }
     }
@@ -124,7 +127,8 @@
             "$ref": "Operation"
           },
           "scopes": [
-            "https://www.googleapis.com/auth/cloud-identity.groups"
+            "https://www.googleapis.com/auth/cloud-identity.groups",
+            "https://www.googleapis.com/auth/cloud-platform"
           ]
         },
         "delete": {
@@ -149,7 +153,8 @@
             "$ref": "Operation"
           },
           "scopes": [
-            "https://www.googleapis.com/auth/cloud-identity.groups"
+            "https://www.googleapis.com/auth/cloud-identity.groups",
+            "https://www.googleapis.com/auth/cloud-platform"
           ]
         },
         "get": {
@@ -175,7 +180,8 @@
           },
           "scopes": [
             "https://www.googleapis.com/auth/cloud-identity.groups",
-            "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
+            "https://www.googleapis.com/auth/cloud-identity.groups.readonly",
+            "https://www.googleapis.com/auth/cloud-platform"
           ]
         },
         "lookup": {
@@ -202,7 +208,8 @@
           },
           "scopes": [
             "https://www.googleapis.com/auth/cloud-identity.groups",
-            "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
+            "https://www.googleapis.com/auth/cloud-identity.groups.readonly",
+            "https://www.googleapis.com/auth/cloud-platform"
           ]
         },
         "patch": {
@@ -215,7 +222,7 @@
           ],
           "parameters": {
             "name": {
-              "description": "[Resource name](https://cloud.google.com/apis/design/resource_names) of the\nGroup in the format: `groups/{group_id}`, where group_id is the unique id\nassigned to the Group.\n\nMust be left blank while creating a Group",
+              "description": "Output only. [Resource name](https://cloud.google.com/apis/design/resource_names) of the\nGroup in the format: `groups/{group_id}`, where group_id is the unique id\nassigned to the Group.\n\nMust be left blank while creating a Group",
               "location": "path",
               "pattern": "^groups/[^/]+$",
               "required": true,
@@ -236,7 +243,8 @@
             "$ref": "Operation"
           },
           "scopes": [
-            "https://www.googleapis.com/auth/cloud-identity.groups"
+            "https://www.googleapis.com/auth/cloud-identity.groups",
+            "https://www.googleapis.com/auth/cloud-platform"
           ]
         },
         "search": {
@@ -278,7 +286,8 @@
           },
           "scopes": [
             "https://www.googleapis.com/auth/cloud-identity.groups",
-            "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
+            "https://www.googleapis.com/auth/cloud-identity.groups.readonly",
+            "https://www.googleapis.com/auth/cloud-platform"
           ]
         }
       },
@@ -310,7 +319,8 @@
                 "$ref": "Operation"
               },
               "scopes": [
-                "https://www.googleapis.com/auth/cloud-identity.groups"
+                "https://www.googleapis.com/auth/cloud-identity.groups",
+                "https://www.googleapis.com/auth/cloud-platform"
               ]
             },
             "delete": {
@@ -335,7 +345,8 @@
                 "$ref": "Operation"
               },
               "scopes": [
-                "https://www.googleapis.com/auth/cloud-identity.groups"
+                "https://www.googleapis.com/auth/cloud-identity.groups",
+                "https://www.googleapis.com/auth/cloud-platform"
               ]
             },
             "get": {
@@ -361,7 +372,8 @@
               },
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-identity.groups",
-                "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
+                "https://www.googleapis.com/auth/cloud-identity.groups.readonly",
+                "https://www.googleapis.com/auth/cloud-platform"
               ]
             },
             "list": {
@@ -407,7 +419,8 @@
               },
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-identity.groups",
-                "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
+                "https://www.googleapis.com/auth/cloud-identity.groups.readonly",
+                "https://www.googleapis.com/auth/cloud-platform"
               ]
             },
             "lookup": {
@@ -443,7 +456,8 @@
               },
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-identity.groups",
-                "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
+                "https://www.googleapis.com/auth/cloud-identity.groups.readonly",
+                "https://www.googleapis.com/auth/cloud-platform"
               ]
             }
           }
@@ -451,7 +465,7 @@
       }
     }
   },
-  "revision": "20190529",
+  "revision": "20191027",
   "rootUrl": "https://cloudidentity.googleapis.com/",
   "schemas": {
     "EntityKey": {
@@ -481,7 +495,7 @@
           "type": "array"
         },
         "createTime": {
-          "description": "The time when the Group was created.\nOutput only",
+          "description": "Output only. The time when the Group was created.\nOutput only",
           "format": "google-datetime",
           "type": "string"
         },
@@ -495,25 +509,25 @@
         },
         "groupKey": {
           "$ref": "EntityKey",
-          "description": "EntityKey of the Group.\n\nMust be set when creating a Group, read-only afterwards."
+          "description": "Required. Immutable. EntityKey of the Group.\n\nMust be set when creating a Group, read-only afterwards."
         },
         "labels": {
           "additionalProperties": {
             "type": "string"
           },
-          "description": "Labels for Group resource.\nRequired.\nFor creating Groups under a namespace, set label key to\n'labels/system/groups/external' and label value as empty.",
+          "description": "Required. Labels for Group resource.\nRequired.\nFor creating Groups under a namespace, set label key to\n'labels/system/groups/external' and label value as empty.",
           "type": "object"
         },
         "name": {
-          "description": "[Resource name](https://cloud.google.com/apis/design/resource_names) of the\nGroup in the format: `groups/{group_id}`, where group_id is the unique id\nassigned to the Group.\n\nMust be left blank while creating a Group",
+          "description": "Output only. [Resource name](https://cloud.google.com/apis/design/resource_names) of the\nGroup in the format: `groups/{group_id}`, where group_id is the unique id\nassigned to the Group.\n\nMust be left blank while creating a Group",
           "type": "string"
         },
         "parent": {
-          "description": "The entity under which this Group resides in Cloud Identity resource\nhierarchy. Must be set when creating a Group, read-only afterwards.\n\nCurrently allowed types: 'identitysources'.",
+          "description": "Required. Immutable. The entity under which this Group resides in Cloud Identity resource\nhierarchy. Must be set when creating a Group, read-only afterwards.\n\nCurrently allowed types: 'identitysources'.",
           "type": "string"
         },
         "updateTime": {
-          "description": "The time when the Group was last updated.\nOutput only",
+          "description": "Output only. The time when the Group was last updated.\nOutput only",
           "format": "google-datetime",
           "type": "string"
         }
@@ -562,27 +576,27 @@
       "id": "Membership",
       "properties": {
         "createTime": {
-          "description": "Creation timestamp of the Membership.",
+          "description": "Output only. Creation timestamp of the Membership.",
           "format": "google-datetime",
           "type": "string"
         },
         "memberKey": {
           "$ref": "EntityKey",
-          "description": "EntityKey of the entity to be added as the member. Must be set while\ncreating a Membership, read-only afterwards.\n\nCurrently allowed entity types: `Users`, `Groups`."
+          "description": "Required. Immutable. EntityKey of the entity to be added as the member. Must be set while\ncreating a Membership, read-only afterwards.\n\nCurrently allowed entity types: `Users`, `Groups`.\nThis field will be deprecated soon."
         },
         "name": {
-          "description": "[Resource name](https://cloud.google.com/apis/design/resource_names) of the\nMembership in the format: `groups/{group_id}/memberships/{member_id}`,\nwhere group_id is the unique id assigned to the Group to which Membership\nbelongs to, and member_id is the unique id assigned to the member\n\nMust be left blank while creating a Membership.",
+          "description": "Output only. [Resource name](https://cloud.google.com/apis/design/resource_names) of the\nMembership in the format: `groups/{group_id}/memberships/{member_id}`,\nwhere group_id is the unique id assigned to the Group to which Membership\nbelongs to, and member_id is the unique id assigned to the member\n\nMust be left blank while creating a Membership.",
           "type": "string"
         },
         "roles": {
-          "description": "Roles for a member within the Group.\n\nCurrently supported MembershipRoles: `\"MEMBER\"`.",
+          "description": "Roles for a member within the Group.\n\nCurrently supported MembershipRoles: `\"MEMBER\", \"OWNER\", \"MANAGER\"`.",
           "items": {
             "$ref": "MembershipRole"
           },
           "type": "array"
         },
         "updateTime": {
-          "description": "Last updated timestamp of the Membership.",
+          "description": "Output only. Last updated timestamp of the Membership.",
           "format": "google-datetime",
           "type": "string"
         }
@@ -594,7 +608,7 @@
       "id": "MembershipRole",
       "properties": {
         "name": {
-          "description": "MembershipRole in string format.\n\nCurrently supported MembershipRoles: `\"MEMBER\"`.",
+          "description": "MembershipRole in string format.\nCurrently supported MembershipRoles: `\"MEMBER\", \"OWNER\", \"MANAGER\"`.",
           "type": "string"
         }
       },

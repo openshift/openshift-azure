@@ -49,8 +49,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -150,6 +150,12 @@ type LighthouseAuditResultV5 struct {
 	// Id: The audit's id.
 	Id string `json:"id,omitempty"`
 
+	// NumericValue: A numeric value that has a meaning specific to the
+	// audit, e.g. the number of nodes in the DOM or the timestamp of a
+	// specific load event. More information can be found in the audit
+	// details, if present.
+	NumericValue float64 `json:"numericValue,omitempty"`
+
 	Score interface{} `json:"score,omitempty"`
 
 	// ScoreDisplayMode: The enumerated score display mode.
@@ -181,6 +187,20 @@ func (s *LighthouseAuditResultV5) MarshalJSON() ([]byte, error) {
 	type NoMethod LighthouseAuditResultV5
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+func (s *LighthouseAuditResultV5) UnmarshalJSON(data []byte) error {
+	type NoMethod LighthouseAuditResultV5
+	var s1 struct {
+		NumericValue gensupport.JSONFloat64 `json:"numericValue"`
+		*NoMethod
+	}
+	s1.NoMethod = (*NoMethod)(s)
+	if err := json.Unmarshal(data, &s1); err != nil {
+		return err
+	}
+	s.NumericValue = float64(s1.NumericValue)
+	return nil
 }
 
 type LighthouseCategoryV5 struct {
@@ -311,7 +331,7 @@ type LighthouseResultV5 struct {
 
 	// RunWarnings: List of all run warnings in the LHR. Will always output
 	// to at least `[]`.
-	RunWarnings []interface{} `json:"runWarnings,omitempty"`
+	RunWarnings []GoogleprotobufValue `json:"runWarnings,omitempty"`
 
 	// RuntimeError: A top-level error message that, if present, indicates a
 	// serious enough problem that this Lighthouse result may need to be
@@ -1049,6 +1069,7 @@ func (c *PagespeedapiRunpagespeedCall) Header() http.Header {
 
 func (c *PagespeedapiRunpagespeedCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1156,7 +1177,7 @@ func (c *PagespeedapiRunpagespeedCall) Do(opts ...googleapi.CallOption) (*Pagesp
 	//     "url": {
 	//       "description": "The URL to fetch and analyze",
 	//       "location": "query",
-	//       "pattern": "(?i)http(s)?://.*",
+	//       "pattern": "(?i)(url:|origin:)?http(s)?://.*",
 	//       "required": true,
 	//       "type": "string"
 	//     },

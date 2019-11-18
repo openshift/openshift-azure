@@ -2485,7 +2485,7 @@
       }
     }
   },
-  "revision": "20190530",
+  "revision": "20191111",
   "rootUrl": "https://adexchangebuyer.googleapis.com/",
   "schemas": {
     "AbsoluteDateRange": {
@@ -2653,7 +2653,7 @@
         },
         "impressionsWon": {
           "$ref": "MetricValue",
-          "description": "The number of bids that won an impression."
+          "description": "The number of bids that won the auction."
         },
         "measurableImpressions": {
           "$ref": "MetricValue",
@@ -2693,8 +2693,8 @@
           "enumDescriptions": [
             "A placeholder for an undefined status.\nThis value will never be returned in responses.",
             "The response had no bids.",
-            "The response had no bids for the specified account, though it may have\nincluded bids on behalf of other accounts.",
-            "The response had no bids for the specified deal, though it may have\nincluded bids on other deals on behalf of the account to which the deal\nbelongs."
+            "The response had no bids for the specified account, though it may have\nincluded bids on behalf of other accounts.\nApplies if:\n1. Request is on behalf of a bidder and an account filter is present.\n2. Request is on behalf of a child seat.",
+            "The response had no bids for the specified deal, though it may have\nincluded bids on other deals on behalf of the account to which the deal\nbelongs. If request is on behalf of a bidder and an account filter is not\npresent, this also includes responses that have bids on behalf of\naccounts other than the account to which the deal belongs."
           ],
           "type": "string"
         }
@@ -3093,14 +3093,18 @@
             "NOT_CHECKED",
             "CONDITIONALLY_APPROVED",
             "APPROVED",
-            "DISAPPROVED"
+            "DISAPPROVED",
+            "PENDING_REVIEW",
+            "STATUS_TYPE_UNSPECIFIED"
           ],
           "enumDescriptions": [
             "The status is unknown.",
             "The creative has not been checked.",
             "The creative has been conditionally approved.\nSee serving_restrictions for details.",
             "The creative has been approved.",
-            "The creative has been disapproved."
+            "The creative has been disapproved.",
+            "Placeholder for transition to v1beta1. Currently not used.",
+            "Placeholder for transition to v1beta1. Currently not used."
           ],
           "type": "string"
         },
@@ -3171,14 +3175,18 @@
             "NOT_CHECKED",
             "CONDITIONALLY_APPROVED",
             "APPROVED",
-            "DISAPPROVED"
+            "DISAPPROVED",
+            "PENDING_REVIEW",
+            "STATUS_TYPE_UNSPECIFIED"
           ],
           "enumDescriptions": [
             "The status is unknown.",
             "The creative has not been checked.",
             "The creative has been conditionally approved.\nSee serving_restrictions for details.",
             "The creative has been approved.",
-            "The creative has been disapproved."
+            "The creative has been disapproved.",
+            "Placeholder for transition to v1beta1. Currently not used.",
+            "Placeholder for transition to v1beta1. Currently not used."
           ],
           "type": "string"
         },

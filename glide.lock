@@ -1,29 +1,32 @@
-hash: 0e94f8fae85c523e148deebd141a4e3de1f6e6267636254c4bdb00a410135b39
-updated: 2019-07-23T12:03:39.824691057+02:00
+hash: 8edf5730968e000580802ca3d22fc680e156f1ded767100fc09acbbe71fd4aba
+updated: 2019-11-18T10:06:05.839317Z
 imports:
 - name: code.cloudfoundry.org/clock
   version: 02e53af36e6c978af692887ed449b74026d76fec
 - name: contrib.go.opencensus.io/exporter/ocagent
-  version: 8110e6c0236bb231b19119275a6be6ec666d05c8
+  version: a8a6f458bbc1d5042322ad1f9b65eeb0b69be9ea
 - name: github.com/alecthomas/units
-  version: c3de453c63f4bdb4dadffab9805ec00426c505f7
+  version: f65c72e2690dc4b403c8bd637baf4611cd4c069b
+- name: github.com/apparentlymart/go-cidr
+  version: c0fb5fbe0acb592411e2db59add389a43260ad44
+  subpackages:
+  - cidr
 - name: github.com/Azure/azure-sdk-for-go
   version: 1951233eb944a49aa5f7278cba8e3e32a8c958af
   subpackages:
-  - profiles/latest/compute/mgmt/compute
-  - profiles/preview/resources/mgmt/managedapplications
+  - profiles/latest/network/mgmt/network
   - services/authorization/mgmt/2015-07-01/authorization
   - services/compute/mgmt/2018-10-01/compute
   - services/dns/mgmt/2017-10-01/dns
   - services/graphrbac/1.6/graphrbac
   - services/keyvault/2016-10-01/keyvault
   - services/keyvault/mgmt/2016-10-01/keyvault
-  - services/marketplaceordering/mgmt/2015-06-01/marketplaceordering
   - services/network/mgmt/2018-06-01/network
   - services/network/mgmt/2018-07-01/network
+  - services/network/mgmt/2018-10-01/network
   - services/preview/monitor/mgmt/2018-09-01/insights
+  - services/preview/operationalinsights/mgmt/2015-11-01-preview/operationalinsights
   - services/resources/mgmt/2018-05-01/resources
-  - services/resources/mgmt/2018-06-01/managedapplications
   - services/storage/mgmt/2018-02-01/storage
   - storage
   - version
@@ -42,11 +45,13 @@ imports:
   - tracing
   - version
 - name: github.com/beorn7/perks
-  version: 4b2b341e8d7715fae06375aa633dbb6e91b3fb46
+  version: 37c8de3658fcb183f997c4e13e8337516ab753e6
   subpackages:
   - quantile
+- name: github.com/BurntSushi/toml
+  version: 3012a1dbe2e4bd1391d42b32f0577cb7bbc7f005
 - name: github.com/census-instrumentation/opencensus-proto
-  version: 97194d1225539f817404bac07e965fd6d8f2a289
+  version: 5cec5ea58c3efa81fa808f2bd38ce182da9ee731
   subpackages:
   - gen-go/agent/common/v1
   - gen-go/agent/metrics/v1
@@ -55,7 +60,7 @@ imports:
   - gen-go/resource/v1
   - gen-go/trace/v1
 - name: github.com/cespare/xxhash
-  version: 32f3a100fff237d14029d34ec8579ef02aaaf87c
+  version: d7df74196a9e781ede915320c11c378c1b2f3a1f
 - name: github.com/coreos/etcd
   version: 420a452267a7ce45b3fcbed04d54030d69964fc1
   subpackages:
@@ -76,7 +81,7 @@ imports:
 - name: github.com/dgrijalva/jwt-go
   version: 01aeca54ebda6e0fbfafd0a524d234159c05ec20
 - name: github.com/dimchansky/utfbom
-  version: 6c6132ff69f0f6c088739067407b5d32c52e1d0f
+  version: d2133a1ce379ef6fa992b0514a77146c60db9d1c
 - name: github.com/ghodss/yaml
   version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
 - name: github.com/go-chi/chi
@@ -84,16 +89,16 @@ imports:
   subpackages:
   - middleware
 - name: github.com/go-kit/kit
-  version: 150a65a7ec6156b4b640c1fd55f26fd3d475d656
+  version: c0f85106313b6e8cb564f91c8a57d87c79efbc1e
   subpackages:
   - log
   - log/level
 - name: github.com/go-logfmt/logfmt
   version: 07c9b44f60d7ffdfb7d8efe1ad539965737836dc
 - name: github.com/go-logr/logr
-  version: 9fb12b3b21c5415d16ac18dc5cd42c1cfdd40c4e
+  version: a1ebd699b1950beb1da0752cbb5559662018f798
 - name: github.com/go-logr/zapr
-  version: 7536572e8d55209135cd5e7ccf7fce43dca217ab
+  version: 8f2487342d52a33a1793e50e3ca04bc1767aa65c
 - name: github.com/gogo/protobuf
   version: c0656edd0d9eab7c66d1eb0c568f9039345796f7
   subpackages:
@@ -112,12 +117,10 @@ imports:
 - name: github.com/golang/protobuf
   version: 6c65a5562fc06764971b7c5d05c76c75e84bdbf7
   subpackages:
+  - descriptor
   - jsonpb
   - proto
   - protoc-gen-go/descriptor
-  - protoc-gen-go/generator
-  - protoc-gen-go/generator/internal/remap
-  - protoc-gen-go/plugin
   - ptypes
   - ptypes/any
   - ptypes/duration
@@ -133,7 +136,7 @@ imports:
   - cmp/internal/function
   - cmp/internal/value
 - name: github.com/google/go-github
-  version: c756c329c19dbbadba0675b42af693093c3f2c45
+  version: 19a41cc0d7a8b22c18bcc13b3e4a6474368c497d
   subpackages:
   - github
 - name: github.com/google/go-querystring
@@ -143,7 +146,7 @@ imports:
 - name: github.com/google/gofuzz
   version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
 - name: github.com/google/uuid
-  version: 9b3b1e0f5f99ae461456d768e7d301a7acdaa2d8
+  version: c2e93f3ae59f2904160ceaab466009f965df46d6
 - name: github.com/googleapis/gnostic
   version: 0c5108395e2debce0d731cf0287ddf7242066aba
   subpackages:
@@ -151,7 +154,7 @@ imports:
   - compiler
   - extensions
 - name: github.com/grpc-ecosystem/grpc-gateway
-  version: ad529a448ba494a88058f9e5be0988713174ac86
+  version: f7120437bb4f6c71f7f5076ad65a45310de2c009
   subpackages:
   - internal
   - runtime
@@ -199,7 +202,7 @@ imports:
   subpackages:
   - pbutil
 - name: github.com/microsoft/ApplicationInsights-Go
-  version: 83da4dfd6ba2cd5f1a2bd83c931fa1dd7a419bd7
+  version: d813d7725313000ad1b71627b8951323635f0572
   subpackages:
   - appinsights
   - appinsights/contracts
@@ -210,7 +213,7 @@ imports:
 - name: github.com/modern-go/reflect2
   version: 05fbef0ca5da472bbf96c9322b84a53edc03c9fd
 - name: github.com/oklog/ulid
-  version: e51a56f2a4c1bf73c967ca6d45d5366bade31943
+  version: a41d229797d91e914323f27d52d1053d2e709119
 - name: github.com/onsi/ginkgo
   version: eea6ad008b96acdaa524f5b409513bf062b500ad
   subpackages:
@@ -288,13 +291,13 @@ imports:
   - user/clientset/versioned/typed/user/v1
   - user/clientset/versioned/typed/user/v1/fake
 - name: github.com/opentracing/opentracing-go
-  version: 135aa78c6f95b4a199daf2f0470d231136cbbd0c
+  version: a7454ce5950e83caac9774ef32cc8979e5975f30
   subpackages:
   - log
 - name: github.com/pborman/uuid
   version: adf5a7427709b9deb95d29d3fa8a2bf9cfd388f1
 - name: github.com/pkg/errors
-  version: 645ef00459ed84a119197bfb8d8205042c6df63d
+  version: 7f95ac13edff643b8ce5398b6ccab125f8a20c1a
 - name: github.com/prometheus/client_golang
   version: 505eaef017263e299324067d40ca2c48f6a2cf50
   subpackages:
@@ -305,7 +308,7 @@ imports:
   - prometheus/promauto
   - prometheus/promhttp
 - name: github.com/prometheus/client_model
-  version: 5c3871d89910bfb32f5fcab2aa4b9ec68e65a99f
+  version: 14fe0d1b01d4d5fc031dd4bec1823bd3ebbe8016
   subpackages:
   - go
 - name: github.com/prometheus/common
@@ -349,9 +352,9 @@ imports:
 - name: github.com/spf13/cobra
   version: ef82de70bb3f60c65fb8eebacbb2d122ef517385
 - name: github.com/spf13/pflag
-  version: 583c0c0531f06d5278b7d917446061adc344b5cd
+  version: 2e9d26c8c37aae03e3f9d4e90b7116f5accb7cab
 - name: go.opencensus.io
-  version: b4a14686f0a98096416fe1b4cb848e384fb2b22b
+  version: aad2c527c5defcf89b5afab7f37274304195a6b2
   subpackages:
   - internal
   - internal/tagencoding
@@ -371,9 +374,13 @@ imports:
   - trace/propagation
   - trace/tracestate
 - name: go.uber.org/atomic
-  version: df976f2515e274675050de7b3f42545de80594fd
+  version: 9dc4df04d0d1c39369750a9f6c32c39560672089
 - name: go.uber.org/multierr
-  version: 3c4937480c32f4c13a875a1829af76c98ca3d40a
+  version: 824d08f79702fe5f54aca8400aa0d754318786e7
+- name: go.uber.org/tools
+  version: 2cfd321de3ee5d5f8a5fda2521d1703478334d98
+  subpackages:
+  - update-license
 - name: go.uber.org/zap
   version: eeedf312bc6c57391d84767a4cd413f02a917974
   subpackages:
@@ -385,13 +392,24 @@ imports:
 - name: golang.org/x/crypto
   version: 81e90905daefcd6fd217b62423c0908922eadb30
   subpackages:
+  - cast5
   - curve25519
   - ed25519
   - ed25519/internal/edwards25519
+  - openpgp
+  - openpgp/armor
+  - openpgp/elgamal
+  - openpgp/errors
+  - openpgp/packet
+  - openpgp/s2k
   - pkcs12
   - pkcs12/internal/rc2
   - ssh
   - ssh/terminal
+- name: golang.org/x/lint
+  version: 16217165b5de779cb6a5e4fc81fa9c1166fda457
+  subpackages:
+  - golint
 - name: golang.org/x/net
   version: 1c05540f6879653db88113bc4a2b70aec4bd491f
   subpackages:
@@ -411,7 +429,7 @@ imports:
   subpackages:
   - internal
 - name: golang.org/x/sync
-  version: 112230192c580c3556b8cee6403af37a4fc5f28c
+  version: cd5d95a43a6e21273425c7ae415d3df9ea832eeb
   subpackages:
   - errgroup
   - semaphore
@@ -445,12 +463,30 @@ imports:
   version: f51c12702a4d776e4c1fa9b0fabab841babae631
   subpackages:
   - rate
+- name: golang.org/x/tools
+  version: 2d2de6298155751e44170d1c9a9baacb688d2606
+  subpackages:
+  - go/analysis
+  - go/analysis/passes/inspect
+  - go/ast/astutil
+  - go/ast/inspector
+  - go/buildutil
+  - go/gcexportdata
+  - go/internal/cgo
+  - go/internal/gcimporter
+  - go/loader
+  - go/packages
+  - go/types/objectpath
+  - go/types/typeutil
+  - internal/fastwalk
+  - internal/gopathwalk
+  - internal/semver
 - name: google.golang.org/api
-  version: 069bea57b1be6ad0671a49ea7a1128025a22b73f
+  version: 006ab4afe25e899e4ec545ce1cbfdaed675d15d8
   subpackages:
   - support/bundler
 - name: google.golang.org/appengine
-  version: b2f4a3cf3c67576a2ee09e1fe62656a5086ce880
+  version: 16bce7d3dc4e458f2f6f56a1349cbbfcdc8a8fdf
   subpackages:
   - internal
   - internal/base
@@ -502,7 +538,39 @@ imports:
 - name: gopkg.in/tomb.v1
   version: c131134a1947e9afd9cecfe11f4c6dff0732ae58
 - name: gopkg.in/yaml.v2
-  version: 670d4cfef0544295bc27a114dbac37980d83185a
+  version: f90ceb4f409096b60e2e9076b38b304b8246e5fa
+- name: honnef.co/go/tools
+  version: a9480a3ec3bcedcf32d00a67bb464c058ba03281
+  subpackages:
+  - arg
+  - cmd/staticcheck
+  - code
+  - config
+  - deprecated
+  - edit
+  - facts
+  - functions
+  - go/types/typeutil
+  - internal/cache
+  - internal/passes/buildir
+  - internal/renameio
+  - internal/robustio
+  - internal/sharedcheck
+  - ir
+  - ir/irutil
+  - lint
+  - lint/lintdsl
+  - lint/lintutil
+  - lint/lintutil/format
+  - loader
+  - pattern
+  - printf
+  - report
+  - simple
+  - staticcheck
+  - stylecheck
+  - unused
+  - version
 - name: k8s.io/api
   version: 0f11257a8a25954878633ebdc9841c67d8f83bdb
   subpackages:

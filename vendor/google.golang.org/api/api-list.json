@@ -200,7 +200,7 @@
         "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
       },
-      "documentationLink": "https://developers.google.com/admin-sdk/reports/",
+      "documentationLink": "/admin-sdk/reports/",
       "preferred": true
     },
     {
@@ -412,6 +412,21 @@
     },
     {
       "kind": "discovery#directoryItem",
+      "id": "apigee:v1",
+      "name": "apigee",
+      "version": "v1",
+      "title": "Apigee API",
+      "description": "The Apigee API lets you programmatically manage Apigee Hybrid with a set of RESTful operations, including: - Create, edit, and delete API proxies - Manage users - Deploy and undeploy proxy revisions - Configure environments For information on using the APIs described in this section, see Get started using the APIs \u003c/hybrid/beta2/reference/apis\u003e.",
+      "discoveryRestUrl": "https://apigee.googleapis.com/$discovery/rest?version=v1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://cloud.google.com/apigee-api-management/",
+      "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
       "id": "appengine:v1alpha",
       "name": "appengine",
       "version": "v1alpha",
@@ -503,22 +518,6 @@
     },
     {
       "kind": "discovery#directoryItem",
-      "id": "appstate:v1",
-      "name": "appstate",
-      "version": "v1",
-      "title": "Google App State API",
-      "description": "The Google App State API.",
-      "discoveryRestUrl": "https://www.googleapis.com/discovery/v1/apis/appstate/v1/rest",
-      "discoveryLink": "./apis/appstate/v1/rest",
-      "icons": {
-        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
-        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
-      },
-      "documentationLink": "https://developers.google.com/games/services/web/api/states",
-      "preferred": true
-    },
-    {
-      "kind": "discovery#directoryItem",
       "id": "bigquery:v2",
       "name": "bigquery",
       "version": "v2",
@@ -529,6 +528,21 @@
       "icons": {
         "x16": "https://www.google.com/images/icons/product/search-16.gif",
         "x32": "https://www.google.com/images/icons/product/search-32.gif"
+      },
+      "documentationLink": "https://cloud.google.com/bigquery/",
+      "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
+      "id": "bigqueryconnection:v1beta1",
+      "name": "bigqueryconnection",
+      "version": "v1beta1",
+      "title": "BigQuery Connection API",
+      "description": "Allows users to manage BigQuery connections to external data sources.",
+      "discoveryRestUrl": "https://bigqueryconnection.googleapis.com/$discovery/rest?version=v1beta1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
       },
       "documentationLink": "https://cloud.google.com/bigquery/",
       "preferred": true
@@ -547,6 +561,51 @@
       },
       "documentationLink": "https://cloud.google.com/bigquery/",
       "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
+      "id": "bigqueryreservation:v1alpha2",
+      "name": "bigqueryreservation",
+      "version": "v1alpha2",
+      "title": "BigQuery Reservation API",
+      "description": "A service to modify your BigQuery flat-rate reservations.",
+      "discoveryRestUrl": "https://bigqueryreservation.googleapis.com/$discovery/rest?version=v1alpha2",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://cloud.google.com/bigquery/",
+      "preferred": false
+    },
+    {
+      "kind": "discovery#directoryItem",
+      "id": "bigqueryreservation:v1",
+      "name": "bigqueryreservation",
+      "version": "v1",
+      "title": "BigQuery Reservation API",
+      "description": "A service to modify your BigQuery flat-rate reservations.",
+      "discoveryRestUrl": "https://bigqueryreservation.googleapis.com/$discovery/rest?version=v1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://cloud.google.com/bigquery/",
+      "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
+      "id": "bigqueryreservation:v1beta1",
+      "name": "bigqueryreservation",
+      "version": "v1beta1",
+      "title": "BigQuery Reservation API",
+      "description": "A service to modify your BigQuery flat-rate reservations.",
+      "discoveryRestUrl": "https://bigqueryreservation.googleapis.com/$discovery/rest?version=v1beta1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://cloud.google.com/bigquery/",
+      "preferred": false
     },
     {
       "kind": "discovery#directoryItem",
@@ -580,6 +639,21 @@
     },
     {
       "kind": "discovery#directoryItem",
+      "id": "binaryauthorization:v1",
+      "name": "binaryauthorization",
+      "version": "v1",
+      "title": "Binary Authorization API",
+      "description": "The management interface for Binary Authorization, a system providing policy control for images deployed to Kubernetes Engine clusters.",
+      "discoveryRestUrl": "https://binaryauthorization.googleapis.com/$discovery/rest?version=v1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://cloud.google.com/binary-authorization/",
+      "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
       "id": "binaryauthorization:v1beta1",
       "name": "binaryauthorization",
       "version": "v1beta1",
@@ -591,7 +665,7 @@
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
       },
       "documentationLink": "https://cloud.google.com/binary-authorization/",
-      "preferred": true
+      "preferred": false
     },
     {
       "kind": "discovery#directoryItem",
@@ -1392,6 +1466,21 @@
     },
     {
       "kind": "discovery#directoryItem",
+      "id": "datacatalog:v1beta1",
+      "name": "datacatalog",
+      "version": "v1beta1",
+      "title": "Google Cloud Data Catalog API",
+      "description": "A fully managed and highly scalable data discovery and metadata management service.",
+      "discoveryRestUrl": "https://datacatalog.googleapis.com/$discovery/rest?version=v1beta1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://cloud.google.com/data-catalog/docs/",
+      "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
       "id": "dataflow:v1b3",
       "name": "dataflow",
       "version": "v1b3",
@@ -1542,38 +1631,6 @@
       },
       "documentationLink": "https://cloud.google.com/deployment-manager/",
       "preferred": true
-    },
-    {
-      "kind": "discovery#directoryItem",
-      "id": "dfareporting:v3.1",
-      "name": "dfareporting",
-      "version": "v3.1",
-      "title": "DCM/DFA Reporting And Trafficking API",
-      "description": "Manages your DoubleClick Campaign Manager ad campaigns and reports.",
-      "discoveryRestUrl": "https://www.googleapis.com/discovery/v1/apis/dfareporting/v3.1/rest",
-      "discoveryLink": "./apis/dfareporting/v3.1/rest",
-      "icons": {
-        "x16": "https://www.google.com/images/icons/product/doubleclick-16.gif",
-        "x32": "https://www.google.com/images/icons/product/doubleclick-32.gif"
-      },
-      "documentationLink": "https://developers.google.com/doubleclick-advertisers/",
-      "preferred": false
-    },
-    {
-      "kind": "discovery#directoryItem",
-      "id": "dfareporting:v3.2",
-      "name": "dfareporting",
-      "version": "v3.2",
-      "title": "DCM/DFA Reporting And Trafficking API",
-      "description": "Manages your DoubleClick Campaign Manager ad campaigns and reports.",
-      "discoveryRestUrl": "https://www.googleapis.com/discovery/v1/apis/dfareporting/v3.2/rest",
-      "discoveryLink": "./apis/dfareporting/v3.2/rest",
-      "icons": {
-        "x16": "https://www.google.com/images/icons/product/doubleclick-16.gif",
-        "x32": "https://www.google.com/images/icons/product/doubleclick-32.gif"
-      },
-      "documentationLink": "https://developers.google.com/doubleclick-advertisers/",
-      "preferred": false
     },
     {
       "kind": "discovery#directoryItem",
@@ -1732,6 +1789,21 @@
     },
     {
       "kind": "discovery#directoryItem",
+      "id": "domainsrdap:v1",
+      "name": "domainsrdap",
+      "version": "v1",
+      "title": "Domains RDAP API",
+      "description": "Read-only public API that lets users search for information about domain names.",
+      "discoveryRestUrl": "https://domainsrdap.googleapis.com/$discovery/rest?version=v1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://developers.google.com/domains/rdap/",
+      "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
       "id": "doubleclickbidmanager:v1",
       "name": "doubleclickbidmanager",
       "version": "v1",
@@ -1747,6 +1819,25 @@
       "labels": [
         "limited_availability"
       ],
+      "preferred": false
+    },
+    {
+      "kind": "discovery#directoryItem",
+      "id": "doubleclickbidmanager:v1.1",
+      "name": "doubleclickbidmanager",
+      "version": "v1.1",
+      "title": "DoubleClick Bid Manager API",
+      "description": "API for viewing and managing your reports in DoubleClick Bid Manager.",
+      "discoveryRestUrl": "https://www.googleapis.com/discovery/v1/apis/doubleclickbidmanager/v1.1/rest",
+      "discoveryLink": "./apis/doubleclickbidmanager/v1.1/rest",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://developers.google.com/bid-manager/",
+      "labels": [
+        "limited_availability"
+      ],
       "preferred": true
     },
     {
@@ -1754,7 +1845,7 @@
       "id": "doubleclicksearch:v2",
       "name": "doubleclicksearch",
       "version": "v2",
-      "title": "DoubleClick Search API",
+      "title": "Search Ads 360 API",
       "description": "Reports and modifies your advertising data in DoubleClick Search (for example, campaigns, ad groups, keywords, and conversions).",
       "discoveryRestUrl": "https://www.googleapis.com/discovery/v1/apis/doubleclicksearch/v2/rest",
       "discoveryLink": "./apis/doubleclicksearch/v2/rest",
@@ -2168,21 +2259,6 @@
     },
     {
       "kind": "discovery#directoryItem",
-      "id": "healthcare:v1alpha2",
-      "name": "healthcare",
-      "version": "v1alpha2",
-      "title": "Cloud Healthcare API",
-      "description": "Manage, store, and access healthcare data in Google Cloud Platform.",
-      "discoveryRestUrl": "https://healthcare.googleapis.com/$discovery/rest?version=v1alpha2",
-      "icons": {
-        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
-        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
-      },
-      "documentationLink": "https://cloud.google.com/healthcare",
-      "preferred": true
-    },
-    {
-      "kind": "discovery#directoryItem",
       "id": "healthcare:v1beta1",
       "name": "healthcare",
       "version": "v1beta1",
@@ -2194,7 +2270,22 @@
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
       },
       "documentationLink": "https://cloud.google.com/healthcare",
-      "preferred": false
+      "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
+      "id": "homegraph:v1",
+      "name": "homegraph",
+      "version": "v1",
+      "title": "HomeGraph API",
+      "description": "",
+      "discoveryRestUrl": "https://homegraph.googleapis.com/$discovery/rest?version=v1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://developers.google.com/actions/smarthome/create-app#request-sync",
+      "preferred": true
     },
     {
       "kind": "discovery#directoryItem",
@@ -2412,15 +2503,30 @@
       "id": "licensing:v1",
       "name": "licensing",
       "version": "v1",
-      "title": "Enterprise License Manager API",
-      "description": "Views and manages licenses for your domain.",
+      "title": "Licensing API",
+      "description": "Licensing API to view and manage licenses for your domain",
       "discoveryRestUrl": "https://www.googleapis.com/discovery/v1/apis/licensing/v1/rest",
       "discoveryLink": "./apis/licensing/v1/rest",
       "icons": {
         "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
       },
-      "documentationLink": "https://developers.google.com/google-apps/licensing/",
+      "documentationLink": "https://developers.google.com/admin-sdk/licensing/",
+      "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
+      "id": "lifesciences:v2beta",
+      "name": "lifesciences",
+      "version": "v2beta",
+      "title": "Cloud Life Sciences API",
+      "description": "Cloud Life Sciences is a suite of services and tools for managing, processing, and transforming life sciences data.",
+      "discoveryRestUrl": "https://lifesciences.googleapis.com/$discovery/rest?version=v2beta",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://cloud.google.com/life-sciences",
       "preferred": true
     },
     {
@@ -2477,7 +2583,7 @@
       "id": "ml:v1",
       "name": "ml",
       "version": "v1",
-      "title": "Cloud Machine Learning Engine",
+      "title": "AI Platform Training & Prediction API",
       "description": "An API to enable creating and using machine learning models.",
       "discoveryRestUrl": "https://ml.googleapis.com/$discovery/rest?version=v1",
       "icons": {
@@ -2495,6 +2601,21 @@
       "title": "Stackdriver Monitoring API",
       "description": "Manages your Stackdriver Monitoring data and configurations. Most projects must be associated with a Stackdriver account, with a few exceptions as noted on the individual method pages. The table entries below are presented in alphabetical order, not in order of common use. For explanations of the concepts found in the table entries, read the [Stackdriver Monitoring documentation](/monitoring/docs).",
       "discoveryRestUrl": "https://monitoring.googleapis.com/$discovery/rest?version=v3p1alpha1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://cloud.google.com/monitoring/api/",
+      "preferred": false
+    },
+    {
+      "kind": "discovery#directoryItem",
+      "id": "monitoring:v1",
+      "name": "monitoring",
+      "version": "v1",
+      "title": "Stackdriver Monitoring API",
+      "description": "Manages your Stackdriver Monitoring data and configurations. Most projects must be associated with a Stackdriver account, with a few exceptions as noted on the individual method pages. The table entries below are presented in alphabetical order, not in order of common use. For explanations of the concepts found in the table entries, read the [Stackdriver Monitoring documentation](/monitoring/docs).",
+      "discoveryRestUrl": "https://monitoring.googleapis.com/$discovery/rest?version=v1",
       "icons": {
         "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
@@ -2585,7 +2706,7 @@
       "name": "oslogin",
       "version": "v1alpha",
       "title": "Cloud OS Login API",
-      "description": "Manages OS login configuration for Google account users.",
+      "description": "You can use OS Login to manage access to your VM instances using IAM roles. For more information, read [OS Login](/compute/docs/oslogin/).",
       "discoveryRestUrl": "https://oslogin.googleapis.com/$discovery/rest?version=v1alpha",
       "icons": {
         "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
@@ -2600,7 +2721,7 @@
       "name": "oslogin",
       "version": "v1beta",
       "title": "Cloud OS Login API",
-      "description": "Manages OS login configuration for Google account users.",
+      "description": "You can use OS Login to manage access to your VM instances using IAM roles. For more information, read [OS Login](/compute/docs/oslogin/).",
       "discoveryRestUrl": "https://oslogin.googleapis.com/$discovery/rest?version=v1beta",
       "icons": {
         "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
@@ -2615,7 +2736,7 @@
       "name": "oslogin",
       "version": "v1",
       "title": "Cloud OS Login API",
-      "description": "Manages OS login configuration for Google account users.",
+      "description": "You can use OS Login to manage access to your VM instances using IAM roles. For more information, read [OS Login](/compute/docs/oslogin/).",
       "discoveryRestUrl": "https://oslogin.googleapis.com/$discovery/rest?version=v1",
       "icons": {
         "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
@@ -2753,6 +2874,21 @@
     },
     {
       "kind": "discovery#directoryItem",
+      "id": "policytroubleshooter:v1beta",
+      "name": "policytroubleshooter",
+      "version": "v1beta",
+      "title": "Policy Troubleshooter API",
+      "description": "",
+      "discoveryRestUrl": "https://policytroubleshooter.googleapis.com/$discovery/rest?version=v1beta",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://cloud.google.com/iam/",
+      "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
       "id": "poly:v1",
       "name": "poly",
       "version": "v1",
@@ -2825,6 +2961,21 @@
       },
       "documentationLink": "https://cloud.google.com/pubsub/docs",
       "preferred": false
+    },
+    {
+      "kind": "discovery#directoryItem",
+      "id": "recommender:v1beta1",
+      "name": "recommender",
+      "version": "v1beta1",
+      "title": "Recommender API",
+      "description": "",
+      "discoveryRestUrl": "https://recommender.googleapis.com/$discovery/rest?version=v1beta1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://cloud.google.com/recommender/docs/",
+      "preferred": true
     },
     {
       "kind": "discovery#directoryItem",
@@ -3362,6 +3513,36 @@
     },
     {
       "kind": "discovery#directoryItem",
+      "id": "speech:v2beta1",
+      "name": "speech",
+      "version": "v2beta1",
+      "title": "Cloud Speech-to-Text API",
+      "description": "Converts audio to text by applying powerful neural network models.",
+      "discoveryRestUrl": "https://speech.googleapis.com/$discovery/rest?version=v2beta1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://cloud.google.com/speech-to-text/docs/quickstart-protocol",
+      "preferred": false
+    },
+    {
+      "kind": "discovery#directoryItem",
+      "id": "sql:v1beta4",
+      "name": "sql",
+      "version": "v1beta4",
+      "title": "Cloud SQL Admin API",
+      "description": "API for Cloud SQL database instance management",
+      "discoveryRestUrl": "https://sqladmin.googleapis.com/$discovery/rest?version=v1beta4",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://developers.google.com/cloud-sql/",
+      "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
       "id": "sqladmin:v1beta4",
       "name": "sqladmin",
       "version": "v1beta4",
@@ -3649,22 +3830,6 @@
     },
     {
       "kind": "discovery#directoryItem",
-      "id": "urlshortener:v1",
-      "name": "urlshortener",
-      "version": "v1",
-      "title": "URL Shortener API",
-      "description": "Lets you create, inspect, and manage goo.gl short URLs",
-      "discoveryRestUrl": "https://www.googleapis.com/discovery/v1/apis/urlshortener/v1/rest",
-      "discoveryLink": "./apis/urlshortener/v1/rest",
-      "icons": {
-        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
-        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
-      },
-      "documentationLink": "https://developers.google.com/url-shortener/v1/getting_started",
-      "preferred": true
-    },
-    {
-      "kind": "discovery#directoryItem",
       "id": "vault:v1",
       "name": "vault",
       "version": "v1",
@@ -3676,6 +3841,21 @@
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
       },
       "documentationLink": "https://developers.google.com/vault",
+      "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
+      "id": "verifiedaccess:v1",
+      "name": "verifiedaccess",
+      "version": "v1",
+      "title": "Chrome Verified Access API",
+      "description": "API for Verified Access chrome extension to provide credential verification for chrome devices connecting to an enterprise network",
+      "discoveryRestUrl": "https://verifiedaccess.googleapis.com/$discovery/rest?version=v1",
+      "icons": {
+        "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+        "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+      },
+      "documentationLink": "https://developers.google.com/chrome/verified-access",
       "preferred": true
     },
     {

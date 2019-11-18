@@ -1,4 +1,4 @@
-// Copyright 2011 Google Inc. All rights reserved.
+// Copyright 2011 Google LLC. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -27,6 +27,7 @@ import (
 	"unicode"
 
 	"google.golang.org/api/google-api-go-generator/internal/disco"
+	"google.golang.org/api/internal/version"
 )
 
 const (
@@ -50,7 +51,7 @@ var (
 	baseURL        = flag.String("base_url", "", "(optional) Override the default service API URL. If empty, the service's root URL will be used.")
 	headerPath     = flag.String("header_path", "", "If non-empty, prepend the contents of this file to generated services.")
 
-	gensupportPkg = flag.String("gensupport_pkg", "google.golang.org/api/gensupport", "Go package path of the 'api/gensupport' support package.")
+	gensupportPkg = flag.String("gensupport_pkg", "google.golang.org/api/internal/gensupport", "Go package path of the 'api/internal/gensupport' support package.")
 	googleapiPkg  = flag.String("googleapi_pkg", "google.golang.org/api/googleapi", "Go package path of the 'api/googleapi' support package.")
 	optionPkg     = flag.String("option_pkg", "google.golang.org/api/option", "Go package path of the 'api/option' support package.")
 	htransportPkg = flag.String("htransport_pkg", "google.golang.org/api/transport/http", "Go package path of the 'api/transport/http' support package.")
@@ -1911,6 +1912,7 @@ func (meth *Method) generateCode() {
 
 	pn("\nfunc (c *%s) doRequest(alt string) (*http.Response, error) {", callName)
 	pn(`reqHeaders := make(http.Header)`)
+	pn(`reqHeaders.Set("x-goog-api-client", "gl-go/%s gdcl/%s")`, version.Go(), version.Repo)
 	pn("for k, v := range c.header_ {")
 	pn(" reqHeaders[k] = v")
 	pn("}")
@@ -1947,10 +1949,7 @@ func (meth *Method) generateCode() {
 	pn("urls := googleapi.ResolveRelative(c.s.BasePath, %q)", meth.m.Path)
 	if meth.supportsMediaUpload() {
 		pn("if c.mediaInfo_ != nil {")
-		// Hack guess, since we get a 404 otherwise:
-		//pn("urls = googleapi.ResolveRelative(%q, %q)", a.apiBaseURL(), meth.mediaUploadPath())
-		// Further hack.  Discovery doc is wrong?
-		pn("  urls = strings.Replace(urls, %q, %q, 1)", "https://www.googleapis.com/", "https://www.googleapis.com/upload/")
+		pn("  urls = googleapi.ResolveRelative(c.s.BasePath, %q)", meth.mediaUploadPath())
 		pn(`  c.urlParams_.Set("uploadType", c.mediaInfo_.UploadType())`)
 		pn("}")
 

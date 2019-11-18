@@ -127,7 +127,7 @@
       }
     }
   },
-  "revision": "20190713",
+  "revision": "20191109",
   "rootUrl": "https://videointelligence.googleapis.com/",
   "schemas": {
     "GoogleCloudVideointelligenceV1_AnnotateVideoProgress": {
@@ -429,7 +429,7 @@
           "type": "array"
         },
         "languageCode": {
-          "description": "Output only. The\n[BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag of the\nlanguage in this result. This language code was detected to have the most\nlikelihood of being spoken in the audio.",
+          "description": "Output only. The [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag of\nthe language in this result. This language code was detected to have the\nmost likelihood of being spoken in the audio.",
           "type": "string"
         }
       },
@@ -585,6 +585,13 @@
           },
           "type": "array"
         },
+        "segmentPresenceLabelAnnotations": {
+          "description": "Presence label annotations on video level or user specified segment level.\nThere is exactly one element for each unique label. Compared to the\nexisting topical `segment_label_annotations`, this field presents more\nfine-grained, segment-level labels detected in video content and is made\navailable only when the client sets `LabelDetectionConfig.model` to\n\"builtin/latest\" in the request.",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1_LabelAnnotation"
+          },
+          "type": "array"
+        },
         "shotAnnotations": {
           "description": "Shot annotations. Each shot is represented as a video segment.",
           "items": {
@@ -594,6 +601,13 @@
         },
         "shotLabelAnnotations": {
           "description": "Topical label annotations on shot level.\nThere is exactly one element for each unique label.",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1_LabelAnnotation"
+          },
+          "type": "array"
+        },
+        "shotPresenceLabelAnnotations": {
+          "description": "Presence label annotations on shot level. There is exactly one element for\neach unique label. Compared to the existing topical\n`shot_label_annotations`, this field presents more fine-grained, shot-level\nlabels detected in video content and is made available only when the client\nsets `LabelDetectionConfig.model` to \"builtin/latest\" in the request.",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1_LabelAnnotation"
           },
@@ -683,7 +697,7 @@
       "id": "GoogleCloudVideointelligenceV1beta2_AnnotateVideoRequest",
       "properties": {
         "features": {
-          "description": "Requested video annotation features.",
+          "description": "Required. Requested video annotation features.",
           "enumDescriptions": [
             "Unspecified.",
             "Label detection. Detect objects, such as dog or flower.",
@@ -717,11 +731,11 @@
           "type": "string"
         },
         "locationId": {
-          "description": "Optional cloud region where annotation should take place. Supported cloud\nregions: `us-east1`, `us-west1`, `europe-west1`, `asia-east1`. If no region\nis specified, a region will be determined based on video file location.",
+          "description": "Optional. Cloud region where annotation should take place. Supported cloud\nregions: `us-east1`, `us-west1`, `europe-west1`, `asia-east1`. If no region\nis specified, a region will be determined based on video file location.",
           "type": "string"
         },
         "outputUri": {
-          "description": "Optional location where the output (in JSON format) should be stored.\nCurrently, only [Google Cloud Storage](https://cloud.google.com/storage/)\nURIs are supported, which must be specified in the following format:\n`gs://bucket-id/object-id` (other URI formats return\ngoogle.rpc.Code.INVALID_ARGUMENT). For more information, see\n[Request URIs](/storage/docs/reference-uris).",
+          "description": "Optional. Location where the output (in JSON format) should be stored.\nCurrently, only [Google Cloud Storage](https://cloud.google.com/storage/)\nURIs are supported, which must be specified in the following format:\n`gs://bucket-id/object-id` (other URI formats return\ngoogle.rpc.Code.INVALID_ARGUMENT). For more information, see\n[Request URIs](/storage/docs/reference-uris).",
           "type": "string"
         },
         "videoContext": {
@@ -1060,7 +1074,7 @@
       "id": "GoogleCloudVideointelligenceV1beta2_SpeechContext",
       "properties": {
         "phrases": {
-          "description": "*Optional* A list of strings containing words and phrases \"hints\" so that\nthe speech recognition is more likely to recognize them. This can be used\nto improve the accuracy for specific words and phrases, for example, if\nspecific commands are typically spoken by the user. This can also be used\nto add additional words to the vocabulary of the recognizer. See\n[usage limits](https://cloud.google.com/speech/limits#content).",
+          "description": "Optional. A list of strings containing words and phrases \"hints\" so that\nthe speech recognition is more likely to recognize them. This can be used\nto improve the accuracy for specific words and phrases, for example, if\nspecific commands are typically spoken by the user. This can also be used\nto add additional words to the vocabulary of the recognizer. See\n[usage limits](https://cloud.google.com/speech/limits#content).",
           "items": {
             "type": "string"
           },
@@ -1104,7 +1118,7 @@
           "type": "array"
         },
         "languageCode": {
-          "description": "Output only. The\n[BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag of the\nlanguage in this result. This language code was detected to have the most\nlikelihood of being spoken in the audio.",
+          "description": "Output only. The [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag of\nthe language in this result. This language code was detected to have the\nmost likelihood of being spoken in the audio.",
           "type": "string"
         }
       },
@@ -1115,7 +1129,7 @@
       "id": "GoogleCloudVideointelligenceV1beta2_SpeechTranscriptionConfig",
       "properties": {
         "audioTracks": {
-          "description": "*Optional* For file formats, such as MXF or MKV, supporting multiple audio\ntracks, specify up to two tracks. Default: track 0.",
+          "description": "Optional. For file formats, such as MXF or MKV, supporting multiple audio\ntracks, specify up to two tracks. Default: track 0.",
           "items": {
             "format": "int32",
             "type": "integer"
@@ -1123,37 +1137,37 @@
           "type": "array"
         },
         "diarizationSpeakerCount": {
-          "description": "*Optional*\nIf set, specifies the estimated number of speakers in the conversation.\nIf not set, defaults to '2'.\nIgnored unless enable_speaker_diarization is set to true.",
+          "description": "Optional. If set, specifies the estimated number of speakers in the conversation.\nIf not set, defaults to '2'.\nIgnored unless enable_speaker_diarization is set to true.",
           "format": "int32",
           "type": "integer"
         },
         "enableAutomaticPunctuation": {
-          "description": "*Optional* If 'true', adds punctuation to recognition result hypotheses.\nThis feature is only available in select languages. Setting this for\nrequests in other languages has no effect at all. The default 'false' value\ndoes not add punctuation to result hypotheses. NOTE: \"This is currently\noffered as an experimental service, complimentary to all users. In the\nfuture this may be exclusively available as a premium feature.\"",
+          "description": "Optional. If 'true', adds punctuation to recognition result hypotheses.\nThis feature is only available in select languages. Setting this for\nrequests in other languages has no effect at all. The default 'false' value\ndoes not add punctuation to result hypotheses. NOTE: \"This is currently\noffered as an experimental service, complimentary to all users. In the\nfuture this may be exclusively available as a premium feature.\"",
           "type": "boolean"
         },
         "enableSpeakerDiarization": {
-          "description": "*Optional* If 'true', enables speaker detection for each recognized word in\nthe top alternative of the recognition result using a speaker_tag provided\nin the WordInfo.\nNote: When this is true, we send all the words from the beginning of the\naudio for the top alternative in every consecutive responses.\nThis is done in order to improve our speaker tags as our models learn to\nidentify the speakers in the conversation over time.",
+          "description": "Optional. If 'true', enables speaker detection for each recognized word in\nthe top alternative of the recognition result using a speaker_tag provided\nin the WordInfo.\nNote: When this is true, we send all the words from the beginning of the\naudio for the top alternative in every consecutive responses.\nThis is done in order to improve our speaker tags as our models learn to\nidentify the speakers in the conversation over time.",
           "type": "boolean"
         },
         "enableWordConfidence": {
-          "description": "*Optional* If `true`, the top result includes a list of words and the\nconfidence for those words. If `false`, no word-level confidence\ninformation is returned. The default is `false`.",
+          "description": "Optional. If `true`, the top result includes a list of words and the\nconfidence for those words. If `false`, no word-level confidence\ninformation is returned. The default is `false`.",
           "type": "boolean"
         },
         "filterProfanity": {
-          "description": "*Optional* If set to `true`, the server will attempt to filter out\nprofanities, replacing all but the initial character in each filtered word\nwith asterisks, e.g. \"f***\". If set to `false` or omitted, profanities\nwon't be filtered out.",
+          "description": "Optional. If set to `true`, the server will attempt to filter out\nprofanities, replacing all but the initial character in each filtered word\nwith asterisks, e.g. \"f***\". If set to `false` or omitted, profanities\nwon't be filtered out.",
           "type": "boolean"
         },
         "languageCode": {
-          "description": "*Required* The language of the supplied audio as a\n[BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag.\nExample: \"en-US\".\nSee [Language Support](https://cloud.google.com/speech/docs/languages)\nfor a list of the currently supported language codes.",
+          "description": "Required. *Required* The language of the supplied audio as a\n[BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag.\nExample: \"en-US\".\nSee [Language Support](https://cloud.google.com/speech/docs/languages)\nfor a list of the currently supported language codes.",
           "type": "string"
         },
         "maxAlternatives": {
-          "description": "*Optional* Maximum number of recognition hypotheses to be returned.\nSpecifically, the maximum number of `SpeechRecognitionAlternative` messages\nwithin each `SpeechTranscription`. The server may return fewer than\n`max_alternatives`. Valid values are `0`-`30`. A value of `0` or `1` will\nreturn a maximum of one. If omitted, will return a maximum of one.",
+          "description": "Optional. Maximum number of recognition hypotheses to be returned.\nSpecifically, the maximum number of `SpeechRecognitionAlternative` messages\nwithin each `SpeechTranscription`. The server may return fewer than\n`max_alternatives`. Valid values are `0`-`30`. A value of `0` or `1` will\nreturn a maximum of one. If omitted, will return a maximum of one.",
           "format": "int32",
           "type": "integer"
         },
         "speechContexts": {
-          "description": "*Optional* A means to provide context to assist the speech recognition.",
+          "description": "Optional. A means to provide context to assist the speech recognition.",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1beta2_SpeechContext"
           },
@@ -1330,6 +1344,13 @@
           },
           "type": "array"
         },
+        "segmentPresenceLabelAnnotations": {
+          "description": "Presence label annotations on video level or user specified segment level.\nThere is exactly one element for each unique label. Compared to the\nexisting topical `segment_label_annotations`, this field presents more\nfine-grained, segment-level labels detected in video content and is made\navailable only when the client sets `LabelDetectionConfig.model` to\n\"builtin/latest\" in the request.",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1beta2_LabelAnnotation"
+          },
+          "type": "array"
+        },
         "shotAnnotations": {
           "description": "Shot annotations. Each shot is represented as a video segment.",
           "items": {
@@ -1339,6 +1360,13 @@
         },
         "shotLabelAnnotations": {
           "description": "Topical label annotations on shot level.\nThere is exactly one element for each unique label.",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1beta2_LabelAnnotation"
+          },
+          "type": "array"
+        },
+        "shotPresenceLabelAnnotations": {
+          "description": "Presence label annotations on shot level. There is exactly one element for\neach unique label. Compared to the existing topical\n`shot_label_annotations`, this field presents more fine-grained, shot-level\nlabels detected in video content and is made available only when the client\nsets `LabelDetectionConfig.model` to \"builtin/latest\" in the request.",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1beta2_LabelAnnotation"
           },
@@ -1746,7 +1774,7 @@
           "type": "array"
         },
         "languageCode": {
-          "description": "Output only. The\n[BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag of the\nlanguage in this result. This language code was detected to have the most\nlikelihood of being spoken in the audio.",
+          "description": "Output only. The [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag of\nthe language in this result. This language code was detected to have the\nmost likelihood of being spoken in the audio.",
           "type": "string"
         }
       },
@@ -1902,6 +1930,13 @@
           },
           "type": "array"
         },
+        "segmentPresenceLabelAnnotations": {
+          "description": "Presence label annotations on video level or user specified segment level.\nThere is exactly one element for each unique label. Compared to the\nexisting topical `segment_label_annotations`, this field presents more\nfine-grained, segment-level labels detected in video content and is made\navailable only when the client sets `LabelDetectionConfig.model` to\n\"builtin/latest\" in the request.",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1p1beta1_LabelAnnotation"
+          },
+          "type": "array"
+        },
         "shotAnnotations": {
           "description": "Shot annotations. Each shot is represented as a video segment.",
           "items": {
@@ -1911,6 +1946,13 @@
         },
         "shotLabelAnnotations": {
           "description": "Topical label annotations on shot level.\nThere is exactly one element for each unique label.",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1p1beta1_LabelAnnotation"
+          },
+          "type": "array"
+        },
+        "shotPresenceLabelAnnotations": {
+          "description": "Presence label annotations on shot level. There is exactly one element for\neach unique label. Compared to the existing topical\n`shot_label_annotations`, this field presents more fine-grained, shot-level\nlabels detected in video content and is made available only when the client\nsets `LabelDetectionConfig.model` to \"builtin/latest\" in the request.",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1p1beta1_LabelAnnotation"
           },
@@ -2280,7 +2322,7 @@
           "type": "array"
         },
         "languageCode": {
-          "description": "Output only. The\n[BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag of the\nlanguage in this result. This language code was detected to have the most\nlikelihood of being spoken in the audio.",
+          "description": "Output only. The [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag of\nthe language in this result. This language code was detected to have the\nmost likelihood of being spoken in the audio.",
           "type": "string"
         }
       },
@@ -2436,6 +2478,13 @@
           },
           "type": "array"
         },
+        "segmentPresenceLabelAnnotations": {
+          "description": "Presence label annotations on video level or user specified segment level.\nThere is exactly one element for each unique label. Compared to the\nexisting topical `segment_label_annotations`, this field presents more\nfine-grained, segment-level labels detected in video content and is made\navailable only when the client sets `LabelDetectionConfig.model` to\n\"builtin/latest\" in the request.",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1p2beta1_LabelAnnotation"
+          },
+          "type": "array"
+        },
         "shotAnnotations": {
           "description": "Shot annotations. Each shot is represented as a video segment.",
           "items": {
@@ -2445,6 +2494,13 @@
         },
         "shotLabelAnnotations": {
           "description": "Topical label annotations on shot level.\nThere is exactly one element for each unique label.",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1p2beta1_LabelAnnotation"
+          },
+          "type": "array"
+        },
+        "shotPresenceLabelAnnotations": {
+          "description": "Presence label annotations on shot level. There is exactly one element for\neach unique label. Compared to the existing topical\n`shot_label_annotations`, this field presents more fine-grained, shot-level\nlabels detected in video content and is made available only when the client\nsets `LabelDetectionConfig.model` to \"builtin/latest\" in the request.",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1p2beta1_LabelAnnotation"
           },
@@ -2539,6 +2595,57 @@
             "$ref": "GoogleCloudVideointelligenceV1p3beta1_VideoAnnotationResults"
           },
           "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVideointelligenceV1p3beta1_Celebrity": {
+      "description": "Celebrity definition.",
+      "id": "GoogleCloudVideointelligenceV1p3beta1_Celebrity",
+      "properties": {
+        "description": {
+          "description": "Textual description of additional information about the celebrity, if\napplicable.",
+          "type": "string"
+        },
+        "displayName": {
+          "description": "The celebrity name.",
+          "type": "string"
+        },
+        "name": {
+          "description": "The resource name of the celebrity. Have the format\n`video-intelligence/kg-mid` indicates a celebrity from preloaded gallery.\nkg-mid is the id in Google knowledge graph, which is unique for the\ncelebrity.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVideointelligenceV1p3beta1_CelebrityRecognitionAnnotation": {
+      "description": "Celebrity recognition annotation per video.",
+      "id": "GoogleCloudVideointelligenceV1p3beta1_CelebrityRecognitionAnnotation",
+      "properties": {
+        "celebrityTracks": {
+          "description": "The tracks detected from the input video, including recognized celebrities\nand other detected faces in the video.",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1p3beta1_CelebrityTrack"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVideointelligenceV1p3beta1_CelebrityTrack": {
+      "description": "The annotation result of a celebrity face track. RecognizedCelebrity field\ncould be empty if the face track does not have any matched celebrities.",
+      "id": "GoogleCloudVideointelligenceV1p3beta1_CelebrityTrack",
+      "properties": {
+        "celebrities": {
+          "description": "Top N match of the celebrities for the face in this track.",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1p3beta1_RecognizedCelebrity"
+          },
+          "type": "array"
+        },
+        "faceTrack": {
+          "$ref": "GoogleCloudVideointelligenceV1p3beta1_Track",
+          "description": "A track of a person's face."
         }
       },
       "type": "object"
@@ -2824,6 +2931,22 @@
       },
       "type": "object"
     },
+    "GoogleCloudVideointelligenceV1p3beta1_RecognizedCelebrity": {
+      "description": "The recognized celebrity with confidence score.",
+      "id": "GoogleCloudVideointelligenceV1p3beta1_RecognizedCelebrity",
+      "properties": {
+        "celebrity": {
+          "$ref": "GoogleCloudVideointelligenceV1p3beta1_Celebrity",
+          "description": "The recognized celebrity."
+        },
+        "confidence": {
+          "description": "Recognition confidence. Range [0, 1].",
+          "format": "float",
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
     "GoogleCloudVideointelligenceV1p3beta1_SpeechRecognitionAlternative": {
       "description": "Alternative hypotheses (a.k.a. n-best list).",
       "id": "GoogleCloudVideointelligenceV1p3beta1_SpeechRecognitionAlternative",
@@ -2859,7 +2982,7 @@
           "type": "array"
         },
         "languageCode": {
-          "description": "Output only. The\n[BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag of the\nlanguage in this result. This language code was detected to have the most\nlikelihood of being spoken in the audio.",
+          "description": "Output only. The [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag of\nthe language in this result. This language code was detected to have the\nmost likelihood of being spoken in the audio.",
           "type": "string"
         }
       },
@@ -2974,7 +3097,7 @@
       "type": "object"
     },
     "GoogleCloudVideointelligenceV1p3beta1_TimestampedObject": {
-      "description": "For tracking related features, such as LOGO_RECOGNITION, FACE_DETECTION,\nCELEBRITY_RECOGNITION, PERSON_DETECTION.\nAn object at time_offset with attributes, and located with\nnormalized_bounding_box.",
+      "description": "For tracking related features.\nAn object at time_offset with attributes, and located with\nnormalized_bounding_box.",
       "id": "GoogleCloudVideointelligenceV1p3beta1_TimestampedObject",
       "properties": {
         "attributes": {
@@ -3040,7 +3163,8 @@
             "SPEECH_TRANSCRIPTION",
             "TEXT_DETECTION",
             "OBJECT_TRACKING",
-            "LOGO_RECOGNITION"
+            "LOGO_RECOGNITION",
+            "CELEBRITY_RECOGNITION"
           ],
           "enumDescriptions": [
             "Unspecified.",
@@ -3050,7 +3174,8 @@
             "Speech transcription.",
             "OCR text detection and tracking.",
             "Object detection and tracking.",
-            "Logo detection, tracking, and recognition."
+            "Logo detection, tracking, and recognition.",
+            "Celebrity recognition."
           ],
           "type": "string"
         },
@@ -3084,6 +3209,10 @@
       "description": "Annotation results for a single video.",
       "id": "GoogleCloudVideointelligenceV1p3beta1_VideoAnnotationResults",
       "properties": {
+        "celebrityRecognitionAnnotations": {
+          "$ref": "GoogleCloudVideointelligenceV1p3beta1_CelebrityRecognitionAnnotation",
+          "description": "Celebrity recognition annotations."
+        },
         "error": {
           "$ref": "GoogleRpc_Status",
           "description": "If set, indicates an error. Note that for a single `AnnotateVideoRequest`\nsome videos may succeed and some may fail."
@@ -3128,6 +3257,13 @@
           },
           "type": "array"
         },
+        "segmentPresenceLabelAnnotations": {
+          "description": "Presence label annotations on video level or user specified segment level.\nThere is exactly one element for each unique label. Compared to the\nexisting topical `segment_label_annotations`, this field presents more\nfine-grained, segment-level labels detected in video content and is made\navailable only when the client sets `LabelDetectionConfig.model` to\n\"builtin/latest\" in the request.",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1p3beta1_LabelAnnotation"
+          },
+          "type": "array"
+        },
         "shotAnnotations": {
           "description": "Shot annotations. Each shot is represented as a video segment.",
           "items": {
@@ -3137,6 +3273,13 @@
         },
         "shotLabelAnnotations": {
           "description": "Topical label annotations on shot level.\nThere is exactly one element for each unique label.",
+          "items": {
+            "$ref": "GoogleCloudVideointelligenceV1p3beta1_LabelAnnotation"
+          },
+          "type": "array"
+        },
+        "shotPresenceLabelAnnotations": {
+          "description": "Presence label annotations on shot level. There is exactly one element for\neach unique label. Compared to the existing topical\n`shot_label_annotations`, this field presents more fine-grained, shot-level\nlabels detected in video content and is made available only when the client\nsets `LabelDetectionConfig.model` to \"builtin/latest\" in the request.",
           "items": {
             "$ref": "GoogleCloudVideointelligenceV1p3beta1_LabelAnnotation"
           },

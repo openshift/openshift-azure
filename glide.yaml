@@ -94,3 +94,7 @@ import:
   version: ^1.0.1
   subpackages:
   - cidr
+# Conflicts with github.com/openshift/client-go which currently wants 2382e3994d48b1d22acc2c86bcad0a2aff028e32,
+# but client-go only uses it internally for code generation so it's ok to ignore it
+- package: golang.org/x/tools
+  version: 2d2de6298155751e44170d1c9a9baacb688d2606

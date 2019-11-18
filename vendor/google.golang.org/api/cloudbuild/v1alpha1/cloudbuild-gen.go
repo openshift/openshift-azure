@@ -49,8 +49,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -999,7 +999,11 @@ func (s *Network) MarshalJSON() ([]byte, error) {
 // RepoSource: Location of the source in a Google Cloud Source
 // Repository.
 type RepoSource struct {
-	// BranchName: Name of the branch to build.
+	// BranchName: Regex matching branches to build.
+	//
+	// The syntax of the regular expressions accepted is the syntax accepted
+	// by
+	// RE2 and described at https://github.com/google/re2/wiki/Syntax
 	BranchName string `json:"branchName,omitempty"`
 
 	// CommitSha: Explicit commit SHA to build.
@@ -1018,12 +1022,18 @@ type RepoSource struct {
 	// project ID requesting the build is assumed.
 	ProjectId string `json:"projectId,omitempty"`
 
-	// RepoName: Name of the Cloud Source Repository. If omitted, the name
-	// "default" is
-	// assumed.
+	// RepoName: Required. Name of the Cloud Source Repository.
 	RepoName string `json:"repoName,omitempty"`
 
-	// TagName: Name of the tag to build.
+	// Substitutions: Substitutions to use in a triggered build.
+	// Should only be used with RunBuildTrigger
+	Substitutions map[string]string `json:"substitutions,omitempty"`
+
+	// TagName: Regex matching tags to build.
+	//
+	// The syntax of the regular expressions accepted is the syntax accepted
+	// by
+	// RE2 and described at https://github.com/google/re2/wiki/Syntax
 	TagName string `json:"tagName,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "BranchName") to
@@ -1579,6 +1589,7 @@ func (c *ProjectsWorkerPoolsCreateCall) Header() http.Header {
 
 func (c *ProjectsWorkerPoolsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1719,6 +1730,7 @@ func (c *ProjectsWorkerPoolsDeleteCall) Header() http.Header {
 
 func (c *ProjectsWorkerPoolsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1861,6 +1873,7 @@ func (c *ProjectsWorkerPoolsGetCall) Header() http.Header {
 
 func (c *ProjectsWorkerPoolsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2006,6 +2019,7 @@ func (c *ProjectsWorkerPoolsListCall) Header() http.Header {
 
 func (c *ProjectsWorkerPoolsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2142,6 +2156,7 @@ func (c *ProjectsWorkerPoolsPatchCall) Header() http.Header {
 
 func (c *ProjectsWorkerPoolsPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

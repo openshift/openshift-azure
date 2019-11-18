@@ -25,7 +25,7 @@
 //
 // By default, all available scopes (see "Constants") are used to authenticate. To restrict scopes, use option.WithScopes:
 //
-//   cloudidentityService, err := cloudidentity.NewService(ctx, option.WithScopes(cloudidentity.CloudIdentityGroupsReadonlyScope))
+//   cloudidentityService, err := cloudidentity.NewService(ctx, option.WithScopes(cloudidentity.CloudPlatformScope))
 //
 // To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
 //
@@ -53,8 +53,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -87,6 +87,9 @@ const (
 	// See any Cloud Identity Groups that you can access, including group
 	// members and their emails
 	CloudIdentityGroupsReadonlyScope = "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
+
+	// View and manage your data across Google Cloud Platform services
+	CloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
 )
 
 // NewService creates a new Service.
@@ -94,6 +97,7 @@ func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, err
 	scopesOption := option.WithScopes(
 		"https://www.googleapis.com/auth/cloud-identity.groups",
 		"https://www.googleapis.com/auth/cloud-identity.groups.readonly",
+		"https://www.googleapis.com/auth/cloud-platform",
 	)
 	// NOTE: prepend, so we don't override user-specified scopes.
 	opts = append([]option.ClientOption{scopesOption}, opts...)
@@ -212,7 +216,7 @@ type Group struct {
 	// Group
 	AdditionalGroupKeys []*EntityKey `json:"additionalGroupKeys,omitempty"`
 
-	// CreateTime: The time when the Group was created.
+	// CreateTime: Output only. The time when the Group was created.
 	// Output only
 	CreateTime string `json:"createTime,omitempty"`
 
@@ -228,19 +232,19 @@ type Group struct {
 	// DisplayName: The Group's display name.
 	DisplayName string `json:"displayName,omitempty"`
 
-	// GroupKey: EntityKey of the Group.
+	// GroupKey: Required. Immutable. EntityKey of the Group.
 	//
 	// Must be set when creating a Group, read-only afterwards.
 	GroupKey *EntityKey `json:"groupKey,omitempty"`
 
-	// Labels: Labels for Group resource.
+	// Labels: Required. Labels for Group resource.
 	// Required.
 	// For creating Groups under a namespace, set label key
 	// to
 	// 'labels/system/groups/external' and label value as empty.
 	Labels map[string]string `json:"labels,omitempty"`
 
-	// Name: [Resource
+	// Name: Output only. [Resource
 	// name](https://cloud.google.com/apis/design/resource_names) of
 	// the
 	// Group in the format: `groups/{group_id}`, where group_id is the
@@ -250,15 +254,16 @@ type Group struct {
 	// Must be left blank while creating a Group
 	Name string `json:"name,omitempty"`
 
-	// Parent: The entity under which this Group resides in Cloud Identity
-	// resource
+	// Parent: Required. Immutable. The entity under which this Group
+	// resides in Cloud Identity resource
 	// hierarchy. Must be set when creating a Group, read-only
 	// afterwards.
 	//
 	// Currently allowed types: 'identitysources'.
 	Parent string `json:"parent,omitempty"`
 
-	// UpdateTime: The time when the Group was last updated.
+	// UpdateTime: Output only. The time when the Group was last
+	// updated.
 	// Output only
 	UpdateTime string `json:"updateTime,omitempty"`
 
@@ -404,17 +409,18 @@ func (s *LookupMembershipNameResponse) MarshalJSON() ([]byte, error) {
 
 // Membership: Resource representing a Membership within a Group
 type Membership struct {
-	// CreateTime: Creation timestamp of the Membership.
+	// CreateTime: Output only. Creation timestamp of the Membership.
 	CreateTime string `json:"createTime,omitempty"`
 
-	// MemberKey: EntityKey of the entity to be added as the member. Must be
-	// set while
+	// MemberKey: Required. Immutable. EntityKey of the entity to be added
+	// as the member. Must be set while
 	// creating a Membership, read-only afterwards.
 	//
 	// Currently allowed entity types: `Users`, `Groups`.
+	// This field will be deprecated soon.
 	MemberKey *EntityKey `json:"memberKey,omitempty"`
 
-	// Name: [Resource
+	// Name: Output only. [Resource
 	// name](https://cloud.google.com/apis/design/resource_names) of
 	// the
 	// Membership in the format:
@@ -429,10 +435,10 @@ type Membership struct {
 
 	// Roles: Roles for a member within the Group.
 	//
-	// Currently supported MembershipRoles: "MEMBER".
+	// Currently supported MembershipRoles: "MEMBER", "OWNER", "MANAGER".
 	Roles []*MembershipRole `json:"roles,omitempty"`
 
-	// UpdateTime: Last updated timestamp of the Membership.
+	// UpdateTime: Output only. Last updated timestamp of the Membership.
 	UpdateTime string `json:"updateTime,omitempty"`
 
 	// ServerResponse contains the HTTP response code and headers from the
@@ -465,8 +471,7 @@ func (s *Membership) MarshalJSON() ([]byte, error) {
 // MembershipRole: Resource representing a role within a Membership.
 type MembershipRole struct {
 	// Name: MembershipRole in string format.
-	//
-	// Currently supported MembershipRoles: "MEMBER".
+	// Currently supported MembershipRoles: "MEMBER", "OWNER", "MANAGER".
 	Name string `json:"name,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Name") to
@@ -700,6 +705,7 @@ func (c *GroupsCreateCall) Header() http.Header {
 
 func (c *GroupsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -774,7 +780,8 @@ func (c *GroupsCreateCall) Do(opts ...googleapi.CallOption) (*Operation, error) 
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-identity.groups"
+	//     "https://www.googleapis.com/auth/cloud-identity.groups",
+	//     "https://www.googleapis.com/auth/cloud-platform"
 	//   ]
 	// }
 
@@ -824,6 +831,7 @@ func (c *GroupsDeleteCall) Header() http.Header {
 
 func (c *GroupsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -903,7 +911,8 @@ func (c *GroupsDeleteCall) Do(opts ...googleapi.CallOption) (*Operation, error) 
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-identity.groups"
+	//     "https://www.googleapis.com/auth/cloud-identity.groups",
+	//     "https://www.googleapis.com/auth/cloud-platform"
 	//   ]
 	// }
 
@@ -964,6 +973,7 @@ func (c *GroupsGetCall) Header() http.Header {
 
 func (c *GroupsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1047,7 +1057,8 @@ func (c *GroupsGetCall) Do(opts ...googleapi.CallOption) (*Group, error) {
 	//   },
 	//   "scopes": [
 	//     "https://www.googleapis.com/auth/cloud-identity.groups",
-	//     "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
+	//     "https://www.googleapis.com/auth/cloud-identity.groups.readonly",
+	//     "https://www.googleapis.com/auth/cloud-platform"
 	//   ]
 	// }
 
@@ -1133,6 +1144,7 @@ func (c *GroupsLookupCall) Header() http.Header {
 
 func (c *GroupsLookupCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1214,7 +1226,8 @@ func (c *GroupsLookupCall) Do(opts ...googleapi.CallOption) (*LookupGroupNameRes
 	//   },
 	//   "scopes": [
 	//     "https://www.googleapis.com/auth/cloud-identity.groups",
-	//     "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
+	//     "https://www.googleapis.com/auth/cloud-identity.groups.readonly",
+	//     "https://www.googleapis.com/auth/cloud-platform"
 	//   ]
 	// }
 
@@ -1273,6 +1286,7 @@ func (c *GroupsPatchCall) Header() http.Header {
 
 func (c *GroupsPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1345,7 +1359,7 @@ func (c *GroupsPatchCall) Do(opts ...googleapi.CallOption) (*Operation, error) {
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "[Resource name](https://cloud.google.com/apis/design/resource_names) of the\nGroup in the format: `groups/{group_id}`, where group_id is the unique id\nassigned to the Group.\n\nMust be left blank while creating a Group",
+	//       "description": "Output only. [Resource name](https://cloud.google.com/apis/design/resource_names) of the\nGroup in the format: `groups/{group_id}`, where group_id is the unique id\nassigned to the Group.\n\nMust be left blank while creating a Group",
 	//       "location": "path",
 	//       "pattern": "^groups/[^/]+$",
 	//       "required": true,
@@ -1366,7 +1380,8 @@ func (c *GroupsPatchCall) Do(opts ...googleapi.CallOption) (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-identity.groups"
+	//     "https://www.googleapis.com/auth/cloud-identity.groups",
+	//     "https://www.googleapis.com/auth/cloud-platform"
 	//   ]
 	// }
 
@@ -1468,6 +1483,7 @@ func (c *GroupsSearchCall) Header() http.Header {
 
 func (c *GroupsSearchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1564,7 +1580,8 @@ func (c *GroupsSearchCall) Do(opts ...googleapi.CallOption) (*SearchGroupsRespon
 	//   },
 	//   "scopes": [
 	//     "https://www.googleapis.com/auth/cloud-identity.groups",
-	//     "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
+	//     "https://www.googleapis.com/auth/cloud-identity.groups.readonly",
+	//     "https://www.googleapis.com/auth/cloud-platform"
 	//   ]
 	// }
 
@@ -1637,6 +1654,7 @@ func (c *GroupsMembershipsCreateCall) Header() http.Header {
 
 func (c *GroupsMembershipsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1724,7 +1742,8 @@ func (c *GroupsMembershipsCreateCall) Do(opts ...googleapi.CallOption) (*Operati
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-identity.groups"
+	//     "https://www.googleapis.com/auth/cloud-identity.groups",
+	//     "https://www.googleapis.com/auth/cloud-platform"
 	//   ]
 	// }
 
@@ -1774,6 +1793,7 @@ func (c *GroupsMembershipsDeleteCall) Header() http.Header {
 
 func (c *GroupsMembershipsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1853,7 +1873,8 @@ func (c *GroupsMembershipsDeleteCall) Do(opts ...googleapi.CallOption) (*Operati
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-identity.groups"
+	//     "https://www.googleapis.com/auth/cloud-identity.groups",
+	//     "https://www.googleapis.com/auth/cloud-platform"
 	//   ]
 	// }
 
@@ -1914,6 +1935,7 @@ func (c *GroupsMembershipsGetCall) Header() http.Header {
 
 func (c *GroupsMembershipsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1997,7 +2019,8 @@ func (c *GroupsMembershipsGetCall) Do(opts ...googleapi.CallOption) (*Membership
 	//   },
 	//   "scopes": [
 	//     "https://www.googleapis.com/auth/cloud-identity.groups",
-	//     "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
+	//     "https://www.googleapis.com/auth/cloud-identity.groups.readonly",
+	//     "https://www.googleapis.com/auth/cloud-platform"
 	//   ]
 	// }
 
@@ -2084,6 +2107,7 @@ func (c *GroupsMembershipsListCall) Header() http.Header {
 
 func (c *GroupsMembershipsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2187,7 +2211,8 @@ func (c *GroupsMembershipsListCall) Do(opts ...googleapi.CallOption) (*ListMembe
 	//   },
 	//   "scopes": [
 	//     "https://www.googleapis.com/auth/cloud-identity.groups",
-	//     "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
+	//     "https://www.googleapis.com/auth/cloud-identity.groups.readonly",
+	//     "https://www.googleapis.com/auth/cloud-platform"
 	//   ]
 	// }
 
@@ -2296,6 +2321,7 @@ func (c *GroupsMembershipsLookupCall) Header() http.Header {
 
 func (c *GroupsMembershipsLookupCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2389,7 +2415,8 @@ func (c *GroupsMembershipsLookupCall) Do(opts ...googleapi.CallOption) (*LookupM
 	//   },
 	//   "scopes": [
 	//     "https://www.googleapis.com/auth/cloud-identity.groups",
-	//     "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
+	//     "https://www.googleapis.com/auth/cloud-identity.groups.readonly",
+	//     "https://www.googleapis.com/auth/cloud-platform"
 	//   ]
 	// }
 

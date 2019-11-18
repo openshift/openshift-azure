@@ -49,8 +49,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -139,7 +139,9 @@ type CommentsService struct {
 	s *Service
 }
 
-// AnalyzeCommentRequest: The comment analysis request message.
+// AnalyzeCommentRequest: The comment analysis request
+// message.
+// LINT.IfChange
 type AnalyzeCommentRequest struct {
 	// ClientToken: Opaque token that is echoed from the request to the
 	// response.
@@ -183,19 +185,17 @@ type AnalyzeCommentRequest struct {
 	// AttributeParameters serve as
 	// configuration for each associated attribute. The map keys are
 	// attribute
-	// names. The following attributes are available:
-	// "ATTACK_ON_AUTHOR" - Attack on author of original article or
-	// post.
-	// "ATTACK_ON_COMMENTER" - Attack on fellow
-	// commenter.
-	// "ATTACK_ON_PUBLISHER" - Attack on publisher of
-	// article/post.
-	// "INCOHERENT" - Difficult to understand, nonsensical.
-	// "INFLAMMATORY" - Intending to provoke or inflame.
-	// "OBSCENE" - Obscene, such as cursing.
-	// "OFF_TOPIC" - Not related to the original topic.
-	// "SPAM" - Commercial/advertising spam content.
-	// "UNSUBSTANTIAL" - Trivial.
+	// names. The available attributes may be different on each RFE
+	// installation,
+	// and can be seen by calling ListAttributes (see above).
+	// For the prod installation, known as Perspective API,
+	// at
+	// blade:commentanalyzer-esf and commentanalyzer.googleapis.com,
+	// see
+	// go/checker-models (internal)
+	// and
+	// https://github.com/conversationai/perspectiveapi/blob/master/api_r
+	// eference.md#models.
 	RequestedAttributes map[string]AttributeParameters `json:"requestedAttributes,omitempty"`
 
 	// SessionId: Session ID. Used to join related RPCs into a single
@@ -813,6 +813,7 @@ func (c *CommentsAnalyzeCall) Header() http.Header {
 
 func (c *CommentsAnalyzeCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -937,6 +938,7 @@ func (c *CommentsSuggestscoreCall) Header() http.Header {
 
 func (c *CommentsSuggestscoreCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

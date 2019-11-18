@@ -244,7 +244,7 @@
       }
     }
   },
-  "revision": "20190422",
+  "revision": "20191109",
   "rootUrl": "https://cloudbuild.googleapis.com/",
   "schemas": {
     "ArtifactObjects": {
@@ -771,7 +771,7 @@
       "id": "RepoSource",
       "properties": {
         "branchName": {
-          "description": "Name of the branch to build.",
+          "description": "Regex matching branches to build.\n\nThe syntax of the regular expressions accepted is the syntax accepted by\nRE2 and described at https://github.com/google/re2/wiki/Syntax",
           "type": "string"
         },
         "commitSha": {
@@ -787,11 +787,18 @@
           "type": "string"
         },
         "repoName": {
-          "description": "Name of the Cloud Source Repository. If omitted, the name \"default\" is\nassumed.",
+          "description": "Required. Name of the Cloud Source Repository.",
           "type": "string"
         },
+        "substitutions": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Substitutions to use in a triggered build.\nShould only be used with RunBuildTrigger",
+          "type": "object"
+        },
         "tagName": {
-          "description": "Name of the tag to build.",
+          "description": "Regex matching tags to build.\n\nThe syntax of the regular expressions accepted is the syntax accepted by\nRE2 and described at https://github.com/google/re2/wiki/Syntax",
           "type": "string"
         }
       },

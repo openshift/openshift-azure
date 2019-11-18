@@ -49,8 +49,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -344,7 +344,7 @@ type CreateInstanceRequest struct {
 	// `projects/myproject/instances/myinstance/clusters/mycluster`.
 	// Fie
 	// lds marked `OutputOnly` must be left blank.
-	// Currently, at most two clusters can be specified.
+	// Currently, at most four clusters can be specified.
 	Clusters map[string]Cluster `json:"clusters,omitempty"`
 
 	// Instance: The instance to create.

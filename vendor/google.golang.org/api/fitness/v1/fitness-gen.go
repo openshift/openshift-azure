@@ -53,8 +53,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -80,58 +80,59 @@ const basePath = "https://www.googleapis.com/fitness/v1/users/"
 
 // OAuth2 scopes used by this API.
 const (
-	// View your activity information in Google Fit
+	// Use Google Fit to see and store your physical activity data
 	FitnessActivityReadScope = "https://www.googleapis.com/auth/fitness.activity.read"
 
-	// View and store your activity information in Google Fit
+	// See and add to your Google Fit physical activity data
 	FitnessActivityWriteScope = "https://www.googleapis.com/auth/fitness.activity.write"
 
-	// View blood glucose data in Google Fit
+	// See info about your blood glucose in Google Fit
 	FitnessBloodGlucoseReadScope = "https://www.googleapis.com/auth/fitness.blood_glucose.read"
 
-	// View and store blood glucose data in Google Fit
+	// See and add info about your blood glucose to Google Fit
 	FitnessBloodGlucoseWriteScope = "https://www.googleapis.com/auth/fitness.blood_glucose.write"
 
-	// View blood pressure data in Google Fit
+	// See info about your blood pressure in Google Fit
 	FitnessBloodPressureReadScope = "https://www.googleapis.com/auth/fitness.blood_pressure.read"
 
-	// View and store blood pressure data in Google Fit
+	// See and add info about your blood pressure in Google Fit
 	FitnessBloodPressureWriteScope = "https://www.googleapis.com/auth/fitness.blood_pressure.write"
 
-	// View body sensor information in Google Fit
+	// See info about your body measurements and heart rate in Google Fit
 	FitnessBodyReadScope = "https://www.googleapis.com/auth/fitness.body.read"
 
-	// View and store body sensor data in Google Fit
+	// See and add info about your body measurements and heart rate to
+	// Google Fit
 	FitnessBodyWriteScope = "https://www.googleapis.com/auth/fitness.body.write"
 
-	// View body temperature data in Google Fit
+	// See info about your body temperature in Google Fit
 	FitnessBodyTemperatureReadScope = "https://www.googleapis.com/auth/fitness.body_temperature.read"
 
-	// View and store body temperature data in Google Fit
+	// See and add to info about your body temperature in Google Fit
 	FitnessBodyTemperatureWriteScope = "https://www.googleapis.com/auth/fitness.body_temperature.write"
 
-	// View your stored location data in Google Fit
+	// See your Google Fit speed and distance data
 	FitnessLocationReadScope = "https://www.googleapis.com/auth/fitness.location.read"
 
-	// View and store your location data in Google Fit
+	// See and add to your Google Fit location data
 	FitnessLocationWriteScope = "https://www.googleapis.com/auth/fitness.location.write"
 
-	// View nutrition information in Google Fit
+	// See info about your nutrition in Google Fit
 	FitnessNutritionReadScope = "https://www.googleapis.com/auth/fitness.nutrition.read"
 
-	// View and store nutrition information in Google Fit
+	// See and add to info about your nutrition in Google Fit
 	FitnessNutritionWriteScope = "https://www.googleapis.com/auth/fitness.nutrition.write"
 
-	// View oxygen saturation data in Google Fit
+	// See info about your oxygen saturation in Google Fit
 	FitnessOxygenSaturationReadScope = "https://www.googleapis.com/auth/fitness.oxygen_saturation.read"
 
-	// View and store oxygen saturation data in Google Fit
+	// See and add info about your oxygen saturation in Google Fit
 	FitnessOxygenSaturationWriteScope = "https://www.googleapis.com/auth/fitness.oxygen_saturation.write"
 
-	// View reproductive health data in Google Fit
+	// See info about your reproductive health in Google Fit
 	FitnessReproductiveHealthReadScope = "https://www.googleapis.com/auth/fitness.reproductive_health.read"
 
-	// View and store reproductive health data in Google Fit
+	// See and add info about your reproductive health in Google Fit
 	FitnessReproductiveHealthWriteScope = "https://www.googleapis.com/auth/fitness.reproductive_health.write"
 )
 
@@ -1451,6 +1452,7 @@ func (c *UsersDataSourcesCreateCall) Header() http.Header {
 
 func (c *UsersDataSourcesCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1597,6 +1599,7 @@ func (c *UsersDataSourcesDeleteCall) Header() http.Header {
 
 func (c *UsersDataSourcesDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1753,6 +1756,7 @@ func (c *UsersDataSourcesGetCall) Header() http.Header {
 
 func (c *UsersDataSourcesGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -1930,6 +1934,7 @@ func (c *UsersDataSourcesListCall) Header() http.Header {
 
 func (c *UsersDataSourcesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2091,6 +2096,7 @@ func (c *UsersDataSourcesUpdateCall) Header() http.Header {
 
 func (c *UsersDataSourcesUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2272,6 +2278,7 @@ func (c *UsersDataSourcesDataPointChangesListCall) Header() http.Header {
 
 func (c *UsersDataSourcesDataPointChangesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2483,6 +2490,7 @@ func (c *UsersDataSourcesDatasetsDeleteCall) Header() http.Header {
 
 func (c *UsersDataSourcesDatasetsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2657,6 +2665,7 @@ func (c *UsersDataSourcesDatasetsGetCall) Header() http.Header {
 
 func (c *UsersDataSourcesDatasetsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -2871,6 +2880,7 @@ func (c *UsersDataSourcesDatasetsPatchCall) Header() http.Header {
 
 func (c *UsersDataSourcesDatasetsPatchCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3026,7 +3036,7 @@ type UsersDatasetAggregateCall struct {
 
 // Aggregate: Aggregates data of a certain type or stream into buckets
 // divided by a given type of boundary. Multiple data sets of multiple
-// types and from multiple sources can be aggreated into exactly one
+// types and from multiple sources can be aggregated into exactly one
 // bucket type per request.
 func (r *UsersDatasetService) Aggregate(userId string, aggregaterequest *AggregateRequest) *UsersDatasetAggregateCall {
 	c := &UsersDatasetAggregateCall{s: r.s, urlParams_: make(gensupport.URLParams)}
@@ -3062,6 +3072,7 @@ func (c *UsersDatasetAggregateCall) Header() http.Header {
 
 func (c *UsersDatasetAggregateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3125,7 +3136,7 @@ func (c *UsersDatasetAggregateCall) Do(opts ...googleapi.CallOption) (*Aggregate
 	}
 	return ret, nil
 	// {
-	//   "description": "Aggregates data of a certain type or stream into buckets divided by a given type of boundary. Multiple data sets of multiple types and from multiple sources can be aggreated into exactly one bucket type per request.",
+	//   "description": "Aggregates data of a certain type or stream into buckets divided by a given type of boundary. Multiple data sets of multiple types and from multiple sources can be aggregated into exactly one bucket type per request.",
 	//   "httpMethod": "POST",
 	//   "id": "fitness.users.dataset.aggregate",
 	//   "parameterOrder": [
@@ -3223,6 +3234,7 @@ func (c *UsersSessionsDeleteCall) Header() http.Header {
 
 func (c *UsersSessionsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3385,6 +3397,7 @@ func (c *UsersSessionsListCall) Header() http.Header {
 
 func (c *UsersSessionsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3584,6 +3597,7 @@ func (c *UsersSessionsUpdateCall) Header() http.Header {
 
 func (c *UsersSessionsUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

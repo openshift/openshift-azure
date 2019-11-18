@@ -5,6 +5,9 @@
         "https://www.googleapis.com/auth/bigquery": {
           "description": "View and manage your data in Google BigQuery"
         },
+        "https://www.googleapis.com/auth/bigquery.readonly": {
+          "description": "View your data in Google BigQuery"
+        },
         "https://www.googleapis.com/auth/cloud-platform": {
           "description": "View and manage your data across Google Cloud Platform services"
         },
@@ -124,7 +127,7 @@
               ],
               "parameters": {
                 "name": {
-                  "description": "The data source in the form:\n`projects/{project_id}/dataSources/{data_source_id}`",
+                  "description": "Required. The data source in the form:\n`projects/{project_id}/dataSources/{data_source_id}`",
                   "location": "path",
                   "pattern": "^projects/[^/]+/dataSources/[^/]+$",
                   "required": true,
@@ -140,6 +143,7 @@
               },
               "scopes": [
                 "https://www.googleapis.com/auth/bigquery",
+                "https://www.googleapis.com/auth/bigquery.readonly",
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/cloud-platform.read-only"
               ]
@@ -154,7 +158,7 @@
               ],
               "parameters": {
                 "name": {
-                  "description": "The field will contain name of the resource requested, for example:\n`projects/{project_id}/dataSources/{data_source_id}`",
+                  "description": "Required. The field will contain name of the resource requested, for example:\n`projects/{project_id}/dataSources/{data_source_id}`",
                   "location": "path",
                   "pattern": "^projects/[^/]+/dataSources/[^/]+$",
                   "required": true,
@@ -167,6 +171,7 @@
               },
               "scopes": [
                 "https://www.googleapis.com/auth/bigquery",
+                "https://www.googleapis.com/auth/bigquery.readonly",
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/cloud-platform.read-only"
               ]
@@ -192,7 +197,7 @@
                   "type": "string"
                 },
                 "parent": {
-                  "description": "The BigQuery project id for which data sources should be returned.\nMust be in the form: `projects/{project_id}`",
+                  "description": "Required. The BigQuery project id for which data sources should be returned.\nMust be in the form: `projects/{project_id}`",
                   "location": "path",
                   "pattern": "^projects/[^/]+$",
                   "required": true,
@@ -205,6 +210,7 @@
               },
               "scopes": [
                 "https://www.googleapis.com/auth/bigquery",
+                "https://www.googleapis.com/auth/bigquery.readonly",
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/cloud-platform.read-only"
               ]
@@ -236,6 +242,7 @@
               },
               "scopes": [
                 "https://www.googleapis.com/auth/bigquery",
+                "https://www.googleapis.com/auth/bigquery.readonly",
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/cloud-platform.read-only"
               ]
@@ -279,6 +286,7 @@
               },
               "scopes": [
                 "https://www.googleapis.com/auth/bigquery",
+                "https://www.googleapis.com/auth/bigquery.readonly",
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/cloud-platform.read-only"
               ]
@@ -297,7 +305,7 @@
                   ],
                   "parameters": {
                     "name": {
-                      "description": "The data source in the form:\n`projects/{project_id}/dataSources/{data_source_id}`",
+                      "description": "Required. The data source in the form:\n`projects/{project_id}/dataSources/{data_source_id}`",
                       "location": "path",
                       "pattern": "^projects/[^/]+/locations/[^/]+/dataSources/[^/]+$",
                       "required": true,
@@ -313,6 +321,7 @@
                   },
                   "scopes": [
                     "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/bigquery.readonly",
                     "https://www.googleapis.com/auth/cloud-platform",
                     "https://www.googleapis.com/auth/cloud-platform.read-only"
                   ]
@@ -327,7 +336,7 @@
                   ],
                   "parameters": {
                     "name": {
-                      "description": "The field will contain name of the resource requested, for example:\n`projects/{project_id}/dataSources/{data_source_id}`",
+                      "description": "Required. The field will contain name of the resource requested, for example:\n`projects/{project_id}/dataSources/{data_source_id}`",
                       "location": "path",
                       "pattern": "^projects/[^/]+/locations/[^/]+/dataSources/[^/]+$",
                       "required": true,
@@ -340,6 +349,7 @@
                   },
                   "scopes": [
                     "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/bigquery.readonly",
                     "https://www.googleapis.com/auth/cloud-platform",
                     "https://www.googleapis.com/auth/cloud-platform.read-only"
                   ]
@@ -365,7 +375,7 @@
                       "type": "string"
                     },
                     "parent": {
-                      "description": "The BigQuery project id for which data sources should be returned.\nMust be in the form: `projects/{project_id}`",
+                      "description": "Required. The BigQuery project id for which data sources should be returned.\nMust be in the form: `projects/{project_id}`",
                       "location": "path",
                       "pattern": "^projects/[^/]+/locations/[^/]+$",
                       "required": true,
@@ -378,6 +388,7 @@
                   },
                   "scopes": [
                     "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/bigquery.readonly",
                     "https://www.googleapis.com/auth/cloud-platform",
                     "https://www.googleapis.com/auth/cloud-platform.read-only"
                   ]
@@ -401,10 +412,15 @@
                       "type": "string"
                     },
                     "parent": {
-                      "description": "The BigQuery project id where the transfer configuration should be created.\nMust be in the format projects/{project_id}/locations/{location_id}\nIf specified location and location of the destination bigquery dataset\ndo not match - the request will fail.",
+                      "description": "Required. The BigQuery project id where the transfer configuration should be created.\nMust be in the format projects/{project_id}/locations/{location_id}\nIf specified location and location of the destination bigquery dataset\ndo not match - the request will fail.",
                       "location": "path",
                       "pattern": "^projects/[^/]+/locations/[^/]+$",
                       "required": true,
+                      "type": "string"
+                    },
+                    "serviceAccountName": {
+                      "description": "Optional service account name. If this field is set, transfer config will\nbe created with this service account credentials. It requires that\nrequesting user calling this API has permissions to act as this service\naccount.",
+                      "location": "query",
                       "type": "string"
                     },
                     "versionInfo": {
@@ -434,7 +450,7 @@
                   ],
                   "parameters": {
                     "name": {
-                      "description": "The field will contain name of the resource requested, for example:\n`projects/{project_id}/transferConfigs/{config_id}`",
+                      "description": "Required. The field will contain name of the resource requested, for example:\n`projects/{project_id}/transferConfigs/{config_id}`",
                       "location": "path",
                       "pattern": "^projects/[^/]+/locations/[^/]+/transferConfigs/[^/]+$",
                       "required": true,
@@ -460,7 +476,7 @@
                   ],
                   "parameters": {
                     "name": {
-                      "description": "The field will contain name of the resource requested, for example:\n`projects/{project_id}/transferConfigs/{config_id}`",
+                      "description": "Required. The field will contain name of the resource requested, for example:\n`projects/{project_id}/transferConfigs/{config_id}`",
                       "location": "path",
                       "pattern": "^projects/[^/]+/locations/[^/]+/transferConfigs/[^/]+$",
                       "required": true,
@@ -473,6 +489,7 @@
                   },
                   "scopes": [
                     "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/bigquery.readonly",
                     "https://www.googleapis.com/auth/cloud-platform",
                     "https://www.googleapis.com/auth/cloud-platform.read-only"
                   ]
@@ -504,7 +521,7 @@
                       "type": "string"
                     },
                     "parent": {
-                      "description": "The BigQuery project id for which data sources\nshould be returned: `projects/{project_id}`.",
+                      "description": "Required. The BigQuery project id for which data sources\nshould be returned: `projects/{project_id}`.",
                       "location": "path",
                       "pattern": "^projects/[^/]+/locations/[^/]+$",
                       "required": true,
@@ -517,6 +534,7 @@
                   },
                   "scopes": [
                     "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/bigquery.readonly",
                     "https://www.googleapis.com/auth/cloud-platform",
                     "https://www.googleapis.com/auth/cloud-platform.read-only"
                   ]
@@ -542,8 +560,13 @@
                       "required": true,
                       "type": "string"
                     },
+                    "serviceAccountName": {
+                      "description": "Optional service account name. If this field is set and\n\"service_account_name\" is set in update_mask, transfer config will be\nupdated to use this service account credentials. It requires that\nrequesting user calling this API has permissions to act as this service\naccount.",
+                      "location": "query",
+                      "type": "string"
+                    },
                     "updateMask": {
-                      "description": "Required list of fields to be updated in this request.",
+                      "description": "Required. Required list of fields to be updated in this request.",
                       "format": "google-fieldmask",
                       "location": "query",
                       "type": "string"
@@ -575,7 +598,7 @@
                   ],
                   "parameters": {
                     "parent": {
-                      "description": "Transfer configuration name in the form:\n`projects/{project_id}/transferConfigs/{config_id}`.",
+                      "description": "Required. Transfer configuration name in the form:\n`projects/{project_id}/transferConfigs/{config_id}`.",
                       "location": "path",
                       "pattern": "^projects/[^/]+/locations/[^/]+/transferConfigs/[^/]+$",
                       "required": true,
@@ -637,7 +660,7 @@
                       ],
                       "parameters": {
                         "name": {
-                          "description": "The field will contain name of the resource requested, for example:\n`projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}`",
+                          "description": "Required. The field will contain name of the resource requested, for example:\n`projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}`",
                           "location": "path",
                           "pattern": "^projects/[^/]+/locations/[^/]+/transferConfigs/[^/]+/runs/[^/]+$",
                           "required": true,
@@ -663,7 +686,7 @@
                       ],
                       "parameters": {
                         "name": {
-                          "description": "The field will contain name of the resource requested, for example:\n`projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}`",
+                          "description": "Required. The field will contain name of the resource requested, for example:\n`projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}`",
                           "location": "path",
                           "pattern": "^projects/[^/]+/locations/[^/]+/transferConfigs/[^/]+/runs/[^/]+$",
                           "required": true,
@@ -676,6 +699,7 @@
                       },
                       "scopes": [
                         "https://www.googleapis.com/auth/bigquery",
+                        "https://www.googleapis.com/auth/bigquery.readonly",
                         "https://www.googleapis.com/auth/cloud-platform",
                         "https://www.googleapis.com/auth/cloud-platform.read-only"
                       ]
@@ -701,7 +725,7 @@
                           "type": "string"
                         },
                         "parent": {
-                          "description": "Name of transfer configuration for which transfer runs should be retrieved.\nFormat of transfer configuration resource name is:\n`projects/{project_id}/transferConfigs/{config_id}`.",
+                          "description": "Required. Name of transfer configuration for which transfer runs should be retrieved.\nFormat of transfer configuration resource name is:\n`projects/{project_id}/transferConfigs/{config_id}`.",
                           "location": "path",
                           "pattern": "^projects/[^/]+/locations/[^/]+/transferConfigs/[^/]+$",
                           "required": true,
@@ -737,6 +761,7 @@
                       },
                       "scopes": [
                         "https://www.googleapis.com/auth/bigquery",
+                        "https://www.googleapis.com/auth/bigquery.readonly",
                         "https://www.googleapis.com/auth/cloud-platform",
                         "https://www.googleapis.com/auth/cloud-platform.read-only"
                       ]
@@ -778,7 +803,7 @@
                               "type": "string"
                             },
                             "parent": {
-                              "description": "Transfer run name in the form:\n`projects/{project_id}/transferConfigs/{config_Id}/runs/{run_id}`.",
+                              "description": "Required. Transfer run name in the form:\n`projects/{project_id}/transferConfigs/{config_Id}/runs/{run_id}`.",
                               "location": "path",
                               "pattern": "^projects/[^/]+/locations/[^/]+/transferConfigs/[^/]+/runs/[^/]+$",
                               "required": true,
@@ -791,6 +816,7 @@
                           },
                           "scopes": [
                             "https://www.googleapis.com/auth/bigquery",
+                            "https://www.googleapis.com/auth/bigquery.readonly",
                             "https://www.googleapis.com/auth/cloud-platform",
                             "https://www.googleapis.com/auth/cloud-platform.read-only"
                           ]
@@ -820,10 +846,15 @@
                   "type": "string"
                 },
                 "parent": {
-                  "description": "The BigQuery project id where the transfer configuration should be created.\nMust be in the format projects/{project_id}/locations/{location_id}\nIf specified location and location of the destination bigquery dataset\ndo not match - the request will fail.",
+                  "description": "Required. The BigQuery project id where the transfer configuration should be created.\nMust be in the format projects/{project_id}/locations/{location_id}\nIf specified location and location of the destination bigquery dataset\ndo not match - the request will fail.",
                   "location": "path",
                   "pattern": "^projects/[^/]+$",
                   "required": true,
+                  "type": "string"
+                },
+                "serviceAccountName": {
+                  "description": "Optional service account name. If this field is set, transfer config will\nbe created with this service account credentials. It requires that\nrequesting user calling this API has permissions to act as this service\naccount.",
+                  "location": "query",
                   "type": "string"
                 },
                 "versionInfo": {
@@ -853,7 +884,7 @@
               ],
               "parameters": {
                 "name": {
-                  "description": "The field will contain name of the resource requested, for example:\n`projects/{project_id}/transferConfigs/{config_id}`",
+                  "description": "Required. The field will contain name of the resource requested, for example:\n`projects/{project_id}/transferConfigs/{config_id}`",
                   "location": "path",
                   "pattern": "^projects/[^/]+/transferConfigs/[^/]+$",
                   "required": true,
@@ -879,7 +910,7 @@
               ],
               "parameters": {
                 "name": {
-                  "description": "The field will contain name of the resource requested, for example:\n`projects/{project_id}/transferConfigs/{config_id}`",
+                  "description": "Required. The field will contain name of the resource requested, for example:\n`projects/{project_id}/transferConfigs/{config_id}`",
                   "location": "path",
                   "pattern": "^projects/[^/]+/transferConfigs/[^/]+$",
                   "required": true,
@@ -892,6 +923,7 @@
               },
               "scopes": [
                 "https://www.googleapis.com/auth/bigquery",
+                "https://www.googleapis.com/auth/bigquery.readonly",
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/cloud-platform.read-only"
               ]
@@ -923,7 +955,7 @@
                   "type": "string"
                 },
                 "parent": {
-                  "description": "The BigQuery project id for which data sources\nshould be returned: `projects/{project_id}`.",
+                  "description": "Required. The BigQuery project id for which data sources\nshould be returned: `projects/{project_id}`.",
                   "location": "path",
                   "pattern": "^projects/[^/]+$",
                   "required": true,
@@ -936,6 +968,7 @@
               },
               "scopes": [
                 "https://www.googleapis.com/auth/bigquery",
+                "https://www.googleapis.com/auth/bigquery.readonly",
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/cloud-platform.read-only"
               ]
@@ -961,8 +994,13 @@
                   "required": true,
                   "type": "string"
                 },
+                "serviceAccountName": {
+                  "description": "Optional service account name. If this field is set and\n\"service_account_name\" is set in update_mask, transfer config will be\nupdated to use this service account credentials. It requires that\nrequesting user calling this API has permissions to act as this service\naccount.",
+                  "location": "query",
+                  "type": "string"
+                },
                 "updateMask": {
-                  "description": "Required list of fields to be updated in this request.",
+                  "description": "Required. Required list of fields to be updated in this request.",
                   "format": "google-fieldmask",
                   "location": "query",
                   "type": "string"
@@ -994,7 +1032,7 @@
               ],
               "parameters": {
                 "parent": {
-                  "description": "Transfer configuration name in the form:\n`projects/{project_id}/transferConfigs/{config_id}`.",
+                  "description": "Required. Transfer configuration name in the form:\n`projects/{project_id}/transferConfigs/{config_id}`.",
                   "location": "path",
                   "pattern": "^projects/[^/]+/transferConfigs/[^/]+$",
                   "required": true,
@@ -1056,7 +1094,7 @@
                   ],
                   "parameters": {
                     "name": {
-                      "description": "The field will contain name of the resource requested, for example:\n`projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}`",
+                      "description": "Required. The field will contain name of the resource requested, for example:\n`projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}`",
                       "location": "path",
                       "pattern": "^projects/[^/]+/transferConfigs/[^/]+/runs/[^/]+$",
                       "required": true,
@@ -1082,7 +1120,7 @@
                   ],
                   "parameters": {
                     "name": {
-                      "description": "The field will contain name of the resource requested, for example:\n`projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}`",
+                      "description": "Required. The field will contain name of the resource requested, for example:\n`projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}`",
                       "location": "path",
                       "pattern": "^projects/[^/]+/transferConfigs/[^/]+/runs/[^/]+$",
                       "required": true,
@@ -1095,6 +1133,7 @@
                   },
                   "scopes": [
                     "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/bigquery.readonly",
                     "https://www.googleapis.com/auth/cloud-platform",
                     "https://www.googleapis.com/auth/cloud-platform.read-only"
                   ]
@@ -1120,7 +1159,7 @@
                       "type": "string"
                     },
                     "parent": {
-                      "description": "Name of transfer configuration for which transfer runs should be retrieved.\nFormat of transfer configuration resource name is:\n`projects/{project_id}/transferConfigs/{config_id}`.",
+                      "description": "Required. Name of transfer configuration for which transfer runs should be retrieved.\nFormat of transfer configuration resource name is:\n`projects/{project_id}/transferConfigs/{config_id}`.",
                       "location": "path",
                       "pattern": "^projects/[^/]+/transferConfigs/[^/]+$",
                       "required": true,
@@ -1156,6 +1195,7 @@
                   },
                   "scopes": [
                     "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/bigquery.readonly",
                     "https://www.googleapis.com/auth/cloud-platform",
                     "https://www.googleapis.com/auth/cloud-platform.read-only"
                   ]
@@ -1197,7 +1237,7 @@
                           "type": "string"
                         },
                         "parent": {
-                          "description": "Transfer run name in the form:\n`projects/{project_id}/transferConfigs/{config_Id}/runs/{run_id}`.",
+                          "description": "Required. Transfer run name in the form:\n`projects/{project_id}/transferConfigs/{config_Id}/runs/{run_id}`.",
                           "location": "path",
                           "pattern": "^projects/[^/]+/transferConfigs/[^/]+/runs/[^/]+$",
                           "required": true,
@@ -1210,6 +1250,7 @@
                       },
                       "scopes": [
                         "https://www.googleapis.com/auth/bigquery",
+                        "https://www.googleapis.com/auth/bigquery.readonly",
                         "https://www.googleapis.com/auth/cloud-platform",
                         "https://www.googleapis.com/auth/cloud-platform.read-only"
                       ]
@@ -1223,7 +1264,7 @@
       }
     }
   },
-  "revision": "20190615",
+  "revision": "20191103",
   "rootUrl": "https://bigquerydatatransfer.googleapis.com/",
   "schemas": {
     "CheckValidCredsRequest": {
@@ -1614,12 +1655,12 @@
       "id": "ScheduleTransferRunsRequest",
       "properties": {
         "endTime": {
-          "description": "End time of the range of transfer runs. For example,\n`\"2017-05-30T00:00:00+00:00\"`.",
+          "description": "Required. End time of the range of transfer runs. For example,\n`\"2017-05-30T00:00:00+00:00\"`.",
           "format": "google-datetime",
           "type": "string"
         },
         "startTime": {
-          "description": "Start time of the range of transfer runs. For example,\n`\"2017-05-25T00:00:00+00:00\"`.",
+          "description": "Required. Start time of the range of transfer runs. For example,\n`\"2017-05-25T00:00:00+00:00\"`.",
           "format": "google-datetime",
           "type": "string"
         }

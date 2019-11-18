@@ -49,8 +49,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -139,6 +139,7 @@ func NewNamespacesService(s *APIService) *NamespacesService {
 	rs.Configurations = NewNamespacesConfigurationsService(s)
 	rs.Domainmappings = NewNamespacesDomainmappingsService(s)
 	rs.Eventtypes = NewNamespacesEventtypesService(s)
+	rs.Pubsubs = NewNamespacesPubsubsService(s)
 	rs.Revisions = NewNamespacesRevisionsService(s)
 	rs.Routes = NewNamespacesRoutesService(s)
 	rs.Services = NewNamespacesServicesService(s)
@@ -156,6 +157,8 @@ type NamespacesService struct {
 	Domainmappings *NamespacesDomainmappingsService
 
 	Eventtypes *NamespacesEventtypesService
+
+	Pubsubs *NamespacesPubsubsService
 
 	Revisions *NamespacesRevisionsService
 
@@ -199,6 +202,15 @@ func NewNamespacesEventtypesService(s *APIService) *NamespacesEventtypesService 
 }
 
 type NamespacesEventtypesService struct {
+	s *APIService
+}
+
+func NewNamespacesPubsubsService(s *APIService) *NamespacesPubsubsService {
+	rs := &NamespacesPubsubsService{s: s}
+	return rs
+}
+
+type NamespacesPubsubsService struct {
 	s *APIService
 }
 
@@ -256,6 +268,7 @@ func NewProjectsLocationsService(s *APIService) *ProjectsLocationsService {
 	rs.Configurations = NewProjectsLocationsConfigurationsService(s)
 	rs.Domainmappings = NewProjectsLocationsDomainmappingsService(s)
 	rs.Eventtypes = NewProjectsLocationsEventtypesService(s)
+	rs.Pubsubs = NewProjectsLocationsPubsubsService(s)
 	rs.Revisions = NewProjectsLocationsRevisionsService(s)
 	rs.Routes = NewProjectsLocationsRoutesService(s)
 	rs.Services = NewProjectsLocationsServicesService(s)
@@ -273,6 +286,8 @@ type ProjectsLocationsService struct {
 	Domainmappings *ProjectsLocationsDomainmappingsService
 
 	Eventtypes *ProjectsLocationsEventtypesService
+
+	Pubsubs *ProjectsLocationsPubsubsService
 
 	Revisions *ProjectsLocationsRevisionsService
 
@@ -316,6 +331,15 @@ func NewProjectsLocationsEventtypesService(s *APIService) *ProjectsLocationsEven
 }
 
 type ProjectsLocationsEventtypesService struct {
+	s *APIService
+}
+
+func NewProjectsLocationsPubsubsService(s *APIService) *ProjectsLocationsPubsubsService {
+	rs := &ProjectsLocationsPubsubsService{s: s}
+	return rs
+}
+
+type ProjectsLocationsPubsubsService struct {
 	s *APIService
 }
 
@@ -409,7 +433,7 @@ func (s *Addressable) MarshalJSON() ([]byte, error) {
 //             {
 //               "log_type": "DATA_READ",
 //               "exempted_members": [
-//                 "user:foo@gmail.com"
+//                 "user:jose@example.com"
 //               ]
 //             },
 //             {
@@ -421,7 +445,7 @@ func (s *Addressable) MarshalJSON() ([]byte, error) {
 //           ]
 //         },
 //         {
-//           "service": "fooservice.googleapis.com"
+//           "service": "sampleservice.googleapis.com"
 //           "audit_log_configs": [
 //             {
 //               "log_type": "DATA_READ",
@@ -429,7 +453,7 @@ func (s *Addressable) MarshalJSON() ([]byte, error) {
 //             {
 //               "log_type": "DATA_WRITE",
 //               "exempted_members": [
-//                 "user:bar@gmail.com"
+//                 "user:aliya@example.com"
 //               ]
 //             }
 //           ]
@@ -437,11 +461,11 @@ func (s *Addressable) MarshalJSON() ([]byte, error) {
 //       ]
 //     }
 //
-// For fooservice, this policy enables DATA_READ, DATA_WRITE and
+// For sampleservice, this policy enables DATA_READ, DATA_WRITE and
 // ADMIN_READ
-// logging. It also exempts foo@gmail.com from DATA_READ logging,
+// logging. It also exempts jose@example.com from DATA_READ logging,
 // and
-// bar@gmail.com from DATA_WRITE logging.
+// aliya@example.com from DATA_WRITE logging.
 type AuditConfig struct {
 	// AuditLogConfigs: The configuration for logging of each type of
 	// permission.
@@ -487,7 +511,7 @@ func (s *AuditConfig) MarshalJSON() ([]byte, error) {
 //         {
 //           "log_type": "DATA_READ",
 //           "exempted_members": [
-//             "user:foo@gmail.com"
+//             "user:jose@example.com"
 //           ]
 //         },
 //         {
@@ -498,20 +522,13 @@ func (s *AuditConfig) MarshalJSON() ([]byte, error) {
 //
 // This enables 'DATA_READ' and 'DATA_WRITE' logging, while
 // exempting
-// foo@gmail.com from DATA_READ logging.
+// jose@example.com from DATA_READ logging.
 type AuditLogConfig struct {
 	// ExemptedMembers: Specifies the identities that do not cause logging
 	// for this type of
 	// permission.
 	// Follows the same format of Binding.members.
 	ExemptedMembers []string `json:"exemptedMembers,omitempty"`
-
-	// IgnoreChildExemptions: Specifies whether principals can be exempted
-	// for the same LogType in
-	// lower-level resource policies. If true, any lower-level exemptions
-	// will
-	// be ignored.
-	IgnoreChildExemptions bool `json:"ignoreChildExemptions,omitempty"`
 
 	// LogType: The log type that this config enables.
 	//
@@ -608,7 +625,7 @@ type Binding struct {
 	//
 	// * `user:{emailid}`: An email address that represents a specific
 	// Google
-	//    account. For example, `alice@gmail.com` .
+	//    account. For example, `alice@example.com` .
 	//
 	//
 	// * `serviceAccount:{emailid}`: An email address that represents a
@@ -690,6 +707,96 @@ func (s *Capabilities) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// CloudEventOverrides: CloudEventOverrides defines arguments for a
+// Source that control the output
+// format of the CloudEvents produced by the Source.
+type CloudEventOverrides struct {
+	// Extensions: Extensions specify what attribute are added or overridden
+	// on the outbound
+	// event. Each `Extensions` key-value pair are set on the event as
+	// an
+	// attribute extension independently.
+	// +optional
+	Extensions map[string]string `json:"extensions,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Extensions") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Extensions") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *CloudEventOverrides) MarshalJSON() ([]byte, error) {
+	type NoMethod CloudEventOverrides
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// Condition: Condition defines a generic condition for a Resource
+type Condition struct {
+	// LastTransitionTime: Optional. Last time the condition transitioned
+	// from one status to another.
+	LastTransitionTime string `json:"lastTransitionTime,omitempty"`
+
+	// Message: Optional. Human readable message indicating details about
+	// the current status.
+	Message string `json:"message,omitempty"`
+
+	// Reason: Optional. One-word CamelCase reason for the condition's last
+	// transition.
+	Reason string `json:"reason,omitempty"`
+
+	// Severity: Optional. How to interpret failures of this condition, one
+	// of Error, Warning, Info
+	Severity string `json:"severity,omitempty"`
+
+	// Status: Status of the condition, one of True, False, Unknown.
+	Status string `json:"status,omitempty"`
+
+	// Type: type is used to communicate the status of the reconciliation
+	// process.
+	// See
+	// also:
+	// https://github.com/knative/serving/blob/master/docs/spec/errors.
+	// md#error-conditions-and-reporting
+	// Types common to all resources include:
+	// * "Ready": True when the Resource is ready.
+	Type string `json:"type,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "LastTransitionTime")
+	// to unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "LastTransitionTime") to
+	// include in API requests with the JSON null value. By default, fields
+	// with empty values are omitted from API requests. However, any field
+	// with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *Condition) MarshalJSON() ([]byte, error) {
+	type NoMethod Condition
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // ConfigMapEnvSource: ConfigMapEnvSource selects a ConfigMap to
 // populate the environment
 // variables with.
@@ -698,10 +805,23 @@ func (s *Capabilities) MarshalJSON() ([]byte, error) {
 // the
 // key-value pairs as environment variables.
 type ConfigMapEnvSource struct {
-	// LocalObjectReference: The ConfigMap to select from.
+	// LocalObjectReference: This field should not be used directly as it is
+	// meant to be inlined
+	// directly into the message. Use the "name" field instead.
 	LocalObjectReference *LocalObjectReference `json:"localObjectReference,omitempty"`
 
-	// Optional: Specify whether the ConfigMap must be defined
+	// Name: Cloud Run fully managed: not supported
+	//
+	// Cloud Run for Anthos: supported
+	//
+	// The ConfigMap to select from.
+	Name string `json:"name,omitempty"`
+
+	// Optional: Cloud Run fully managed: not supported
+	//
+	// Cloud Run for Anthos: supported
+	//
+	// Specify whether the ConfigMap must be defined
 	// +optional
 	Optional bool `json:"optional,omitempty"`
 
@@ -726,6 +846,62 @@ type ConfigMapEnvSource struct {
 
 func (s *ConfigMapEnvSource) MarshalJSON() ([]byte, error) {
 	type NoMethod ConfigMapEnvSource
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// ConfigMapKeySelector: Cloud Run fully managed: not supported
+//
+// Cloud Run on GKE: supported
+//
+// Selects a key from a ConfigMap.
+type ConfigMapKeySelector struct {
+	// Key: Cloud Run fully managed: not supported
+	//
+	// Cloud Run on GKE: supported
+	//
+	// The key to select.
+	Key string `json:"key,omitempty"`
+
+	// LocalObjectReference: This field should not be used directly as it is
+	// meant to be inlined
+	// directly into the message. Use the "name" field instead.
+	LocalObjectReference *LocalObjectReference `json:"localObjectReference,omitempty"`
+
+	// Name: Cloud Run fully managed: not supported
+	//
+	// Cloud Run on GKE: supported
+	//
+	// The ConfigMap to select from.
+	Name string `json:"name,omitempty"`
+
+	// Optional: Cloud Run fully managed: not supported
+	//
+	// Cloud Run on GKE: supported
+	//
+	// Specify whether the ConfigMap or its key must be defined
+	// +optional
+	Optional bool `json:"optional,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Key") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Key") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *ConfigMapKeySelector) MarshalJSON() ([]byte, error) {
+	type NoMethod ConfigMapKeySelector
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -1334,6 +1510,42 @@ func (s *ContainerPort) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+type Destination struct {
+	// Ref: ObjectReference points to an Addressable.
+	// + optional
+	Ref *ObjectReference `json:"ref,omitempty"`
+
+	// Uri: URI is for direct URI Designations or used with the resulting
+	// URL from
+	// Addressable ObjectReference. If used with an ObjectReference, will
+	// be
+	// appended to the path of the resulting URL from the Addressable.
+	// + optional
+	Uri string `json:"uri,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Ref") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Ref") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *Destination) MarshalJSON() ([]byte, error) {
+	type NoMethod Destination
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // DomainMapping: Resource to hold the state and status of a user's
 // domain mapping.
 type DomainMapping struct {
@@ -1613,6 +1825,15 @@ type EnvVar struct {
 	// +optional
 	Value string `json:"value,omitempty"`
 
+	// ValueFrom: Cloud Run fully managed: not supported
+	//
+	// Cloud Run on GKE: supported
+	//
+	// Source for the environment variable's value. Cannot be used if value
+	// is not
+	// empty. +optional
+	ValueFrom *EnvVarSource `json:"valueFrom,omitempty"`
+
 	// ForceSendFields is a list of field names (e.g. "Name") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
@@ -1632,6 +1853,52 @@ type EnvVar struct {
 
 func (s *EnvVar) MarshalJSON() ([]byte, error) {
 	type NoMethod EnvVar
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// EnvVarSource: Cloud Run fully managed: not supported
+//
+// Cloud Run on GKE: supported
+//
+// EnvVarSource represents a source for the value of an EnvVar.
+type EnvVarSource struct {
+	// ConfigMapKeyRef: Cloud Run fully managed: not supported
+	//
+	// Cloud Run on GKE: supported
+	//
+	// Selects a key of a ConfigMap.
+	// +optional
+	ConfigMapKeyRef *ConfigMapKeySelector `json:"configMapKeyRef,omitempty"`
+
+	// SecretKeyRef: Cloud Run fully managed: not supported
+	//
+	// Cloud Run on GKE: supported
+	//
+	// Selects a key of a secret in the pod's namespace
+	// +optional
+	SecretKeyRef *SecretKeySelector `json:"secretKeyRef,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "ConfigMapKeyRef") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "ConfigMapKeyRef") to
+	// include in API requests with the JSON null value. By default, fields
+	// with empty values are omitted from API requests. However, any field
+	// with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *EnvVarSource) MarshalJSON() ([]byte, error) {
+	type NoMethod EnvVarSource
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -1677,6 +1944,71 @@ func (s *EventType) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+type EventTypeImporter struct {
+	// ApiVersion: The API version of the importer CRD.
+	ApiVersion string `json:"apiVersion,omitempty"`
+
+	// Kind: The kind of the importer CRD.
+	Kind string `json:"kind,omitempty"`
+
+	// Parameters: Parameters required to create an importer for the
+	// EventType.
+	Parameters []*EventTypeParameter `json:"parameters,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "ApiVersion") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "ApiVersion") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *EventTypeImporter) MarshalJSON() ([]byte, error) {
+	type NoMethod EventTypeImporter
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+type EventTypeParameter struct {
+	// Description: Description of the parameter. E.g. "Google Cloud Project
+	// Id."
+	Description string `json:"description,omitempty"`
+
+	// Name: Name of the parameter. E.g. googleCloudProject.
+	Name string `json:"name,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Description") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Description") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *EventTypeParameter) MarshalJSON() ([]byte, error) {
+	type NoMethod EventTypeParameter
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 type EventTypeSpec struct {
 	// Broker: Refers to the Broker that can provide the EventType.
 	Broker string `json:"broker,omitempty"`
@@ -1685,6 +2017,10 @@ type EventTypeSpec struct {
 	// about.
 	// +optional
 	Description string `json:"description,omitempty"`
+
+	// Importer: The importer that provides this EventType to the eventing
+	// mesh.
+	Importer *EventTypeImporter `json:"importer,omitempty"`
 
 	// Schema: Schema is a URI with the EventType schema. It may be a JSON
 	// schema, a
@@ -2247,6 +2583,9 @@ type ListDomainMappingsResponse struct {
 	// Metadata: Metadata associated with this DomainMapping list.
 	Metadata *ListMeta `json:"metadata,omitempty"`
 
+	// Unreachable: Locations that could not be reached.
+	Unreachable []string `json:"unreachable,omitempty"`
+
 	// ServerResponse contains the HTTP response code and headers from the
 	// server.
 	googleapi.ServerResponse `json:"-"`
@@ -2420,6 +2759,52 @@ type ListMeta struct {
 
 func (s *ListMeta) MarshalJSON() ([]byte, error) {
 	type NoMethod ListMeta
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// ListPubSubsResponse: ListPubSubsResponse is a list of PubSub
+// resources.
+type ListPubSubsResponse struct {
+	// ApiVersion: The API version for this call such as
+	// "events.cloud.google.com/v1alpha1".
+	ApiVersion string `json:"apiVersion,omitempty"`
+
+	// Items: List of PubSubs.
+	Items []*PubSub `json:"items,omitempty"`
+
+	// Kind: The kind of this resource, in this case "PubSubList".
+	Kind string `json:"kind,omitempty"`
+
+	// Metadata: Metadata associated with this PubSub list.
+	Metadata *ListMeta `json:"metadata,omitempty"`
+
+	// Unreachable: Locations that could not be reached.
+	Unreachable []string `json:"unreachable,omitempty"`
+
+	// ServerResponse contains the HTTP response code and headers from the
+	// server.
+	googleapi.ServerResponse `json:"-"`
+
+	// ForceSendFields is a list of field names (e.g. "ApiVersion") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "ApiVersion") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *ListPubSubsResponse) MarshalJSON() ([]byte, error) {
+	type NoMethod ListPubSubsResponse
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -3120,31 +3505,43 @@ func (s *OwnerReference) MarshalJSON() ([]byte, error) {
 // specify access control policies for Cloud Platform resources.
 //
 //
-// A `Policy` consists of a list of `bindings`. A `binding` binds a list
-// of
-// `members` to a `role`, where the members can be user accounts, Google
-// groups,
-// Google domains, and service accounts. A `role` is a named list of
-// permissions
-// defined by IAM.
+// A `Policy` is a collection of `bindings`. A `binding` binds one or
+// more
+// `members` to a single `role`. Members can be user accounts, service
+// accounts,
+// Google groups, and domains (such as G Suite). A `role` is a named
+// list of
+// permissions (defined by IAM or configured by users). A `binding`
+// can
+// optionally specify a `condition`, which is a logic expression that
+// further
+// constrains the role binding based on attributes about the request
+// and/or
+// target resource.
 //
 // **JSON Example**
 //
 //     {
 //       "bindings": [
 //         {
-//           "role": "roles/owner",
+//           "role": "roles/resourcemanager.organizationAdmin",
 //           "members": [
 //             "user:mike@example.com",
 //             "group:admins@example.com",
 //             "domain:google.com",
 //
-// "serviceAccount:my-other-app@appspot.gserviceaccount.com"
+// "serviceAccount:my-project-id@appspot.gserviceaccount.com"
 //           ]
 //         },
 //         {
-//           "role": "roles/viewer",
-//           "members": ["user:sean@example.com"]
+//           "role": "roles/resourcemanager.organizationViewer",
+//           "members": ["user:eve@example.com"],
+//           "condition": {
+//             "title": "expirable access",
+//             "description": "Does not grant access after Sep 2020",
+//             "expression": "request.time <
+//             timestamp('2020-10-01T00:00:00.000Z')",
+//           }
 //         }
 //       ]
 //     }
@@ -3156,12 +3553,16 @@ func (s *OwnerReference) MarshalJSON() ([]byte, error) {
 //       - user:mike@example.com
 //       - group:admins@example.com
 //       - domain:google.com
-//       - serviceAccount:my-other-app@appspot.gserviceaccount.com
-//       role: roles/owner
+//       - serviceAccount:my-project-id@appspot.gserviceaccount.com
+//       role: roles/resourcemanager.organizationAdmin
 //     - members:
-//       - user:sean@example.com
-//       role: roles/viewer
-//
+//       - user:eve@example.com
+//       role: roles/resourcemanager.organizationViewer
+//       condition:
+//         title: expirable access
+//         description: Does not grant access after Sep 2020
+//         expression: request.time <
+// timestamp('2020-10-01T00:00:00.000Z')
 //
 // For a description of IAM and its features, see the
 // [IAM developer's guide](https://cloud.google.com/iam/docs).
@@ -3170,7 +3571,9 @@ type Policy struct {
 	// policy.
 	AuditConfigs []*AuditConfig `json:"auditConfigs,omitempty"`
 
-	// Bindings: Associates a list of `members` to a `role`.
+	// Bindings: Associates a list of `members` to a `role`. Optionally may
+	// specify a
+	// `condition` that determines when binding is in effect.
 	// `bindings` with no members will result in an error.
 	Bindings []*Binding `json:"bindings,omitempty"`
 
@@ -3191,10 +3594,32 @@ type Policy struct {
 	//
 	// If no `etag` is provided in the call to `setIamPolicy`, then the
 	// existing
-	// policy is overwritten blindly.
+	// policy is overwritten. Due to blind-set semantics of an etag-less
+	// policy,
+	// 'setIamPolicy' will not fail even if either of incoming or stored
+	// policy
+	// does not meet the version requirements.
 	Etag string `json:"etag,omitempty"`
 
-	// Version: Deprecated.
+	// Version: Specifies the format of the policy.
+	//
+	// Valid values are 0, 1, and 3. Requests specifying an invalid value
+	// will be
+	// rejected.
+	//
+	// Operations affecting conditional bindings must specify version 3.
+	// This can
+	// be either setting a conditional policy, modifying a conditional
+	// binding,
+	// or removing a conditional binding from the stored conditional
+	// policy.
+	// Operations on non-conditional policies may specify any valid value
+	// or
+	// leave the field unset.
+	//
+	// If no etag is provided in the call to `setIamPolicy`, any
+	// version
+	// compliance checks on the incoming and/or stored policy is skipped.
 	Version int64 `json:"version,omitempty"`
 
 	// ServerResponse contains the HTTP response code and headers from the
@@ -3287,6 +3712,182 @@ type Probe struct {
 
 func (s *Probe) MarshalJSON() ([]byte, error) {
 	type NoMethod Probe
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+type PubSub struct {
+	// ApiVersion: The API version for this call such as
+	// "events.cloud.google.com/v1alpha1".
+	ApiVersion string `json:"apiVersion,omitempty"`
+
+	// Kind: The kind of resource, in this case "PubSub".
+	Kind string `json:"kind,omitempty"`
+
+	// Metadata: Metadata associated with this PubSub.
+	Metadata *ObjectMeta `json:"metadata,omitempty"`
+
+	// Spec: Spec defines the desired state of the PubSub.
+	Spec *PubSubSpec `json:"spec,omitempty"`
+
+	// Status: Status represents the current state of the PubSub. This data
+	// may be
+	// out of date. +optional
+	Status *PubSubStatus `json:"status,omitempty"`
+
+	// ServerResponse contains the HTTP response code and headers from the
+	// server.
+	googleapi.ServerResponse `json:"-"`
+
+	// ForceSendFields is a list of field names (e.g. "ApiVersion") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "ApiVersion") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *PubSub) MarshalJSON() ([]byte, error) {
+	type NoMethod PubSub
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// PubSubSpec: The desired state of the PubSub.
+type PubSubSpec struct {
+	// AckDeadline: AckDeadline is the default maximum time after a
+	// subscriber receives a
+	// message before the subscriber should acknowledge the message.
+	// Defaults
+	// to 30 seconds ('30s').
+	// +optional
+	AckDeadline string `json:"ackDeadline,omitempty"`
+
+	// CeOverrides: CloudEventOverrides defines overrides to control the
+	// output format and
+	// modifications of the event sent to the sink.
+	// +optional
+	CeOverrides *CloudEventOverrides `json:"ceOverrides,omitempty"`
+
+	// Project: Project is the ID of the Google Cloud Project that the
+	// PubSub Topic exists
+	// in. If omitted, defaults to same as the cluster. +optional
+	Project string `json:"project,omitempty"`
+
+	// PubsubSecret: PubSubSecret is the credential to use to create
+	// Topic / PullSubscription resources. If omitted, uses Secret.
+	PubsubSecret *SecretKeySelector `json:"pubsubSecret,omitempty"`
+
+	// RetainAckedMessages: RetainAckedMessages defines whether to retain
+	// acknowledged messages. If
+	// true, acknowledged messages will not be expunged until they fall out
+	// of
+	// the RetentionDuration window.
+	RetainAckedMessages bool `json:"retainAckedMessages,omitempty"`
+
+	// RetentionDuration: RetentionDuration defines how long to retain
+	// messages in backlog, from
+	// the time of publish. If RetainAckedMessages is true, this
+	// duration
+	// affects the retention of acknowledged messages, otherwise
+	// only
+	// unacknowledged messages are retained. Cannot be longer than 7 days
+	// or
+	// shorter than 10 minutes. Defaults to 7 days ('7d').
+	// +optional
+	RetentionDuration string `json:"retentionDuration,omitempty"`
+
+	// Secret: Secret is the credential to use to create the Scheduler
+	// Job.
+	// If not specified, defaults to:
+	// Name: google-cloud-key
+	// Key: key.json
+	// +optional
+	Secret *SecretKeySelector `json:"secret,omitempty"`
+
+	// Sink: Sink is a reference to an object that will resolve to a domain
+	// name or a
+	// URI directly to use as the sink.
+	Sink *Destination `json:"sink,omitempty"`
+
+	// Topic: Topic is the ID of the PubSub Topic to Subscribe to. It
+	// must
+	// be in the form of the unique identifier within the project, not
+	// the
+	// entire name. E.g. it must be 'laconia',
+	// not
+	// 'projects/my-proj/topics/laconia'.
+	Topic string `json:"topic,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "AckDeadline") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "AckDeadline") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *PubSubSpec) MarshalJSON() ([]byte, error) {
+	type NoMethod PubSubSpec
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// PubSubStatus: PubSubStatus represents the current state of a PubSub.
+type PubSubStatus struct {
+	// Conditions: Array of observed PubSubConditions, indicating the
+	// current state
+	// of the PubSub.
+	Conditions []*Condition `json:"conditions,omitempty"`
+
+	// ObservedGeneration: ObservedGeneration is the 'Generation' of the
+	// PubSub that
+	// was last processed by the controller.
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+
+	// SinkUri: SinkURI is the current active sink URI that has been
+	// configured for the
+	// Source.
+	// +optional
+	SinkUri string `json:"sinkUri,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Conditions") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Conditions") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *PubSubStatus) MarshalJSON() ([]byte, error) {
+	type NoMethod PubSubStatus
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -3588,14 +4189,18 @@ type RevisionSpec struct {
 	// ract.md
 	Container *Container `json:"container,omitempty"`
 
-	// ContainerConcurrency: ContainerConcurrency specifies the maximum
-	// allowed in-flight (concurrent)
-	// requests per container of the Revision. Values are:
-	// - `0` thread-safe, the system should manage the max concurrency. This
-	// is
-	//    the default value.
-	// - `1` not-thread-safe. Single concurrency
-	// - `2-N` thread-safe, max concurrency of N
+	// ContainerConcurrency: (Optional)
+	//
+	// ContainerConcurrency specifies the maximum allowed in-flight
+	// (concurrent)
+	// requests per container instance of the Revision.
+	//
+	// Cloud Run fully managed: supported, defaults to 80
+	//
+	// Cloud Run on GKE: supported, defaults to 0, which means
+	// concurrency
+	// to the application is not limited, and the system decides the
+	// target concurrency for the autoscaler.
 	ContainerConcurrency int64 `json:"containerConcurrency,omitempty"`
 
 	// Containers: Containers holds the single container that defines the
@@ -4105,10 +4710,23 @@ func (s *SELinuxOptions) MarshalJSON() ([]byte, error) {
 // the
 // key-value pairs as environment variables.
 type SecretEnvSource struct {
-	// LocalObjectReference: The Secret to select from.
+	// LocalObjectReference: This field should not be used directly as it is
+	// meant to be inlined
+	// directly into the message. Use the "name" field instead.
 	LocalObjectReference *LocalObjectReference `json:"localObjectReference,omitempty"`
 
-	// Optional: Specify whether the Secret must be defined
+	// Name: Cloud Run fully managed: not supported
+	//
+	// Cloud Run for Anthos: supported
+	//
+	// The Secret to select from.
+	Name string `json:"name,omitempty"`
+
+	// Optional: Cloud Run fully managed: not supported
+	//
+	// Cloud Run for Anthos: supported
+	//
+	// Specify whether the Secret must be defined
 	// +optional
 	Optional bool `json:"optional,omitempty"`
 
@@ -4133,6 +4751,62 @@ type SecretEnvSource struct {
 
 func (s *SecretEnvSource) MarshalJSON() ([]byte, error) {
 	type NoMethod SecretEnvSource
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// SecretKeySelector: Cloud Run fully managed: not supported
+//
+// Cloud Run on GKE: supported
+//
+// SecretKeySelector selects a key of a Secret.
+type SecretKeySelector struct {
+	// Key: Cloud Run fully managed: not supported
+	//
+	// Cloud Run on GKE: supported
+	//
+	// The key of the secret to select from.  Must be a valid secret key.
+	Key string `json:"key,omitempty"`
+
+	// LocalObjectReference: This field should not be used directly as it is
+	// meant to be inlined
+	// directly into the message. Use the "name" field instead.
+	LocalObjectReference *LocalObjectReference `json:"localObjectReference,omitempty"`
+
+	// Name: Cloud Run fully managed: not supported
+	//
+	// Cloud Run on GKE: supported
+	//
+	// The name of the secret in the pod's namespace to select from.
+	Name string `json:"name,omitempty"`
+
+	// Optional: Cloud Run fully managed: not supported
+	//
+	// Cloud Run on GKE: supported
+	//
+	// Specify whether the Secret or its key must be defined
+	// +optional
+	Optional bool `json:"optional,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Key") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Key") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *SecretKeySelector) MarshalJSON() ([]byte, error) {
+	type NoMethod SecretKeySelector
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -5113,9 +5787,29 @@ func (s *TriggerCondition) MarshalJSON() ([]byte, error) {
 }
 
 type TriggerFilter struct {
+	// Attributes: Cloud Run fully managed: not supported
+	//
+	// Cloud Run on GKE: supported
+	//
+	// Attributes filters events by exact match on event context
+	// attributes.
+	// Each key in the map is compared with the equivalent key in the
+	// event
+	// context. An event passes the filter if all values are equal to
+	// the
+	// specified values.
+	//
+	// Nested context attributes are not supported as keys.
+	// Only string values are supported.
+	//
+	// +optional
+	Attributes map[string]string `json:"attributes,omitempty"`
+
+	// SourceAndType: SourceAndType is DEPRECATED and replaced by the
+	// Attributes field.
 	SourceAndType *TriggerFilterSourceAndType `json:"sourceAndType,omitempty"`
 
-	// ForceSendFields is a list of field names (e.g. "SourceAndType") to
+	// ForceSendFields is a list of field names (e.g. "Attributes") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -5123,10 +5817,10 @@ type TriggerFilter struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "SourceAndType") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
+	// NullFields is a list of field names (e.g. "Attributes") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
 	// null. It is an error if a field in this list has a non-empty value.
 	// This may be used to include null fields in Patch requests.
 	NullFields []string `json:"-"`
@@ -5138,10 +5832,9 @@ func (s *TriggerFilter) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
-// TriggerFilterSourceAndType: TriggerFilterSourceAndType filters events
-// based on exact matches on the cloud
-// event's type and source attributes. Only exact matches will pass the
-// filter.
+// TriggerFilterSourceAndType: TriggerFilterSourceAndType is DEPRECATED.
+// Filters are now contained in the
+// map of attributes in TriggerFilter proto.
 type TriggerFilterSourceAndType struct {
 	Source string `json:"source,omitempty"`
 
@@ -5170,6 +5863,38 @@ func (s *TriggerFilterSourceAndType) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+type TriggerImporterSpec struct {
+	// Arguments: Arguments to use for the importer. These must match the
+	// parameters in the
+	// EventType's importer.
+	Arguments map[string]string `json:"arguments,omitempty"`
+
+	// EventTypeName: Name of the EventType that this importer provides.
+	EventTypeName string `json:"eventTypeName,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Arguments") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Arguments") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *TriggerImporterSpec) MarshalJSON() ([]byte, error) {
+	type NoMethod TriggerImporterSpec
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // TriggerSpec: The desired state of the Trigger.
 type TriggerSpec struct {
 	// Broker: Broker is the broker that this trigger receives events from.
@@ -5181,12 +5906,15 @@ type TriggerSpec struct {
 
 	// Filter: Filter is the filter to apply against all events from the
 	// Broker. Only
-	// events that pass this filter will be sent to the Subscriber. If
-	// not
-	// specified, will default to allowing all events.
-	//
-	// This must be specified in Cloud Run.
+	// events that pass this filter will be sent to the Subscriber.
 	Filter *TriggerFilter `json:"filter,omitempty"`
+
+	// Importers: Specification of the importers that will provide events to
+	// the trigger.
+	// Note, for Cloud Run, the importers will only be used if a filter is
+	// not
+	// specified.
+	Importers []*TriggerImporterSpec `json:"importers,omitempty"`
 
 	// Subscriber: Subscriber is the addressable that receives events from
 	// the Broker that
@@ -5449,6 +6177,7 @@ func (c *NamespacesAuthorizeddomainsListCall) Header() http.Header {
 
 func (c *NamespacesAuthorizeddomainsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5624,6 +6353,7 @@ func (c *NamespacesConfigurationsGetCall) Header() http.Header {
 
 func (c *NamespacesConfigurationsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5822,6 +6552,7 @@ func (c *NamespacesConfigurationsListCall) Header() http.Header {
 
 func (c *NamespacesConfigurationsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -5992,6 +6723,7 @@ func (c *NamespacesDomainmappingsCreateCall) Header() http.Header {
 
 func (c *NamespacesDomainmappingsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6170,6 +6902,7 @@ func (c *NamespacesDomainmappingsDeleteCall) Header() http.Header {
 
 func (c *NamespacesDomainmappingsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6330,6 +7063,7 @@ func (c *NamespacesDomainmappingsGetCall) Header() http.Header {
 
 func (c *NamespacesDomainmappingsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6528,6 +7262,7 @@ func (c *NamespacesDomainmappingsListCall) Header() http.Header {
 
 func (c *NamespacesDomainmappingsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6707,6 +7442,7 @@ func (c *NamespacesEventtypesGetCall) Header() http.Header {
 
 func (c *NamespacesEventtypesGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -6905,6 +7641,7 @@ func (c *NamespacesEventtypesListCall) Header() http.Header {
 
 func (c *NamespacesEventtypesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7029,6 +7766,846 @@ func (c *NamespacesEventtypesListCall) Do(opts ...googleapi.CallOption) (*ListEv
 
 }
 
+// method id "run.namespaces.pubsubs.create":
+
+type NamespacesPubsubsCreateCall struct {
+	s          *APIService
+	parent     string
+	pubsub     *PubSub
+	urlParams_ gensupport.URLParams
+	ctx_       context.Context
+	header_    http.Header
+}
+
+// Create: Creates a new pubsub.
+func (r *NamespacesPubsubsService) Create(parent string, pubsub *PubSub) *NamespacesPubsubsCreateCall {
+	c := &NamespacesPubsubsCreateCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.parent = parent
+	c.pubsub = pubsub
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *NamespacesPubsubsCreateCall) Fields(s ...googleapi.Field) *NamespacesPubsubsCreateCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *NamespacesPubsubsCreateCall) Context(ctx context.Context) *NamespacesPubsubsCreateCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *NamespacesPubsubsCreateCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *NamespacesPubsubsCreateCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.pubsub)
+	if err != nil {
+		return nil, err
+	}
+	reqHeaders.Set("Content-Type", "application/json")
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "apis/events.cloud.google.com/v1alpha1/{+parent}/pubsubs")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"parent": c.parent,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "run.namespaces.pubsubs.create" call.
+// Exactly one of *PubSub or error will be non-nil. Any non-2xx status
+// code is an error. Response headers are in either
+// *PubSub.ServerResponse.Header or (if a response was returned at all)
+// in error.(*googleapi.Error).Header. Use googleapi.IsNotModified to
+// check whether the returned error was because http.StatusNotModified
+// was returned.
+func (c *NamespacesPubsubsCreateCall) Do(opts ...googleapi.CallOption) (*PubSub, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &PubSub{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Creates a new pubsub.",
+	//   "flatPath": "apis/events.cloud.google.com/v1alpha1/namespaces/{namespacesId}/pubsubs",
+	//   "httpMethod": "POST",
+	//   "id": "run.namespaces.pubsubs.create",
+	//   "parameterOrder": [
+	//     "parent"
+	//   ],
+	//   "parameters": {
+	//     "parent": {
+	//       "description": "The project ID or project number in which this pubsub should\nbe created.",
+	//       "location": "path",
+	//       "pattern": "^namespaces/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "apis/events.cloud.google.com/v1alpha1/{+parent}/pubsubs",
+	//   "request": {
+	//     "$ref": "PubSub"
+	//   },
+	//   "response": {
+	//     "$ref": "PubSub"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform"
+	//   ]
+	// }
+
+}
+
+// method id "run.namespaces.pubsubs.delete":
+
+type NamespacesPubsubsDeleteCall struct {
+	s          *APIService
+	name       string
+	urlParams_ gensupport.URLParams
+	ctx_       context.Context
+	header_    http.Header
+}
+
+// Delete: Rpc to delete a pubsub.
+func (r *NamespacesPubsubsService) Delete(name string) *NamespacesPubsubsDeleteCall {
+	c := &NamespacesPubsubsDeleteCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.name = name
+	return c
+}
+
+// ApiVersion sets the optional parameter "apiVersion": Cloud Run
+// currently ignores this parameter.
+func (c *NamespacesPubsubsDeleteCall) ApiVersion(apiVersion string) *NamespacesPubsubsDeleteCall {
+	c.urlParams_.Set("apiVersion", apiVersion)
+	return c
+}
+
+// Kind sets the optional parameter "kind": Cloud Run currently ignores
+// this parameter.
+func (c *NamespacesPubsubsDeleteCall) Kind(kind string) *NamespacesPubsubsDeleteCall {
+	c.urlParams_.Set("kind", kind)
+	return c
+}
+
+// PropagationPolicy sets the optional parameter "propagationPolicy":
+// Specifies the propagation policy of delete. Cloud Run currently
+// ignores
+// this setting, and deletes in the background. Please
+// see
+// kubernetes.io/docs/concepts/workloads/controllers/garbage-collecti
+// on/ for
+// more information.
+func (c *NamespacesPubsubsDeleteCall) PropagationPolicy(propagationPolicy string) *NamespacesPubsubsDeleteCall {
+	c.urlParams_.Set("propagationPolicy", propagationPolicy)
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *NamespacesPubsubsDeleteCall) Fields(s ...googleapi.Field) *NamespacesPubsubsDeleteCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *NamespacesPubsubsDeleteCall) Context(ctx context.Context) *NamespacesPubsubsDeleteCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *NamespacesPubsubsDeleteCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *NamespacesPubsubsDeleteCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "apis/events.cloud.google.com/v1alpha1/{+name}")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("DELETE", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"name": c.name,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "run.namespaces.pubsubs.delete" call.
+// Exactly one of *Empty or error will be non-nil. Any non-2xx status
+// code is an error. Response headers are in either
+// *Empty.ServerResponse.Header or (if a response was returned at all)
+// in error.(*googleapi.Error).Header. Use googleapi.IsNotModified to
+// check whether the returned error was because http.StatusNotModified
+// was returned.
+func (c *NamespacesPubsubsDeleteCall) Do(opts ...googleapi.CallOption) (*Empty, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &Empty{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Rpc to delete a pubsub.",
+	//   "flatPath": "apis/events.cloud.google.com/v1alpha1/namespaces/{namespacesId}/pubsubs/{pubsubsId}",
+	//   "httpMethod": "DELETE",
+	//   "id": "run.namespaces.pubsubs.delete",
+	//   "parameterOrder": [
+	//     "name"
+	//   ],
+	//   "parameters": {
+	//     "apiVersion": {
+	//       "description": "Cloud Run currently ignores this parameter.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "kind": {
+	//       "description": "Cloud Run currently ignores this parameter.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "name": {
+	//       "description": "The name of the pubsub being deleted. If needed, replace\n{namespace_id} with the project ID.",
+	//       "location": "path",
+	//       "pattern": "^namespaces/[^/]+/pubsubs/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "propagationPolicy": {
+	//       "description": "Specifies the propagation policy of delete. Cloud Run currently ignores\nthis setting, and deletes in the background. Please see\nkubernetes.io/docs/concepts/workloads/controllers/garbage-collection/ for\nmore information.",
+	//       "location": "query",
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "apis/events.cloud.google.com/v1alpha1/{+name}",
+	//   "response": {
+	//     "$ref": "Empty"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform"
+	//   ]
+	// }
+
+}
+
+// method id "run.namespaces.pubsubs.get":
+
+type NamespacesPubsubsGetCall struct {
+	s            *APIService
+	name         string
+	urlParams_   gensupport.URLParams
+	ifNoneMatch_ string
+	ctx_         context.Context
+	header_      http.Header
+}
+
+// Get: Rpc to get information about a pubsub.
+func (r *NamespacesPubsubsService) Get(name string) *NamespacesPubsubsGetCall {
+	c := &NamespacesPubsubsGetCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.name = name
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *NamespacesPubsubsGetCall) Fields(s ...googleapi.Field) *NamespacesPubsubsGetCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// IfNoneMatch sets the optional parameter which makes the operation
+// fail if the object's ETag matches the given value. This is useful for
+// getting updates only after the object has changed since the last
+// request. Use googleapi.IsNotModified to check whether the response
+// error from Do is the result of In-None-Match.
+func (c *NamespacesPubsubsGetCall) IfNoneMatch(entityTag string) *NamespacesPubsubsGetCall {
+	c.ifNoneMatch_ = entityTag
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *NamespacesPubsubsGetCall) Context(ctx context.Context) *NamespacesPubsubsGetCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *NamespacesPubsubsGetCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *NamespacesPubsubsGetCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	if c.ifNoneMatch_ != "" {
+		reqHeaders.Set("If-None-Match", c.ifNoneMatch_)
+	}
+	var body io.Reader = nil
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "apis/events.cloud.google.com/v1alpha1/{+name}")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"name": c.name,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "run.namespaces.pubsubs.get" call.
+// Exactly one of *PubSub or error will be non-nil. Any non-2xx status
+// code is an error. Response headers are in either
+// *PubSub.ServerResponse.Header or (if a response was returned at all)
+// in error.(*googleapi.Error).Header. Use googleapi.IsNotModified to
+// check whether the returned error was because http.StatusNotModified
+// was returned.
+func (c *NamespacesPubsubsGetCall) Do(opts ...googleapi.CallOption) (*PubSub, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &PubSub{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Rpc to get information about a pubsub.",
+	//   "flatPath": "apis/events.cloud.google.com/v1alpha1/namespaces/{namespacesId}/pubsubs/{pubsubsId}",
+	//   "httpMethod": "GET",
+	//   "id": "run.namespaces.pubsubs.get",
+	//   "parameterOrder": [
+	//     "name"
+	//   ],
+	//   "parameters": {
+	//     "name": {
+	//       "description": "The name of the pubsub being retrieved. If needed, replace\n{namespace_id} with the project ID.",
+	//       "location": "path",
+	//       "pattern": "^namespaces/[^/]+/pubsubs/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "apis/events.cloud.google.com/v1alpha1/{+name}",
+	//   "response": {
+	//     "$ref": "PubSub"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform"
+	//   ]
+	// }
+
+}
+
+// method id "run.namespaces.pubsubs.list":
+
+type NamespacesPubsubsListCall struct {
+	s            *APIService
+	parent       string
+	urlParams_   gensupport.URLParams
+	ifNoneMatch_ string
+	ctx_         context.Context
+	header_      http.Header
+}
+
+// List: Rpc to list pubsubs.
+func (r *NamespacesPubsubsService) List(parent string) *NamespacesPubsubsListCall {
+	c := &NamespacesPubsubsListCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.parent = parent
+	return c
+}
+
+// Continue sets the optional parameter "continue": Optional encoded
+// string to continue paging.
+func (c *NamespacesPubsubsListCall) Continue(continue_ string) *NamespacesPubsubsListCall {
+	c.urlParams_.Set("continue", continue_)
+	return c
+}
+
+// FieldSelector sets the optional parameter "fieldSelector": Allows to
+// filter resources based on a specific value for a field name.
+// Send this in a query string format. i.e. 'metadata.name%3Dlorem'.
+// Not currently used by Cloud Run.
+func (c *NamespacesPubsubsListCall) FieldSelector(fieldSelector string) *NamespacesPubsubsListCall {
+	c.urlParams_.Set("fieldSelector", fieldSelector)
+	return c
+}
+
+// IncludeUninitialized sets the optional parameter
+// "includeUninitialized": Not currently used by Cloud Run.
+func (c *NamespacesPubsubsListCall) IncludeUninitialized(includeUninitialized bool) *NamespacesPubsubsListCall {
+	c.urlParams_.Set("includeUninitialized", fmt.Sprint(includeUninitialized))
+	return c
+}
+
+// LabelSelector sets the optional parameter "labelSelector": Allows to
+// filter resources based on a label. Supported operations are
+// =, !=, exists, in, and notIn.
+func (c *NamespacesPubsubsListCall) LabelSelector(labelSelector string) *NamespacesPubsubsListCall {
+	c.urlParams_.Set("labelSelector", labelSelector)
+	return c
+}
+
+// Limit sets the optional parameter "limit": The maximum number of
+// records that should be returned.
+func (c *NamespacesPubsubsListCall) Limit(limit int64) *NamespacesPubsubsListCall {
+	c.urlParams_.Set("limit", fmt.Sprint(limit))
+	return c
+}
+
+// ResourceVersion sets the optional parameter "resourceVersion": The
+// baseline resource version from which the list or watch operation
+// should
+// start. Not currently used by Cloud Run.
+func (c *NamespacesPubsubsListCall) ResourceVersion(resourceVersion string) *NamespacesPubsubsListCall {
+	c.urlParams_.Set("resourceVersion", resourceVersion)
+	return c
+}
+
+// Watch sets the optional parameter "watch": Flag that indicates that
+// the client expects to watch this resource as well.
+// Not currently used by Cloud Run.
+func (c *NamespacesPubsubsListCall) Watch(watch bool) *NamespacesPubsubsListCall {
+	c.urlParams_.Set("watch", fmt.Sprint(watch))
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *NamespacesPubsubsListCall) Fields(s ...googleapi.Field) *NamespacesPubsubsListCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// IfNoneMatch sets the optional parameter which makes the operation
+// fail if the object's ETag matches the given value. This is useful for
+// getting updates only after the object has changed since the last
+// request. Use googleapi.IsNotModified to check whether the response
+// error from Do is the result of In-None-Match.
+func (c *NamespacesPubsubsListCall) IfNoneMatch(entityTag string) *NamespacesPubsubsListCall {
+	c.ifNoneMatch_ = entityTag
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *NamespacesPubsubsListCall) Context(ctx context.Context) *NamespacesPubsubsListCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *NamespacesPubsubsListCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *NamespacesPubsubsListCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	if c.ifNoneMatch_ != "" {
+		reqHeaders.Set("If-None-Match", c.ifNoneMatch_)
+	}
+	var body io.Reader = nil
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "apis/events.cloud.google.com/v1alpha1/{+parent}/pubsubs")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"parent": c.parent,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "run.namespaces.pubsubs.list" call.
+// Exactly one of *ListPubSubsResponse or error will be non-nil. Any
+// non-2xx status code is an error. Response headers are in either
+// *ListPubSubsResponse.ServerResponse.Header or (if a response was
+// returned at all) in error.(*googleapi.Error).Header. Use
+// googleapi.IsNotModified to check whether the returned error was
+// because http.StatusNotModified was returned.
+func (c *NamespacesPubsubsListCall) Do(opts ...googleapi.CallOption) (*ListPubSubsResponse, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &ListPubSubsResponse{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Rpc to list pubsubs.",
+	//   "flatPath": "apis/events.cloud.google.com/v1alpha1/namespaces/{namespacesId}/pubsubs",
+	//   "httpMethod": "GET",
+	//   "id": "run.namespaces.pubsubs.list",
+	//   "parameterOrder": [
+	//     "parent"
+	//   ],
+	//   "parameters": {
+	//     "continue": {
+	//       "description": "Optional encoded string to continue paging.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "fieldSelector": {
+	//       "description": "Allows to filter resources based on a specific value for a field name.\nSend this in a query string format. i.e. 'metadata.name%3Dlorem'.\nNot currently used by Cloud Run.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "includeUninitialized": {
+	//       "description": "Not currently used by Cloud Run.",
+	//       "location": "query",
+	//       "type": "boolean"
+	//     },
+	//     "labelSelector": {
+	//       "description": "Allows to filter resources based on a label. Supported operations are\n=, !=, exists, in, and notIn.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "limit": {
+	//       "description": "The maximum number of records that should be returned.",
+	//       "format": "int32",
+	//       "location": "query",
+	//       "type": "integer"
+	//     },
+	//     "parent": {
+	//       "description": "The project ID or project number from which the pubsubs should\nbe listed.",
+	//       "location": "path",
+	//       "pattern": "^namespaces/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "resourceVersion": {
+	//       "description": "The baseline resource version from which the list or watch operation should\nstart. Not currently used by Cloud Run.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "watch": {
+	//       "description": "Flag that indicates that the client expects to watch this resource as well.\nNot currently used by Cloud Run.",
+	//       "location": "query",
+	//       "type": "boolean"
+	//     }
+	//   },
+	//   "path": "apis/events.cloud.google.com/v1alpha1/{+parent}/pubsubs",
+	//   "response": {
+	//     "$ref": "ListPubSubsResponse"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform"
+	//   ]
+	// }
+
+}
+
+// method id "run.namespaces.pubsubs.replacePubSub":
+
+type NamespacesPubsubsReplacePubSubCall struct {
+	s          *APIService
+	name       string
+	pubsub     *PubSub
+	urlParams_ gensupport.URLParams
+	ctx_       context.Context
+	header_    http.Header
+}
+
+// ReplacePubSub: Rpc to replace a pubsub.
+//
+// Only the spec and metadata labels and annotations are modifiable.
+// After
+// the Update request, Cloud Run will work to make the 'status'
+// match the requested 'spec'.
+//
+// May provide metadata.resourceVersion to enforce update from last read
+// for
+// optimistic concurrency control.
+func (r *NamespacesPubsubsService) ReplacePubSub(name string, pubsub *PubSub) *NamespacesPubsubsReplacePubSubCall {
+	c := &NamespacesPubsubsReplacePubSubCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.name = name
+	c.pubsub = pubsub
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *NamespacesPubsubsReplacePubSubCall) Fields(s ...googleapi.Field) *NamespacesPubsubsReplacePubSubCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *NamespacesPubsubsReplacePubSubCall) Context(ctx context.Context) *NamespacesPubsubsReplacePubSubCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *NamespacesPubsubsReplacePubSubCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *NamespacesPubsubsReplacePubSubCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.pubsub)
+	if err != nil {
+		return nil, err
+	}
+	reqHeaders.Set("Content-Type", "application/json")
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "apis/events.cloud.google.com/v1alpha1/{+name}")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("PUT", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"name": c.name,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "run.namespaces.pubsubs.replacePubSub" call.
+// Exactly one of *PubSub or error will be non-nil. Any non-2xx status
+// code is an error. Response headers are in either
+// *PubSub.ServerResponse.Header or (if a response was returned at all)
+// in error.(*googleapi.Error).Header. Use googleapi.IsNotModified to
+// check whether the returned error was because http.StatusNotModified
+// was returned.
+func (c *NamespacesPubsubsReplacePubSubCall) Do(opts ...googleapi.CallOption) (*PubSub, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &PubSub{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Rpc to replace a pubsub.\n\nOnly the spec and metadata labels and annotations are modifiable. After\nthe Update request, Cloud Run will work to make the 'status'\nmatch the requested 'spec'.\n\nMay provide metadata.resourceVersion to enforce update from last read for\noptimistic concurrency control.",
+	//   "flatPath": "apis/events.cloud.google.com/v1alpha1/namespaces/{namespacesId}/pubsubs/{pubsubsId}",
+	//   "httpMethod": "PUT",
+	//   "id": "run.namespaces.pubsubs.replacePubSub",
+	//   "parameterOrder": [
+	//     "name"
+	//   ],
+	//   "parameters": {
+	//     "name": {
+	//       "description": "The name of the pubsub being retrieved. If needed, replace\n{namespace_id} with the project ID.",
+	//       "location": "path",
+	//       "pattern": "^namespaces/[^/]+/pubsubs/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "apis/events.cloud.google.com/v1alpha1/{+name}",
+	//   "request": {
+	//     "$ref": "PubSub"
+	//   },
+	//   "response": {
+	//     "$ref": "PubSub"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform"
+	//   ]
+	// }
+
+}
+
 // method id "run.namespaces.revisions.delete":
 
 type NamespacesRevisionsDeleteCall struct {
@@ -7114,6 +8691,7 @@ func (c *NamespacesRevisionsDeleteCall) Header() http.Header {
 
 func (c *NamespacesRevisionsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7274,6 +8852,7 @@ func (c *NamespacesRevisionsGetCall) Header() http.Header {
 
 func (c *NamespacesRevisionsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7472,6 +9051,7 @@ func (c *NamespacesRevisionsListCall) Header() http.Header {
 
 func (c *NamespacesRevisionsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7651,6 +9231,7 @@ func (c *NamespacesRoutesGetCall) Header() http.Header {
 
 func (c *NamespacesRoutesGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -7849,6 +9430,7 @@ func (c *NamespacesRoutesListCall) Header() http.Header {
 
 func (c *NamespacesRoutesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8019,6 +9601,7 @@ func (c *NamespacesServicesCreateCall) Header() http.Header {
 
 func (c *NamespacesServicesCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8200,6 +9783,7 @@ func (c *NamespacesServicesDeleteCall) Header() http.Header {
 
 func (c *NamespacesServicesDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8360,6 +9944,7 @@ func (c *NamespacesServicesGetCall) Header() http.Header {
 
 func (c *NamespacesServicesGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8558,6 +10143,7 @@ func (c *NamespacesServicesListCall) Header() http.Header {
 
 func (c *NamespacesServicesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8737,6 +10323,7 @@ func (c *NamespacesServicesReplaceServiceCall) Header() http.Header {
 
 func (c *NamespacesServicesReplaceServiceCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -8876,6 +10463,7 @@ func (c *NamespacesTriggersCreateCall) Header() http.Header {
 
 func (c *NamespacesTriggersCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -9040,6 +10628,7 @@ func (c *NamespacesTriggersDeleteCall) Header() http.Header {
 
 func (c *NamespacesTriggersDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -9195,6 +10784,7 @@ func (c *NamespacesTriggersGetCall) Header() http.Header {
 
 func (c *NamespacesTriggersGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -9393,6 +10983,7 @@ func (c *NamespacesTriggersListCall) Header() http.Header {
 
 func (c *NamespacesTriggersListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -9572,6 +11163,7 @@ func (c *NamespacesTriggersReplaceTriggerCall) Header() http.Header {
 
 func (c *NamespacesTriggersReplaceTriggerCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -9742,6 +11334,7 @@ func (c *ProjectsLocationsListCall) Header() http.Header {
 
 func (c *ProjectsLocationsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -9936,6 +11529,7 @@ func (c *ProjectsLocationsAuthorizeddomainsListCall) Header() http.Header {
 
 func (c *ProjectsLocationsAuthorizeddomainsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10111,6 +11705,7 @@ func (c *ProjectsLocationsConfigurationsGetCall) Header() http.Header {
 
 func (c *ProjectsLocationsConfigurationsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10309,6 +11904,7 @@ func (c *ProjectsLocationsConfigurationsListCall) Header() http.Header {
 
 func (c *ProjectsLocationsConfigurationsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10479,6 +12075,7 @@ func (c *ProjectsLocationsDomainmappingsCreateCall) Header() http.Header {
 
 func (c *ProjectsLocationsDomainmappingsCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10657,6 +12254,7 @@ func (c *ProjectsLocationsDomainmappingsDeleteCall) Header() http.Header {
 
 func (c *ProjectsLocationsDomainmappingsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10817,6 +12415,7 @@ func (c *ProjectsLocationsDomainmappingsGetCall) Header() http.Header {
 
 func (c *ProjectsLocationsDomainmappingsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -11015,6 +12614,7 @@ func (c *ProjectsLocationsDomainmappingsListCall) Header() http.Header {
 
 func (c *ProjectsLocationsDomainmappingsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -11194,6 +12794,7 @@ func (c *ProjectsLocationsEventtypesGetCall) Header() http.Header {
 
 func (c *ProjectsLocationsEventtypesGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -11392,6 +12993,7 @@ func (c *ProjectsLocationsEventtypesListCall) Header() http.Header {
 
 func (c *ProjectsLocationsEventtypesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -11516,6 +13118,846 @@ func (c *ProjectsLocationsEventtypesListCall) Do(opts ...googleapi.CallOption) (
 
 }
 
+// method id "run.projects.locations.pubsubs.create":
+
+type ProjectsLocationsPubsubsCreateCall struct {
+	s          *APIService
+	parent     string
+	pubsub     *PubSub
+	urlParams_ gensupport.URLParams
+	ctx_       context.Context
+	header_    http.Header
+}
+
+// Create: Creates a new pubsub.
+func (r *ProjectsLocationsPubsubsService) Create(parent string, pubsub *PubSub) *ProjectsLocationsPubsubsCreateCall {
+	c := &ProjectsLocationsPubsubsCreateCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.parent = parent
+	c.pubsub = pubsub
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsLocationsPubsubsCreateCall) Fields(s ...googleapi.Field) *ProjectsLocationsPubsubsCreateCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsLocationsPubsubsCreateCall) Context(ctx context.Context) *ProjectsLocationsPubsubsCreateCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsLocationsPubsubsCreateCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsLocationsPubsubsCreateCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.pubsub)
+	if err != nil {
+		return nil, err
+	}
+	reqHeaders.Set("Content-Type", "application/json")
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1alpha1/{+parent}/pubsubs")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"parent": c.parent,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "run.projects.locations.pubsubs.create" call.
+// Exactly one of *PubSub or error will be non-nil. Any non-2xx status
+// code is an error. Response headers are in either
+// *PubSub.ServerResponse.Header or (if a response was returned at all)
+// in error.(*googleapi.Error).Header. Use googleapi.IsNotModified to
+// check whether the returned error was because http.StatusNotModified
+// was returned.
+func (c *ProjectsLocationsPubsubsCreateCall) Do(opts ...googleapi.CallOption) (*PubSub, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &PubSub{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Creates a new pubsub.",
+	//   "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/pubsubs",
+	//   "httpMethod": "POST",
+	//   "id": "run.projects.locations.pubsubs.create",
+	//   "parameterOrder": [
+	//     "parent"
+	//   ],
+	//   "parameters": {
+	//     "parent": {
+	//       "description": "The project ID or project number in which this pubsub should\nbe created.",
+	//       "location": "path",
+	//       "pattern": "^projects/[^/]+/locations/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1alpha1/{+parent}/pubsubs",
+	//   "request": {
+	//     "$ref": "PubSub"
+	//   },
+	//   "response": {
+	//     "$ref": "PubSub"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform"
+	//   ]
+	// }
+
+}
+
+// method id "run.projects.locations.pubsubs.delete":
+
+type ProjectsLocationsPubsubsDeleteCall struct {
+	s          *APIService
+	name       string
+	urlParams_ gensupport.URLParams
+	ctx_       context.Context
+	header_    http.Header
+}
+
+// Delete: Rpc to delete a pubsub.
+func (r *ProjectsLocationsPubsubsService) Delete(name string) *ProjectsLocationsPubsubsDeleteCall {
+	c := &ProjectsLocationsPubsubsDeleteCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.name = name
+	return c
+}
+
+// ApiVersion sets the optional parameter "apiVersion": Cloud Run
+// currently ignores this parameter.
+func (c *ProjectsLocationsPubsubsDeleteCall) ApiVersion(apiVersion string) *ProjectsLocationsPubsubsDeleteCall {
+	c.urlParams_.Set("apiVersion", apiVersion)
+	return c
+}
+
+// Kind sets the optional parameter "kind": Cloud Run currently ignores
+// this parameter.
+func (c *ProjectsLocationsPubsubsDeleteCall) Kind(kind string) *ProjectsLocationsPubsubsDeleteCall {
+	c.urlParams_.Set("kind", kind)
+	return c
+}
+
+// PropagationPolicy sets the optional parameter "propagationPolicy":
+// Specifies the propagation policy of delete. Cloud Run currently
+// ignores
+// this setting, and deletes in the background. Please
+// see
+// kubernetes.io/docs/concepts/workloads/controllers/garbage-collecti
+// on/ for
+// more information.
+func (c *ProjectsLocationsPubsubsDeleteCall) PropagationPolicy(propagationPolicy string) *ProjectsLocationsPubsubsDeleteCall {
+	c.urlParams_.Set("propagationPolicy", propagationPolicy)
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsLocationsPubsubsDeleteCall) Fields(s ...googleapi.Field) *ProjectsLocationsPubsubsDeleteCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsLocationsPubsubsDeleteCall) Context(ctx context.Context) *ProjectsLocationsPubsubsDeleteCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsLocationsPubsubsDeleteCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsLocationsPubsubsDeleteCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1alpha1/{+name}")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("DELETE", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"name": c.name,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "run.projects.locations.pubsubs.delete" call.
+// Exactly one of *Empty or error will be non-nil. Any non-2xx status
+// code is an error. Response headers are in either
+// *Empty.ServerResponse.Header or (if a response was returned at all)
+// in error.(*googleapi.Error).Header. Use googleapi.IsNotModified to
+// check whether the returned error was because http.StatusNotModified
+// was returned.
+func (c *ProjectsLocationsPubsubsDeleteCall) Do(opts ...googleapi.CallOption) (*Empty, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &Empty{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Rpc to delete a pubsub.",
+	//   "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/pubsubs/{pubsubsId}",
+	//   "httpMethod": "DELETE",
+	//   "id": "run.projects.locations.pubsubs.delete",
+	//   "parameterOrder": [
+	//     "name"
+	//   ],
+	//   "parameters": {
+	//     "apiVersion": {
+	//       "description": "Cloud Run currently ignores this parameter.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "kind": {
+	//       "description": "Cloud Run currently ignores this parameter.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "name": {
+	//       "description": "The name of the pubsub being deleted. If needed, replace\n{namespace_id} with the project ID.",
+	//       "location": "path",
+	//       "pattern": "^projects/[^/]+/locations/[^/]+/pubsubs/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "propagationPolicy": {
+	//       "description": "Specifies the propagation policy of delete. Cloud Run currently ignores\nthis setting, and deletes in the background. Please see\nkubernetes.io/docs/concepts/workloads/controllers/garbage-collection/ for\nmore information.",
+	//       "location": "query",
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1alpha1/{+name}",
+	//   "response": {
+	//     "$ref": "Empty"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform"
+	//   ]
+	// }
+
+}
+
+// method id "run.projects.locations.pubsubs.get":
+
+type ProjectsLocationsPubsubsGetCall struct {
+	s            *APIService
+	name         string
+	urlParams_   gensupport.URLParams
+	ifNoneMatch_ string
+	ctx_         context.Context
+	header_      http.Header
+}
+
+// Get: Rpc to get information about a pubsub.
+func (r *ProjectsLocationsPubsubsService) Get(name string) *ProjectsLocationsPubsubsGetCall {
+	c := &ProjectsLocationsPubsubsGetCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.name = name
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsLocationsPubsubsGetCall) Fields(s ...googleapi.Field) *ProjectsLocationsPubsubsGetCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// IfNoneMatch sets the optional parameter which makes the operation
+// fail if the object's ETag matches the given value. This is useful for
+// getting updates only after the object has changed since the last
+// request. Use googleapi.IsNotModified to check whether the response
+// error from Do is the result of In-None-Match.
+func (c *ProjectsLocationsPubsubsGetCall) IfNoneMatch(entityTag string) *ProjectsLocationsPubsubsGetCall {
+	c.ifNoneMatch_ = entityTag
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsLocationsPubsubsGetCall) Context(ctx context.Context) *ProjectsLocationsPubsubsGetCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsLocationsPubsubsGetCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsLocationsPubsubsGetCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	if c.ifNoneMatch_ != "" {
+		reqHeaders.Set("If-None-Match", c.ifNoneMatch_)
+	}
+	var body io.Reader = nil
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1alpha1/{+name}")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"name": c.name,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "run.projects.locations.pubsubs.get" call.
+// Exactly one of *PubSub or error will be non-nil. Any non-2xx status
+// code is an error. Response headers are in either
+// *PubSub.ServerResponse.Header or (if a response was returned at all)
+// in error.(*googleapi.Error).Header. Use googleapi.IsNotModified to
+// check whether the returned error was because http.StatusNotModified
+// was returned.
+func (c *ProjectsLocationsPubsubsGetCall) Do(opts ...googleapi.CallOption) (*PubSub, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &PubSub{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Rpc to get information about a pubsub.",
+	//   "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/pubsubs/{pubsubsId}",
+	//   "httpMethod": "GET",
+	//   "id": "run.projects.locations.pubsubs.get",
+	//   "parameterOrder": [
+	//     "name"
+	//   ],
+	//   "parameters": {
+	//     "name": {
+	//       "description": "The name of the pubsub being retrieved. If needed, replace\n{namespace_id} with the project ID.",
+	//       "location": "path",
+	//       "pattern": "^projects/[^/]+/locations/[^/]+/pubsubs/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1alpha1/{+name}",
+	//   "response": {
+	//     "$ref": "PubSub"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform"
+	//   ]
+	// }
+
+}
+
+// method id "run.projects.locations.pubsubs.list":
+
+type ProjectsLocationsPubsubsListCall struct {
+	s            *APIService
+	parent       string
+	urlParams_   gensupport.URLParams
+	ifNoneMatch_ string
+	ctx_         context.Context
+	header_      http.Header
+}
+
+// List: Rpc to list pubsubs.
+func (r *ProjectsLocationsPubsubsService) List(parent string) *ProjectsLocationsPubsubsListCall {
+	c := &ProjectsLocationsPubsubsListCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.parent = parent
+	return c
+}
+
+// Continue sets the optional parameter "continue": Optional encoded
+// string to continue paging.
+func (c *ProjectsLocationsPubsubsListCall) Continue(continue_ string) *ProjectsLocationsPubsubsListCall {
+	c.urlParams_.Set("continue", continue_)
+	return c
+}
+
+// FieldSelector sets the optional parameter "fieldSelector": Allows to
+// filter resources based on a specific value for a field name.
+// Send this in a query string format. i.e. 'metadata.name%3Dlorem'.
+// Not currently used by Cloud Run.
+func (c *ProjectsLocationsPubsubsListCall) FieldSelector(fieldSelector string) *ProjectsLocationsPubsubsListCall {
+	c.urlParams_.Set("fieldSelector", fieldSelector)
+	return c
+}
+
+// IncludeUninitialized sets the optional parameter
+// "includeUninitialized": Not currently used by Cloud Run.
+func (c *ProjectsLocationsPubsubsListCall) IncludeUninitialized(includeUninitialized bool) *ProjectsLocationsPubsubsListCall {
+	c.urlParams_.Set("includeUninitialized", fmt.Sprint(includeUninitialized))
+	return c
+}
+
+// LabelSelector sets the optional parameter "labelSelector": Allows to
+// filter resources based on a label. Supported operations are
+// =, !=, exists, in, and notIn.
+func (c *ProjectsLocationsPubsubsListCall) LabelSelector(labelSelector string) *ProjectsLocationsPubsubsListCall {
+	c.urlParams_.Set("labelSelector", labelSelector)
+	return c
+}
+
+// Limit sets the optional parameter "limit": The maximum number of
+// records that should be returned.
+func (c *ProjectsLocationsPubsubsListCall) Limit(limit int64) *ProjectsLocationsPubsubsListCall {
+	c.urlParams_.Set("limit", fmt.Sprint(limit))
+	return c
+}
+
+// ResourceVersion sets the optional parameter "resourceVersion": The
+// baseline resource version from which the list or watch operation
+// should
+// start. Not currently used by Cloud Run.
+func (c *ProjectsLocationsPubsubsListCall) ResourceVersion(resourceVersion string) *ProjectsLocationsPubsubsListCall {
+	c.urlParams_.Set("resourceVersion", resourceVersion)
+	return c
+}
+
+// Watch sets the optional parameter "watch": Flag that indicates that
+// the client expects to watch this resource as well.
+// Not currently used by Cloud Run.
+func (c *ProjectsLocationsPubsubsListCall) Watch(watch bool) *ProjectsLocationsPubsubsListCall {
+	c.urlParams_.Set("watch", fmt.Sprint(watch))
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsLocationsPubsubsListCall) Fields(s ...googleapi.Field) *ProjectsLocationsPubsubsListCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// IfNoneMatch sets the optional parameter which makes the operation
+// fail if the object's ETag matches the given value. This is useful for
+// getting updates only after the object has changed since the last
+// request. Use googleapi.IsNotModified to check whether the response
+// error from Do is the result of In-None-Match.
+func (c *ProjectsLocationsPubsubsListCall) IfNoneMatch(entityTag string) *ProjectsLocationsPubsubsListCall {
+	c.ifNoneMatch_ = entityTag
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsLocationsPubsubsListCall) Context(ctx context.Context) *ProjectsLocationsPubsubsListCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsLocationsPubsubsListCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsLocationsPubsubsListCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	if c.ifNoneMatch_ != "" {
+		reqHeaders.Set("If-None-Match", c.ifNoneMatch_)
+	}
+	var body io.Reader = nil
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1alpha1/{+parent}/pubsubs")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"parent": c.parent,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "run.projects.locations.pubsubs.list" call.
+// Exactly one of *ListPubSubsResponse or error will be non-nil. Any
+// non-2xx status code is an error. Response headers are in either
+// *ListPubSubsResponse.ServerResponse.Header or (if a response was
+// returned at all) in error.(*googleapi.Error).Header. Use
+// googleapi.IsNotModified to check whether the returned error was
+// because http.StatusNotModified was returned.
+func (c *ProjectsLocationsPubsubsListCall) Do(opts ...googleapi.CallOption) (*ListPubSubsResponse, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &ListPubSubsResponse{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Rpc to list pubsubs.",
+	//   "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/pubsubs",
+	//   "httpMethod": "GET",
+	//   "id": "run.projects.locations.pubsubs.list",
+	//   "parameterOrder": [
+	//     "parent"
+	//   ],
+	//   "parameters": {
+	//     "continue": {
+	//       "description": "Optional encoded string to continue paging.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "fieldSelector": {
+	//       "description": "Allows to filter resources based on a specific value for a field name.\nSend this in a query string format. i.e. 'metadata.name%3Dlorem'.\nNot currently used by Cloud Run.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "includeUninitialized": {
+	//       "description": "Not currently used by Cloud Run.",
+	//       "location": "query",
+	//       "type": "boolean"
+	//     },
+	//     "labelSelector": {
+	//       "description": "Allows to filter resources based on a label. Supported operations are\n=, !=, exists, in, and notIn.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "limit": {
+	//       "description": "The maximum number of records that should be returned.",
+	//       "format": "int32",
+	//       "location": "query",
+	//       "type": "integer"
+	//     },
+	//     "parent": {
+	//       "description": "The project ID or project number from which the pubsubs should\nbe listed.",
+	//       "location": "path",
+	//       "pattern": "^projects/[^/]+/locations/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "resourceVersion": {
+	//       "description": "The baseline resource version from which the list or watch operation should\nstart. Not currently used by Cloud Run.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "watch": {
+	//       "description": "Flag that indicates that the client expects to watch this resource as well.\nNot currently used by Cloud Run.",
+	//       "location": "query",
+	//       "type": "boolean"
+	//     }
+	//   },
+	//   "path": "v1alpha1/{+parent}/pubsubs",
+	//   "response": {
+	//     "$ref": "ListPubSubsResponse"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform"
+	//   ]
+	// }
+
+}
+
+// method id "run.projects.locations.pubsubs.replacePubSub":
+
+type ProjectsLocationsPubsubsReplacePubSubCall struct {
+	s          *APIService
+	name       string
+	pubsub     *PubSub
+	urlParams_ gensupport.URLParams
+	ctx_       context.Context
+	header_    http.Header
+}
+
+// ReplacePubSub: Rpc to replace a pubsub.
+//
+// Only the spec and metadata labels and annotations are modifiable.
+// After
+// the Update request, Cloud Run will work to make the 'status'
+// match the requested 'spec'.
+//
+// May provide metadata.resourceVersion to enforce update from last read
+// for
+// optimistic concurrency control.
+func (r *ProjectsLocationsPubsubsService) ReplacePubSub(name string, pubsub *PubSub) *ProjectsLocationsPubsubsReplacePubSubCall {
+	c := &ProjectsLocationsPubsubsReplacePubSubCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.name = name
+	c.pubsub = pubsub
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsLocationsPubsubsReplacePubSubCall) Fields(s ...googleapi.Field) *ProjectsLocationsPubsubsReplacePubSubCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsLocationsPubsubsReplacePubSubCall) Context(ctx context.Context) *ProjectsLocationsPubsubsReplacePubSubCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsLocationsPubsubsReplacePubSubCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsLocationsPubsubsReplacePubSubCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.pubsub)
+	if err != nil {
+		return nil, err
+	}
+	reqHeaders.Set("Content-Type", "application/json")
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1alpha1/{+name}")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("PUT", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"name": c.name,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "run.projects.locations.pubsubs.replacePubSub" call.
+// Exactly one of *PubSub or error will be non-nil. Any non-2xx status
+// code is an error. Response headers are in either
+// *PubSub.ServerResponse.Header or (if a response was returned at all)
+// in error.(*googleapi.Error).Header. Use googleapi.IsNotModified to
+// check whether the returned error was because http.StatusNotModified
+// was returned.
+func (c *ProjectsLocationsPubsubsReplacePubSubCall) Do(opts ...googleapi.CallOption) (*PubSub, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &PubSub{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Rpc to replace a pubsub.\n\nOnly the spec and metadata labels and annotations are modifiable. After\nthe Update request, Cloud Run will work to make the 'status'\nmatch the requested 'spec'.\n\nMay provide metadata.resourceVersion to enforce update from last read for\noptimistic concurrency control.",
+	//   "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/pubsubs/{pubsubsId}",
+	//   "httpMethod": "PUT",
+	//   "id": "run.projects.locations.pubsubs.replacePubSub",
+	//   "parameterOrder": [
+	//     "name"
+	//   ],
+	//   "parameters": {
+	//     "name": {
+	//       "description": "The name of the pubsub being retrieved. If needed, replace\n{namespace_id} with the project ID.",
+	//       "location": "path",
+	//       "pattern": "^projects/[^/]+/locations/[^/]+/pubsubs/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1alpha1/{+name}",
+	//   "request": {
+	//     "$ref": "PubSub"
+	//   },
+	//   "response": {
+	//     "$ref": "PubSub"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform"
+	//   ]
+	// }
+
+}
+
 // method id "run.projects.locations.revisions.delete":
 
 type ProjectsLocationsRevisionsDeleteCall struct {
@@ -11601,6 +14043,7 @@ func (c *ProjectsLocationsRevisionsDeleteCall) Header() http.Header {
 
 func (c *ProjectsLocationsRevisionsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -11761,6 +14204,7 @@ func (c *ProjectsLocationsRevisionsGetCall) Header() http.Header {
 
 func (c *ProjectsLocationsRevisionsGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -11959,6 +14403,7 @@ func (c *ProjectsLocationsRevisionsListCall) Header() http.Header {
 
 func (c *ProjectsLocationsRevisionsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -12138,6 +14583,7 @@ func (c *ProjectsLocationsRoutesGetCall) Header() http.Header {
 
 func (c *ProjectsLocationsRoutesGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -12336,6 +14782,7 @@ func (c *ProjectsLocationsRoutesListCall) Header() http.Header {
 
 func (c *ProjectsLocationsRoutesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -12506,6 +14953,7 @@ func (c *ProjectsLocationsServicesCreateCall) Header() http.Header {
 
 func (c *ProjectsLocationsServicesCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -12687,6 +15135,7 @@ func (c *ProjectsLocationsServicesDeleteCall) Header() http.Header {
 
 func (c *ProjectsLocationsServicesDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -12847,6 +15296,7 @@ func (c *ProjectsLocationsServicesGetCall) Header() http.Header {
 
 func (c *ProjectsLocationsServicesGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -12959,10 +15409,16 @@ func (r *ProjectsLocationsServicesService) GetIamPolicy(resource string) *Projec
 // OptionsRequestedPolicyVersion sets the optional parameter
 // "options.requestedPolicyVersion": The policy format version to be
 // returned.
-// Acceptable values are 0 and 1.
-// If the value is 0, or the field is omitted, policy format version 1
+//
+// Valid values are 0, 1, and 3. Requests specifying an invalid value
 // will be
-// returned.
+// rejected.
+//
+// Requests for policies with any conditional bindings must specify
+// version 3.
+// Policies without any conditional bindings may specify any valid value
+// or
+// leave the field unset.
 func (c *ProjectsLocationsServicesGetIamPolicyCall) OptionsRequestedPolicyVersion(optionsRequestedPolicyVersion int64) *ProjectsLocationsServicesGetIamPolicyCall {
 	c.urlParams_.Set("options.requestedPolicyVersion", fmt.Sprint(optionsRequestedPolicyVersion))
 	return c
@@ -13005,6 +15461,7 @@ func (c *ProjectsLocationsServicesGetIamPolicyCall) Header() http.Header {
 
 func (c *ProjectsLocationsServicesGetIamPolicyCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -13075,7 +15532,7 @@ func (c *ProjectsLocationsServicesGetIamPolicyCall) Do(opts ...googleapi.CallOpt
 	//   ],
 	//   "parameters": {
 	//     "options.requestedPolicyVersion": {
-	//       "description": "Optional. The policy format version to be returned.\nAcceptable values are 0 and 1.\nIf the value is 0, or the field is omitted, policy format version 1 will be\nreturned.",
+	//       "description": "Optional. The policy format version to be returned.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nRequests for policies with any conditional bindings must specify version 3.\nPolicies without any conditional bindings may specify any valid value or\nleave the field unset.",
 	//       "format": "int32",
 	//       "location": "query",
 	//       "type": "integer"
@@ -13209,6 +15666,7 @@ func (c *ProjectsLocationsServicesListCall) Header() http.Header {
 
 func (c *ProjectsLocationsServicesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -13388,6 +15846,7 @@ func (c *ProjectsLocationsServicesReplaceServiceCall) Header() http.Header {
 
 func (c *ProjectsLocationsServicesReplaceServiceCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -13529,6 +15988,7 @@ func (c *ProjectsLocationsServicesSetIamPolicyCall) Header() http.Header {
 
 func (c *ProjectsLocationsServicesSetIamPolicyCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -13671,6 +16131,7 @@ func (c *ProjectsLocationsServicesTestIamPermissionsCall) Header() http.Header {
 
 func (c *ProjectsLocationsServicesTestIamPermissionsCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -13810,6 +16271,7 @@ func (c *ProjectsLocationsTriggersCreateCall) Header() http.Header {
 
 func (c *ProjectsLocationsTriggersCreateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -13974,6 +16436,7 @@ func (c *ProjectsLocationsTriggersDeleteCall) Header() http.Header {
 
 func (c *ProjectsLocationsTriggersDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -14129,6 +16592,7 @@ func (c *ProjectsLocationsTriggersGetCall) Header() http.Header {
 
 func (c *ProjectsLocationsTriggersGetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -14327,6 +16791,7 @@ func (c *ProjectsLocationsTriggersListCall) Header() http.Header {
 
 func (c *ProjectsLocationsTriggersListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -14506,6 +16971,7 @@ func (c *ProjectsLocationsTriggersReplaceTriggerCall) Header() http.Header {
 
 func (c *ProjectsLocationsTriggersReplaceTriggerCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

@@ -276,7 +276,7 @@
           ]
         },
         "reserveIds": {
-          "description": "Prevents the supplied keys' IDs from being auto-allocated by Cloud\nDatastore.",
+          "description": "Prevents the supplied keys' IDs from being auto-allocated by Cloud\nDatastore. Used for imports only; other workloads are not supported.",
           "flatPath": "v1/projects/{projectId}:reserveIds",
           "httpMethod": "POST",
           "id": "datastore.projects.reserveIds",
@@ -363,6 +363,66 @@
       "resources": {
         "indexes": {
           "methods": {
+            "create": {
+              "description": "Creates the specified index.\nA newly created index's initial state is `CREATING`. On completion of the\nreturned google.longrunning.Operation, the state will be `READY`.\nIf the index already exists, the call will return an `ALREADY_EXISTS`\nstatus.\n\nDuring index creation, the process could result in an error, in which\ncase the index will move to the `ERROR` state. The process can be recovered\nby fixing the data that caused the error, removing the index with\ndelete, then\nre-creating the index with create.\n\nIndexes with a single property cannot be created.",
+              "flatPath": "v1/projects/{projectId}/indexes",
+              "httpMethod": "POST",
+              "id": "datastore.projects.indexes.create",
+              "parameterOrder": [
+                "projectId"
+              ],
+              "parameters": {
+                "projectId": {
+                  "description": "Project ID against which to make the request.",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "path": "v1/projects/{projectId}/indexes",
+              "request": {
+                "$ref": "GoogleDatastoreAdminV1Index"
+              },
+              "response": {
+                "$ref": "GoogleLongrunningOperation"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/datastore"
+              ]
+            },
+            "delete": {
+              "description": "Deletes an existing index.\nAn index can only be deleted if it is in a `READY` or `ERROR` state. On\nsuccessful execution of the request, the index will be in a `DELETING`\nstate. And on completion of the\nreturned google.longrunning.Operation, the index will be removed.\n\nDuring index deletion, the process could result in an error, in which\ncase the index will move to the `ERROR` state. The process can be recovered\nby fixing the data that caused the error, followed by calling\ndelete again.",
+              "flatPath": "v1/projects/{projectId}/indexes/{indexId}",
+              "httpMethod": "DELETE",
+              "id": "datastore.projects.indexes.delete",
+              "parameterOrder": [
+                "projectId",
+                "indexId"
+              ],
+              "parameters": {
+                "indexId": {
+                  "description": "The resource ID of the index to delete.",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                },
+                "projectId": {
+                  "description": "Project ID against which to make the request.",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "path": "v1/projects/{projectId}/indexes/{indexId}",
+              "response": {
+                "$ref": "GoogleLongrunningOperation"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/datastore"
+              ]
+            },
             "get": {
               "description": "Gets an index.",
               "flatPath": "v1/projects/{projectId}/indexes/{indexId}",
@@ -564,7 +624,7 @@
       }
     }
   },
-  "revision": "20190421",
+  "revision": "20191020",
   "rootUrl": "https://datastore.googleapis.com/",
   "schemas": {
     "AllocateIdsRequest": {
@@ -1307,7 +1367,7 @@
           "type": "object"
         },
         "name": {
-          "description": "The server-assigned name, which is only unique within the same service that\noriginally returns it. If you use the default HTTP mapping, the\n`name` should have the format of `operations/some/unique/name`.",
+          "description": "The server-assigned name, which is only unique within the same service that\noriginally returns it. If you use the default HTTP mapping, the\n`name` should be a resource name ending with `operations/{unique_id}`.",
           "type": "string"
         },
         "response": {
@@ -1877,7 +1937,7 @@
       "type": "object"
     },
     "Status": {
-      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). The error model is designed to be:\n\n- Simple to use and understand for most users\n- Flexible enough to meet unexpected needs\n\n# Overview\n\nThe `Status` message contains three pieces of data: error code, error\nmessage, and error details. The error code should be an enum value of\ngoogle.rpc.Code, but it may accept additional error codes if needed.  The\nerror message should be a developer-facing English message that helps\ndevelopers *understand* and *resolve* the error. If a localized user-facing\nerror message is needed, put the localized message in the error details or\nlocalize it in the client. The optional error details may contain arbitrary\ninformation about the error. There is a predefined set of error detail types\nin the package `google.rpc` that can be used for common error conditions.\n\n# Language mapping\n\nThe `Status` message is the logical representation of the error model, but it\nis not necessarily the actual wire format. When the `Status` message is\nexposed in different client libraries and different wire protocols, it can be\nmapped differently. For example, it will likely be mapped to some exceptions\nin Java, but more likely mapped to some error codes in C.\n\n# Other uses\n\nThe error model and the `Status` message can be used in a variety of\nenvironments, either with or without APIs, to provide a\nconsistent developer experience across different environments.\n\nExample uses of this error model include:\n\n- Partial errors. If a service needs to return partial errors to the client,\n    it may embed the `Status` in the normal response to indicate the partial\n    errors.\n\n- Workflow errors. A typical workflow has multiple steps. Each step may\n    have a `Status` message for error reporting.\n\n- Batch operations. If a client uses batch request and batch response, the\n    `Status` message should be used directly inside batch response, one for\n    each error sub-response.\n\n- Asynchronous operations. If an API call embeds asynchronous operation\n    results in its response, the status of those operations should be\n    represented directly using the `Status` message.\n\n- Logging. If some API errors are stored in logs, the message `Status` could\n    be used directly after any stripping needed for security/privacy reasons.",
+      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https://cloud.google.com/apis/design/errors).",
       "id": "Status",
       "properties": {
         "code": {

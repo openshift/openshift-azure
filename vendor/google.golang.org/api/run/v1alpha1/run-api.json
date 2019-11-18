@@ -489,6 +489,192 @@
             }
           }
         },
+        "pubsubs": {
+          "methods": {
+            "create": {
+              "description": "Creates a new pubsub.",
+              "flatPath": "apis/events.cloud.google.com/v1alpha1/namespaces/{namespacesId}/pubsubs",
+              "httpMethod": "POST",
+              "id": "run.namespaces.pubsubs.create",
+              "parameterOrder": [
+                "parent"
+              ],
+              "parameters": {
+                "parent": {
+                  "description": "The project ID or project number in which this pubsub should\nbe created.",
+                  "location": "path",
+                  "pattern": "^namespaces/[^/]+$",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "path": "apis/events.cloud.google.com/v1alpha1/{+parent}/pubsubs",
+              "request": {
+                "$ref": "PubSub"
+              },
+              "response": {
+                "$ref": "PubSub"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ]
+            },
+            "delete": {
+              "description": "Rpc to delete a pubsub.",
+              "flatPath": "apis/events.cloud.google.com/v1alpha1/namespaces/{namespacesId}/pubsubs/{pubsubsId}",
+              "httpMethod": "DELETE",
+              "id": "run.namespaces.pubsubs.delete",
+              "parameterOrder": [
+                "name"
+              ],
+              "parameters": {
+                "apiVersion": {
+                  "description": "Cloud Run currently ignores this parameter.",
+                  "location": "query",
+                  "type": "string"
+                },
+                "kind": {
+                  "description": "Cloud Run currently ignores this parameter.",
+                  "location": "query",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "The name of the pubsub being deleted. If needed, replace\n{namespace_id} with the project ID.",
+                  "location": "path",
+                  "pattern": "^namespaces/[^/]+/pubsubs/[^/]+$",
+                  "required": true,
+                  "type": "string"
+                },
+                "propagationPolicy": {
+                  "description": "Specifies the propagation policy of delete. Cloud Run currently ignores\nthis setting, and deletes in the background. Please see\nkubernetes.io/docs/concepts/workloads/controllers/garbage-collection/ for\nmore information.",
+                  "location": "query",
+                  "type": "string"
+                }
+              },
+              "path": "apis/events.cloud.google.com/v1alpha1/{+name}",
+              "response": {
+                "$ref": "Empty"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ]
+            },
+            "get": {
+              "description": "Rpc to get information about a pubsub.",
+              "flatPath": "apis/events.cloud.google.com/v1alpha1/namespaces/{namespacesId}/pubsubs/{pubsubsId}",
+              "httpMethod": "GET",
+              "id": "run.namespaces.pubsubs.get",
+              "parameterOrder": [
+                "name"
+              ],
+              "parameters": {
+                "name": {
+                  "description": "The name of the pubsub being retrieved. If needed, replace\n{namespace_id} with the project ID.",
+                  "location": "path",
+                  "pattern": "^namespaces/[^/]+/pubsubs/[^/]+$",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "path": "apis/events.cloud.google.com/v1alpha1/{+name}",
+              "response": {
+                "$ref": "PubSub"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ]
+            },
+            "list": {
+              "description": "Rpc to list pubsubs.",
+              "flatPath": "apis/events.cloud.google.com/v1alpha1/namespaces/{namespacesId}/pubsubs",
+              "httpMethod": "GET",
+              "id": "run.namespaces.pubsubs.list",
+              "parameterOrder": [
+                "parent"
+              ],
+              "parameters": {
+                "continue": {
+                  "description": "Optional encoded string to continue paging.",
+                  "location": "query",
+                  "type": "string"
+                },
+                "fieldSelector": {
+                  "description": "Allows to filter resources based on a specific value for a field name.\nSend this in a query string format. i.e. 'metadata.name%3Dlorem'.\nNot currently used by Cloud Run.",
+                  "location": "query",
+                  "type": "string"
+                },
+                "includeUninitialized": {
+                  "description": "Not currently used by Cloud Run.",
+                  "location": "query",
+                  "type": "boolean"
+                },
+                "labelSelector": {
+                  "description": "Allows to filter resources based on a label. Supported operations are\n=, !=, exists, in, and notIn.",
+                  "location": "query",
+                  "type": "string"
+                },
+                "limit": {
+                  "description": "The maximum number of records that should be returned.",
+                  "format": "int32",
+                  "location": "query",
+                  "type": "integer"
+                },
+                "parent": {
+                  "description": "The project ID or project number from which the pubsubs should\nbe listed.",
+                  "location": "path",
+                  "pattern": "^namespaces/[^/]+$",
+                  "required": true,
+                  "type": "string"
+                },
+                "resourceVersion": {
+                  "description": "The baseline resource version from which the list or watch operation should\nstart. Not currently used by Cloud Run.",
+                  "location": "query",
+                  "type": "string"
+                },
+                "watch": {
+                  "description": "Flag that indicates that the client expects to watch this resource as well.\nNot currently used by Cloud Run.",
+                  "location": "query",
+                  "type": "boolean"
+                }
+              },
+              "path": "apis/events.cloud.google.com/v1alpha1/{+parent}/pubsubs",
+              "response": {
+                "$ref": "ListPubSubsResponse"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ]
+            },
+            "replacePubSub": {
+              "description": "Rpc to replace a pubsub.\n\nOnly the spec and metadata labels and annotations are modifiable. After\nthe Update request, Cloud Run will work to make the 'status'\nmatch the requested 'spec'.\n\nMay provide metadata.resourceVersion to enforce update from last read for\noptimistic concurrency control.",
+              "flatPath": "apis/events.cloud.google.com/v1alpha1/namespaces/{namespacesId}/pubsubs/{pubsubsId}",
+              "httpMethod": "PUT",
+              "id": "run.namespaces.pubsubs.replacePubSub",
+              "parameterOrder": [
+                "name"
+              ],
+              "parameters": {
+                "name": {
+                  "description": "The name of the pubsub being retrieved. If needed, replace\n{namespace_id} with the project ID.",
+                  "location": "path",
+                  "pattern": "^namespaces/[^/]+/pubsubs/[^/]+$",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "path": "apis/events.cloud.google.com/v1alpha1/{+name}",
+              "request": {
+                "$ref": "PubSub"
+              },
+              "response": {
+                "$ref": "PubSub"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ]
+            }
+          }
+        },
         "revisions": {
           "methods": {
             "delete": {
@@ -1523,6 +1709,192 @@
                 }
               }
             },
+            "pubsubs": {
+              "methods": {
+                "create": {
+                  "description": "Creates a new pubsub.",
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/pubsubs",
+                  "httpMethod": "POST",
+                  "id": "run.projects.locations.pubsubs.create",
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "parameters": {
+                    "parent": {
+                      "description": "The project ID or project number in which this pubsub should\nbe created.",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+$",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "path": "v1alpha1/{+parent}/pubsubs",
+                  "request": {
+                    "$ref": "PubSub"
+                  },
+                  "response": {
+                    "$ref": "PubSub"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ]
+                },
+                "delete": {
+                  "description": "Rpc to delete a pubsub.",
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/pubsubs/{pubsubsId}",
+                  "httpMethod": "DELETE",
+                  "id": "run.projects.locations.pubsubs.delete",
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "parameters": {
+                    "apiVersion": {
+                      "description": "Cloud Run currently ignores this parameter.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "kind": {
+                      "description": "Cloud Run currently ignores this parameter.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "The name of the pubsub being deleted. If needed, replace\n{namespace_id} with the project ID.",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/pubsubs/[^/]+$",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "propagationPolicy": {
+                      "description": "Specifies the propagation policy of delete. Cloud Run currently ignores\nthis setting, and deletes in the background. Please see\nkubernetes.io/docs/concepts/workloads/controllers/garbage-collection/ for\nmore information.",
+                      "location": "query",
+                      "type": "string"
+                    }
+                  },
+                  "path": "v1alpha1/{+name}",
+                  "response": {
+                    "$ref": "Empty"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ]
+                },
+                "get": {
+                  "description": "Rpc to get information about a pubsub.",
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/pubsubs/{pubsubsId}",
+                  "httpMethod": "GET",
+                  "id": "run.projects.locations.pubsubs.get",
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "parameters": {
+                    "name": {
+                      "description": "The name of the pubsub being retrieved. If needed, replace\n{namespace_id} with the project ID.",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/pubsubs/[^/]+$",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "path": "v1alpha1/{+name}",
+                  "response": {
+                    "$ref": "PubSub"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ]
+                },
+                "list": {
+                  "description": "Rpc to list pubsubs.",
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/pubsubs",
+                  "httpMethod": "GET",
+                  "id": "run.projects.locations.pubsubs.list",
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "parameters": {
+                    "continue": {
+                      "description": "Optional encoded string to continue paging.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "fieldSelector": {
+                      "description": "Allows to filter resources based on a specific value for a field name.\nSend this in a query string format. i.e. 'metadata.name%3Dlorem'.\nNot currently used by Cloud Run.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "includeUninitialized": {
+                      "description": "Not currently used by Cloud Run.",
+                      "location": "query",
+                      "type": "boolean"
+                    },
+                    "labelSelector": {
+                      "description": "Allows to filter resources based on a label. Supported operations are\n=, !=, exists, in, and notIn.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "limit": {
+                      "description": "The maximum number of records that should be returned.",
+                      "format": "int32",
+                      "location": "query",
+                      "type": "integer"
+                    },
+                    "parent": {
+                      "description": "The project ID or project number from which the pubsubs should\nbe listed.",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+$",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "resourceVersion": {
+                      "description": "The baseline resource version from which the list or watch operation should\nstart. Not currently used by Cloud Run.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "watch": {
+                      "description": "Flag that indicates that the client expects to watch this resource as well.\nNot currently used by Cloud Run.",
+                      "location": "query",
+                      "type": "boolean"
+                    }
+                  },
+                  "path": "v1alpha1/{+parent}/pubsubs",
+                  "response": {
+                    "$ref": "ListPubSubsResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ]
+                },
+                "replacePubSub": {
+                  "description": "Rpc to replace a pubsub.\n\nOnly the spec and metadata labels and annotations are modifiable. After\nthe Update request, Cloud Run will work to make the 'status'\nmatch the requested 'spec'.\n\nMay provide metadata.resourceVersion to enforce update from last read for\noptimistic concurrency control.",
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/pubsubs/{pubsubsId}",
+                  "httpMethod": "PUT",
+                  "id": "run.projects.locations.pubsubs.replacePubSub",
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "parameters": {
+                    "name": {
+                      "description": "The name of the pubsub being retrieved. If needed, replace\n{namespace_id} with the project ID.",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/pubsubs/[^/]+$",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "path": "v1alpha1/{+name}",
+                  "request": {
+                    "$ref": "PubSub"
+                  },
+                  "response": {
+                    "$ref": "PubSub"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ]
+                }
+              }
+            },
             "revisions": {
               "methods": {
                 "delete": {
@@ -1858,7 +2230,7 @@
                   ],
                   "parameters": {
                     "options.requestedPolicyVersion": {
-                      "description": "Optional. The policy format version to be returned.\nAcceptable values are 0 and 1.\nIf the value is 0, or the field is omitted, policy format version 1 will be\nreturned.",
+                      "description": "Optional. The policy format version to be returned.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nRequests for policies with any conditional bindings must specify version 3.\nPolicies without any conditional bindings may specify any valid value or\nleave the field unset.",
                       "format": "int32",
                       "location": "query",
                       "type": "integer"
@@ -2217,7 +2589,7 @@
       }
     }
   },
-  "revision": "20190703",
+  "revision": "20191021",
   "rootUrl": "https://run.googleapis.com/",
   "schemas": {
     "Addressable": {
@@ -2235,7 +2607,7 @@
       "type": "object"
     },
     "AuditConfig": {
-      "description": "Specifies the audit configuration for a service.\nThe configuration determines which permission types are logged, and what\nidentities, if any, are exempted from logging.\nAn AuditConfig must have one or more AuditLogConfigs.\n\nIf there are AuditConfigs for both `allServices` and a specific service,\nthe union of the two AuditConfigs is used for that service: the log_types\nspecified in each AuditConfig are enabled, and the exempted_members in each\nAuditLogConfig are exempted.\n\nExample Policy with multiple AuditConfigs:\n\n    {\n      \"audit_configs\": [\n        {\n          \"service\": \"allServices\"\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n              \"exempted_members\": [\n                \"user:foo@gmail.com\"\n              ]\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n            },\n            {\n              \"log_type\": \"ADMIN_READ\",\n            }\n          ]\n        },\n        {\n          \"service\": \"fooservice.googleapis.com\"\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n              \"exempted_members\": [\n                \"user:bar@gmail.com\"\n              ]\n            }\n          ]\n        }\n      ]\n    }\n\nFor fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ\nlogging. It also exempts foo@gmail.com from DATA_READ logging, and\nbar@gmail.com from DATA_WRITE logging.",
+      "description": "Specifies the audit configuration for a service.\nThe configuration determines which permission types are logged, and what\nidentities, if any, are exempted from logging.\nAn AuditConfig must have one or more AuditLogConfigs.\n\nIf there are AuditConfigs for both `allServices` and a specific service,\nthe union of the two AuditConfigs is used for that service: the log_types\nspecified in each AuditConfig are enabled, and the exempted_members in each\nAuditLogConfig are exempted.\n\nExample Policy with multiple AuditConfigs:\n\n    {\n      \"audit_configs\": [\n        {\n          \"service\": \"allServices\"\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n              \"exempted_members\": [\n                \"user:jose@example.com\"\n              ]\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n            },\n            {\n              \"log_type\": \"ADMIN_READ\",\n            }\n          ]\n        },\n        {\n          \"service\": \"sampleservice.googleapis.com\"\n          \"audit_log_configs\": [\n            {\n              \"log_type\": \"DATA_READ\",\n            },\n            {\n              \"log_type\": \"DATA_WRITE\",\n              \"exempted_members\": [\n                \"user:aliya@example.com\"\n              ]\n            }\n          ]\n        }\n      ]\n    }\n\nFor sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ\nlogging. It also exempts jose@example.com from DATA_READ logging, and\naliya@example.com from DATA_WRITE logging.",
       "id": "AuditConfig",
       "properties": {
         "auditLogConfigs": {
@@ -2253,7 +2625,7 @@
       "type": "object"
     },
     "AuditLogConfig": {
-      "description": "Provides the configuration for logging a type of permissions.\nExample:\n\n    {\n      \"audit_log_configs\": [\n        {\n          \"log_type\": \"DATA_READ\",\n          \"exempted_members\": [\n            \"user:foo@gmail.com\"\n          ]\n        },\n        {\n          \"log_type\": \"DATA_WRITE\",\n        }\n      ]\n    }\n\nThis enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting\nfoo@gmail.com from DATA_READ logging.",
+      "description": "Provides the configuration for logging a type of permissions.\nExample:\n\n    {\n      \"audit_log_configs\": [\n        {\n          \"log_type\": \"DATA_READ\",\n          \"exempted_members\": [\n            \"user:jose@example.com\"\n          ]\n        },\n        {\n          \"log_type\": \"DATA_WRITE\",\n        }\n      ]\n    }\n\nThis enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting\njose@example.com from DATA_READ logging.",
       "id": "AuditLogConfig",
       "properties": {
         "exemptedMembers": {
@@ -2262,10 +2634,6 @@
             "type": "string"
           },
           "type": "array"
-        },
-        "ignoreChildExemptions": {
-          "description": "Specifies whether principals can be exempted for the same LogType in\nlower-level resource policies. If true, any lower-level exemptions will\nbe ignored.",
-          "type": "boolean"
         },
         "logType": {
           "description": "The log type that this config enables.",
@@ -2310,7 +2678,7 @@
           "description": "The condition that is associated with this binding.\nNOTE: An unsatisfied condition will not allow user access via current\nbinding. Different bindings, including their conditions, are examined\nindependently."
         },
         "members": {
-          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@gmail.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
+          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@example.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
           "items": {
             "type": "string"
           },
@@ -2344,16 +2712,89 @@
       },
       "type": "object"
     },
+    "CloudEventOverrides": {
+      "description": "CloudEventOverrides defines arguments for a Source that control the output\nformat of the CloudEvents produced by the Source.",
+      "id": "CloudEventOverrides",
+      "properties": {
+        "extensions": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Extensions specify what attribute are added or overridden on the outbound\nevent. Each `Extensions` key-value pair are set on the event as an\nattribute extension independently.\n+optional",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "Condition": {
+      "description": "Condition defines a generic condition for a Resource",
+      "id": "Condition",
+      "properties": {
+        "lastTransitionTime": {
+          "description": "Optional. Last time the condition transitioned from one status to another.",
+          "format": "google-datetime",
+          "type": "string"
+        },
+        "message": {
+          "description": "Optional. Human readable message indicating details about the current status.",
+          "type": "string"
+        },
+        "reason": {
+          "description": "Optional. One-word CamelCase reason for the condition's last transition.",
+          "type": "string"
+        },
+        "severity": {
+          "description": "Optional. How to interpret failures of this condition, one of Error, Warning, Info",
+          "type": "string"
+        },
+        "status": {
+          "description": "Status of the condition, one of True, False, Unknown.",
+          "type": "string"
+        },
+        "type": {
+          "description": "type is used to communicate the status of the reconciliation process.\nSee also:\nhttps://github.com/knative/serving/blob/master/docs/spec/errors.md#error-conditions-and-reporting\nTypes common to all resources include:\n* \"Ready\": True when the Resource is ready.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "ConfigMapEnvSource": {
       "description": "ConfigMapEnvSource selects a ConfigMap to populate the environment\nvariables with.\n\nThe contents of the target ConfigMap's Data field will represent the\nkey-value pairs as environment variables.",
       "id": "ConfigMapEnvSource",
       "properties": {
         "localObjectReference": {
           "$ref": "LocalObjectReference",
-          "description": "The ConfigMap to select from."
+          "description": "This field should not be used directly as it is meant to be inlined\ndirectly into the message. Use the \"name\" field instead."
+        },
+        "name": {
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run for Anthos: supported\n\nThe ConfigMap to select from.",
+          "type": "string"
         },
         "optional": {
-          "description": "Specify whether the ConfigMap must be defined\n+optional",
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run for Anthos: supported\n\nSpecify whether the ConfigMap must be defined\n+optional",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "ConfigMapKeySelector": {
+      "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nSelects a key from a ConfigMap.",
+      "id": "ConfigMapKeySelector",
+      "properties": {
+        "key": {
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nThe key to select.",
+          "type": "string"
+        },
+        "localObjectReference": {
+          "$ref": "LocalObjectReference",
+          "description": "This field should not be used directly as it is meant to be inlined\ndirectly into the message. Use the \"name\" field instead."
+        },
+        "name": {
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nThe ConfigMap to select from.",
+          "type": "string"
+        },
+        "optional": {
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nSpecify whether the ConfigMap or its key must be defined\n+optional",
           "type": "boolean"
         }
       },
@@ -2633,6 +3074,20 @@
       },
       "type": "object"
     },
+    "Destination": {
+      "id": "Destination",
+      "properties": {
+        "ref": {
+          "$ref": "ObjectReference",
+          "description": "ObjectReference points to an Addressable.\n+ optional"
+        },
+        "uri": {
+          "description": "URI is for direct URI Designations or used with the resulting URL from\nAddressable ObjectReference. If used with an ObjectReference, will be\nappended to the path of the resulting URL from the Addressable.\n+ optional",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "DomainMapping": {
       "description": "Resource to hold the state and status of a user's domain mapping.",
       "id": "DomainMapping",
@@ -2787,6 +3242,25 @@
         "value": {
           "description": "Variable references $(VAR_NAME) are expanded\nusing the previous defined environment variables in the container and\nany route environment variables. If a variable cannot be resolved,\nthe reference in the input string will be unchanged. The $(VAR_NAME)\nsyntax can be escaped with a double $$, ie: $$(VAR_NAME). Escaped\nreferences will never be expanded, regardless of whether the variable\nexists or not.\nDefaults to \"\".\n+optional",
           "type": "string"
+        },
+        "valueFrom": {
+          "$ref": "EnvVarSource",
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nSource for the environment variable's value. Cannot be used if value is not\nempty. +optional"
+        }
+      },
+      "type": "object"
+    },
+    "EnvVarSource": {
+      "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nEnvVarSource represents a source for the value of an EnvVar.",
+      "id": "EnvVarSource",
+      "properties": {
+        "configMapKeyRef": {
+          "$ref": "ConfigMapKeySelector",
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nSelects a key of a ConfigMap.\n+optional"
+        },
+        "secretKeyRef": {
+          "$ref": "SecretKeySelector",
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nSelects a key of a secret in the pod's namespace\n+optional"
         }
       },
       "type": "object"
@@ -2813,6 +3287,41 @@
       },
       "type": "object"
     },
+    "EventTypeImporter": {
+      "id": "EventTypeImporter",
+      "properties": {
+        "apiVersion": {
+          "description": "The API version of the importer CRD.",
+          "type": "string"
+        },
+        "kind": {
+          "description": "The kind of the importer CRD.",
+          "type": "string"
+        },
+        "parameters": {
+          "description": "Parameters required to create an importer for the EventType.",
+          "items": {
+            "$ref": "EventTypeParameter"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "EventTypeParameter": {
+      "id": "EventTypeParameter",
+      "properties": {
+        "description": {
+          "description": "Description of the parameter. E.g. \"Google Cloud Project Id.\"",
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the parameter. E.g. googleCloudProject.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "EventTypeSpec": {
       "id": "EventTypeSpec",
       "properties": {
@@ -2823,6 +3332,10 @@
         "description": {
           "description": "Description is a string describing what the EventType is about.\n+optional",
           "type": "string"
+        },
+        "importer": {
+          "$ref": "EventTypeImporter",
+          "description": "The importer that provides this EventType to the eventing mesh."
         },
         "schema": {
           "description": "Schema is a URI with the EventType schema. It may be a JSON schema, a\nprotobuf schema, etc.\n+optional",
@@ -3091,6 +3604,13 @@
         "metadata": {
           "$ref": "ListMeta",
           "description": "Metadata associated with this DomainMapping list."
+        },
+        "unreachable": {
+          "description": "Locations that could not be reached.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         }
       },
       "type": "object"
@@ -3161,6 +3681,39 @@
         "selfLink": {
           "description": "SelfLink is a URL representing this object.\nPopulated by the system.\nRead-only.\n+optional",
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ListPubSubsResponse": {
+      "description": "ListPubSubsResponse is a list of PubSub resources.",
+      "id": "ListPubSubsResponse",
+      "properties": {
+        "apiVersion": {
+          "description": "The API version for this call such as \"events.cloud.google.com/v1alpha1\".",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of PubSubs.",
+          "items": {
+            "$ref": "PubSub"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "The kind of this resource, in this case \"PubSubList\".",
+          "type": "string"
+        },
+        "metadata": {
+          "$ref": "ListMeta",
+          "description": "Metadata associated with this PubSub list."
+        },
+        "unreachable": {
+          "description": "Locations that could not be reached.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         }
       },
       "type": "object"
@@ -3496,7 +4049,7 @@
       "type": "object"
     },
     "Policy": {
-      "description": "Defines an Identity and Access Management (IAM) policy. It is used to\nspecify access control policies for Cloud Platform resources.\n\n\nA `Policy` consists of a list of `bindings`. A `binding` binds a list of\n`members` to a `role`, where the members can be user accounts, Google groups,\nGoogle domains, and service accounts. A `role` is a named list of permissions\ndefined by IAM.\n\n**JSON Example**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles/owner\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-other-app@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles/viewer\",\n          \"members\": [\"user:sean@example.com\"]\n        }\n      ]\n    }\n\n**YAML Example**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-other-app@appspot.gserviceaccount.com\n      role: roles/owner\n    - members:\n      - user:sean@example.com\n      role: roles/viewer\n\n\nFor a description of IAM and its features, see the\n[IAM developer's guide](https://cloud.google.com/iam/docs).",
+      "description": "Defines an Identity and Access Management (IAM) policy. It is used to\nspecify access control policies for Cloud Platform resources.\n\n\nA `Policy` is a collection of `bindings`. A `binding` binds one or more\n`members` to a single `role`. Members can be user accounts, service accounts,\nGoogle groups, and domains (such as G Suite). A `role` is a named list of\npermissions (defined by IAM or configured by users). A `binding` can\noptionally specify a `condition`, which is a logic expression that further\nconstrains the role binding based on attributes about the request and/or\ntarget resource.\n\n**JSON Example**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles/resourcemanager.organizationAdmin\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-project-id@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles/resourcemanager.organizationViewer\",\n          \"members\": [\"user:eve@example.com\"],\n          \"condition\": {\n            \"title\": \"expirable access\",\n            \"description\": \"Does not grant access after Sep 2020\",\n            \"expression\": \"request.time \u003c\n            timestamp('2020-10-01T00:00:00.000Z')\",\n          }\n        }\n      ]\n    }\n\n**YAML Example**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-project-id@appspot.gserviceaccount.com\n      role: roles/resourcemanager.organizationAdmin\n    - members:\n      - user:eve@example.com\n      role: roles/resourcemanager.organizationViewer\n      condition:\n        title: expirable access\n        description: Does not grant access after Sep 2020\n        expression: request.time \u003c timestamp('2020-10-01T00:00:00.000Z')\n\nFor a description of IAM and its features, see the\n[IAM developer's guide](https://cloud.google.com/iam/docs).",
       "id": "Policy",
       "properties": {
         "auditConfigs": {
@@ -3507,19 +4060,19 @@
           "type": "array"
         },
         "bindings": {
-          "description": "Associates a list of `members` to a `role`.\n`bindings` with no members will result in an error.",
+          "description": "Associates a list of `members` to a `role`. Optionally may specify a\n`condition` that determines when binding is in effect.\n`bindings` with no members will result in an error.",
           "items": {
             "$ref": "Binding"
           },
           "type": "array"
         },
         "etag": {
-          "description": "`etag` is used for optimistic concurrency control as a way to help\nprevent simultaneous updates of a policy from overwriting each other.\nIt is strongly suggested that systems make use of the `etag` in the\nread-modify-write cycle to perform policy updates in order to avoid race\nconditions: An `etag` is returned in the response to `getIamPolicy`, and\nsystems are expected to put that etag in the request to `setIamPolicy` to\nensure that their change will be applied to the same version of the policy.\n\nIf no `etag` is provided in the call to `setIamPolicy`, then the existing\npolicy is overwritten blindly.",
+          "description": "`etag` is used for optimistic concurrency control as a way to help\nprevent simultaneous updates of a policy from overwriting each other.\nIt is strongly suggested that systems make use of the `etag` in the\nread-modify-write cycle to perform policy updates in order to avoid race\nconditions: An `etag` is returned in the response to `getIamPolicy`, and\nsystems are expected to put that etag in the request to `setIamPolicy` to\nensure that their change will be applied to the same version of the policy.\n\nIf no `etag` is provided in the call to `setIamPolicy`, then the existing\npolicy is overwritten. Due to blind-set semantics of an etag-less policy,\n'setIamPolicy' will not fail even if either of incoming or stored policy\ndoes not meet the version requirements.",
           "format": "byte",
           "type": "string"
         },
         "version": {
-          "description": "Deprecated.",
+          "description": "Specifies the format of the policy.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nOperations affecting conditional bindings must specify version 3. This can\nbe either setting a conditional policy, modifying a conditional binding,\nor removing a conditional binding from the stored conditional policy.\nOperations on non-conditional policies may specify any valid value or\nleave the field unset.\n\nIf no etag is provided in the call to `setIamPolicy`, any version\ncompliance checks on the incoming and/or stored policy is skipped.",
           "format": "int32",
           "type": "integer"
         }
@@ -3558,6 +4111,98 @@
           "description": "Number of seconds after which the probe times out.\nDefaults to 1 second. Minimum value is 1.\nMore info:\nhttps://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes\n+optional",
           "format": "int32",
           "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "PubSub": {
+      "id": "PubSub",
+      "properties": {
+        "apiVersion": {
+          "description": "The API version for this call such as \"events.cloud.google.com/v1alpha1\".",
+          "type": "string"
+        },
+        "kind": {
+          "description": "The kind of resource, in this case \"PubSub\".",
+          "type": "string"
+        },
+        "metadata": {
+          "$ref": "ObjectMeta",
+          "description": "Metadata associated with this PubSub."
+        },
+        "spec": {
+          "$ref": "PubSubSpec",
+          "description": "Spec defines the desired state of the PubSub."
+        },
+        "status": {
+          "$ref": "PubSubStatus",
+          "description": "Status represents the current state of the PubSub. This data may be\nout of date. +optional"
+        }
+      },
+      "type": "object"
+    },
+    "PubSubSpec": {
+      "description": "The desired state of the PubSub.",
+      "id": "PubSubSpec",
+      "properties": {
+        "ackDeadline": {
+          "description": "AckDeadline is the default maximum time after a subscriber receives a\nmessage before the subscriber should acknowledge the message. Defaults\nto 30 seconds ('30s').\n+optional",
+          "type": "string"
+        },
+        "ceOverrides": {
+          "$ref": "CloudEventOverrides",
+          "description": "CloudEventOverrides defines overrides to control the output format and\nmodifications of the event sent to the sink.\n+optional"
+        },
+        "project": {
+          "description": "Project is the ID of the Google Cloud Project that the PubSub Topic exists\nin. If omitted, defaults to same as the cluster. +optional",
+          "type": "string"
+        },
+        "pubsubSecret": {
+          "$ref": "SecretKeySelector",
+          "description": "PubSubSecret is the credential to use to create\nTopic / PullSubscription resources. If omitted, uses Secret."
+        },
+        "retainAckedMessages": {
+          "description": "RetainAckedMessages defines whether to retain acknowledged messages. If\ntrue, acknowledged messages will not be expunged until they fall out of\nthe RetentionDuration window.",
+          "type": "boolean"
+        },
+        "retentionDuration": {
+          "description": "RetentionDuration defines how long to retain messages in backlog, from\nthe time of publish. If RetainAckedMessages is true, this duration\naffects the retention of acknowledged messages, otherwise only\nunacknowledged messages are retained. Cannot be longer than 7 days or\nshorter than 10 minutes. Defaults to 7 days ('7d').\n+optional",
+          "type": "string"
+        },
+        "secret": {
+          "$ref": "SecretKeySelector",
+          "description": "Secret is the credential to use to create the Scheduler Job.\nIf not specified, defaults to:\nName: google-cloud-key\nKey: key.json\n+optional"
+        },
+        "sink": {
+          "$ref": "Destination",
+          "description": "Sink is a reference to an object that will resolve to a domain name or a\nURI directly to use as the sink."
+        },
+        "topic": {
+          "description": "Topic is the ID of the PubSub Topic to Subscribe to. It must\nbe in the form of the unique identifier within the project, not the\nentire name. E.g. it must be 'laconia', not\n'projects/my-proj/topics/laconia'.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "PubSubStatus": {
+      "description": "PubSubStatus represents the current state of a PubSub.",
+      "id": "PubSubStatus",
+      "properties": {
+        "conditions": {
+          "description": "Array of observed PubSubConditions, indicating the current state\nof the PubSub.",
+          "items": {
+            "$ref": "Condition"
+          },
+          "type": "array"
+        },
+        "observedGeneration": {
+          "description": "ObservedGeneration is the 'Generation' of the PubSub that\nwas last processed by the controller.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "sinkUri": {
+          "description": "SinkURI is the current active sink URI that has been configured for the\nSource.\n+optional",
+          "type": "string"
         }
       },
       "type": "object"
@@ -3711,7 +4356,7 @@
           "description": "Container defines the unit of execution for this Revision.\nIn the context of a Revision, we disallow a number of the fields of\nthis Container, including: name, ports, and volumeMounts.\nThe runtime contract is documented here:\nhttps://github.com/knative/serving/blob/master/docs/runtime-contract.md"
         },
         "containerConcurrency": {
-          "description": "ContainerConcurrency specifies the maximum allowed in-flight (concurrent)\nrequests per container of the Revision. Values are:\n- `0` thread-safe, the system should manage the max concurrency. This is\n   the default value.\n- `1` not-thread-safe. Single concurrency\n- `2-N` thread-safe, max concurrency of N",
+          "description": "(Optional)\n\nContainerConcurrency specifies the maximum allowed in-flight (concurrent)\nrequests per container instance of the Revision.\n\nCloud Run fully managed: supported, defaults to 80\n\nCloud Run on GKE: supported, defaults to 0, which means concurrency\nto the application is not limited, and the system decides the\ntarget concurrency for the autoscaler.",
           "format": "int32",
           "type": "integer"
         },
@@ -3956,10 +4601,37 @@
       "properties": {
         "localObjectReference": {
           "$ref": "LocalObjectReference",
-          "description": "The Secret to select from."
+          "description": "This field should not be used directly as it is meant to be inlined\ndirectly into the message. Use the \"name\" field instead."
+        },
+        "name": {
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run for Anthos: supported\n\nThe Secret to select from.",
+          "type": "string"
         },
         "optional": {
-          "description": "Specify whether the Secret must be defined\n+optional",
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run for Anthos: supported\n\nSpecify whether the Secret must be defined\n+optional",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "SecretKeySelector": {
+      "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nSecretKeySelector selects a key of a Secret.",
+      "id": "SecretKeySelector",
+      "properties": {
+        "key": {
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nThe key of the secret to select from.  Must be a valid secret key.",
+          "type": "string"
+        },
+        "localObjectReference": {
+          "$ref": "LocalObjectReference",
+          "description": "This field should not be used directly as it is meant to be inlined\ndirectly into the message. Use the \"name\" field instead."
+        },
+        "name": {
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nThe name of the secret in the pod's namespace to select from.",
+          "type": "string"
+        },
+        "optional": {
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nSpecify whether the Secret or its key must be defined\n+optional",
           "type": "boolean"
         }
       },
@@ -4402,20 +5074,45 @@
     "TriggerFilter": {
       "id": "TriggerFilter",
       "properties": {
+        "attributes": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Cloud Run fully managed: not supported\n\nCloud Run on GKE: supported\n\nAttributes filters events by exact match on event context attributes.\nEach key in the map is compared with the equivalent key in the event\ncontext. An event passes the filter if all values are equal to the\nspecified values.\n\nNested context attributes are not supported as keys.\nOnly string values are supported.\n\n+optional",
+          "type": "object"
+        },
         "sourceAndType": {
-          "$ref": "TriggerFilterSourceAndType"
+          "$ref": "TriggerFilterSourceAndType",
+          "description": "SourceAndType is DEPRECATED and replaced by the Attributes field."
         }
       },
       "type": "object"
     },
     "TriggerFilterSourceAndType": {
-      "description": "TriggerFilterSourceAndType filters events based on exact matches on the cloud\nevent's type and source attributes. Only exact matches will pass the filter.",
+      "description": "TriggerFilterSourceAndType is DEPRECATED. Filters are now contained in the\nmap of attributes in TriggerFilter proto.",
       "id": "TriggerFilterSourceAndType",
       "properties": {
         "source": {
           "type": "string"
         },
         "type": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "TriggerImporterSpec": {
+      "id": "TriggerImporterSpec",
+      "properties": {
+        "arguments": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arguments to use for the importer. These must match the parameters in the\nEventType's importer.",
+          "type": "object"
+        },
+        "eventTypeName": {
+          "description": "Name of the EventType that this importer provides.",
           "type": "string"
         }
       },
@@ -4431,7 +5128,14 @@
         },
         "filter": {
           "$ref": "TriggerFilter",
-          "description": "Filter is the filter to apply against all events from the Broker. Only\nevents that pass this filter will be sent to the Subscriber. If not\nspecified, will default to allowing all events.\n\nThis must be specified in Cloud Run."
+          "description": "Filter is the filter to apply against all events from the Broker. Only\nevents that pass this filter will be sent to the Subscriber."
+        },
+        "importers": {
+          "description": "Specification of the importers that will provide events to the trigger.\nNote, for Cloud Run, the importers will only be used if a filter is not\nspecified.",
+          "items": {
+            "$ref": "TriggerImporterSpec"
+          },
+          "type": "array"
         },
         "subscriber": {
           "$ref": "SubscriberSpec",

@@ -106,6 +106,34 @@
   "resources": {
     "projects": {
       "methods": {
+        "explain": {
+          "description": "Performs explanation on the data in the request.\nAI Platform implements a custom `explain` verb on top of an HTTP POST\nmethod. \u003cp\u003eFor details of the request and response format, see the **guide\nto the [explain request format](/ml-engine/docs/v1/explain-request)**.",
+          "flatPath": "v1/projects/{projectsId}:explain",
+          "httpMethod": "POST",
+          "id": "ml.projects.explain",
+          "parameterOrder": [
+            "name"
+          ],
+          "parameters": {
+            "name": {
+              "description": "Required. The resource name of a model or a version.\n\nAuthorization: requires the `predict` permission on the specified resource.",
+              "location": "path",
+              "pattern": "^projects/.+$",
+              "required": true,
+              "type": "string"
+            }
+          },
+          "path": "v1/{+name}:explain",
+          "request": {
+            "$ref": "GoogleCloudMlV1__ExplainRequest"
+          },
+          "response": {
+            "$ref": "GoogleApi__HttpBody"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform"
+          ]
+        },
         "getConfig": {
           "description": "Get the service account information associated with your project. You need\nthis information in order to grant the service account permissions for\nthe Google Cloud Storage location where you put your model training code\nfor training the model with Google Cloud Machine Learning.",
           "flatPath": "v1/projects/{projectsId}:getConfig",
@@ -254,7 +282,7 @@
               ],
               "parameters": {
                 "options.requestedPolicyVersion": {
-                  "description": "Optional. The policy format version to be returned.\nAcceptable values are 0 and 1.\nIf the value is 0, or the field is omitted, policy format version 1 will be\nreturned.",
+                  "description": "Optional. The policy format version to be returned.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nRequests for policies with any conditional bindings must specify version 3.\nPolicies without any conditional bindings may specify any valid value or\nleave the field unset.",
                   "format": "int32",
                   "location": "query",
                   "type": "integer"
@@ -351,7 +379,7 @@
               ]
             },
             "setIamPolicy": {
-              "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy.",
+              "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy.\n\nCan return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED",
               "flatPath": "v1/projects/{projectsId}/jobs/{jobsId}:setIamPolicy",
               "httpMethod": "POST",
               "id": "ml.projects.jobs.setIamPolicy",
@@ -563,7 +591,7 @@
               ],
               "parameters": {
                 "options.requestedPolicyVersion": {
-                  "description": "Optional. The policy format version to be returned.\nAcceptable values are 0 and 1.\nIf the value is 0, or the field is omitted, policy format version 1 will be\nreturned.",
+                  "description": "Optional. The policy format version to be returned.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nRequests for policies with any conditional bindings must specify version 3.\nPolicies without any conditional bindings may specify any valid value or\nleave the field unset.",
                   "format": "int32",
                   "location": "query",
                   "type": "integer"
@@ -660,7 +688,7 @@
               ]
             },
             "setIamPolicy": {
-              "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy.",
+              "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy.\n\nCan return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED",
               "flatPath": "v1/projects/{projectsId}/models/{modelsId}:setIamPolicy",
               "httpMethod": "POST",
               "id": "ml.projects.models.setIamPolicy",
@@ -855,7 +883,7 @@
                       "type": "string"
                     },
                     "updateMask": {
-                      "description": "Required. Specifies the path, relative to `Version`, of the field to\nupdate. Must be present and non-empty.\n\nFor example, to change the description of a version to \"foo\", the\n`update_mask` parameter would be specified as `description`, and the\n`PATCH` request body would specify the new value, as follows:\n    {\n      \"description\": \"foo\"\n    }\n\nCurrently the only supported update mask fields are `description` and\n`autoScaling.minNodes`.",
+                      "description": "Required. Specifies the path, relative to `Version`, of the field to\nupdate. Must be present and non-empty.\n\nFor example, to change the description of a version to \"foo\", the\n`update_mask` parameter would be specified as `description`, and the\n`PATCH` request body would specify the new value, as follows:\n\n```\n{\n  \"description\": \"foo\"\n}\n```\n\nCurrently the only supported update mask fields are `description`,\n`autoScaling.minNodes`, and `manualScaling.nodes`. However, you can only\nupdate `manualScaling.nodes` if the version uses a [Compute Engine (N1)\nmachine type](/ml-engine/docs/machine-types-online-prediction).",
                       "format": "google-fieldmask",
                       "location": "query",
                       "type": "string"
@@ -1002,7 +1030,7 @@
       }
     }
   },
-  "revision": "20190704",
+  "revision": "20191112",
   "rootUrl": "https://ml.googleapis.com/",
   "schemas": {
     "GoogleApi__HttpBody": {
@@ -1050,7 +1078,7 @@
       "type": "object"
     },
     "GoogleCloudMlV1__AcceleratorConfig": {
-      "description": "Represents a hardware accelerator request config.",
+      "description": "Represents a hardware accelerator request config.\nNote that the AcceleratorConfig can be used in both Jobs and Versions.\nLearn more about [accelerators for training](/ml-engine/docs/using-gpus) and\n[accelerators for online\nprediction](/ml-engine/docs/machine-types-online-prediction#gpus).",
       "id": "GoogleCloudMlV1__AcceleratorConfig",
       "properties": {
         "count": {
@@ -1067,7 +1095,8 @@
             "NVIDIA_TESLA_V100",
             "NVIDIA_TESLA_P4",
             "NVIDIA_TESLA_T4",
-            "TPU_V2"
+            "TPU_V2",
+            "TPU_V3"
           ],
           "enumDescriptions": [
             "Unspecified accelerator type. Default to no GPU.",
@@ -1076,7 +1105,8 @@
             "Nvidia Tesla V100 GPU.",
             "Nvidia Tesla P4 GPU.",
             "Nvidia Tesla T4 GPU.",
-            "TPU v2."
+            "TPU v2.",
+            "TPU v3."
           ],
           "type": "string"
         }
@@ -1088,7 +1118,7 @@
       "id": "GoogleCloudMlV1__AutoScaling",
       "properties": {
         "minNodes": {
-          "description": "Optional. The minimum number of nodes to allocate for this model. These\nnodes are always up, starting from the time the model is deployed.\nTherefore, the cost of operating this model will be at least\n`rate` * `min_nodes` * number of hours since last billing cycle,\nwhere `rate` is the cost per node-hour as documented in the\n[pricing guide](/ml-engine/docs/pricing),\neven if no predictions are performed. There is additional cost for each\nprediction performed.\n\nUnlike manual scaling, if the load gets too heavy for the nodes\nthat are up, the service will automatically add nodes to handle the\nincreased load as well as scale back as traffic drops, always maintaining\nat least `min_nodes`. You will be charged for the time in which additional\nnodes are used.\n\nIf not specified, `min_nodes` defaults to 0, in which case, when traffic\nto a model stops (and after a cool-down period), nodes will be shut down\nand no charges will be incurred until traffic to the model resumes.\n\nYou can set `min_nodes` when creating the model version, and you can also\nupdate `min_nodes` for an existing version:\n\u003cpre\u003e\nupdate_body.json:\n{\n  'autoScaling': {\n    'minNodes': 5\n  }\n}\n\u003c/pre\u003e\nHTTP request:\n\u003cpre\u003e\nPATCH\nhttps://ml.googleapis.com/v1/{name=projects/*/models/*/versions/*}?update_mask=autoScaling.minNodes\n-d @./update_body.json\n\u003c/pre\u003e",
+          "description": "Optional. The minimum number of nodes to allocate for this model. These\nnodes are always up, starting from the time the model is deployed.\nTherefore, the cost of operating this model will be at least\n`rate` * `min_nodes` * number of hours since last billing cycle,\nwhere `rate` is the cost per node-hour as documented in the\n[pricing guide](/ml-engine/docs/pricing),\neven if no predictions are performed. There is additional cost for each\nprediction performed.\n\nUnlike manual scaling, if the load gets too heavy for the nodes\nthat are up, the service will automatically add nodes to handle the\nincreased load as well as scale back as traffic drops, always maintaining\nat least `min_nodes`. You will be charged for the time in which additional\nnodes are used.\n\nIf `min_nodes` is not specified and AutoScaling is used with a [legacy\n(MLS1) machine type](/ml-engine/docs/machine-types-online-prediction),\n`min_nodes` defaults to 0, in which case, when traffic to a model stops\n(and after a cool-down period), nodes will be shut down and no charges will\nbe incurred until traffic to the model resumes.\n\nIf `min_nodes` is not specified and AutoScaling is used with a [Compute\nEngine (N1) machine type](/ml-engine/docs/machine-types-online-prediction),\n`min_nodes` defaults to 1. `min_nodes` must be at least 1 for use with a\nCompute Engine machine type.\n\nNote that you cannot use AutoScaling if your version uses\n[GPUs](#Version.FIELDS.accelerator_config). Instead, you must use\nManualScaling.\n\nYou can set `min_nodes` when creating the model version, and you can also\nupdate `min_nodes` for an existing version:\n\u003cpre\u003e\nupdate_body.json:\n{\n  'autoScaling': {\n    'minNodes': 5\n  }\n}\n\u003c/pre\u003e\nHTTP request:\n\u003cpre style=\"max-width: 626px;\"\u003e\nPATCH\nhttps://ml.googleapis.com/v1/{name=projects/*/models/*/versions/*}?update_mask=autoScaling.minNodes\n-d @./update_body.json\n\u003c/pre\u003e",
           "format": "int32",
           "type": "integer"
         }
@@ -1136,7 +1166,8 @@
             "Nvidia Tesla V100 GPU.",
             "Nvidia Tesla P4 GPU.",
             "Nvidia Tesla T4 GPU.",
-            "TPU v2."
+            "TPU v2.",
+            "TPU v3."
           ],
           "items": {
             "enum": [
@@ -1146,7 +1177,8 @@
               "NVIDIA_TESLA_V100",
               "NVIDIA_TESLA_P4",
               "NVIDIA_TESLA_T4",
-              "TPU_V2"
+              "TPU_V2",
+              "TPU_V3"
             ],
             "type": "string"
           },
@@ -1176,6 +1208,30 @@
         "tpuServiceAccount": {
           "description": "The service account Cloud ML uses to run on TPU node.",
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudMlV1__ExplainRequest": {
+      "description": "Request for explanations to be issued against a trained model.",
+      "id": "GoogleCloudMlV1__ExplainRequest",
+      "properties": {
+        "httpBody": {
+          "$ref": "GoogleApi__HttpBody",
+          "description": "Required.\nThe explanation request body."
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudMlV1__ExplanationConfig": {
+      "description": "Message holding configuration options for explaining model predictions.\nCurrently, the only supported mechanism to explain a model's prediction is\nthrough attributing its output back to its inputs which is essentially a\ncredit assignment task. We support multiple attribution methods, some\nspecific to particular frameworks like Tensorflow and XGBoost.\nNext idx: 7.",
+      "id": "GoogleCloudMlV1__ExplanationConfig",
+      "properties": {
+        "integratedGradientsAttribution": {
+          "$ref": "GoogleCloudMlV1__IntegratedGradientsAttribution"
+        },
+        "sampledShapleyAttribution": {
+          "$ref": "GoogleCloudMlV1__SampledShapleyAttribution"
         }
       },
       "type": "object"
@@ -1335,6 +1391,18 @@
         "resumePreviousJobId": {
           "description": "Optional. The prior hyperparameter tuning job id that users hope to\ncontinue with. The job id will be used to find the corresponding vizier\nstudy guid and resume the study.",
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudMlV1__IntegratedGradientsAttribution": {
+      "description": "Attributes credit by computing the Aumann-Shapley value taking advantage\nof the model's fully differentiable structure. Refer to this paper for\nmore details: http://proceedings.mlr.press/v70/sundararajan17a.html",
+      "id": "GoogleCloudMlV1__IntegratedGradientsAttribution",
+      "properties": {
+        "numIntegralSteps": {
+          "description": "Number of steps for approximating the path integral.\nA good value to start is 50 and gradually increase until the\nsum to diff property is met within the desired error range.",
+          "format": "int32",
+          "type": "integer"
         }
       },
       "type": "object"
@@ -1846,8 +1914,36 @@
           "type": "string"
         },
         "tpuTfVersion": {
-          "description": "TensorFlow version used in the custom container. This field is required if\nthe replica is a TPU worker that uses a custom container. Otherwise, do not\nspecify this field.",
+          "description": "The AI Platform runtime version that includes a TensorFlow version matching\nthe one used in the custom container. This field is required if the replica\nis a TPU worker that uses a custom container. Otherwise, do not specify\nthis field. This must be a [runtime version that currently supports\ntraining with\nTPUs](/ml-engine/docs/tensorflow/runtime-version-list#tpu-support).\n\nNote that the version of TensorFlow included in a runtime version may\ndiffer from the numbering of the runtime version itself, because it may\nhave a different [patch\nversion](https://www.tensorflow.org/guide/version_compat#semantic_versioning_20).\nIn this field, you must specify the runtime version (TensorFlow minor\nversion). For example, if your custom container runs TensorFlow `1.x.y`,\nspecify `1.x`.",
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudMlV1__RequestLoggingConfig": {
+      "description": "Configuration for logging request-response pairs to a BigQuery table.\nOnline prediction requests to a model version and the responses to these\nrequests are converted to raw strings and saved to the specified BigQuery\ntable. Logging is constrained by [BigQuery quotas and\nlimits](/bigquery/quotas). If your project exceeds BigQuery quotas or limits,\nAI Platform Prediction does not log request-response pairs, but it continues\nto serve predictions.\n\nIf you are using [continuous\nevaluation](/ml-engine/docs/continuous-evaluation/), you do not need to\nspecify this configuration manually. Setting up continuous evaluation\nautomatically enables logging of request-response pairs.",
+      "id": "GoogleCloudMlV1__RequestLoggingConfig",
+      "properties": {
+        "bigqueryTableName": {
+          "description": "Required. Fully qualified BigQuery table name in the following format:\n\"\u003cvar\u003eproject_id\u003c/var\u003e.\u003cvar\u003edataset_name\u003c/var\u003e.\u003cvar\u003etable_name\u003c/var\u003e\"\n\nThe specifcied table must already exist, and the \"Cloud ML Service Agent\"\nfor your project must have permission to write to it. The table must have\nthe following [schema](/bigquery/docs/schemas):\n\n\u003ctable\u003e\n  \u003ctr\u003e\u003cth\u003eField name\u003c/th\u003e\u003cth style=\"display: table-cell\"\u003eType\u003c/th\u003e\n    \u003cth style=\"display: table-cell\"\u003eMode\u003c/th\u003e\u003c/tr\u003e\n  \u003ctr\u003e\u003ctd\u003emodel\u003c/td\u003e\u003ctd\u003eSTRING\u003c/td\u003e\u003ctd\u003eREQUIRED\u003c/td\u003e\u003c/tr\u003e\n  \u003ctr\u003e\u003ctd\u003emodel_version\u003c/td\u003e\u003ctd\u003eSTRING\u003c/td\u003e\u003ctd\u003eREQUIRED\u003c/td\u003e\u003c/tr\u003e\n  \u003ctr\u003e\u003ctd\u003etime\u003c/td\u003e\u003ctd\u003eTIMESTAMP\u003c/td\u003e\u003ctd\u003eREQUIRED\u003c/td\u003e\u003c/tr\u003e\n  \u003ctr\u003e\u003ctd\u003eraw_data\u003c/td\u003e\u003ctd\u003eSTRING\u003c/td\u003e\u003ctd\u003eREQUIRED\u003c/td\u003e\u003c/tr\u003e\n  \u003ctr\u003e\u003ctd\u003eraw_prediction\u003c/td\u003e\u003ctd\u003eSTRING\u003c/td\u003e\u003ctd\u003eNULLABLE\u003c/td\u003e\u003c/tr\u003e\n  \u003ctr\u003e\u003ctd\u003egroundtruth\u003c/td\u003e\u003ctd\u003eSTRING\u003c/td\u003e\u003ctd\u003eNULLABLE\u003c/td\u003e\u003c/tr\u003e\n\u003c/table\u003e",
+          "type": "string"
+        },
+        "samplingPercentage": {
+          "description": "Percentage of requests to be logged, expressed as a fraction from 0 to 1.\nFor example, if you want to log 10% of requests, enter `0.1`. The sampling\nwindow is the lifetime of the model version. Defaults to 0.",
+          "format": "double",
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudMlV1__SampledShapleyAttribution": {
+      "description": "An attribution method that approximates Shapley values for features that\ncontribute to the label being predicted. A sampling strategy is used to\napproximate the value rather than considering all subsets of features.",
+      "id": "GoogleCloudMlV1__SampledShapleyAttribution",
+      "properties": {
+        "numPaths": {
+          "description": "The number of feature permutations to consider when approximating the\nshapley values.",
+          "format": "int32",
+          "type": "integer"
         }
       },
       "type": "object"
@@ -1882,12 +1978,7 @@
           "description": "Optional. The configuration for your master worker.\n\nYou should only set `masterConfig.acceleratorConfig` if `masterType` is set\nto a Compute Engine machine type. Learn about [restrictions on accelerator\nconfigurations for\ntraining.](/ml-engine/docs/tensorflow/using-gpus#compute-engine-machine-types-with-gpu)\n\nSet `masterConfig.imageUri` only if you build a custom image. Only one of\n`masterConfig.imageUri` and `runtimeVersion` should be set. Learn more about\n[configuring custom\ncontainers](/ml-engine/docs/distributed-training-containers)."
         },
         "masterType": {
-          "description": "Optional. Specifies the type of virtual machine to use for your training\njob's master worker.\n\nThe following types are supported:\n\n\u003cdl\u003e\n  \u003cdt\u003estandard\u003c/dt\u003e\n  \u003cdd\u003e\n  A basic machine configuration suitable for training simple models with\n  small to moderate datasets.\n  \u003c/dd\u003e\n  \u003cdt\u003elarge_model\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine with a lot of memory, specially suited for parameter servers\n  when your model is large (having many hidden layers or layers with very\n  large numbers of nodes).\n  \u003c/dd\u003e\n  \u003cdt\u003ecomplex_model_s\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine suitable for the master and workers of the cluster when your\n  model requires more computation than the standard machine can handle\n  satisfactorily.\n  \u003c/dd\u003e\n  \u003cdt\u003ecomplex_model_m\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine with roughly twice the number of cores and roughly double the\n  memory of \u003ci\u003ecomplex_model_s\u003c/i\u003e.\n  \u003c/dd\u003e\n  \u003cdt\u003ecomplex_model_l\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine with roughly twice the number of cores and roughly double the\n  memory of \u003ci\u003ecomplex_model_m\u003c/i\u003e.\n  \u003c/dd\u003e\n  \u003cdt\u003estandard_gpu\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine equivalent to \u003ci\u003estandard\u003c/i\u003e that\n  also includes a single NVIDIA Tesla K80 GPU. See more about\n  \u003ca href=\"/ml-engine/docs/tensorflow/using-gpus\"\u003eusing GPUs to\n  train your model\u003c/a\u003e.\n  \u003c/dd\u003e\n  \u003cdt\u003ecomplex_model_m_gpu\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine equivalent to \u003ci\u003ecomplex_model_m\u003c/i\u003e that also includes\n  four NVIDIA Tesla K80 GPUs.\n  \u003c/dd\u003e\n  \u003cdt\u003ecomplex_model_l_gpu\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine equivalent to \u003ci\u003ecomplex_model_l\u003c/i\u003e that also includes\n  eight NVIDIA Tesla K80 GPUs.\n  \u003c/dd\u003e\n  \u003cdt\u003estandard_p100\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine equivalent to \u003ci\u003estandard\u003c/i\u003e that\n  also includes a single NVIDIA Tesla P100 GPU.\n  \u003c/dd\u003e\n  \u003cdt\u003ecomplex_model_m_p100\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine equivalent to \u003ci\u003ecomplex_model_m\u003c/i\u003e that also includes\n  four NVIDIA Tesla P100 GPUs.\n  \u003c/dd\u003e\n  \u003cdt\u003estandard_v100\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine equivalent to \u003ci\u003estandard\u003c/i\u003e that\n  also includes a single NVIDIA Tesla V100 GPU.\n  \u003c/dd\u003e\n  \u003cdt\u003elarge_model_v100\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine equivalent to \u003ci\u003elarge_model\u003c/i\u003e that\n  also includes a single NVIDIA Tesla V100 GPU.\n  \u003c/dd\u003e\n  \u003cdt\u003ecomplex_model_m_v100\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine equivalent to \u003ci\u003ecomplex_model_m\u003c/i\u003e that\n  also includes four NVIDIA Tesla V100 GPUs.\n  \u003c/dd\u003e\n  \u003cdt\u003ecomplex_model_l_v100\u003c/dt\u003e\n  \u003cdd\u003e\n  A machine equivalent to \u003ci\u003ecomplex_model_l\u003c/i\u003e that\n  also includes eight NVIDIA Tesla V100 GPUs.\n  \u003c/dd\u003e\n  \u003cdt\u003ecloud_tpu\u003c/dt\u003e\n  \u003cdd\u003e\n  A TPU VM including one Cloud TPU. See more about\n  \u003ca href=\"/ml-engine/docs/tensorflow/using-tpus\"\u003eusing TPUs to train\n  your model\u003c/a\u003e.\n  \u003c/dd\u003e\n\u003c/dl\u003e\n\nYou may also use certain Compute Engine machine types directly in this\nfield. The following types are supported:\n\n- `n1-standard-4`\n- `n1-standard-8`\n- `n1-standard-16`\n- `n1-standard-32`\n- `n1-standard-64`\n- `n1-standard-96`\n- `n1-highmem-2`\n- `n1-highmem-4`\n- `n1-highmem-8`\n- `n1-highmem-16`\n- `n1-highmem-32`\n- `n1-highmem-64`\n- `n1-highmem-96`\n- `n1-highcpu-16`\n- `n1-highcpu-32`\n- `n1-highcpu-64`\n- `n1-highcpu-96`\n\nSee more about [using Compute Engine machine\ntypes](/ml-engine/docs/tensorflow/machine-types#compute-engine-machine-types).\n\nYou must set this value when `scaleTier` is set to `CUSTOM`.",
-          "type": "string"
-        },
-        "maxRunningTime": {
-          "description": "Optional. The maximum job running time. The default is 7 days.",
-          "format": "google-duration",
+          "description": "Optional. Specifies the type of virtual machine to use for your training\njob's master worker. You must specify this field when `scaleTier` is set to\n`CUSTOM`.\n\nYou can use certain Compute Engine machine types directly in this field.\nThe following types are supported:\n\n- `n1-standard-4`\n- `n1-standard-8`\n- `n1-standard-16`\n- `n1-standard-32`\n- `n1-standard-64`\n- `n1-standard-96`\n- `n1-highmem-2`\n- `n1-highmem-4`\n- `n1-highmem-8`\n- `n1-highmem-16`\n- `n1-highmem-32`\n- `n1-highmem-64`\n- `n1-highmem-96`\n- `n1-highcpu-16`\n- `n1-highcpu-32`\n- `n1-highcpu-64`\n- `n1-highcpu-96`\n\nLearn more about [using Compute Engine machine\ntypes](/ml-engine/docs/machine-types#compute-engine-machine-types).\n\nAlternatively, you can use the following legacy machine types:\n\n- `standard`\n- `large_model`\n- `complex_model_s`\n- `complex_model_m`\n- `complex_model_l`\n- `standard_gpu`\n- `complex_model_m_gpu`\n- `complex_model_l_gpu`\n- `standard_p100`\n- `complex_model_m_p100`\n- `standard_v100`\n- `large_model_v100`\n- `complex_model_m_v100`\n- `complex_model_l_v100`\n\nLearn more about [using legacy machine\ntypes](/ml-engine/docs/machine-types#legacy-machine-types).\n\nFinally, if you want to use a TPU for training, specify `cloud_tpu` in this\nfield. Learn more about the [special configuration options for training\nwith\nTPUs](/ml-engine/docs/tensorflow/using-tpus#configuring_a_custom_tpu_machine).",
           "type": "string"
         },
         "packageUris": {
@@ -1907,7 +1998,7 @@
           "type": "string"
         },
         "parameterServerType": {
-          "description": "Optional. Specifies the type of virtual machine to use for your training\njob's parameter server.\n\nThe supported values are the same as those described in the entry for\n`master_type`.\n\nThis value must be consistent with the category of machine type that\n`masterType` uses. In other words, both must be AI Platform machine\ntypes or both must be Compute Engine machine types.\n\nThis value must be present when `scaleTier` is set to `CUSTOM` and\n`parameter_server_count` is greater than zero.",
+          "description": "Optional. Specifies the type of virtual machine to use for your training\njob's parameter server.\n\nThe supported values are the same as those described in the entry for\n`master_type`.\n\nThis value must be consistent with the category of machine type that\n`masterType` uses. In other words, both must be Compute Engine machine\ntypes or both must be legacy machine types.\n\nThis value must be present when `scaleTier` is set to `CUSTOM` and\n`parameter_server_count` is greater than zero.",
           "type": "string"
         },
         "pythonModule": {
@@ -1946,6 +2037,10 @@
           ],
           "type": "string"
         },
+        "useChiefInTfConfig": {
+          "description": "Optional. Use 'chief' instead of 'master' in TF_CONFIG when Custom\nContainer is used and evaluator is not specified.\n\nDefaults to false.",
+          "type": "boolean"
+        },
         "workerConfig": {
           "$ref": "GoogleCloudMlV1__ReplicaConfig",
           "description": "Optional. The configuration for workers.\n\nYou should only set `workerConfig.acceleratorConfig` if `workerType` is set\nto a Compute Engine machine type. [Learn about restrictions on accelerator\nconfigurations for\ntraining.](/ml-engine/docs/tensorflow/using-gpus#compute-engine-machine-types-with-gpu)\n\nSet `workerConfig.imageUri` only if you build a custom image for your\nworker. If `workerConfig.imageUri` has not been set, AI Platform uses\nthe value of `masterConfig.imageUri`. Learn more about\n[configuring custom\ncontainers](/ml-engine/docs/distributed-training-containers)."
@@ -1956,7 +2051,7 @@
           "type": "string"
         },
         "workerType": {
-          "description": "Optional. Specifies the type of virtual machine to use for your training\njob's worker nodes.\n\nThe supported values are the same as those described in the entry for\n`masterType`.\n\nThis value must be consistent with the category of machine type that\n`masterType` uses. In other words, both must be AI Platform machine\ntypes or both must be Compute Engine machine types.\n\nIf you use `cloud_tpu` for this value, see special instructions for\n[configuring a custom TPU\nmachine](/ml-engine/docs/tensorflow/using-tpus#configuring_a_custom_tpu_machine).\n\nThis value must be present when `scaleTier` is set to `CUSTOM` and\n`workerCount` is greater than zero.",
+          "description": "Optional. Specifies the type of virtual machine to use for your training\njob's worker nodes.\n\nThe supported values are the same as those described in the entry for\n`masterType`.\n\nThis value must be consistent with the category of machine type that\n`masterType` uses. In other words, both must be Compute Engine machine\ntypes or both must be legacy machine types.\n\nIf you use `cloud_tpu` for this value, see special instructions for\n[configuring a custom TPU\nmachine](/ml-engine/docs/tensorflow/using-tpus#configuring_a_custom_tpu_machine).\n\nThis value must be present when `scaleTier` is set to `CUSTOM` and\n`workerCount` is greater than zero.",
           "type": "string"
         }
       },
@@ -2006,9 +2101,13 @@
       "description": "Represents a version of the model.\n\nEach version is a trained model deployed in the cloud, ready to handle\nprediction requests. A model can have multiple versions. You can get\ninformation about all of the versions of a given model by calling\n[projects.models.versions.list](/ml-engine/reference/rest/v1/projects.models.versions/list).",
       "id": "GoogleCloudMlV1__Version",
       "properties": {
+        "acceleratorConfig": {
+          "$ref": "GoogleCloudMlV1__AcceleratorConfig",
+          "description": "Optional. Accelerator config for using GPUs for online prediction (beta).\nOnly specify this field if you have specified a Compute Engine (N1) machine\ntype in the `machineType` field. Learn more about [using GPUs for online\nprediction](/ml-engine/docs/machine-types-online-prediction#gpus)."
+        },
         "autoScaling": {
           "$ref": "GoogleCloudMlV1__AutoScaling",
-          "description": "Automatically scale the number of nodes used to serve the model in\nresponse to increases and decreases in traffic. Care should be\ntaken to ramp up traffic according to the model's ability to scale\nor you will start seeing increases in latency and 429 response codes."
+          "description": "Automatically scale the number of nodes used to serve the model in\nresponse to increases and decreases in traffic. Care should be\ntaken to ramp up traffic according to the model's ability to scale\nor you will start seeing increases in latency and 429 response codes.\n\nNote that you cannot use AutoScaling if your version uses\n[GPUs](#Version.FIELDS.accelerator_config). Instead, you must use specify\n`manual_scaling`."
         },
         "createTime": {
           "description": "Output only. The time the version was created.",
@@ -2032,8 +2131,12 @@
           "format": "byte",
           "type": "string"
         },
+        "explanationConfig": {
+          "$ref": "GoogleCloudMlV1__ExplanationConfig",
+          "description": "Optional. Configures explainability features on the model's version.\nSome explanation features require additional metadata to be loaded\nas part of the model payload."
+        },
         "framework": {
-          "description": "Optional. The machine learning framework AI Platform uses to train\nthis version of the model. Valid values are `TENSORFLOW`, `SCIKIT_LEARN`,\n`XGBOOST`. If you do not specify a framework, AI Platform\nwill analyze files in the deployment_uri to determine a framework. If you\nchoose `SCIKIT_LEARN` or `XGBOOST`, you must also set the runtime version\nof the model to 1.4 or greater.\n\nDo **not** specify a framework if you're deploying a [custom\nprediction routine](/ml-engine/docs/tensorflow/custom-prediction-routines).",
+          "description": "Optional. The machine learning framework AI Platform uses to train\nthis version of the model. Valid values are `TENSORFLOW`, `SCIKIT_LEARN`,\n`XGBOOST`. If you do not specify a framework, AI Platform\nwill analyze files in the deployment_uri to determine a framework. If you\nchoose `SCIKIT_LEARN` or `XGBOOST`, you must also set the runtime version\nof the model to 1.4 or greater.\n\nDo **not** specify a framework if you're deploying a [custom\nprediction routine](/ml-engine/docs/tensorflow/custom-prediction-routines).\n\nIf you specify a [Compute Engine (N1) machine\ntype](/ml-engine/docs/machine-types-online-prediction) in the\n`machineType` field, you must specify `TENSORFLOW`\nfor the framework.",
           "enum": [
             "FRAMEWORK_UNSPECIFIED",
             "TENSORFLOW",
@@ -2065,7 +2168,7 @@
           "type": "string"
         },
         "machineType": {
-          "description": "Optional. The type of machine on which to serve the model. Currently only\napplies to online prediction service.\n\u003cdl\u003e\n  \u003cdt\u003emls1-c1-m2\u003c/dt\u003e\n  \u003cdd\u003e\n  The \u003cb\u003edefault\u003c/b\u003e machine type, with 1 core and 2 GB RAM. The deprecated\n  name for this machine type is \"mls1-highmem-1\".\n  \u003c/dd\u003e\n  \u003cdt\u003emls1-c4-m2\u003c/dt\u003e\n  \u003cdd\u003e\n  In \u003cb\u003eBeta\u003c/b\u003e. This machine type has 4 cores and 2 GB RAM. The\n  deprecated name for this machine type is \"mls1-highcpu-4\".\n  \u003c/dd\u003e\n\u003c/dl\u003e",
+          "description": "Optional. The type of machine on which to serve the model. Currently only\napplies to online prediction service. If this field is not specified, it\ndefaults to `mls1-c1-m2`.\n\nOnline prediction supports the following machine types:\n\n* `mls1-c1-m2`\n* `mls1-c4-m2`\n* `n1-standard-2`\n* `n1-standard-4`\n* `n1-standard-8`\n* `n1-standard-16`\n* `n1-standard-32`\n* `n1-highmem-2`\n* `n1-highmem-4`\n* `n1-highmem-8`\n* `n1-highmem-16`\n* `n1-highmem-32`\n* `n1-highcpu-2`\n* `n1-highcpu-4`\n* `n1-highcpu-8`\n* `n1-highcpu-16`\n* `n1-highcpu-32`\n\n`mls1-c1-m2` is generally available. All other machine types are available\nin beta. Learn more about the [differences between machine\ntypes](/ml-engine/docs/machine-types-online-prediction).",
           "type": "string"
         },
         "manualScaling": {
@@ -2084,12 +2187,16 @@
           "type": "array"
         },
         "predictionClass": {
-          "description": "Optional. The fully qualified name\n(\u003cvar\u003emodule_name\u003c/var\u003e.\u003cvar\u003eclass_name\u003c/var\u003e) of a class that implements\nthe Predictor interface described in this reference field. The module\ncontaining this class should be included in a package provided to the\n[`packageUris` field](#Version.FIELDS.package_uris).\n\nSpecify this field if and only if you are deploying a [custom prediction\nroutine (beta)](/ml-engine/docs/tensorflow/custom-prediction-routines).\nIf you specify this field, you must set\n[`runtimeVersion`](#Version.FIELDS.runtime_version) to 1.4 or greater.\n\nThe following code sample provides the Predictor interface:\n\n```py\nclass Predictor(object):\n\"\"\"Interface for constructing custom predictors.\"\"\"\n\ndef predict(self, instances, **kwargs):\n    \"\"\"Performs custom prediction.\n\n    Instances are the decoded values from the request. They have already\n    been deserialized from JSON.\n\n    Args:\n        instances: A list of prediction input instances.\n        **kwargs: A dictionary of keyword args provided as additional\n            fields on the predict request body.\n\n    Returns:\n        A list of outputs containing the prediction results. This list must\n        be JSON serializable.\n    \"\"\"\n    raise NotImplementedError()\n\n@classmethod\ndef from_path(cls, model_dir):\n    \"\"\"Creates an instance of Predictor using the given path.\n\n    Loading of the predictor should be done in this method.\n\n    Args:\n        model_dir: The local directory that contains the exported model\n            file along with any additional files uploaded when creating the\n            version resource.\n\n    Returns:\n        An instance implementing this Predictor class.\n    \"\"\"\n    raise NotImplementedError()\n```\n\nLearn more about [the Predictor interface and custom prediction\nroutines](/ml-engine/docs/tensorflow/custom-prediction-routines).",
+          "description": "Optional. The fully qualified name\n(\u003cvar\u003emodule_name\u003c/var\u003e.\u003cvar\u003eclass_name\u003c/var\u003e) of a class that implements\nthe Predictor interface described in this reference field. The module\ncontaining this class should be included in a package provided to the\n[`packageUris` field](#Version.FIELDS.package_uris).\n\nSpecify this field if and only if you are deploying a [custom prediction\nroutine (beta)](/ml-engine/docs/tensorflow/custom-prediction-routines).\nIf you specify this field, you must set\n[`runtimeVersion`](#Version.FIELDS.runtime_version) to 1.4 or greater and\nyou must set `machineType` to a [legacy (MLS1)\nmachine type](/ml-engine/docs/machine-types-online-prediction).\n\nThe following code sample provides the Predictor interface:\n\n\u003cpre style=\"max-width: 626px;\"\u003e\nclass Predictor(object):\n\"\"\"Interface for constructing custom predictors.\"\"\"\n\ndef predict(self, instances, **kwargs):\n    \"\"\"Performs custom prediction.\n\n    Instances are the decoded values from the request. They have already\n    been deserialized from JSON.\n\n    Args:\n        instances: A list of prediction input instances.\n        **kwargs: A dictionary of keyword args provided as additional\n            fields on the predict request body.\n\n    Returns:\n        A list of outputs containing the prediction results. This list must\n        be JSON serializable.\n    \"\"\"\n    raise NotImplementedError()\n\n@classmethod\ndef from_path(cls, model_dir):\n    \"\"\"Creates an instance of Predictor using the given path.\n\n    Loading of the predictor should be done in this method.\n\n    Args:\n        model_dir: The local directory that contains the exported model\n            file along with any additional files uploaded when creating the\n            version resource.\n\n    Returns:\n        An instance implementing this Predictor class.\n    \"\"\"\n    raise NotImplementedError()\n\u003c/pre\u003e\n\nLearn more about [the Predictor interface and custom prediction\nroutines](/ml-engine/docs/tensorflow/custom-prediction-routines).",
           "type": "string"
         },
         "pythonVersion": {
           "description": "Optional. The version of Python used in prediction. If not set, the default\nversion is '2.7'. Python '3.5' is available when `runtime_version` is set\nto '1.4' and above. Python '2.7' works with all supported runtime versions.",
           "type": "string"
+        },
+        "requestLoggingConfig": {
+          "$ref": "GoogleCloudMlV1__RequestLoggingConfig",
+          "description": "Optional. Configures the request-response pair logging on predictions from\nthis Version."
         },
         "runtimeVersion": {
           "description": "Optional. The AI Platform runtime version to use for this deployment.\nIf not set, AI Platform uses the default stable version, 1.0. For more\ninformation, see the\n[runtime version list](/ml-engine/docs/runtime-version-list) and\n[how to manage runtime versions](/ml-engine/docs/versioning).",
@@ -2193,7 +2300,7 @@
       "type": "object"
     },
     "GoogleIamV1__Policy": {
-      "description": "Defines an Identity and Access Management (IAM) policy. It is used to\nspecify access control policies for Cloud Platform resources.\n\n\nA `Policy` consists of a list of `bindings`. A `binding` binds a list of\n`members` to a `role`, where the members can be user accounts, Google groups,\nGoogle domains, and service accounts. A `role` is a named list of permissions\ndefined by IAM.\n\n**JSON Example**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles/owner\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-other-app@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles/viewer\",\n          \"members\": [\"user:sean@example.com\"]\n        }\n      ]\n    }\n\n**YAML Example**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-other-app@appspot.gserviceaccount.com\n      role: roles/owner\n    - members:\n      - user:sean@example.com\n      role: roles/viewer\n\n\nFor a description of IAM and its features, see the\n[IAM developer's guide](https://cloud.google.com/iam/docs).",
+      "description": "Defines an Identity and Access Management (IAM) policy. It is used to\nspecify access control policies for Cloud Platform resources.\n\n\nA `Policy` is a collection of `bindings`. A `binding` binds one or more\n`members` to a single `role`. Members can be user accounts, service accounts,\nGoogle groups, and domains (such as G Suite). A `role` is a named list of\npermissions (defined by IAM or configured by users). A `binding` can\noptionally specify a `condition`, which is a logic expression that further\nconstrains the role binding based on attributes about the request and/or\ntarget resource.\n\n**JSON Example**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles/resourcemanager.organizationAdmin\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-project-id@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles/resourcemanager.organizationViewer\",\n          \"members\": [\"user:eve@example.com\"],\n          \"condition\": {\n            \"title\": \"expirable access\",\n            \"description\": \"Does not grant access after Sep 2020\",\n            \"expression\": \"request.time \u003c\n            timestamp('2020-10-01T00:00:00.000Z')\",\n          }\n        }\n      ]\n    }\n\n**YAML Example**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-project-id@appspot.gserviceaccount.com\n      role: roles/resourcemanager.organizationAdmin\n    - members:\n      - user:eve@example.com\n      role: roles/resourcemanager.organizationViewer\n      condition:\n        title: expirable access\n        description: Does not grant access after Sep 2020\n        expression: request.time \u003c timestamp('2020-10-01T00:00:00.000Z')\n\nFor a description of IAM and its features, see the\n[IAM developer's guide](https://cloud.google.com/iam/docs).",
       "id": "GoogleIamV1__Policy",
       "properties": {
         "auditConfigs": {
@@ -2204,19 +2311,19 @@
           "type": "array"
         },
         "bindings": {
-          "description": "Associates a list of `members` to a `role`.\n`bindings` with no members will result in an error.",
+          "description": "Associates a list of `members` to a `role`. Optionally may specify a\n`condition` that determines when binding is in effect.\n`bindings` with no members will result in an error.",
           "items": {
             "$ref": "GoogleIamV1__Binding"
           },
           "type": "array"
         },
         "etag": {
-          "description": "`etag` is used for optimistic concurrency control as a way to help\nprevent simultaneous updates of a policy from overwriting each other.\nIt is strongly suggested that systems make use of the `etag` in the\nread-modify-write cycle to perform policy updates in order to avoid race\nconditions: An `etag` is returned in the response to `getIamPolicy`, and\nsystems are expected to put that etag in the request to `setIamPolicy` to\nensure that their change will be applied to the same version of the policy.\n\nIf no `etag` is provided in the call to `setIamPolicy`, then the existing\npolicy is overwritten.",
+          "description": "`etag` is used for optimistic concurrency control as a way to help\nprevent simultaneous updates of a policy from overwriting each other.\nIt is strongly suggested that systems make use of the `etag` in the\nread-modify-write cycle to perform policy updates in order to avoid race\nconditions: An `etag` is returned in the response to `getIamPolicy`, and\nsystems are expected to put that etag in the request to `setIamPolicy` to\nensure that their change will be applied to the same version of the policy.\n\nIf no `etag` is provided in the call to `setIamPolicy`, then the existing\npolicy is overwritten. Due to blind-set semantics of an etag-less policy,\n'setIamPolicy' will not fail even if the incoming policy version does not\nmeet the requirements for modifying the stored policy.",
           "format": "byte",
           "type": "string"
         },
         "version": {
-          "description": "Deprecated.",
+          "description": "Specifies the format of the policy.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nOperations affecting conditional bindings must specify version 3. This can\nbe either setting a conditional policy, modifying a conditional binding,\nor removing a binding (conditional or unconditional) from the stored\nconditional policy.\nOperations on non-conditional policies may specify any valid value or\nleave the field unset.\n\nIf no etag is provided in the call to `setIamPolicy`, version compliance\nchecks against the stored policy is skipped.",
           "format": "int32",
           "type": "integer"
         }
@@ -2378,7 +2485,7 @@
     }
   },
   "servicePath": "",
-  "title": "Cloud Machine Learning Engine",
+  "title": "AI Platform Training \u0026 Prediction API",
   "version": "v1",
   "version_module": true
 }

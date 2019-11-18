@@ -53,8 +53,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -154,7 +154,9 @@ type AllocateInfo struct {
 	// time
 	// window, the caller can choose to ignore these labels in the
 	// requests
-	// to achieve better client-side cache hits and quota aggregation.
+	// to achieve better client-side cache hits and quota aggregation for
+	// rate
+	// quota. This field is not populated for allocation quota checks.
 	UnusedArguments []string `json:"unusedArguments,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "UnusedArguments") to
@@ -519,6 +521,11 @@ type AuthenticationInfo struct {
 	// fail
 	// with a "permission denied" error.
 	PrincipalEmail string `json:"principalEmail,omitempty"`
+
+	// PrincipalSubject: String representation of identity of requesting
+	// party.
+	// Populated for both first and third party identities.
+	PrincipalSubject string `json:"principalSubject,omitempty"`
 
 	// ServiceAccountDelegationInfo: Identity delegation history of an
 	// authenticated service account that makes
@@ -1493,6 +1500,11 @@ type LogEntry struct {
 	//   "EMERGENCY" - (800) One or more systems are unusable.
 	Severity string `json:"severity,omitempty"`
 
+	// SourceLocation: Optional. Source code location information associated
+	// with the log entry,
+	// if any.
+	SourceLocation *LogEntrySourceLocation `json:"sourceLocation,omitempty"`
+
 	// StructPayload: The log entry payload, represented as a structure
 	// that
 	// is expressed as a JSON object.
@@ -1584,6 +1596,56 @@ type LogEntryOperation struct {
 
 func (s *LogEntryOperation) MarshalJSON() ([]byte, error) {
 	type NoMethod LogEntryOperation
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// LogEntrySourceLocation: Additional information about the source code
+// location that produced the log
+// entry.
+type LogEntrySourceLocation struct {
+	// File: Optional. Source file name. Depending on the runtime
+	// environment, this
+	// might be a simple name or a fully-qualified name.
+	File string `json:"file,omitempty"`
+
+	// Function: Optional. Human-readable name of the function or method
+	// being invoked, with
+	// optional context such as the class or package name. This information
+	// may be
+	// used in contexts such as the logs viewer, where a file and line
+	// number are
+	// less meaningful. The format can vary by language. For
+	// example:
+	// `qual.if.ied.Class.method` (Java), `dir/package.func` (Go),
+	// `function`
+	// (Python).
+	Function string `json:"function,omitempty"`
+
+	// Line: Optional. Line within the source file. 1-based; 0 indicates no
+	// line number
+	// available.
+	Line int64 `json:"line,omitempty,string"`
+
+	// ForceSendFields is a list of field names (e.g. "File") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "File") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *LogEntrySourceLocation) MarshalJSON() ([]byte, error) {
+	type NoMethod LogEntrySourceLocation
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -1855,17 +1917,6 @@ type Operation struct {
 	// check will be performed.
 	QuotaProperties *QuotaProperties `json:"quotaProperties,omitempty"`
 
-	// ResourceContainer: DO NOT USE. This field is deprecated, use
-	// "resources" field instead.
-	// The resource name of the parent of a resource in the resource
-	// hierarchy.
-	//
-	// This can be in one of the following formats:
-	//     - “projects/<project-id or project-number>”
-	//     - “folders/<folder-id>”
-	//     - “organizations/<organization-id>”
-	ResourceContainer string `json:"resourceContainer,omitempty"`
-
 	// Resources: The resources that are involved in the operation.
 	// The maximum supported number of entries in this field is 100.
 	Resources []*ResourceInfo `json:"resources,omitempty"`
@@ -1907,9 +1958,8 @@ func (s *Operation) MarshalJSON() ([]byte, error) {
 // network request.
 // The node can be either a service or an application that sends,
 // forwards,
-// or receives the request. Service peers should fill in the
-// `service`,
-// `principal`, and `labels` as appropriate.
+// or receives the request. Service peers should fill in
+// `principal` and `labels` as appropriate.
 type Peer struct {
 	// Ip: The IP address of the peer.
 	Ip string `json:"ip,omitempty"`
@@ -1932,11 +1982,6 @@ type Peer struct {
 	// the
 	// physical location where this peer is running.
 	RegionCode string `json:"regionCode,omitempty"`
-
-	// Service: The canonical service name of the peer.
-	//
-	// NOTE: different systems may have different service naming schemes.
-	Service string `json:"service,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Ip") to
 	// unconditionally include in API requests. By default, fields with
@@ -2141,13 +2186,15 @@ type QuotaOperation struct {
 	// idempotency in
 	// case of retries.
 	//
-	// UUID version 4 is recommended, though not required. In scenarios
-	// where an
-	// operation is computed from existing information and an idempotent id
+	// In order to ensure best performance and latency in the Quota
+	// backends,
+	// operation_ids are optimally associated with time, so that
+	// related
+	// operations can be accessed fast in storage. For this reason,
+	// the
+	// recommended token for services that intend to operate at a high QPS
 	// is
-	// desirable for deduplication purpose, UUID version 5 is recommended.
-	// See
-	// RFC 4122 for details.
+	// Unix time in nanos + UUID
 	OperationId string `json:"operationId,omitempty"`
 
 	// QuotaMetrics: Represents information about this operation. Each
@@ -2471,9 +2518,6 @@ type Request struct {
 	// Derived from the HTTP request `Authorization` header or equivalent.
 	Auth *Auth `json:"auth,omitempty"`
 
-	// Fragment: The HTTP URL fragment. No URL decoding is performed.
-	Fragment string `json:"fragment,omitempty"`
-
 	// Headers: The HTTP request headers. If multiple headers share the same
 	// key, they
 	// must be merged according to the HTTP spec. All header keys must
@@ -2681,9 +2725,11 @@ type Resource struct {
 	// hostname that actually serves the request.
 	Service string `json:"service,omitempty"`
 
-	// Type: The type of the resource. The scheme is platform-specific
+	// Type: The type of the resource. The syntax is platform-specific
 	// because
 	// different platforms define their resources differently.
+	//
+	// For Google APIs, the type format must be "{service}/{kind}".
 	Type string `json:"type,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Labels") to
@@ -2982,6 +3028,7 @@ func (c *ServicesAllocateQuotaCall) Header() http.Header {
 
 func (c *ServicesAllocateQuotaCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3143,6 +3190,7 @@ func (c *ServicesCheckCall) Header() http.Header {
 
 func (c *ServicesCheckCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -3301,6 +3349,7 @@ func (c *ServicesReportCall) Header() http.Header {
 
 func (c *ServicesReportCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

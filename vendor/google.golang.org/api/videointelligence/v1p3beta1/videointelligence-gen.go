@@ -51,8 +51,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -803,13 +803,12 @@ type GoogleCloudVideointelligenceV1SpeechTranscription struct {
 	// ranked by the recognizer.
 	Alternatives []*GoogleCloudVideointelligenceV1SpeechRecognitionAlternative `json:"alternatives,omitempty"`
 
-	// LanguageCode: Output only.
-	// The
+	// LanguageCode: Output only. The
 	// [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag
-	// of the
-	// language in this result. This language code was detected to have the
-	// most
-	// likelihood of being spoken in the audio.
+	// of
+	// the language in this result. This language code was detected to have
+	// the
+	// most likelihood of being spoken in the audio.
 	LanguageCode string `json:"languageCode,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Alternatives") to
@@ -1051,6 +1050,19 @@ type GoogleCloudVideointelligenceV1VideoAnnotationResults struct {
 	// There is exactly one element for each unique label.
 	SegmentLabelAnnotations []*GoogleCloudVideointelligenceV1LabelAnnotation `json:"segmentLabelAnnotations,omitempty"`
 
+	// SegmentPresenceLabelAnnotations: Presence label annotations on video
+	// level or user specified segment level.
+	// There is exactly one element for each unique label. Compared to
+	// the
+	// existing topical `segment_label_annotations`, this field presents
+	// more
+	// fine-grained, segment-level labels detected in video content and is
+	// made
+	// available only when the client sets `LabelDetectionConfig.model`
+	// to
+	// "builtin/latest" in the request.
+	SegmentPresenceLabelAnnotations []*GoogleCloudVideointelligenceV1LabelAnnotation `json:"segmentPresenceLabelAnnotations,omitempty"`
+
 	// ShotAnnotations: Shot annotations. Each shot is represented as a
 	// video segment.
 	ShotAnnotations []*GoogleCloudVideointelligenceV1VideoSegment `json:"shotAnnotations,omitempty"`
@@ -1058,6 +1070,17 @@ type GoogleCloudVideointelligenceV1VideoAnnotationResults struct {
 	// ShotLabelAnnotations: Topical label annotations on shot level.
 	// There is exactly one element for each unique label.
 	ShotLabelAnnotations []*GoogleCloudVideointelligenceV1LabelAnnotation `json:"shotLabelAnnotations,omitempty"`
+
+	// ShotPresenceLabelAnnotations: Presence label annotations on shot
+	// level. There is exactly one element for
+	// each unique label. Compared to the existing
+	// topical
+	// `shot_label_annotations`, this field presents more fine-grained,
+	// shot-level
+	// labels detected in video content and is made available only when the
+	// client
+	// sets `LabelDetectionConfig.model` to "builtin/latest" in the request.
+	ShotPresenceLabelAnnotations []*GoogleCloudVideointelligenceV1LabelAnnotation `json:"shotPresenceLabelAnnotations,omitempty"`
 
 	// SpeechTranscriptions: Speech transcription.
 	SpeechTranscriptions []*GoogleCloudVideointelligenceV1SpeechTranscription `json:"speechTranscriptions,omitempty"`
@@ -1875,13 +1898,12 @@ type GoogleCloudVideointelligenceV1beta2SpeechTranscription struct {
 	// ranked by the recognizer.
 	Alternatives []*GoogleCloudVideointelligenceV1beta2SpeechRecognitionAlternative `json:"alternatives,omitempty"`
 
-	// LanguageCode: Output only.
-	// The
+	// LanguageCode: Output only. The
 	// [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag
-	// of the
-	// language in this result. This language code was detected to have the
-	// most
-	// likelihood of being spoken in the audio.
+	// of
+	// the language in this result. This language code was detected to have
+	// the
+	// most likelihood of being spoken in the audio.
 	LanguageCode string `json:"languageCode,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Alternatives") to
@@ -2124,6 +2146,19 @@ type GoogleCloudVideointelligenceV1beta2VideoAnnotationResults struct {
 	// There is exactly one element for each unique label.
 	SegmentLabelAnnotations []*GoogleCloudVideointelligenceV1beta2LabelAnnotation `json:"segmentLabelAnnotations,omitempty"`
 
+	// SegmentPresenceLabelAnnotations: Presence label annotations on video
+	// level or user specified segment level.
+	// There is exactly one element for each unique label. Compared to
+	// the
+	// existing topical `segment_label_annotations`, this field presents
+	// more
+	// fine-grained, segment-level labels detected in video content and is
+	// made
+	// available only when the client sets `LabelDetectionConfig.model`
+	// to
+	// "builtin/latest" in the request.
+	SegmentPresenceLabelAnnotations []*GoogleCloudVideointelligenceV1beta2LabelAnnotation `json:"segmentPresenceLabelAnnotations,omitempty"`
+
 	// ShotAnnotations: Shot annotations. Each shot is represented as a
 	// video segment.
 	ShotAnnotations []*GoogleCloudVideointelligenceV1beta2VideoSegment `json:"shotAnnotations,omitempty"`
@@ -2131,6 +2166,17 @@ type GoogleCloudVideointelligenceV1beta2VideoAnnotationResults struct {
 	// ShotLabelAnnotations: Topical label annotations on shot level.
 	// There is exactly one element for each unique label.
 	ShotLabelAnnotations []*GoogleCloudVideointelligenceV1beta2LabelAnnotation `json:"shotLabelAnnotations,omitempty"`
+
+	// ShotPresenceLabelAnnotations: Presence label annotations on shot
+	// level. There is exactly one element for
+	// each unique label. Compared to the existing
+	// topical
+	// `shot_label_annotations`, this field presents more fine-grained,
+	// shot-level
+	// labels detected in video content and is made available only when the
+	// client
+	// sets `LabelDetectionConfig.model` to "builtin/latest" in the request.
+	ShotPresenceLabelAnnotations []*GoogleCloudVideointelligenceV1beta2LabelAnnotation `json:"shotPresenceLabelAnnotations,omitempty"`
 
 	// SpeechTranscriptions: Speech transcription.
 	SpeechTranscriptions []*GoogleCloudVideointelligenceV1beta2SpeechTranscription `json:"speechTranscriptions,omitempty"`
@@ -2949,13 +2995,12 @@ type GoogleCloudVideointelligenceV1p1beta1SpeechTranscription struct {
 	// ranked by the recognizer.
 	Alternatives []*GoogleCloudVideointelligenceV1p1beta1SpeechRecognitionAlternative `json:"alternatives,omitempty"`
 
-	// LanguageCode: Output only.
-	// The
+	// LanguageCode: Output only. The
 	// [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag
-	// of the
-	// language in this result. This language code was detected to have the
-	// most
-	// likelihood of being spoken in the audio.
+	// of
+	// the language in this result. This language code was detected to have
+	// the
+	// most likelihood of being spoken in the audio.
 	LanguageCode string `json:"languageCode,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Alternatives") to
@@ -3198,6 +3243,19 @@ type GoogleCloudVideointelligenceV1p1beta1VideoAnnotationResults struct {
 	// There is exactly one element for each unique label.
 	SegmentLabelAnnotations []*GoogleCloudVideointelligenceV1p1beta1LabelAnnotation `json:"segmentLabelAnnotations,omitempty"`
 
+	// SegmentPresenceLabelAnnotations: Presence label annotations on video
+	// level or user specified segment level.
+	// There is exactly one element for each unique label. Compared to
+	// the
+	// existing topical `segment_label_annotations`, this field presents
+	// more
+	// fine-grained, segment-level labels detected in video content and is
+	// made
+	// available only when the client sets `LabelDetectionConfig.model`
+	// to
+	// "builtin/latest" in the request.
+	SegmentPresenceLabelAnnotations []*GoogleCloudVideointelligenceV1p1beta1LabelAnnotation `json:"segmentPresenceLabelAnnotations,omitempty"`
+
 	// ShotAnnotations: Shot annotations. Each shot is represented as a
 	// video segment.
 	ShotAnnotations []*GoogleCloudVideointelligenceV1p1beta1VideoSegment `json:"shotAnnotations,omitempty"`
@@ -3205,6 +3263,17 @@ type GoogleCloudVideointelligenceV1p1beta1VideoAnnotationResults struct {
 	// ShotLabelAnnotations: Topical label annotations on shot level.
 	// There is exactly one element for each unique label.
 	ShotLabelAnnotations []*GoogleCloudVideointelligenceV1p1beta1LabelAnnotation `json:"shotLabelAnnotations,omitempty"`
+
+	// ShotPresenceLabelAnnotations: Presence label annotations on shot
+	// level. There is exactly one element for
+	// each unique label. Compared to the existing
+	// topical
+	// `shot_label_annotations`, this field presents more fine-grained,
+	// shot-level
+	// labels detected in video content and is made available only when the
+	// client
+	// sets `LabelDetectionConfig.model` to "builtin/latest" in the request.
+	ShotPresenceLabelAnnotations []*GoogleCloudVideointelligenceV1p1beta1LabelAnnotation `json:"shotPresenceLabelAnnotations,omitempty"`
 
 	// SpeechTranscriptions: Speech transcription.
 	SpeechTranscriptions []*GoogleCloudVideointelligenceV1p1beta1SpeechTranscription `json:"speechTranscriptions,omitempty"`
@@ -4023,13 +4092,12 @@ type GoogleCloudVideointelligenceV1p2beta1SpeechTranscription struct {
 	// ranked by the recognizer.
 	Alternatives []*GoogleCloudVideointelligenceV1p2beta1SpeechRecognitionAlternative `json:"alternatives,omitempty"`
 
-	// LanguageCode: Output only.
-	// The
+	// LanguageCode: Output only. The
 	// [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag
-	// of the
-	// language in this result. This language code was detected to have the
-	// most
-	// likelihood of being spoken in the audio.
+	// of
+	// the language in this result. This language code was detected to have
+	// the
+	// most likelihood of being spoken in the audio.
 	LanguageCode string `json:"languageCode,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Alternatives") to
@@ -4272,6 +4340,19 @@ type GoogleCloudVideointelligenceV1p2beta1VideoAnnotationResults struct {
 	// There is exactly one element for each unique label.
 	SegmentLabelAnnotations []*GoogleCloudVideointelligenceV1p2beta1LabelAnnotation `json:"segmentLabelAnnotations,omitempty"`
 
+	// SegmentPresenceLabelAnnotations: Presence label annotations on video
+	// level or user specified segment level.
+	// There is exactly one element for each unique label. Compared to
+	// the
+	// existing topical `segment_label_annotations`, this field presents
+	// more
+	// fine-grained, segment-level labels detected in video content and is
+	// made
+	// available only when the client sets `LabelDetectionConfig.model`
+	// to
+	// "builtin/latest" in the request.
+	SegmentPresenceLabelAnnotations []*GoogleCloudVideointelligenceV1p2beta1LabelAnnotation `json:"segmentPresenceLabelAnnotations,omitempty"`
+
 	// ShotAnnotations: Shot annotations. Each shot is represented as a
 	// video segment.
 	ShotAnnotations []*GoogleCloudVideointelligenceV1p2beta1VideoSegment `json:"shotAnnotations,omitempty"`
@@ -4279,6 +4360,17 @@ type GoogleCloudVideointelligenceV1p2beta1VideoAnnotationResults struct {
 	// ShotLabelAnnotations: Topical label annotations on shot level.
 	// There is exactly one element for each unique label.
 	ShotLabelAnnotations []*GoogleCloudVideointelligenceV1p2beta1LabelAnnotation `json:"shotLabelAnnotations,omitempty"`
+
+	// ShotPresenceLabelAnnotations: Presence label annotations on shot
+	// level. There is exactly one element for
+	// each unique label. Compared to the existing
+	// topical
+	// `shot_label_annotations`, this field presents more fine-grained,
+	// shot-level
+	// labels detected in video content and is made available only when the
+	// client
+	// sets `LabelDetectionConfig.model` to "builtin/latest" in the request.
+	ShotPresenceLabelAnnotations []*GoogleCloudVideointelligenceV1p2beta1LabelAnnotation `json:"shotPresenceLabelAnnotations,omitempty"`
 
 	// SpeechTranscriptions: Speech transcription.
 	SpeechTranscriptions []*GoogleCloudVideointelligenceV1p2beta1SpeechTranscription `json:"speechTranscriptions,omitempty"`
@@ -4468,7 +4560,7 @@ func (s *GoogleCloudVideointelligenceV1p3beta1AnnotateVideoProgress) MarshalJSON
 // GoogleCloudVideointelligenceV1p3beta1AnnotateVideoRequest: Video
 // annotation request.
 type GoogleCloudVideointelligenceV1p3beta1AnnotateVideoRequest struct {
-	// Features: Requested video annotation features.
+	// Features: Required. Requested video annotation features.
 	//
 	// Possible values:
 	//   "FEATURE_UNSPECIFIED" - Unspecified.
@@ -4480,6 +4572,7 @@ type GoogleCloudVideointelligenceV1p3beta1AnnotateVideoRequest struct {
 	//   "TEXT_DETECTION" - OCR text detection and tracking.
 	//   "OBJECT_TRACKING" - Object detection and tracking.
 	//   "LOGO_RECOGNITION" - Logo detection, tracking, and recognition.
+	//   "CELEBRITY_RECOGNITION" - Celebrity recognition.
 	Features []string `json:"features,omitempty"`
 
 	// InputContent: The video data bytes.
@@ -4506,16 +4599,16 @@ type GoogleCloudVideointelligenceV1p3beta1AnnotateVideoRequest struct {
 	// unset.
 	InputUri string `json:"inputUri,omitempty"`
 
-	// LocationId: Optional cloud region where annotation should take place.
-	// Supported cloud
+	// LocationId: Optional. Cloud region where annotation should take
+	// place. Supported cloud
 	// regions: `us-east1`, `us-west1`, `europe-west1`, `asia-east1`. If no
 	// region
 	// is specified, a region will be determined based on video file
 	// location.
 	LocationId string `json:"locationId,omitempty"`
 
-	// OutputUri: Optional location where the output (in JSON format) should
-	// be stored.
+	// OutputUri: Optional. Location where the output (in JSON format)
+	// should be stored.
 	// Currently, only [Google Cloud
 	// Storage](https://cloud.google.com/storage/)
 	// URIs are supported, which must be specified in the following
@@ -4582,6 +4675,115 @@ type GoogleCloudVideointelligenceV1p3beta1AnnotateVideoResponse struct {
 
 func (s *GoogleCloudVideointelligenceV1p3beta1AnnotateVideoResponse) MarshalJSON() ([]byte, error) {
 	type NoMethod GoogleCloudVideointelligenceV1p3beta1AnnotateVideoResponse
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// GoogleCloudVideointelligenceV1p3beta1Celebrity: Celebrity definition.
+type GoogleCloudVideointelligenceV1p3beta1Celebrity struct {
+	// Description: Textual description of additional information about the
+	// celebrity, if
+	// applicable.
+	Description string `json:"description,omitempty"`
+
+	// DisplayName: The celebrity name.
+	DisplayName string `json:"displayName,omitempty"`
+
+	// Name: The resource name of the celebrity. Have the
+	// format
+	// `video-intelligence/kg-mid` indicates a celebrity from preloaded
+	// gallery.
+	// kg-mid is the id in Google knowledge graph, which is unique for
+	// the
+	// celebrity.
+	Name string `json:"name,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Description") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Description") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GoogleCloudVideointelligenceV1p3beta1Celebrity) MarshalJSON() ([]byte, error) {
+	type NoMethod GoogleCloudVideointelligenceV1p3beta1Celebrity
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// GoogleCloudVideointelligenceV1p3beta1CelebrityRecognitionAnnotation:
+// Celebrity recognition annotation per video.
+type GoogleCloudVideointelligenceV1p3beta1CelebrityRecognitionAnnotation struct {
+	// CelebrityTracks: The tracks detected from the input video, including
+	// recognized celebrities
+	// and other detected faces in the video.
+	CelebrityTracks []*GoogleCloudVideointelligenceV1p3beta1CelebrityTrack `json:"celebrityTracks,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "CelebrityTracks") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "CelebrityTracks") to
+	// include in API requests with the JSON null value. By default, fields
+	// with empty values are omitted from API requests. However, any field
+	// with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GoogleCloudVideointelligenceV1p3beta1CelebrityRecognitionAnnotation) MarshalJSON() ([]byte, error) {
+	type NoMethod GoogleCloudVideointelligenceV1p3beta1CelebrityRecognitionAnnotation
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// GoogleCloudVideointelligenceV1p3beta1CelebrityTrack: The annotation
+// result of a celebrity face track. RecognizedCelebrity field
+// could be empty if the face track does not have any matched
+// celebrities.
+type GoogleCloudVideointelligenceV1p3beta1CelebrityTrack struct {
+	// Celebrities: Top N match of the celebrities for the face in this
+	// track.
+	Celebrities []*GoogleCloudVideointelligenceV1p3beta1RecognizedCelebrity `json:"celebrities,omitempty"`
+
+	// FaceTrack: A track of a person's face.
+	FaceTrack *GoogleCloudVideointelligenceV1p3beta1Track `json:"faceTrack,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Celebrities") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Celebrities") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GoogleCloudVideointelligenceV1p3beta1CelebrityTrack) MarshalJSON() ([]byte, error) {
+	type NoMethod GoogleCloudVideointelligenceV1p3beta1CelebrityTrack
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -5364,6 +5566,52 @@ func (s *GoogleCloudVideointelligenceV1p3beta1ObjectTrackingFrame) MarshalJSON()
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// GoogleCloudVideointelligenceV1p3beta1RecognizedCelebrity: The
+// recognized celebrity with confidence score.
+type GoogleCloudVideointelligenceV1p3beta1RecognizedCelebrity struct {
+	// Celebrity: The recognized celebrity.
+	Celebrity *GoogleCloudVideointelligenceV1p3beta1Celebrity `json:"celebrity,omitempty"`
+
+	// Confidence: Recognition confidence. Range [0, 1].
+	Confidence float64 `json:"confidence,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Celebrity") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Celebrity") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GoogleCloudVideointelligenceV1p3beta1RecognizedCelebrity) MarshalJSON() ([]byte, error) {
+	type NoMethod GoogleCloudVideointelligenceV1p3beta1RecognizedCelebrity
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+func (s *GoogleCloudVideointelligenceV1p3beta1RecognizedCelebrity) UnmarshalJSON(data []byte) error {
+	type NoMethod GoogleCloudVideointelligenceV1p3beta1RecognizedCelebrity
+	var s1 struct {
+		Confidence gensupport.JSONFloat64 `json:"confidence"`
+		*NoMethod
+	}
+	s1.NoMethod = (*NoMethod)(s)
+	if err := json.Unmarshal(data, &s1); err != nil {
+		return err
+	}
+	s.Confidence = float64(s1.Confidence)
+	return nil
+}
+
 // GoogleCloudVideointelligenceV1p3beta1ShotChangeDetectionConfig:
 // Config for SHOT_CHANGE_DETECTION.
 type GoogleCloudVideointelligenceV1p3beta1ShotChangeDetectionConfig struct {
@@ -5400,7 +5648,7 @@ func (s *GoogleCloudVideointelligenceV1p3beta1ShotChangeDetectionConfig) Marshal
 // to the speech recognizer to favor specific words and phrases
 // in the results.
 type GoogleCloudVideointelligenceV1p3beta1SpeechContext struct {
-	// Phrases: *Optional* A list of strings containing words and phrases
+	// Phrases: Optional. A list of strings containing words and phrases
 	// "hints" so that
 	// the speech recognition is more likely to recognize them. This can be
 	// used
@@ -5511,13 +5759,12 @@ type GoogleCloudVideointelligenceV1p3beta1SpeechTranscription struct {
 	// ranked by the recognizer.
 	Alternatives []*GoogleCloudVideointelligenceV1p3beta1SpeechRecognitionAlternative `json:"alternatives,omitempty"`
 
-	// LanguageCode: Output only.
-	// The
+	// LanguageCode: Output only. The
 	// [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag
-	// of the
-	// language in this result. This language code was detected to have the
-	// most
-	// likelihood of being spoken in the audio.
+	// of
+	// the language in this result. This language code was detected to have
+	// the
+	// most likelihood of being spoken in the audio.
 	LanguageCode string `json:"languageCode,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Alternatives") to
@@ -5546,19 +5793,18 @@ func (s *GoogleCloudVideointelligenceV1p3beta1SpeechTranscription) MarshalJSON()
 // GoogleCloudVideointelligenceV1p3beta1SpeechTranscriptionConfig:
 // Config for SPEECH_TRANSCRIPTION.
 type GoogleCloudVideointelligenceV1p3beta1SpeechTranscriptionConfig struct {
-	// AudioTracks: *Optional* For file formats, such as MXF or MKV,
+	// AudioTracks: Optional. For file formats, such as MXF or MKV,
 	// supporting multiple audio
 	// tracks, specify up to two tracks. Default: track 0.
 	AudioTracks []int64 `json:"audioTracks,omitempty"`
 
-	// DiarizationSpeakerCount: *Optional*
-	// If set, specifies the estimated number of speakers in the
-	// conversation.
+	// DiarizationSpeakerCount: Optional. If set, specifies the estimated
+	// number of speakers in the conversation.
 	// If not set, defaults to '2'.
 	// Ignored unless enable_speaker_diarization is set to true.
 	DiarizationSpeakerCount int64 `json:"diarizationSpeakerCount,omitempty"`
 
-	// EnableAutomaticPunctuation: *Optional* If 'true', adds punctuation to
+	// EnableAutomaticPunctuation: Optional. If 'true', adds punctuation to
 	// recognition result hypotheses.
 	// This feature is only available in select languages. Setting this
 	// for
@@ -5571,7 +5817,7 @@ type GoogleCloudVideointelligenceV1p3beta1SpeechTranscriptionConfig struct {
 	// future this may be exclusively available as a premium feature."
 	EnableAutomaticPunctuation bool `json:"enableAutomaticPunctuation,omitempty"`
 
-	// EnableSpeakerDiarization: *Optional* If 'true', enables speaker
+	// EnableSpeakerDiarization: Optional. If 'true', enables speaker
 	// detection for each recognized word in
 	// the top alternative of the recognition result using a speaker_tag
 	// provided
@@ -5584,14 +5830,14 @@ type GoogleCloudVideointelligenceV1p3beta1SpeechTranscriptionConfig struct {
 	// identify the speakers in the conversation over time.
 	EnableSpeakerDiarization bool `json:"enableSpeakerDiarization,omitempty"`
 
-	// EnableWordConfidence: *Optional* If `true`, the top result includes a
+	// EnableWordConfidence: Optional. If `true`, the top result includes a
 	// list of words and the
 	// confidence for those words. If `false`, no word-level
 	// confidence
 	// information is returned. The default is `false`.
 	EnableWordConfidence bool `json:"enableWordConfidence,omitempty"`
 
-	// FilterProfanity: *Optional* If set to `true`, the server will attempt
+	// FilterProfanity: Optional. If set to `true`, the server will attempt
 	// to filter out
 	// profanities, replacing all but the initial character in each filtered
 	// word
@@ -5600,8 +5846,8 @@ type GoogleCloudVideointelligenceV1p3beta1SpeechTranscriptionConfig struct {
 	// won't be filtered out.
 	FilterProfanity bool `json:"filterProfanity,omitempty"`
 
-	// LanguageCode: *Required* The language of the supplied audio as
-	// a
+	// LanguageCode: Required. *Required* The language of the supplied audio
+	// as a
 	// [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language
 	// tag.
 	// Example: "en-US".
@@ -5610,7 +5856,7 @@ type GoogleCloudVideointelligenceV1p3beta1SpeechTranscriptionConfig struct {
 	// for a list of the currently supported language codes.
 	LanguageCode string `json:"languageCode,omitempty"`
 
-	// MaxAlternatives: *Optional* Maximum number of recognition hypotheses
+	// MaxAlternatives: Optional. Maximum number of recognition hypotheses
 	// to be returned.
 	// Specifically, the maximum number of `SpeechRecognitionAlternative`
 	// messages
@@ -5621,7 +5867,7 @@ type GoogleCloudVideointelligenceV1p3beta1SpeechTranscriptionConfig struct {
 	// return a maximum of one. If omitted, will return a maximum of one.
 	MaxAlternatives int64 `json:"maxAlternatives,omitempty"`
 
-	// SpeechContexts: *Optional* A means to provide context to assist the
+	// SpeechContexts: Optional. A means to provide context to assist the
 	// speech recognition.
 	SpeechContexts []*GoogleCloudVideointelligenceV1p3beta1SpeechContext `json:"speechContexts,omitempty"`
 
@@ -5905,9 +6151,7 @@ func (s *GoogleCloudVideointelligenceV1p3beta1TextSegment) UnmarshalJSON(data []
 }
 
 // GoogleCloudVideointelligenceV1p3beta1TimestampedObject: For tracking
-// related features, such as LOGO_RECOGNITION,
-// FACE_DETECTION,
-// CELEBRITY_RECOGNITION, PERSON_DETECTION.
+// related features.
 // An object at time_offset with attributes, and located
 // with
 // normalized_bounding_box.
@@ -6018,6 +6262,7 @@ type GoogleCloudVideointelligenceV1p3beta1VideoAnnotationProgress struct {
 	//   "TEXT_DETECTION" - OCR text detection and tracking.
 	//   "OBJECT_TRACKING" - Object detection and tracking.
 	//   "LOGO_RECOGNITION" - Logo detection, tracking, and recognition.
+	//   "CELEBRITY_RECOGNITION" - Celebrity recognition.
 	Feature string `json:"feature,omitempty"`
 
 	// InputUri: Video file location in
@@ -6066,6 +6311,9 @@ func (s *GoogleCloudVideointelligenceV1p3beta1VideoAnnotationProgress) MarshalJS
 // GoogleCloudVideointelligenceV1p3beta1VideoAnnotationResults:
 // Annotation results for a single video.
 type GoogleCloudVideointelligenceV1p3beta1VideoAnnotationResults struct {
+	// CelebrityRecognitionAnnotations: Celebrity recognition annotations.
+	CelebrityRecognitionAnnotations *GoogleCloudVideointelligenceV1p3beta1CelebrityRecognitionAnnotation `json:"celebrityRecognitionAnnotations,omitempty"`
+
 	// Error: If set, indicates an error. Note that for a single
 	// `AnnotateVideoRequest`
 	// some videos may succeed and some may fail.
@@ -6098,6 +6346,19 @@ type GoogleCloudVideointelligenceV1p3beta1VideoAnnotationResults struct {
 	// There is exactly one element for each unique label.
 	SegmentLabelAnnotations []*GoogleCloudVideointelligenceV1p3beta1LabelAnnotation `json:"segmentLabelAnnotations,omitempty"`
 
+	// SegmentPresenceLabelAnnotations: Presence label annotations on video
+	// level or user specified segment level.
+	// There is exactly one element for each unique label. Compared to
+	// the
+	// existing topical `segment_label_annotations`, this field presents
+	// more
+	// fine-grained, segment-level labels detected in video content and is
+	// made
+	// available only when the client sets `LabelDetectionConfig.model`
+	// to
+	// "builtin/latest" in the request.
+	SegmentPresenceLabelAnnotations []*GoogleCloudVideointelligenceV1p3beta1LabelAnnotation `json:"segmentPresenceLabelAnnotations,omitempty"`
+
 	// ShotAnnotations: Shot annotations. Each shot is represented as a
 	// video segment.
 	ShotAnnotations []*GoogleCloudVideointelligenceV1p3beta1VideoSegment `json:"shotAnnotations,omitempty"`
@@ -6105,6 +6366,17 @@ type GoogleCloudVideointelligenceV1p3beta1VideoAnnotationResults struct {
 	// ShotLabelAnnotations: Topical label annotations on shot level.
 	// There is exactly one element for each unique label.
 	ShotLabelAnnotations []*GoogleCloudVideointelligenceV1p3beta1LabelAnnotation `json:"shotLabelAnnotations,omitempty"`
+
+	// ShotPresenceLabelAnnotations: Presence label annotations on shot
+	// level. There is exactly one element for
+	// each unique label. Compared to the existing
+	// topical
+	// `shot_label_annotations`, this field presents more fine-grained,
+	// shot-level
+	// labels detected in video content and is made available only when the
+	// client
+	// sets `LabelDetectionConfig.model` to "builtin/latest" in the request.
+	ShotPresenceLabelAnnotations []*GoogleCloudVideointelligenceV1p3beta1LabelAnnotation `json:"shotPresenceLabelAnnotations,omitempty"`
 
 	// SpeechTranscriptions: Speech transcription.
 	SpeechTranscriptions []*GoogleCloudVideointelligenceV1p3beta1SpeechTranscription `json:"speechTranscriptions,omitempty"`
@@ -6115,20 +6387,22 @@ type GoogleCloudVideointelligenceV1p3beta1VideoAnnotationResults struct {
 	// frame information associated with it.
 	TextAnnotations []*GoogleCloudVideointelligenceV1p3beta1TextAnnotation `json:"textAnnotations,omitempty"`
 
-	// ForceSendFields is a list of field names (e.g. "Error") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
+	// ForceSendFields is a list of field names (e.g.
+	// "CelebrityRecognitionAnnotations") to unconditionally include in API
+	// requests. By default, fields with empty values are omitted from API
+	// requests. However, any non-pointer, non-interface field appearing in
+	// ForceSendFields will be sent to the server regardless of whether the
+	// field is empty or not. This may be used to include empty fields in
+	// Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "Error") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
+	// NullFields is a list of field names (e.g.
+	// "CelebrityRecognitionAnnotations") to include in API requests with
+	// the JSON null value. By default, fields with empty values are omitted
+	// from API requests. However, any field with an empty value appearing
+	// in NullFields will be sent to the server as null. It is an error if a
+	// field in this list has a non-empty value. This may be used to include
+	// null fields in Patch requests.
 	NullFields []string `json:"-"`
 }
 
@@ -6490,6 +6764,7 @@ func (c *VideosAnnotateCall) Header() http.Header {
 
 func (c *VideosAnnotateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

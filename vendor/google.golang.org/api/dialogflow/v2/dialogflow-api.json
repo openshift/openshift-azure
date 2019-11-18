@@ -303,7 +303,7 @@
                   "type": "integer"
                 },
                 "pageToken": {
-                  "description": "Optional. The next_page_token value returned from a previous list request.",
+                  "description": "The next_page_token value returned from a previous list request.",
                   "location": "query",
                   "type": "string"
                 },
@@ -1173,7 +1173,7 @@
                 "entityTypes": {
                   "methods": {
                     "create": {
-                      "description": "Creates a session entity type.\n\nIf the specified session entity type already exists, overrides the session\nentity type.",
+                      "description": "Creates a session entity type.\n\nIf the specified session entity type already exists, overrides the session\nentity type.\n\nThis method doesn't work with Google Assistant integration.\nContact Dialogflow support if you need to use session entities\nwith Google Assistant integration.",
                       "flatPath": "v2/projects/{projectsId}/agent/sessions/{sessionsId}/entityTypes",
                       "httpMethod": "POST",
                       "id": "dialogflow.projects.agent.sessions.entityTypes.create",
@@ -1202,7 +1202,7 @@
                       ]
                     },
                     "delete": {
-                      "description": "Deletes the specified session entity type.",
+                      "description": "Deletes the specified session entity type.\n\nThis method doesn't work with Google Assistant integration.\nContact Dialogflow support if you need to use session entities\nwith Google Assistant integration.",
                       "flatPath": "v2/projects/{projectsId}/agent/sessions/{sessionsId}/entityTypes/{entityTypesId}",
                       "httpMethod": "DELETE",
                       "id": "dialogflow.projects.agent.sessions.entityTypes.delete",
@@ -1228,7 +1228,7 @@
                       ]
                     },
                     "get": {
-                      "description": "Retrieves the specified session entity type.",
+                      "description": "Retrieves the specified session entity type.\n\nThis method doesn't work with Google Assistant integration.\nContact Dialogflow support if you need to use session entities\nwith Google Assistant integration.",
                       "flatPath": "v2/projects/{projectsId}/agent/sessions/{sessionsId}/entityTypes/{entityTypesId}",
                       "httpMethod": "GET",
                       "id": "dialogflow.projects.agent.sessions.entityTypes.get",
@@ -1254,7 +1254,7 @@
                       ]
                     },
                     "list": {
-                      "description": "Returns the list of all session entity types in the specified session.",
+                      "description": "Returns the list of all session entity types in the specified session.\n\nThis method doesn't work with Google Assistant integration.\nContact Dialogflow support if you need to use session entities\nwith Google Assistant integration.",
                       "flatPath": "v2/projects/{projectsId}/agent/sessions/{sessionsId}/entityTypes",
                       "httpMethod": "GET",
                       "id": "dialogflow.projects.agent.sessions.entityTypes.list",
@@ -1291,7 +1291,7 @@
                       ]
                     },
                     "patch": {
-                      "description": "Updates the specified session entity type.",
+                      "description": "Updates the specified session entity type.\n\nThis method doesn't work with Google Assistant integration.\nContact Dialogflow support if you need to use session entities\nwith Google Assistant integration.",
                       "flatPath": "v2/projects/{projectsId}/agent/sessions/{sessionsId}/entityTypes/{entityTypesId}",
                       "httpMethod": "PATCH",
                       "id": "dialogflow.projects.agent.sessions.entityTypes.patch",
@@ -1331,8 +1331,136 @@
             }
           }
         },
+        "locations": {
+          "resources": {
+            "operations": {
+              "methods": {
+                "cancel": {
+                  "description": "Starts asynchronous cancellation on a long-running operation.  The server\nmakes a best effort to cancel the operation, but success is not\nguaranteed.  If the server doesn't support this method, it returns\n`google.rpc.Code.UNIMPLEMENTED`.  Clients can use\nOperations.GetOperation or\nother methods to check whether the cancellation succeeded or whether the\noperation completed despite cancellation. On successful cancellation,\nthe operation is not deleted; instead, it becomes an operation with\nan Operation.error value with a google.rpc.Status.code of 1,\ncorresponding to `Code.CANCELLED`.",
+                  "flatPath": "v2/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
+                  "httpMethod": "POST",
+                  "id": "dialogflow.projects.locations.operations.cancel",
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "parameters": {
+                    "name": {
+                      "description": "The name of the operation resource to be cancelled.",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "path": "v2/{+name}:cancel",
+                  "response": {
+                    "$ref": "GoogleProtobufEmpty"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform",
+                    "https://www.googleapis.com/auth/dialogflow"
+                  ]
+                },
+                "get": {
+                  "description": "Gets the latest state of a long-running operation.  Clients can use this\nmethod to poll the operation result at intervals as recommended by the API\nservice.",
+                  "flatPath": "v2/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}",
+                  "httpMethod": "GET",
+                  "id": "dialogflow.projects.locations.operations.get",
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "parameters": {
+                    "name": {
+                      "description": "The name of the operation resource.",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "path": "v2/{+name}",
+                  "response": {
+                    "$ref": "GoogleLongrunningOperation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform",
+                    "https://www.googleapis.com/auth/dialogflow"
+                  ]
+                },
+                "list": {
+                  "description": "Lists operations that match the specified filter in the request. If the\nserver doesn't support this method, it returns `UNIMPLEMENTED`.\n\nNOTE: the `name` binding allows API services to override the binding\nto use different resource name schemes, such as `users/*/operations`. To\noverride the binding, API services can add a binding such as\n`\"/v1/{name=users/*}/operations\"` to their service configuration.\nFor backwards compatibility, the default name includes the operations\ncollection id, however overriding users must ensure the name binding\nis the parent resource, without the operations collection id.",
+                  "flatPath": "v2/projects/{projectsId}/locations/{locationsId}/operations",
+                  "httpMethod": "GET",
+                  "id": "dialogflow.projects.locations.operations.list",
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "parameters": {
+                    "filter": {
+                      "description": "The standard list filter.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "The name of the operation's parent resource.",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+$",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "pageSize": {
+                      "description": "The standard list page size.",
+                      "format": "int32",
+                      "location": "query",
+                      "type": "integer"
+                    },
+                    "pageToken": {
+                      "description": "The standard list page token.",
+                      "location": "query",
+                      "type": "string"
+                    }
+                  },
+                  "path": "v2/{+name}/operations",
+                  "response": {
+                    "$ref": "GoogleLongrunningListOperationsResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform",
+                    "https://www.googleapis.com/auth/dialogflow"
+                  ]
+                }
+              }
+            }
+          }
+        },
         "operations": {
           "methods": {
+            "cancel": {
+              "description": "Starts asynchronous cancellation on a long-running operation.  The server\nmakes a best effort to cancel the operation, but success is not\nguaranteed.  If the server doesn't support this method, it returns\n`google.rpc.Code.UNIMPLEMENTED`.  Clients can use\nOperations.GetOperation or\nother methods to check whether the cancellation succeeded or whether the\noperation completed despite cancellation. On successful cancellation,\nthe operation is not deleted; instead, it becomes an operation with\nan Operation.error value with a google.rpc.Status.code of 1,\ncorresponding to `Code.CANCELLED`.",
+              "flatPath": "v2/projects/{projectsId}/operations/{operationsId}:cancel",
+              "httpMethod": "POST",
+              "id": "dialogflow.projects.operations.cancel",
+              "parameterOrder": [
+                "name"
+              ],
+              "parameters": {
+                "name": {
+                  "description": "The name of the operation resource to be cancelled.",
+                  "location": "path",
+                  "pattern": "^projects/[^/]+/operations/[^/]+$",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "path": "v2/{+name}:cancel",
+              "response": {
+                "$ref": "GoogleProtobufEmpty"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/dialogflow"
+              ]
+            },
             "get": {
               "description": "Gets the latest state of a long-running operation.  Clients can use this\nmethod to poll the operation result at intervals as recommended by the API\nservice.",
               "flatPath": "v2/projects/{projectsId}/operations/{operationsId}",
@@ -1406,7 +1534,7 @@
       }
     }
   },
-  "revision": "20190717",
+  "revision": "20191102",
   "rootUrl": "https://dialogflow.googleapis.com/",
   "schemas": {
     "GoogleCloudDialogflowV2Agent": {
@@ -1773,6 +1901,10 @@
           "description": "Required. The name of the entity type.",
           "type": "string"
         },
+        "enableFuzzyExtraction": {
+          "description": "Optional. Enables fuzzy entity extraction during classification.",
+          "type": "boolean"
+        },
         "entities": {
           "description": "Optional. The collection of entity entries associated with the entity type.",
           "items": {
@@ -1785,12 +1917,14 @@
           "enum": [
             "KIND_UNSPECIFIED",
             "KIND_MAP",
-            "KIND_LIST"
+            "KIND_LIST",
+            "KIND_REGEXP"
           ],
           "enumDescriptions": [
             "Not specified. This value should be never used.",
             "Map entity types allow mapping of a group of synonyms to a canonical\nvalue.",
-            "List entity types contain a set of entries that do not map to canonical\nvalues. However, list entity types can contain references to other entity\ntypes (with or without aliases)."
+            "List entity types contain a set of entries that do not map to canonical\nvalues. However, list entity types can contain references to other entity\ntypes (with or without aliases).",
+            "Regexp entity types allow to specify regular expressions in entries\nvalues."
           ],
           "type": "string"
         },
@@ -1861,7 +1995,7 @@
       "id": "GoogleCloudDialogflowV2ExportAgentRequest",
       "properties": {
         "agentUri": {
-          "description": "Optional. The\n[Google Cloud Storage](https://cloud.google.com/storage/docs/)\nURI to export the agent to.\nThe format of this URI must be `gs://\u003cbucket-name\u003e/\u003cobject-name\u003e`.\nIf left unspecified, the serialized agent is returned inline.",
+          "description": "Required. The [Google Cloud Storage](https://cloud.google.com/storage/docs/)\nURI to export the agent to.\nThe format of this URI must be `gs://\u003cbucket-name\u003e/\u003cobject-name\u003e`.\nIf left unspecified, the serialized agent is returned inline.",
           "type": "string"
         }
       },
@@ -1872,7 +2006,7 @@
       "id": "GoogleCloudDialogflowV2ExportAgentResponse",
       "properties": {
         "agentContent": {
-          "description": "The exported agent.\n\nExample for how to export an agent to a zip file via a command line:\n\u003cpre\u003ecurl \\\n  'https://dialogflow.googleapis.com/v2/projects/\u0026lt;project_name\u0026gt;/agent:export'\\\n  -X POST \\\n  -H 'Authorization: Bearer '$(gcloud auth application-default\n  print-access-token) \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/json' \\\n  --compressed \\\n  --data-binary '{}' \\\n| grep agentContent | sed -e 's/.*\"agentContent\": \"\\([^\"]*\\)\".*/\\1/' \\\n| base64 --decode \u003e \u0026lt;agent zip file\u0026gt;\u003c/pre\u003e",
+          "description": "Zip compressed raw byte content for agent.",
           "format": "byte",
           "type": "string"
         },
@@ -1888,7 +2022,7 @@
       "id": "GoogleCloudDialogflowV2ImportAgentRequest",
       "properties": {
         "agentContent": {
-          "description": "The agent to import.\n\nExample for how to import an agent via the command line:\n\u003cpre\u003ecurl \\\n  'https://dialogflow.googleapis.com/v2/projects/\u0026lt;project_name\u0026gt;/agent:import\\\n   -X POST \\\n   -H 'Authorization: Bearer '$(gcloud auth application-default\n   print-access-token) \\\n   -H 'Accept: application/json' \\\n   -H 'Content-Type: application/json' \\\n   --compressed \\\n   --data-binary \"{\n      'agentContent': '$(cat \u0026lt;agent zip file\u0026gt; | base64 -w 0)'\n   }\"\u003c/pre\u003e",
+          "description": "Zip compressed raw byte content for agent.",
           "format": "byte",
           "type": "string"
         },
@@ -2068,7 +2202,7 @@
           "type": "string"
         },
         "priority": {
-          "description": "Optional. The priority of this intent. Higher numbers represent higher\npriorities. If this is zero or unspecified, we use the default\npriority 500000.\n\nNegative numbers mean that the intent is disabled.",
+          "description": "Optional. The priority of this intent. Higher numbers represent higher\npriorities.\n\n- If the supplied value is unspecified or 0, the service\n  translates the value to 500,000, which corresponds to the\n  `Normal` priority in the console.\n- If the supplied value is negative, the intent is ignored\n  in runtime detect intent requests.",
           "format": "int32",
           "type": "integer"
         },
@@ -2141,6 +2275,10 @@
           "$ref": "GoogleCloudDialogflowV2IntentMessageBasicCard",
           "description": "The basic card response for Actions on Google."
         },
+        "browseCarouselCard": {
+          "$ref": "GoogleCloudDialogflowV2IntentMessageBrowseCarouselCard",
+          "description": "Browse carousel card for Actions on Google."
+        },
         "card": {
           "$ref": "GoogleCloudDialogflowV2IntentMessageCard",
           "description": "The card response."
@@ -2160,6 +2298,10 @@
         "listSelect": {
           "$ref": "GoogleCloudDialogflowV2IntentMessageListSelect",
           "description": "The list card response for Actions on Google."
+        },
+        "mediaContent": {
+          "$ref": "GoogleCloudDialogflowV2IntentMessageMediaContent",
+          "description": "The media content card for Actions on Google."
         },
         "payload": {
           "additionalProperties": {
@@ -2208,6 +2350,10 @@
         "suggestions": {
           "$ref": "GoogleCloudDialogflowV2IntentMessageSuggestions",
           "description": "The suggestion chips for Actions on Google."
+        },
+        "tableCard": {
+          "$ref": "GoogleCloudDialogflowV2IntentMessageTableCard",
+          "description": "Table card for Actions on Google."
         },
         "text": {
           "$ref": "GoogleCloudDialogflowV2IntentMessageText",
@@ -2272,6 +2418,90 @@
       },
       "type": "object"
     },
+    "GoogleCloudDialogflowV2IntentMessageBrowseCarouselCard": {
+      "description": "Browse Carousel Card for Actions on Google.\nhttps://developers.google.com/actions/assistant/responses#browsing_carousel",
+      "id": "GoogleCloudDialogflowV2IntentMessageBrowseCarouselCard",
+      "properties": {
+        "imageDisplayOptions": {
+          "description": "Optional. Settings for displaying the image. Applies to every image in\nitems.",
+          "enum": [
+            "IMAGE_DISPLAY_OPTIONS_UNSPECIFIED",
+            "GRAY",
+            "WHITE",
+            "CROPPED",
+            "BLURRED_BACKGROUND"
+          ],
+          "enumDescriptions": [
+            "Fill the gaps between the image and the image container with gray\nbars.",
+            "Fill the gaps between the image and the image container with gray\nbars.",
+            "Fill the gaps between the image and the image container with white\nbars.",
+            "Image is scaled such that the image width and height match or exceed\nthe container dimensions. This may crop the top and bottom of the\nimage if the scaled image height is greater than the container\nheight, or crop the left and right of the image if the scaled image\nwidth is greater than the container width. This is similar to \"Zoom\nMode\" on a widescreen TV when playing a 4:3 video.",
+            "Pad the gaps between image and image frame with a blurred copy of the\nsame image."
+          ],
+          "type": "string"
+        },
+        "items": {
+          "description": "Required. List of items in the Browse Carousel Card. Minimum of two\nitems, maximum of ten.",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2IntentMessageBrowseCarouselCardBrowseCarouselCardItem"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2IntentMessageBrowseCarouselCardBrowseCarouselCardItem": {
+      "description": "Browsing carousel tile",
+      "id": "GoogleCloudDialogflowV2IntentMessageBrowseCarouselCardBrowseCarouselCardItem",
+      "properties": {
+        "description": {
+          "description": "Optional. Description of the carousel item. Maximum of four lines of\ntext.",
+          "type": "string"
+        },
+        "footer": {
+          "description": "Optional. Text that appears at the bottom of the Browse Carousel\nCard. Maximum of one line of text.",
+          "type": "string"
+        },
+        "image": {
+          "$ref": "GoogleCloudDialogflowV2IntentMessageImage",
+          "description": "Optional. Hero image for the carousel item."
+        },
+        "openUriAction": {
+          "$ref": "GoogleCloudDialogflowV2IntentMessageBrowseCarouselCardBrowseCarouselCardItemOpenUrlAction",
+          "description": "Required. Action to present to the user."
+        },
+        "title": {
+          "description": "Required. Title of the carousel item. Maximum of two lines of text.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2IntentMessageBrowseCarouselCardBrowseCarouselCardItemOpenUrlAction": {
+      "description": "Actions on Google action to open a given url.",
+      "id": "GoogleCloudDialogflowV2IntentMessageBrowseCarouselCardBrowseCarouselCardItemOpenUrlAction",
+      "properties": {
+        "url": {
+          "description": "Required. URL",
+          "type": "string"
+        },
+        "urlTypeHint": {
+          "description": "Optional. Specifies the type of viewer that is used when opening\nthe URL. Defaults to opening via web browser.",
+          "enum": [
+            "URL_TYPE_HINT_UNSPECIFIED",
+            "AMP_ACTION",
+            "AMP_CONTENT"
+          ],
+          "enumDescriptions": [
+            "Unspecified",
+            "Url would be an amp action",
+            "URL that points directly to AMP content, or to a canonical URL\nwhich refers to AMP content via \u003clink rel=\"amphtml\"\u003e."
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "GoogleCloudDialogflowV2IntentMessageCard": {
       "description": "The card response message.",
       "id": "GoogleCloudDialogflowV2IntentMessageCard",
@@ -2299,7 +2529,7 @@
       "type": "object"
     },
     "GoogleCloudDialogflowV2IntentMessageCardButton": {
-      "description": "Optional. Contains information about a button.",
+      "description": "Contains information about a button.",
       "id": "GoogleCloudDialogflowV2IntentMessageCardButton",
       "properties": {
         "postback": {
@@ -2350,6 +2580,33 @@
       },
       "type": "object"
     },
+    "GoogleCloudDialogflowV2IntentMessageColumnProperties": {
+      "description": "Column properties for TableCard.",
+      "id": "GoogleCloudDialogflowV2IntentMessageColumnProperties",
+      "properties": {
+        "header": {
+          "description": "Required. Column heading.",
+          "type": "string"
+        },
+        "horizontalAlignment": {
+          "description": "Optional. Defines text alignment for all cells in this column.",
+          "enum": [
+            "HORIZONTAL_ALIGNMENT_UNSPECIFIED",
+            "LEADING",
+            "CENTER",
+            "TRAILING"
+          ],
+          "enumDescriptions": [
+            "Text is aligned to the leading edge of the column.",
+            "Text is aligned to the leading edge of the column.",
+            "Text is centered in the column.",
+            "Text is aligned to the trailing edge of the column."
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "GoogleCloudDialogflowV2IntentMessageImage": {
       "description": "The image response message.",
       "id": "GoogleCloudDialogflowV2IntentMessageImage",
@@ -2391,6 +2648,10 @@
           },
           "type": "array"
         },
+        "subtitle": {
+          "description": "Optional. Subtitle of the list.",
+          "type": "string"
+        },
         "title": {
           "description": "Optional. The overall title of the list.",
           "type": "string"
@@ -2416,6 +2677,59 @@
         },
         "title": {
           "description": "Required. The title of the list item.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2IntentMessageMediaContent": {
+      "description": "The media content card for Actions on Google.",
+      "id": "GoogleCloudDialogflowV2IntentMessageMediaContent",
+      "properties": {
+        "mediaObjects": {
+          "description": "Required. List of media objects.",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2IntentMessageMediaContentResponseMediaObject"
+          },
+          "type": "array"
+        },
+        "mediaType": {
+          "description": "Optional. What type of media is the content (ie \"audio\").",
+          "enum": [
+            "RESPONSE_MEDIA_TYPE_UNSPECIFIED",
+            "AUDIO"
+          ],
+          "enumDescriptions": [
+            "Unspecified.",
+            "Response media type is audio."
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2IntentMessageMediaContentResponseMediaObject": {
+      "description": "Response media object for media content card.",
+      "id": "GoogleCloudDialogflowV2IntentMessageMediaContentResponseMediaObject",
+      "properties": {
+        "contentUrl": {
+          "description": "Required. Url where the media is stored.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Optional. Description of media card.",
+          "type": "string"
+        },
+        "icon": {
+          "$ref": "GoogleCloudDialogflowV2IntentMessageImage",
+          "description": "Optional. Icon to display above media content."
+        },
+        "largeImage": {
+          "$ref": "GoogleCloudDialogflowV2IntentMessageImage",
+          "description": "Optional. Image to display above media content."
+        },
+        "name": {
+          "description": "Required. Name of media card.",
           "type": "string"
         }
       },
@@ -2511,6 +2825,75 @@
             "$ref": "GoogleCloudDialogflowV2IntentMessageSuggestion"
           },
           "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2IntentMessageTableCard": {
+      "description": "Table card for Actions on Google.",
+      "id": "GoogleCloudDialogflowV2IntentMessageTableCard",
+      "properties": {
+        "buttons": {
+          "description": "Optional. List of buttons for the card.",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2IntentMessageBasicCardButton"
+          },
+          "type": "array"
+        },
+        "columnProperties": {
+          "description": "Optional. Display properties for the columns in this table.",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2IntentMessageColumnProperties"
+          },
+          "type": "array"
+        },
+        "image": {
+          "$ref": "GoogleCloudDialogflowV2IntentMessageImage",
+          "description": "Optional. Image which should be displayed on the card."
+        },
+        "rows": {
+          "description": "Optional. Rows in this table of data.",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2IntentMessageTableCardRow"
+          },
+          "type": "array"
+        },
+        "subtitle": {
+          "description": "Optional. Subtitle to the title.",
+          "type": "string"
+        },
+        "title": {
+          "description": "Required. Title of the card.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2IntentMessageTableCardCell": {
+      "description": "Cell of TableCardRow.",
+      "id": "GoogleCloudDialogflowV2IntentMessageTableCardCell",
+      "properties": {
+        "text": {
+          "description": "Required. Text in this cell.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2IntentMessageTableCardRow": {
+      "description": "Row of TableCard.",
+      "id": "GoogleCloudDialogflowV2IntentMessageTableCardRow",
+      "properties": {
+        "cells": {
+          "description": "Optional. List of cells that make up this row.",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2IntentMessageTableCardCell"
+          },
+          "type": "array"
+        },
+        "dividerAfter": {
+          "description": "Optional. Whether to add a visual divider after this row.",
+          "type": "boolean"
         }
       },
       "type": "object"
@@ -2855,7 +3238,7 @@
         },
         "intent": {
           "$ref": "GoogleCloudDialogflowV2Intent",
-          "description": "The intent that matched the conversational query. Some, not\nall fields are filled in this message, including but not limited to:\n`name`, `display_name` and `webhook_state`."
+          "description": "The intent that matched the conversational query. Some, not\nall fields are filled in this message, including but not limited to:\n`name`, `display_name`, `end_interaction` and `is_fallback`."
         },
         "intentDetectionConfidence": {
           "description": "The intent detection confidence. Values range from 0.0\n(completely uncertain) to 1.0 (completely certain).\nThis value is for informational purpose only and is only used to\nhelp match the best intent within the classification threshold.\nThis value may change for the same end-user expression at any time due to a\nmodel retraining or change in implementation.\nIf there are `multiple knowledge_answers` messages, this value is set to\nthe greatest `knowledgeAnswers.match_confidence` value in the list.",
@@ -2914,7 +3297,7 @@
       "id": "GoogleCloudDialogflowV2RestoreAgentRequest",
       "properties": {
         "agentContent": {
-          "description": "The agent to restore.\n\nExample for how to restore an agent via the command line:\n\u003cpre\u003ecurl \\\n  'https://dialogflow.googleapis.com/v2/projects/\u0026lt;project_name\u0026gt;/agent:restore\\\n   -X POST \\\n   -H 'Authorization: Bearer '$(gcloud auth application-default\n   print-access-token) \\\n   -H 'Accept: application/json' \\\n   -H 'Content-Type: application/json' \\\n   --compressed \\\n   --data-binary \"{\n       'agentContent': '$(cat \u0026lt;agent zip file\u0026gt; | base64 -w 0)'\n   }\"\u003c/pre\u003e",
+          "description": "Zip compressed raw byte content for agent.",
           "format": "byte",
           "type": "string"
         },
@@ -3152,6 +3535,13 @@
           "description": "Optional. This value is passed directly to `QueryResult.webhook_payload`.\nSee the related `fulfillment_messages[i].payload field`, which may be used\nas an alternative to this field.\n\nThis field can be used for Actions on Google responses.\nIt should have a structure similar to the JSON message shown here. For more\ninformation, see\n[Actions on Google Webhook\nFormat](https://developers.google.com/actions/dialogflow/webhook)\n\u003cpre\u003e{\n  \"google\": {\n    \"expectUserResponse\": true,\n    \"richResponse\": {\n      \"items\": [\n        {\n          \"simpleResponse\": {\n            \"textToSpeech\": \"this is a simple response\"\n          }\n        }\n      ]\n    }\n  }\n}\u003c/pre\u003e",
           "type": "object"
         },
+        "sessionEntityTypes": {
+          "description": "Optional. Additional session entity types to replace or extend developer\nentity types with. The entity synonyms apply to all languages and persist\nfor the session of this query. Setting the session entity types inside\nwebhook overwrites the session entity types that have been set through\n`DetectIntentRequest.query_params.session_entity_types`.",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2SessionEntityType"
+          },
+          "type": "array"
+        },
         "source": {
           "description": "Optional. This value is passed directly to `QueryResult.webhook_source`.",
           "type": "string"
@@ -3192,17 +3582,6 @@
         },
         "questionTypeName": {
           "description": "Output only. Question type name that identifies a labeling task.\nA question is a single task that a worker answers. A question type is set\nof related questions. Each question belongs to a particular question type.\nIt can be used in CrowdCompute UI to filter and manage labeling tasks.",
-          "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "GoogleCloudDialogflowV2beta1ArticleSuggestionModelMetadata": {
-      "description": "Metadata for article suggestion models.",
-      "id": "GoogleCloudDialogflowV2beta1ArticleSuggestionModelMetadata",
-      "properties": {
-        "modelType": {
-          "description": "Optional. Type of the article suggestion model. The available values are:\n*   `article-suggestion-gbt-1` - (default) Article Suggestion Gbt model.",
           "type": "string"
         }
       },
@@ -3260,61 +3639,6 @@
       },
       "type": "object"
     },
-    "GoogleCloudDialogflowV2beta1ConversationModel": {
-      "description": "Represents a conversation model.",
-      "id": "GoogleCloudDialogflowV2beta1ConversationModel",
-      "properties": {
-        "articleSuggestionModelMetadata": {
-          "$ref": "GoogleCloudDialogflowV2beta1ArticleSuggestionModelMetadata",
-          "description": "Metadata for article suggestion models."
-        },
-        "createTime": {
-          "description": "Output only. Creation time of this model.",
-          "format": "google-datetime",
-          "type": "string"
-        },
-        "datasets": {
-          "description": "Required. Datasets used to create model.",
-          "items": {
-            "$ref": "GoogleCloudDialogflowV2beta1InputDataset"
-          },
-          "type": "array"
-        },
-        "displayName": {
-          "description": "Required. The display name of the model. At most 64 bytes long.",
-          "type": "string"
-        },
-        "name": {
-          "description": "Output only. ConversationModel resource name. Format:\n`projects/\u003cProject ID\u003e/conversationModels/\u003cConversation Model ID\u003e`",
-          "type": "string"
-        },
-        "state": {
-          "description": "Output only. State of the model. A model can only serve prediction requests\nafter it gets deployed.",
-          "enum": [
-            "STATE_UNSPECIFIED",
-            "CREATING",
-            "UNDEPLOYED",
-            "DEPLOYING",
-            "DEPLOYED",
-            "UNDEPLOYING",
-            "DELETING",
-            "FAILED"
-          ],
-          "enumDescriptions": [
-            "Should not be used, an un-set enum has this value by default.",
-            "Model is creating.",
-            "Model is not deployed but ready to deploy.",
-            "Model is deploying.",
-            "Model is deployed and ready to use.",
-            "Model is undeploying.",
-            "Model is deleting.",
-            "Model is in error state. Not ready to deploy and use."
-          ],
-          "type": "string"
-        }
-      },
-      "type": "object"
-    },
     "GoogleCloudDialogflowV2beta1EntityType": {
       "description": "Represents an entity type.\nEntity types serve as a tool for extracting parameter values from natural\nlanguage queries.",
       "id": "GoogleCloudDialogflowV2beta1EntityType",
@@ -3335,6 +3659,10 @@
           "description": "Required. The name of the entity type.",
           "type": "string"
         },
+        "enableFuzzyExtraction": {
+          "description": "Optional. Enables fuzzy entity extraction during classification.",
+          "type": "boolean"
+        },
         "entities": {
           "description": "Optional. The collection of entity entries associated with the entity type.",
           "items": {
@@ -3347,12 +3675,14 @@
           "enum": [
             "KIND_UNSPECIFIED",
             "KIND_MAP",
-            "KIND_LIST"
+            "KIND_LIST",
+            "KIND_REGEXP"
           ],
           "enumDescriptions": [
             "Not specified. This value should be never used.",
             "Map entity types allow mapping of a group of synonyms to a canonical\nvalue.",
-            "List entity types contain a set of entries that do not map to canonical\nvalues. However, list entity types can contain references to other entity\ntypes (with or without aliases)."
+            "List entity types contain a set of entries that do not map to canonical\nvalues. However, list entity types can contain references to other entity\ntypes (with or without aliases).",
+            "Regexp entity types allow to specify regular expressions in entries\nvalues."
           ],
           "type": "string"
         },
@@ -3409,23 +3739,12 @@
       "id": "GoogleCloudDialogflowV2beta1ExportAgentResponse",
       "properties": {
         "agentContent": {
-          "description": "The exported agent.\n\nExample for how to export an agent to a zip file via a command line:\n\u003cpre\u003ecurl \\\n  'https://dialogflow.googleapis.com/v2beta1/projects/\u0026lt;project_name\u0026gt;/agent:export'\\\n  -X POST \\\n  -H 'Authorization: Bearer '$(gcloud auth application-default\n  print-access-token) \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/json' \\\n  --compressed \\\n  --data-binary '{}' \\\n| grep agentContent | sed -e 's/.*\"agentContent\": \"\\([^\"]*\\)\".*/\\1/' \\\n| base64 --decode \u003e \u0026lt;agent zip file\u0026gt;\u003c/pre\u003e",
+          "description": "Zip compressed raw byte content for agent.",
           "format": "byte",
           "type": "string"
         },
         "agentUri": {
           "description": "The URI to a file containing the exported agent. This field is populated\nonly if `agent_uri` is specified in `ExportAgentRequest`.",
-          "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "GoogleCloudDialogflowV2beta1InputDataset": {
-      "description": "InputDataset used to create model or do evaluation.",
-      "id": "GoogleCloudDialogflowV2beta1InputDataset",
-      "properties": {
-        "dataset": {
-          "description": "Required. ConversationDataset resource name. Format:\n`projects/\u003cProject ID\u003e/conversationDatasets/\u003cConversation Dataset ID\u003e`\nor\n`projects/\u003cProject ID\u003e/conversationDatasets/\u003cConversation Dataset\nID\u003e/annotatedConversationDatasets/\u003cAnnotated Conversation Dataset ID\u003e`",
           "type": "string"
         }
       },
@@ -3543,7 +3862,7 @@
           "type": "string"
         },
         "priority": {
-          "description": "Optional. The priority of this intent. Higher numbers represent higher\npriorities. If this is zero or unspecified, we use the default\npriority 500000.\n\nNegative numbers mean that the intent is disabled.",
+          "description": "The priority of this intent. Higher numbers represent higher\npriorities.\n\n- If the supplied value is unspecified or 0, the service\n  translates the value to 500,000, which corresponds to the\n  `Normal` priority in the console.\n- If the supplied value is negative, the intent is ignored\n  in runtime detect intent requests.",
           "format": "int32",
           "type": "integer"
         },
@@ -3602,6 +3921,10 @@
           "$ref": "GoogleCloudDialogflowV2beta1IntentMessageBasicCard",
           "description": "Displays a basic card for Actions on Google."
         },
+        "browseCarouselCard": {
+          "$ref": "GoogleCloudDialogflowV2beta1IntentMessageBrowseCarouselCard",
+          "description": "Browse carousel card for Actions on Google."
+        },
         "card": {
           "$ref": "GoogleCloudDialogflowV2beta1IntentMessageCard",
           "description": "Displays a card."
@@ -3621,6 +3944,10 @@
         "listSelect": {
           "$ref": "GoogleCloudDialogflowV2beta1IntentMessageListSelect",
           "description": "Displays a list card for Actions on Google."
+        },
+        "mediaContent": {
+          "$ref": "GoogleCloudDialogflowV2beta1IntentMessageMediaContent",
+          "description": "The media content card for Actions on Google."
         },
         "payload": {
           "additionalProperties": {
@@ -3683,6 +4010,10 @@
         "suggestions": {
           "$ref": "GoogleCloudDialogflowV2beta1IntentMessageSuggestions",
           "description": "Displays suggestion chips for Actions on Google."
+        },
+        "tableCard": {
+          "$ref": "GoogleCloudDialogflowV2beta1IntentMessageTableCard",
+          "description": "Table card for Actions on Google."
         },
         "telephonyPlayAudio": {
           "$ref": "GoogleCloudDialogflowV2beta1IntentMessageTelephonyPlayAudio",
@@ -3754,6 +4085,90 @@
       "properties": {
         "uri": {
           "description": "Required. The HTTP or HTTPS scheme URI.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1IntentMessageBrowseCarouselCard": {
+      "description": "Browse Carousel Card for Actions on Google.\nhttps://developers.google.com/actions/assistant/responses#browsing_carousel",
+      "id": "GoogleCloudDialogflowV2beta1IntentMessageBrowseCarouselCard",
+      "properties": {
+        "imageDisplayOptions": {
+          "description": "Optional. Settings for displaying the image. Applies to every image in\nitems.",
+          "enum": [
+            "IMAGE_DISPLAY_OPTIONS_UNSPECIFIED",
+            "GRAY",
+            "WHITE",
+            "CROPPED",
+            "BLURRED_BACKGROUND"
+          ],
+          "enumDescriptions": [
+            "Fill the gaps between the image and the image container with gray\nbars.",
+            "Fill the gaps between the image and the image container with gray\nbars.",
+            "Fill the gaps between the image and the image container with white\nbars.",
+            "Image is scaled such that the image width and height match or exceed\nthe container dimensions. This may crop the top and bottom of the\nimage if the scaled image height is greater than the container\nheight, or crop the left and right of the image if the scaled image\nwidth is greater than the container width. This is similar to \"Zoom\nMode\" on a widescreen TV when playing a 4:3 video.",
+            "Pad the gaps between image and image frame with a blurred copy of the\nsame image."
+          ],
+          "type": "string"
+        },
+        "items": {
+          "description": "Required. List of items in the Browse Carousel Card. Minimum of two\nitems, maximum of ten.",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2beta1IntentMessageBrowseCarouselCardBrowseCarouselCardItem"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1IntentMessageBrowseCarouselCardBrowseCarouselCardItem": {
+      "description": "Browsing carousel tile",
+      "id": "GoogleCloudDialogflowV2beta1IntentMessageBrowseCarouselCardBrowseCarouselCardItem",
+      "properties": {
+        "description": {
+          "description": "Optional. Description of the carousel item. Maximum of four lines of\ntext.",
+          "type": "string"
+        },
+        "footer": {
+          "description": "Optional. Text that appears at the bottom of the Browse Carousel\nCard. Maximum of one line of text.",
+          "type": "string"
+        },
+        "image": {
+          "$ref": "GoogleCloudDialogflowV2beta1IntentMessageImage",
+          "description": "Optional. Hero image for the carousel item."
+        },
+        "openUriAction": {
+          "$ref": "GoogleCloudDialogflowV2beta1IntentMessageBrowseCarouselCardBrowseCarouselCardItemOpenUrlAction",
+          "description": "Required. Action to present to the user."
+        },
+        "title": {
+          "description": "Required. Title of the carousel item. Maximum of two lines of text.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1IntentMessageBrowseCarouselCardBrowseCarouselCardItemOpenUrlAction": {
+      "description": "Actions on Google action to open a given url.",
+      "id": "GoogleCloudDialogflowV2beta1IntentMessageBrowseCarouselCardBrowseCarouselCardItemOpenUrlAction",
+      "properties": {
+        "url": {
+          "description": "Required. URL",
+          "type": "string"
+        },
+        "urlTypeHint": {
+          "description": "Optional. Specifies the type of viewer that is used when opening\nthe URL. Defaults to opening via web browser.",
+          "enum": [
+            "URL_TYPE_HINT_UNSPECIFIED",
+            "AMP_ACTION",
+            "AMP_CONTENT"
+          ],
+          "enumDescriptions": [
+            "Unspecified",
+            "Url would be an amp action",
+            "URL that points directly to AMP content, or to a canonical URL\nwhich refers to AMP content via \u003clink rel=\"amphtml\"\u003e."
+          ],
           "type": "string"
         }
       },
@@ -3837,6 +4252,33 @@
       },
       "type": "object"
     },
+    "GoogleCloudDialogflowV2beta1IntentMessageColumnProperties": {
+      "description": "Column properties for TableCard.",
+      "id": "GoogleCloudDialogflowV2beta1IntentMessageColumnProperties",
+      "properties": {
+        "header": {
+          "description": "Required. Column heading.",
+          "type": "string"
+        },
+        "horizontalAlignment": {
+          "description": "Optional. Defines text alignment for all cells in this column.",
+          "enum": [
+            "HORIZONTAL_ALIGNMENT_UNSPECIFIED",
+            "LEADING",
+            "CENTER",
+            "TRAILING"
+          ],
+          "enumDescriptions": [
+            "Text is aligned to the leading edge of the column.",
+            "Text is aligned to the leading edge of the column.",
+            "Text is centered in the column.",
+            "Text is aligned to the trailing edge of the column."
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "GoogleCloudDialogflowV2beta1IntentMessageImage": {
       "description": "The image response message.",
       "id": "GoogleCloudDialogflowV2beta1IntentMessageImage",
@@ -3878,6 +4320,10 @@
           },
           "type": "array"
         },
+        "subtitle": {
+          "description": "Optional. Subtitle of the list.",
+          "type": "string"
+        },
         "title": {
           "description": "Optional. The overall title of the list.",
           "type": "string"
@@ -3903,6 +4349,59 @@
         },
         "title": {
           "description": "Required. The title of the list item.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1IntentMessageMediaContent": {
+      "description": "The media content card for Actions on Google.",
+      "id": "GoogleCloudDialogflowV2beta1IntentMessageMediaContent",
+      "properties": {
+        "mediaObjects": {
+          "description": "Required. List of media objects.",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2beta1IntentMessageMediaContentResponseMediaObject"
+          },
+          "type": "array"
+        },
+        "mediaType": {
+          "description": "Optional. What type of media is the content (ie \"audio\").",
+          "enum": [
+            "RESPONSE_MEDIA_TYPE_UNSPECIFIED",
+            "AUDIO"
+          ],
+          "enumDescriptions": [
+            "Unspecified.",
+            "Response media type is audio."
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1IntentMessageMediaContentResponseMediaObject": {
+      "description": "Response media object for media content card.",
+      "id": "GoogleCloudDialogflowV2beta1IntentMessageMediaContentResponseMediaObject",
+      "properties": {
+        "contentUrl": {
+          "description": "Required. Url where the media is stored.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Optional. Description of media card.",
+          "type": "string"
+        },
+        "icon": {
+          "$ref": "GoogleCloudDialogflowV2beta1IntentMessageImage",
+          "description": "Optional. Icon to display above media content."
+        },
+        "largeImage": {
+          "$ref": "GoogleCloudDialogflowV2beta1IntentMessageImage",
+          "description": "Optional. Image to display above media content."
+        },
+        "name": {
+          "description": "Required. Name of media card.",
           "type": "string"
         }
       },
@@ -4229,6 +4728,75 @@
       },
       "type": "object"
     },
+    "GoogleCloudDialogflowV2beta1IntentMessageTableCard": {
+      "description": "Table card for Actions on Google.",
+      "id": "GoogleCloudDialogflowV2beta1IntentMessageTableCard",
+      "properties": {
+        "buttons": {
+          "description": "Optional. List of buttons for the card.",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2beta1IntentMessageBasicCardButton"
+          },
+          "type": "array"
+        },
+        "columnProperties": {
+          "description": "Optional. Display properties for the columns in this table.",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2beta1IntentMessageColumnProperties"
+          },
+          "type": "array"
+        },
+        "image": {
+          "$ref": "GoogleCloudDialogflowV2beta1IntentMessageImage",
+          "description": "Optional. Image which should be displayed on the card."
+        },
+        "rows": {
+          "description": "Optional. Rows in this table of data.",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2beta1IntentMessageTableCardRow"
+          },
+          "type": "array"
+        },
+        "subtitle": {
+          "description": "Optional. Subtitle to the title.",
+          "type": "string"
+        },
+        "title": {
+          "description": "Required. Title of the card.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1IntentMessageTableCardCell": {
+      "description": "Cell of TableCardRow.",
+      "id": "GoogleCloudDialogflowV2beta1IntentMessageTableCardCell",
+      "properties": {
+        "text": {
+          "description": "Required. Text in this cell.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudDialogflowV2beta1IntentMessageTableCardRow": {
+      "description": "Row of TableCard.",
+      "id": "GoogleCloudDialogflowV2beta1IntentMessageTableCardRow",
+      "properties": {
+        "cells": {
+          "description": "Optional. List of cells that make up this row.",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2beta1IntentMessageTableCardCell"
+          },
+          "type": "array"
+        },
+        "dividerAfter": {
+          "description": "Optional. Whether to add a visual divider after this row.",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
     "GoogleCloudDialogflowV2beta1IntentMessageTelephonyPlayAudio": {
       "description": "Plays audio from a file in Telephony Gateway.",
       "id": "GoogleCloudDialogflowV2beta1IntentMessageTelephonyPlayAudio",
@@ -4526,7 +5094,7 @@
         },
         "intent": {
           "$ref": "GoogleCloudDialogflowV2beta1Intent",
-          "description": "The intent that matched the conversational query. Some, not\nall fields are filled in this message, including but not limited to:\n`name`, `display_name` and `webhook_state`."
+          "description": "The intent that matched the conversational query. Some, not\nall fields are filled in this message, including but not limited to:\n`name`, `display_name`, `end_interaction` and `is_fallback`."
         },
         "intentDetectionConfidence": {
           "description": "The intent detection confidence. Values range from 0.0\n(completely uncertain) to 1.0 (completely certain).\nThis value is for informational purpose only and is only used to\nhelp match the best intent within the classification threshold.\nThis value may change for the same end-user expression at any time due to a\nmodel retraining or change in implementation.\nIf there are `multiple knowledge_answers` messages, this value is set to\nthe greatest `knowledgeAnswers.match_confidence` value in the list.",
@@ -4612,6 +5180,38 @@
       },
       "type": "object"
     },
+    "GoogleCloudDialogflowV2beta1SessionEntityType": {
+      "description": "Represents a session entity type.\n\nExtends or replaces a developer entity type at the user session level (we\nrefer to the entity types defined at the agent level as \"developer entity\ntypes\").\n\nNote: session entity types apply to all queries, regardless of the language.",
+      "id": "GoogleCloudDialogflowV2beta1SessionEntityType",
+      "properties": {
+        "entities": {
+          "description": "Required. The collection of entities associated with this session entity\ntype.",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2beta1EntityTypeEntity"
+          },
+          "type": "array"
+        },
+        "entityOverrideMode": {
+          "description": "Required. Indicates whether the additional data should override or\nsupplement the developer entity type definition.",
+          "enum": [
+            "ENTITY_OVERRIDE_MODE_UNSPECIFIED",
+            "ENTITY_OVERRIDE_MODE_OVERRIDE",
+            "ENTITY_OVERRIDE_MODE_SUPPLEMENT"
+          ],
+          "enumDescriptions": [
+            "Not specified. This value should be never used.",
+            "The collection of session entities overrides the collection of entities\nin the corresponding developer entity type.",
+            "The collection of session entities extends the collection of entities in\nthe corresponding developer entity type.\n\nNote: Even in this override mode calls to `ListSessionEntityTypes`,\n`GetSessionEntityType`, `CreateSessionEntityType` and\n`UpdateSessionEntityType` only return the additional entities added in\nthis session entity type. If you want to get the supplemented list,\nplease call EntityTypes.GetEntityType on the developer entity type\nand merge."
+          ],
+          "type": "string"
+        },
+        "name": {
+          "description": "Required. The unique identifier of this session entity type. Format:\n`projects/\u003cProject ID\u003e/agent/sessions/\u003cSession ID\u003e/entityTypes/\u003cEntity Type\nDisplay Name\u003e`, or\n`projects/\u003cProject ID\u003e/agent/environments/\u003cEnvironment ID\u003e/users/\u003cUser\nID\u003e/sessions/\u003cSession ID\u003e/entityTypes/\u003cEntity Type Display Name\u003e`.\nIf `Environment ID` is not specified, we assume default 'draft'\nenvironment. If `User ID` is not specified, we assume default '-' user.\n\n`\u003cEntity Type Display Name\u003e` must be the display name of an existing entity\ntype in the same agent that will be overridden or supplemented.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "GoogleCloudDialogflowV2beta1WebhookRequest": {
       "description": "The request message for a webhook call.",
       "id": "GoogleCloudDialogflowV2beta1WebhookRequest",
@@ -4679,6 +5279,13 @@
           },
           "description": "Optional. This value is passed directly to `QueryResult.webhook_payload`.\nSee the related `fulfillment_messages[i].payload field`, which may be used\nas an alternative to this field.\n\nThis field can be used for Actions on Google responses.\nIt should have a structure similar to the JSON message shown here. For more\ninformation, see\n[Actions on Google Webhook\nFormat](https://developers.google.com/actions/dialogflow/webhook)\n\u003cpre\u003e{\n  \"google\": {\n    \"expectUserResponse\": true,\n    \"richResponse\": {\n      \"items\": [\n        {\n          \"simpleResponse\": {\n            \"textToSpeech\": \"this is a simple response\"\n          }\n        }\n      ]\n    }\n  }\n}\u003c/pre\u003e",
           "type": "object"
+        },
+        "sessionEntityTypes": {
+          "description": "Optional. Additional session entity types to replace or extend developer\nentity types with. The entity synonyms apply to all languages and persist\nfor the session of this query. Setting the session entity types inside\nwebhook overwrites the session entity types that have been set through\n`DetectIntentRequest.query_params.session_entity_types`.",
+          "items": {
+            "$ref": "GoogleCloudDialogflowV2beta1SessionEntityType"
+          },
+          "type": "array"
         },
         "source": {
           "description": "Optional. This value is passed directly to `QueryResult.webhook_source`.",

@@ -53,8 +53,8 @@ import (
 	"strconv"
 	"strings"
 
-	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	gensupport "google.golang.org/api/internal/gensupport"
 	option "google.golang.org/api/option"
 	htransport "google.golang.org/api/transport/http"
 )
@@ -152,6 +152,8 @@ func New(client *http.Client) (*Service, error) {
 	s.LiveChatMessages = NewLiveChatMessagesService(s)
 	s.LiveChatModerators = NewLiveChatModeratorsService(s)
 	s.LiveStreams = NewLiveStreamsService(s)
+	s.Members = NewMembersService(s)
+	s.MembershipsLevels = NewMembershipsLevelsService(s)
 	s.PlaylistItems = NewPlaylistItemsService(s)
 	s.Playlists = NewPlaylistsService(s)
 	s.Search = NewSearchService(s)
@@ -200,6 +202,10 @@ type Service struct {
 	LiveChatModerators *LiveChatModeratorsService
 
 	LiveStreams *LiveStreamsService
+
+	Members *MembersService
+
+	MembershipsLevels *MembershipsLevelsService
 
 	PlaylistItems *PlaylistItemsService
 
@@ -363,6 +369,24 @@ func NewLiveStreamsService(s *Service) *LiveStreamsService {
 }
 
 type LiveStreamsService struct {
+	s *Service
+}
+
+func NewMembersService(s *Service) *MembersService {
+	rs := &MembersService{s: s}
+	return rs
+}
+
+type MembersService struct {
+	s *Service
+}
+
+func NewMembershipsLevelsService(s *Service) *MembershipsLevelsService {
+	rs := &MembershipsLevelsService{s: s}
+	return rs
+}
+
+type MembershipsLevelsService struct {
 	s *Service
 }
 
@@ -1396,6 +1420,7 @@ type CdnSettings struct {
 	//   "dash"
 	//   "hls"
 	//   "rtmp"
+	//   "webrtc"
 	IngestionType string `json:"ingestionType,omitempty"`
 
 	// Resolution: The resolution of the inbound video data.
@@ -2422,7 +2447,6 @@ type ChannelStatus struct {
 	//   "private"
 	//   "public"
 	//   "unlisted"
-	//   "unlisted_new"
 	PrivacyStatus string `json:"privacyStatus,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "IsLinked") to
@@ -2862,7 +2886,7 @@ func (s *CommentThreadSnippet) MarshalJSON() ([]byte, error) {
 }
 
 // ContentRating: Ratings schemes. The country-specific ratings are
-// mostly for movies and shows. NEXT_ID: 71
+// mostly for movies and shows. NEXT_ID: 72
 type ContentRating struct {
 	// AcbRating: The video's Australian Classification Board (ACB) or
 	// Australian Communications and Media Authority (ACMA) rating. ACMA
@@ -3626,11 +3650,23 @@ type ContentRating struct {
 	//
 	// Possible values:
 	//   "nkclv12plus"
+	//   "nkclv16plus"
 	//   "nkclv18plus"
 	//   "nkclv7plus"
 	//   "nkclvU"
 	//   "nkclvUnrated"
 	NkclvRating string `json:"nkclvRating,omitempty"`
+
+	// Possible values:
+	//   "nmc15plus"
+	//   "nmc18plus"
+	//   "nmc18tc"
+	//   "nmcG"
+	//   "nmcPg"
+	//   "nmcPg13"
+	//   "nmcPg15"
+	//   "nmcUnrated"
+	NmcRating string `json:"nmcRating,omitempty"`
 
 	// OflcRating: The video's Office of Film and Literature Classification
 	// (OFLC - New Zealand) rating.
@@ -4580,6 +4616,32 @@ func (s *LanguageTag) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+type LevelDetails struct {
+	DisplayName string `json:"displayName,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "DisplayName") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "DisplayName") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *LevelDetails) MarshalJSON() ([]byte, error) {
+	type NoMethod LevelDetails
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // LiveBroadcast: A liveBroadcast resource represents an event that will
 // be streamed, via live video, on YouTube.
 type LiveBroadcast struct {
@@ -4843,6 +4905,19 @@ type LiveBroadcastSnippet struct {
 	// (YYYY-MM-DDThh:mm:ss.sZ) format.
 	ActualStartTime string `json:"actualStartTime,omitempty"`
 
+	// Possible values:
+	//   "fludd"
+	//   "fluddArchive"
+	//   "gplusHoa"
+	//   "lcrEncoder"
+	//   "mobile"
+	//   "persistent"
+	//   "premiere"
+	//   "unspecified"
+	//   "webcam"
+	//   "ytHoa"
+	BroadcastType string `json:"broadcastType,omitempty"`
+
 	// ChannelId: The ID that YouTube uses to uniquely identify the channel
 	// that is publishing the broadcast.
 	ChannelId string `json:"channelId,omitempty"`
@@ -4986,7 +5061,6 @@ type LiveBroadcastStatus struct {
 	//   "private"
 	//   "public"
 	//   "unlisted"
-	//   "unlisted_new"
 	PrivacyStatus string `json:"privacyStatus,omitempty"`
 
 	// RecordingStatus: The broadcast's recording status.
@@ -6305,6 +6379,303 @@ func (s *LocalizedString) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// Member: A member resource represents a member for a YouTube channel.
+// A member provides recurring monetary support to a creator and
+// receives special benefits.
+type Member struct {
+	// Etag: Etag of this resource.
+	Etag string `json:"etag,omitempty"`
+
+	// Id: The ID that YouTube assigns to uniquely identify the member.
+	Id string `json:"id,omitempty"`
+
+	// Kind: Identifies what kind of resource this is. Value: the fixed
+	// string "youtube#member".
+	Kind string `json:"kind,omitempty"`
+
+	// Snippet: The snippet object contains basic details about the member.
+	Snippet *MemberSnippet `json:"snippet,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Etag") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Etag") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *Member) MarshalJSON() ([]byte, error) {
+	type NoMethod Member
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+type MemberListResponse struct {
+	// Etag: Etag of this resource.
+	Etag string `json:"etag,omitempty"`
+
+	// EventId: Serialized EventId of the request which produced this
+	// response.
+	EventId string `json:"eventId,omitempty"`
+
+	// Items: A list of members that match the request criteria.
+	Items []*Member `json:"items,omitempty"`
+
+	// Kind: Identifies what kind of resource this is. Value: the fixed
+	// string "youtube#memberListResponse".
+	Kind string `json:"kind,omitempty"`
+
+	// NextPageToken: The token that can be used as the value of the
+	// pageToken parameter to retrieve the next page in the result set.
+	NextPageToken string `json:"nextPageToken,omitempty"`
+
+	PageInfo *PageInfo `json:"pageInfo,omitempty"`
+
+	TokenPagination *TokenPagination `json:"tokenPagination,omitempty"`
+
+	// VisitorId: The visitorId identifies the visitor.
+	VisitorId string `json:"visitorId,omitempty"`
+
+	// ServerResponse contains the HTTP response code and headers from the
+	// server.
+	googleapi.ServerResponse `json:"-"`
+
+	// ForceSendFields is a list of field names (e.g. "Etag") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Etag") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *MemberListResponse) MarshalJSON() ([]byte, error) {
+	type NoMethod MemberListResponse
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+type MemberSnippet struct {
+	// CreatorChannelId: The id of the channel that's offering memberships.
+	CreatorChannelId string `json:"creatorChannelId,omitempty"`
+
+	// MemberDetails: Details about the member.
+	MemberDetails *ChannelProfileDetails `json:"memberDetails,omitempty"`
+
+	// MembershipsDetails: Details about the user's membership.
+	MembershipsDetails *MembershipsDetails `json:"membershipsDetails,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "CreatorChannelId") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "CreatorChannelId") to
+	// include in API requests with the JSON null value. By default, fields
+	// with empty values are omitted from API requests. However, any field
+	// with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *MemberSnippet) MarshalJSON() ([]byte, error) {
+	type NoMethod MemberSnippet
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+type MembershipsDetails struct {
+	// AccessibleLevels: All levels that the user has access to. This
+	// includes the purchased level and all other levels that are included
+	// because of a higher purchase.
+	AccessibleLevels []string `json:"accessibleLevels,omitempty"`
+
+	// MemberSince: The date and time when the user became a continuous
+	// member across all levels.
+	MemberSince string `json:"memberSince,omitempty"`
+
+	// MemberSinceCurrentLevel: The date and time when the user started to
+	// continuously have access to the currently highest level.
+	MemberSinceCurrentLevel string `json:"memberSinceCurrentLevel,omitempty"`
+
+	// MemberTotalDuration: The cumulative time the user has been a member
+	// across all levels in complete months (the time is rounded down to the
+	// nearest integer).
+	MemberTotalDuration int64 `json:"memberTotalDuration,omitempty"`
+
+	// MemberTotalDurationCurrentLevel: The cumulative time the user has had
+	// access to the currently highest level in complete months (the time is
+	// rounded down to the nearest integer).
+	MemberTotalDurationCurrentLevel int64 `json:"memberTotalDurationCurrentLevel,omitempty"`
+
+	// PurchasedLevel: The highest level the user has access to at the
+	// moment.
+	PurchasedLevel string `json:"purchasedLevel,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "AccessibleLevels") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "AccessibleLevels") to
+	// include in API requests with the JSON null value. By default, fields
+	// with empty values are omitted from API requests. However, any field
+	// with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *MembershipsDetails) MarshalJSON() ([]byte, error) {
+	type NoMethod MembershipsDetails
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// MembershipsLevel: A membershipsLevel resource represents an offer
+// made by YouTube creators for their fans. Users can become members of
+// the channel by joining one of the available levels. They will provide
+// recurring monetary support and receives special benefits.
+type MembershipsLevel struct {
+	// Etag: Etag of this resource.
+	Etag string `json:"etag,omitempty"`
+
+	// Id: The ID that YouTube assigns to uniquely identify the memberships
+	// level.
+	Id string `json:"id,omitempty"`
+
+	// Kind: Identifies what kind of resource this is. Value: the fixed
+	// string "youtube#membershipsLevel".
+	Kind string `json:"kind,omitempty"`
+
+	// Snippet: The snippet object contains basic details about the level.
+	Snippet *MembershipsLevelSnippet `json:"snippet,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Etag") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Etag") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *MembershipsLevel) MarshalJSON() ([]byte, error) {
+	type NoMethod MembershipsLevel
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+type MembershipsLevelListResponse struct {
+	// Etag: Etag of this resource.
+	Etag string `json:"etag,omitempty"`
+
+	// EventId: Serialized EventId of the request which produced this
+	// response.
+	EventId string `json:"eventId,omitempty"`
+
+	// Items: A list of pricing levels offered by a creator to the fans.
+	Items []*MembershipsLevel `json:"items,omitempty"`
+
+	// Kind: Identifies what kind of resource this is. Value: the fixed
+	// string "youtube#membershipsLevelListResponse".
+	Kind string `json:"kind,omitempty"`
+
+	// VisitorId: The visitorId identifies the visitor.
+	VisitorId string `json:"visitorId,omitempty"`
+
+	// ServerResponse contains the HTTP response code and headers from the
+	// server.
+	googleapi.ServerResponse `json:"-"`
+
+	// ForceSendFields is a list of field names (e.g. "Etag") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Etag") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *MembershipsLevelListResponse) MarshalJSON() ([]byte, error) {
+	type NoMethod MembershipsLevelListResponse
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+type MembershipsLevelSnippet struct {
+	// CreatorChannelId: The id of the channel that's offering channel
+	// memberships.
+	CreatorChannelId string `json:"creatorChannelId,omitempty"`
+
+	LevelDetails *LevelDetails `json:"levelDetails,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "CreatorChannelId") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "CreatorChannelId") to
+	// include in API requests with the JSON null value. By default, fields
+	// with empty values are omitted from API requests. However, any field
+	// with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *MembershipsLevelSnippet) MarshalJSON() ([]byte, error) {
+	type NoMethod MembershipsLevelSnippet
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // MonitorStreamInfo: Settings and Info of the monitor stream
 type MonitorStreamInfo struct {
 	// BroadcastStreamDelayMs: If you have set the enableMonitorStream
@@ -6810,7 +7181,6 @@ type PlaylistItemStatus struct {
 	//   "private"
 	//   "public"
 	//   "unlisted"
-	//   "unlisted_new"
 	PrivacyStatus string `json:"privacyStatus,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "PrivacyStatus") to
@@ -7019,7 +7389,6 @@ type PlaylistStatus struct {
 	//   "private"
 	//   "public"
 	//   "unlisted"
-	//   "unlisted_new"
 	PrivacyStatus string `json:"privacyStatus,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "PrivacyStatus") to
@@ -9540,7 +9909,6 @@ type VideoStatus struct {
 	//   "private"
 	//   "public"
 	//   "unlisted"
-	//   "unlisted_new"
 	PrivacyStatus string `json:"privacyStatus,omitempty"`
 
 	// PublicStatsViewable: This value indicates if the extended video
@@ -9869,6 +10237,7 @@ func (c *ActivitiesInsertCall) Header() http.Header {
 
 func (c *ActivitiesInsertCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10091,6 +10460,7 @@ func (c *ActivitiesListCall) Header() http.Header {
 
 func (c *ActivitiesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10312,6 +10682,7 @@ func (c *CaptionsDeleteCall) Header() http.Header {
 
 func (c *CaptionsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10486,6 +10857,7 @@ func (c *CaptionsDownloadCall) Header() http.Header {
 
 func (c *CaptionsDownloadCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10721,6 +11093,7 @@ func (c *CaptionsInsertCall) Header() http.Header {
 
 func (c *CaptionsInsertCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -10735,7 +11108,7 @@ func (c *CaptionsInsertCall) doRequest(alt string) (*http.Response, error) {
 	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "captions")
 	if c.mediaInfo_ != nil {
-		urls = strings.Replace(urls, "https://www.googleapis.com/", "https://www.googleapis.com/upload/", 1)
+		urls = googleapi.ResolveRelative(c.s.BasePath, "/upload/youtube/v3/captions")
 		c.urlParams_.Set("uploadType", c.mediaInfo_.UploadType())
 	}
 	if body == nil {
@@ -10965,6 +11338,7 @@ func (c *CaptionsListCall) Header() http.Header {
 
 func (c *CaptionsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -11197,6 +11571,7 @@ func (c *CaptionsUpdateCall) Header() http.Header {
 
 func (c *CaptionsUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -11211,7 +11586,7 @@ func (c *CaptionsUpdateCall) doRequest(alt string) (*http.Response, error) {
 	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "captions")
 	if c.mediaInfo_ != nil {
-		urls = strings.Replace(urls, "https://www.googleapis.com/", "https://www.googleapis.com/upload/", 1)
+		urls = googleapi.ResolveRelative(c.s.BasePath, "/upload/youtube/v3/captions")
 		c.urlParams_.Set("uploadType", c.mediaInfo_.UploadType())
 	}
 	if body == nil {
@@ -11476,6 +11851,7 @@ func (c *ChannelBannersInsertCall) Header() http.Header {
 
 func (c *ChannelBannersInsertCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -11490,7 +11866,7 @@ func (c *ChannelBannersInsertCall) doRequest(alt string) (*http.Response, error)
 	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "channelBanners/insert")
 	if c.mediaInfo_ != nil {
-		urls = strings.Replace(urls, "https://www.googleapis.com/", "https://www.googleapis.com/upload/", 1)
+		urls = googleapi.ResolveRelative(c.s.BasePath, "/upload/youtube/v3/channelBanners/insert")
 		c.urlParams_.Set("uploadType", c.mediaInfo_.UploadType())
 	}
 	if body == nil {
@@ -11675,6 +12051,7 @@ func (c *ChannelSectionsDeleteCall) Header() http.Header {
 
 func (c *ChannelSectionsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -11823,6 +12200,7 @@ func (c *ChannelSectionsInsertCall) Header() http.Header {
 
 func (c *ChannelSectionsInsertCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -12034,6 +12412,7 @@ func (c *ChannelSectionsListCall) Header() http.Header {
 
 func (c *ChannelSectionsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -12208,6 +12587,7 @@ func (c *ChannelSectionsUpdateCall) Header() http.Header {
 
 func (c *ChannelSectionsUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -12455,6 +12835,7 @@ func (c *ChannelsListCall) Header() http.Header {
 
 func (c *ChannelsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -12679,6 +13060,7 @@ func (c *ChannelsUpdateCall) Header() http.Header {
 
 func (c *ChannelsUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -12820,6 +13202,7 @@ func (c *CommentThreadsInsertCall) Header() http.Header {
 
 func (c *CommentThreadsInsertCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -13086,6 +13469,7 @@ func (c *CommentThreadsListCall) Header() http.Header {
 
 func (c *CommentThreadsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -13318,6 +13702,7 @@ func (c *CommentThreadsUpdateCall) Header() http.Header {
 
 func (c *CommentThreadsUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -13449,6 +13834,7 @@ func (c *CommentsDeleteCall) Header() http.Header {
 
 func (c *CommentsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -13547,6 +13933,7 @@ func (c *CommentsInsertCall) Header() http.Header {
 
 func (c *CommentsInsertCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -13746,6 +14133,7 @@ func (c *CommentsListCall) Header() http.Header {
 
 func (c *CommentsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -13932,6 +14320,7 @@ func (c *CommentsMarkAsSpamCall) Header() http.Header {
 
 func (c *CommentsMarkAsSpamCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -14042,6 +14431,7 @@ func (c *CommentsSetModerationStatusCall) Header() http.Header {
 
 func (c *CommentsSetModerationStatusCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -14162,6 +14552,7 @@ func (c *CommentsUpdateCall) Header() http.Header {
 
 func (c *CommentsUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -14330,6 +14721,7 @@ func (c *GuideCategoriesListCall) Header() http.Header {
 
 func (c *GuideCategoriesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -14494,6 +14886,7 @@ func (c *I18nLanguagesListCall) Header() http.Header {
 
 func (c *I18nLanguagesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -14648,6 +15041,7 @@ func (c *I18nRegionsListCall) Header() http.Header {
 
 func (c *I18nRegionsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -14840,6 +15234,7 @@ func (c *LiveBroadcastsBindCall) Header() http.Header {
 
 func (c *LiveBroadcastsBindCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -15069,6 +15464,7 @@ func (c *LiveBroadcastsControlCall) Header() http.Header {
 
 func (c *LiveBroadcastsControlCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -15271,6 +15667,7 @@ func (c *LiveBroadcastsDeleteCall) Header() http.Header {
 
 func (c *LiveBroadcastsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -15423,6 +15820,7 @@ func (c *LiveBroadcastsInsertCall) Header() http.Header {
 
 func (c *LiveBroadcastsInsertCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -15684,6 +16082,7 @@ func (c *LiveBroadcastsListCall) Header() http.Header {
 
 func (c *LiveBroadcastsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -15952,6 +16351,7 @@ func (c *LiveBroadcastsTransitionCall) Header() http.Header {
 
 func (c *LiveBroadcastsTransitionCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -16158,6 +16558,7 @@ func (c *LiveBroadcastsUpdateCall) Header() http.Header {
 
 func (c *LiveBroadcastsUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -16300,6 +16701,7 @@ func (c *LiveChatBansDeleteCall) Header() http.Header {
 
 func (c *LiveChatBansDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -16398,6 +16800,7 @@ func (c *LiveChatBansInsertCall) Header() http.Header {
 
 func (c *LiveChatBansInsertCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -16530,6 +16933,7 @@ func (c *LiveChatMessagesDeleteCall) Header() http.Header {
 
 func (c *LiveChatMessagesDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -16628,6 +17032,7 @@ func (c *LiveChatMessagesInsertCall) Header() http.Header {
 
 func (c *LiveChatMessagesInsertCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -16813,6 +17218,7 @@ func (c *LiveChatMessagesListCall) Header() http.Header {
 
 func (c *LiveChatMessagesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -16996,6 +17402,7 @@ func (c *LiveChatModeratorsDeleteCall) Header() http.Header {
 
 func (c *LiveChatModeratorsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -17094,6 +17501,7 @@ func (c *LiveChatModeratorsInsertCall) Header() http.Header {
 
 func (c *LiveChatModeratorsInsertCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -17255,6 +17663,7 @@ func (c *LiveChatModeratorsListCall) Header() http.Header {
 
 func (c *LiveChatModeratorsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -17469,6 +17878,7 @@ func (c *LiveStreamsDeleteCall) Header() http.Header {
 
 func (c *LiveStreamsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -17623,6 +18033,7 @@ func (c *LiveStreamsInsertCall) Header() http.Header {
 
 func (c *LiveStreamsInsertCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -17856,6 +18267,7 @@ func (c *LiveStreamsListCall) Header() http.Header {
 
 func (c *LiveStreamsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -18087,6 +18499,7 @@ func (c *LiveStreamsUpdateCall) Header() http.Header {
 
 func (c *LiveStreamsUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -18186,6 +18599,381 @@ func (c *LiveStreamsUpdateCall) Do(opts ...googleapi.CallOption) (*LiveStream, e
 
 }
 
+// method id "youtube.members.list":
+
+type MembersListCall struct {
+	s            *Service
+	urlParams_   gensupport.URLParams
+	ifNoneMatch_ string
+	ctx_         context.Context
+	header_      http.Header
+}
+
+// List: Lists members for a channel.
+func (r *MembersService) List(part string) *MembersListCall {
+	c := &MembersListCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.urlParams_.Set("part", part)
+	return c
+}
+
+// HasAccessToLevel sets the optional parameter "hasAccessToLevel": The
+// hasAccessToLevel parameter specifies, when set, the ID of a pricing
+// level that members from the results set should have access to. When
+// not set, all members will be considered, regardless of their active
+// pricing level.
+func (c *MembersListCall) HasAccessToLevel(hasAccessToLevel string) *MembersListCall {
+	c.urlParams_.Set("hasAccessToLevel", hasAccessToLevel)
+	return c
+}
+
+// MaxResults sets the optional parameter "maxResults": The maxResults
+// parameter specifies the maximum number of items that should be
+// returned in the result set.
+func (c *MembersListCall) MaxResults(maxResults int64) *MembersListCall {
+	c.urlParams_.Set("maxResults", fmt.Sprint(maxResults))
+	return c
+}
+
+// Mode sets the optional parameter "mode": The mode parameter specifies
+// which channel members to return.
+//
+// Possible values:
+//   "all_current" - Return all current members, from newest to oldest.
+//   "updates" - Return only members that joined after the first call
+// with this mode was made.
+func (c *MembersListCall) Mode(mode string) *MembersListCall {
+	c.urlParams_.Set("mode", mode)
+	return c
+}
+
+// PageToken sets the optional parameter "pageToken": The pageToken
+// parameter identifies a specific page in the result set that should be
+// returned. In an API response, the nextPageToken and prevPageToken
+// properties identify other pages that could be retrieved.
+func (c *MembersListCall) PageToken(pageToken string) *MembersListCall {
+	c.urlParams_.Set("pageToken", pageToken)
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *MembersListCall) Fields(s ...googleapi.Field) *MembersListCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// IfNoneMatch sets the optional parameter which makes the operation
+// fail if the object's ETag matches the given value. This is useful for
+// getting updates only after the object has changed since the last
+// request. Use googleapi.IsNotModified to check whether the response
+// error from Do is the result of In-None-Match.
+func (c *MembersListCall) IfNoneMatch(entityTag string) *MembersListCall {
+	c.ifNoneMatch_ = entityTag
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *MembersListCall) Context(ctx context.Context) *MembersListCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *MembersListCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *MembersListCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	if c.ifNoneMatch_ != "" {
+		reqHeaders.Set("If-None-Match", c.ifNoneMatch_)
+	}
+	var body io.Reader = nil
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "members")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "youtube.members.list" call.
+// Exactly one of *MemberListResponse or error will be non-nil. Any
+// non-2xx status code is an error. Response headers are in either
+// *MemberListResponse.ServerResponse.Header or (if a response was
+// returned at all) in error.(*googleapi.Error).Header. Use
+// googleapi.IsNotModified to check whether the returned error was
+// because http.StatusNotModified was returned.
+func (c *MembersListCall) Do(opts ...googleapi.CallOption) (*MemberListResponse, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &MemberListResponse{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Lists members for a channel.",
+	//   "httpMethod": "GET",
+	//   "id": "youtube.members.list",
+	//   "parameterOrder": [
+	//     "part"
+	//   ],
+	//   "parameters": {
+	//     "hasAccessToLevel": {
+	//       "description": "The hasAccessToLevel parameter specifies, when set, the ID of a pricing level that members from the results set should have access to. When not set, all members will be considered, regardless of their active pricing level.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "maxResults": {
+	//       "default": "5",
+	//       "description": "The maxResults parameter specifies the maximum number of items that should be returned in the result set.",
+	//       "format": "uint32",
+	//       "location": "query",
+	//       "maximum": "50",
+	//       "minimum": "0",
+	//       "type": "integer"
+	//     },
+	//     "mode": {
+	//       "default": "LIST_MEMBERS_MODE_ALL_CURRENT",
+	//       "description": "The mode parameter specifies which channel members to return.",
+	//       "enum": [
+	//         "all_current",
+	//         "updates"
+	//       ],
+	//       "enumDescriptions": [
+	//         "Return all current members, from newest to oldest.",
+	//         "Return only members that joined after the first call with this mode was made."
+	//       ],
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "pageToken": {
+	//       "description": "The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "part": {
+	//       "description": "The part parameter specifies the member resource parts that the API response will include. Supported values are id and snippet.",
+	//       "location": "query",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "members",
+	//   "response": {
+	//     "$ref": "MemberListResponse"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/youtube",
+	//     "https://www.googleapis.com/auth/youtube.force-ssl",
+	//     "https://www.googleapis.com/auth/youtube.readonly",
+	//     "https://www.googleapis.com/auth/youtubepartner"
+	//   ]
+	// }
+
+}
+
+// Pages invokes f for each page of results.
+// A non-nil error returned from f will halt the iteration.
+// The provided context supersedes any context provided to the Context method.
+func (c *MembersListCall) Pages(ctx context.Context, f func(*MemberListResponse) error) error {
+	c.ctx_ = ctx
+	defer c.PageToken(c.urlParams_.Get("pageToken")) // reset paging to original point
+	for {
+		x, err := c.Do()
+		if err != nil {
+			return err
+		}
+		if err := f(x); err != nil {
+			return err
+		}
+		if x.NextPageToken == "" {
+			return nil
+		}
+		c.PageToken(x.NextPageToken)
+	}
+}
+
+// method id "youtube.membershipsLevels.list":
+
+type MembershipsLevelsListCall struct {
+	s            *Service
+	urlParams_   gensupport.URLParams
+	ifNoneMatch_ string
+	ctx_         context.Context
+	header_      http.Header
+}
+
+// List: Lists pricing levels for a channel.
+func (r *MembershipsLevelsService) List(part string) *MembershipsLevelsListCall {
+	c := &MembershipsLevelsListCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.urlParams_.Set("part", part)
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *MembershipsLevelsListCall) Fields(s ...googleapi.Field) *MembershipsLevelsListCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// IfNoneMatch sets the optional parameter which makes the operation
+// fail if the object's ETag matches the given value. This is useful for
+// getting updates only after the object has changed since the last
+// request. Use googleapi.IsNotModified to check whether the response
+// error from Do is the result of In-None-Match.
+func (c *MembershipsLevelsListCall) IfNoneMatch(entityTag string) *MembershipsLevelsListCall {
+	c.ifNoneMatch_ = entityTag
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *MembershipsLevelsListCall) Context(ctx context.Context) *MembershipsLevelsListCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *MembershipsLevelsListCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *MembershipsLevelsListCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	if c.ifNoneMatch_ != "" {
+		reqHeaders.Set("If-None-Match", c.ifNoneMatch_)
+	}
+	var body io.Reader = nil
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "membershipsLevels")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "youtube.membershipsLevels.list" call.
+// Exactly one of *MembershipsLevelListResponse or error will be
+// non-nil. Any non-2xx status code is an error. Response headers are in
+// either *MembershipsLevelListResponse.ServerResponse.Header or (if a
+// response was returned at all) in error.(*googleapi.Error).Header. Use
+// googleapi.IsNotModified to check whether the returned error was
+// because http.StatusNotModified was returned.
+func (c *MembershipsLevelsListCall) Do(opts ...googleapi.CallOption) (*MembershipsLevelListResponse, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &MembershipsLevelListResponse{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Lists pricing levels for a channel.",
+	//   "httpMethod": "GET",
+	//   "id": "youtube.membershipsLevels.list",
+	//   "parameterOrder": [
+	//     "part"
+	//   ],
+	//   "parameters": {
+	//     "part": {
+	//       "description": "The part parameter specifies the membershipsLevel resource parts that the API response will include. Supported values are id and snippet.",
+	//       "location": "query",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "membershipsLevels",
+	//   "response": {
+	//     "$ref": "MembershipsLevelListResponse"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/youtube",
+	//     "https://www.googleapis.com/auth/youtube.force-ssl",
+	//     "https://www.googleapis.com/auth/youtube.readonly",
+	//     "https://www.googleapis.com/auth/youtubepartner"
+	//   ]
+	// }
+
+}
+
 // method id "youtube.playlistItems.delete":
 
 type PlaylistItemsDeleteCall struct {
@@ -18247,6 +19035,7 @@ func (c *PlaylistItemsDeleteCall) Header() http.Header {
 
 func (c *PlaylistItemsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -18369,6 +19158,7 @@ func (c *PlaylistItemsInsertCall) Header() http.Header {
 
 func (c *PlaylistItemsInsertCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -18581,6 +19371,7 @@ func (c *PlaylistItemsListCall) Header() http.Header {
 
 func (c *PlaylistItemsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -18787,6 +19578,7 @@ func (c *PlaylistItemsUpdateCall) Header() http.Header {
 
 func (c *PlaylistItemsUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -18943,6 +19735,7 @@ func (c *PlaylistsDeleteCall) Header() http.Header {
 
 func (c *PlaylistsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -19091,6 +19884,7 @@ func (c *PlaylistsInsertCall) Header() http.Header {
 
 func (c *PlaylistsInsertCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -19342,6 +20136,7 @@ func (c *PlaylistsListCall) Header() http.Header {
 
 func (c *PlaylistsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -19557,6 +20352,7 @@ func (c *PlaylistsUpdateCall) Header() http.Header {
 
 func (c *PlaylistsUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -20109,6 +20905,7 @@ func (c *SearchListCall) Header() http.Header {
 
 func (c *SearchListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -20578,6 +21375,7 @@ func (c *SponsorsListCall) Header() http.Header {
 
 func (c *SponsorsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -20755,6 +21553,7 @@ func (c *SubscriptionsDeleteCall) Header() http.Header {
 
 func (c *SubscriptionsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -20854,6 +21653,7 @@ func (c *SubscriptionsInsertCall) Header() http.Header {
 
 func (c *SubscriptionsInsertCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -21123,6 +21923,7 @@ func (c *SubscriptionsListCall) Header() http.Header {
 
 func (c *SubscriptionsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -21387,6 +22188,7 @@ func (c *SuperChatEventsListCall) Header() http.Header {
 
 func (c *SuperChatEventsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -21615,6 +22417,7 @@ func (c *ThumbnailsSetCall) Header() http.Header {
 
 func (c *ThumbnailsSetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -21624,7 +22427,7 @@ func (c *ThumbnailsSetCall) doRequest(alt string) (*http.Response, error) {
 	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "thumbnails/set")
 	if c.mediaInfo_ != nil {
-		urls = strings.Replace(urls, "https://www.googleapis.com/", "https://www.googleapis.com/upload/", 1)
+		urls = googleapi.ResolveRelative(c.s.BasePath, "/upload/youtube/v3/thumbnails/set")
 		c.urlParams_.Set("uploadType", c.mediaInfo_.UploadType())
 	}
 	if body == nil {
@@ -21812,6 +22615,7 @@ func (c *VideoAbuseReportReasonsListCall) Header() http.Header {
 
 func (c *VideoAbuseReportReasonsListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -21983,6 +22787,7 @@ func (c *VideoCategoriesListCall) Header() http.Header {
 
 func (c *VideoCategoriesListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -22147,6 +22952,7 @@ func (c *VideosDeleteCall) Header() http.Header {
 
 func (c *VideosDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -22279,6 +23085,7 @@ func (c *VideosGetRatingCall) Header() http.Header {
 
 func (c *VideosGetRatingCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -22528,6 +23335,7 @@ func (c *VideosInsertCall) Header() http.Header {
 
 func (c *VideosInsertCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -22542,7 +23350,7 @@ func (c *VideosInsertCall) doRequest(alt string) (*http.Response, error) {
 	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "videos")
 	if c.mediaInfo_ != nil {
-		urls = strings.Replace(urls, "https://www.googleapis.com/", "https://www.googleapis.com/upload/", 1)
+		urls = googleapi.ResolveRelative(c.s.BasePath, "/upload/youtube/v3/videos")
 		c.urlParams_.Set("uploadType", c.mediaInfo_.UploadType())
 	}
 	if body == nil {
@@ -22624,7 +23432,7 @@ func (c *VideosInsertCall) Do(opts ...googleapi.CallOption) (*Video, error) {
 	//       "application/octet-stream",
 	//       "video/*"
 	//     ],
-	//     "maxSize": "64GB",
+	//     "maxSize": "128GB",
 	//     "protocols": {
 	//       "resumable": {
 	//         "multipart": true,
@@ -22880,6 +23688,7 @@ func (c *VideosListCall) Header() http.Header {
 
 func (c *VideosListCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -23117,6 +23926,7 @@ func (c *VideosRateCall) Header() http.Header {
 
 func (c *VideosRateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -23250,6 +24060,7 @@ func (c *VideosReportAbuseCall) Header() http.Header {
 
 func (c *VideosReportAbuseCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -23372,6 +24183,7 @@ func (c *VideosUpdateCall) Header() http.Header {
 
 func (c *VideosUpdateCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -23570,6 +24382,7 @@ func (c *WatermarksSetCall) Header() http.Header {
 
 func (c *WatermarksSetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}
@@ -23584,7 +24397,7 @@ func (c *WatermarksSetCall) doRequest(alt string) (*http.Response, error) {
 	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "watermarks/set")
 	if c.mediaInfo_ != nil {
-		urls = strings.Replace(urls, "https://www.googleapis.com/", "https://www.googleapis.com/upload/", 1)
+		urls = googleapi.ResolveRelative(c.s.BasePath, "/upload/youtube/v3/watermarks/set")
 		c.urlParams_.Set("uploadType", c.mediaInfo_.UploadType())
 	}
 	if body == nil {
@@ -23746,6 +24559,7 @@ func (c *WatermarksUnsetCall) Header() http.Header {
 
 func (c *WatermarksUnsetCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
+	reqHeaders.Set("x-goog-api-client", "gl-go/1.11.0 gdcl/20191115")
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
 	}

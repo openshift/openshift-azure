@@ -48,6 +48,11 @@ func TestEcho(t *testing.T) {
 }
 
 func TestForwardResponseOption(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+		return
+	}
+
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -670,6 +675,11 @@ func testABELookup(t *testing.T, port int) {
 // Then, issue a PATCH request updating only the string_value
 // Then, GET the resource and verify that string_value is changed, but int32_value isn't
 func TestABEPatch(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+		return
+	}
+
 	port := 8080
 
 	// create a record with a known string_value and int32_value
@@ -707,7 +717,13 @@ func TestABEPatch(t *testing.T) {
 }
 
 // TestABEPatchBody demonstrates the ability to specify an update mask within the request body.
+// This binding does not use an automatically generated update_mask.
 func TestABEPatchBody(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+		return
+	}
+
 	port := 8080
 
 	for _, tc := range []struct {
@@ -719,6 +735,7 @@ func TestABEPatchBody(t *testing.T) {
 		{
 			name: "with fieldmask provided",
 			originalValue: gw.ABitOfEverything{
+				Int32Value:   42,
 				StringValue:  "rabbit",
 				SingleNested: &gw.ABitOfEverything_Nested{Name: "some value that will get overwritten", Amount: 345},
 			},
@@ -726,11 +743,17 @@ func TestABEPatchBody(t *testing.T) {
 				StringValue:  "some value that won't get updated because it's not in the field mask",
 				SingleNested: &gw.ABitOfEverything_Nested{Amount: 456},
 			}, UpdateMask: &field_mask.FieldMask{Paths: []string{"single_nested"}}},
-			want: gw.ABitOfEverything{StringValue: "rabbit", SingleNested: &gw.ABitOfEverything_Nested{Amount: 456}},
+			want: gw.ABitOfEverything{
+				Int32Value:   42,
+				StringValue:  "rabbit",
+				SingleNested: &gw.ABitOfEverything_Nested{Amount: 456},
+			},
 		},
 		{
+			// N.B. This case passes the empty field mask to the UpdateV2 method so falls back to PUT semantics as per the implementation.
 			name: "with empty fieldmask",
 			originalValue: gw.ABitOfEverything{
+				Int32Value:   42,
 				StringValue:  "some value that will get overwritten",
 				SingleNested: &gw.ABitOfEverything_Nested{Name: "value that will get empty", Amount: 345},
 			},
@@ -744,8 +767,10 @@ func TestABEPatchBody(t *testing.T) {
 			},
 		},
 		{
+			// N.B. This case passes the nil field mask to the UpdateV2 method so falls back to PUT semantics as per the implementation.
 			name: "with nil fieldmask",
 			originalValue: gw.ABitOfEverything{
+				Int32Value:   42,
 				StringValue:  "some value that will get overwritten",
 				SingleNested: &gw.ABitOfEverything_Nested{Name: "value that will get empty", Amount: 123},
 			},
@@ -1254,6 +1279,11 @@ func testABERepeated(t *testing.T, port int) {
 }
 
 func TestTimeout(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+		return
+	}
+
 	apiURL := "http://localhost:8080/v2/example/timeout"
 	req, err := http.NewRequest("GET", apiURL, nil)
 	if err != nil {
@@ -1274,6 +1304,11 @@ func TestTimeout(t *testing.T) {
 }
 
 func TestErrorWithDetails(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+		return
+	}
+
 	apiURL := "http://localhost:8080/v2/example/errorwithdetails"
 	resp, err := http.Get(apiURL)
 	if err != nil {
@@ -1334,6 +1369,11 @@ func TestErrorWithDetails(t *testing.T) {
 }
 
 func TestPostWithEmptyBody(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+		return
+	}
+
 	apiURL := "http://localhost:8080/v2/example/postwithemptybody/name"
 	rep, err := http.Post(apiURL, "application/json", nil)
 
@@ -1350,6 +1390,11 @@ func TestPostWithEmptyBody(t *testing.T) {
 }
 
 func TestUnknownPath(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+		return
+	}
+
 	apiURL := "http://localhost:8080"
 	resp, err := http.Post(apiURL, "application/json", strings.NewReader("{}"))
 	if err != nil {
@@ -1370,6 +1415,11 @@ func TestUnknownPath(t *testing.T) {
 }
 
 func TestMethodNotAllowed(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+		return
+	}
+
 	apiURL := "http://localhost:8080/v1/example/echo/myid"
 	resp, err := http.Get(apiURL)
 	if err != nil {
@@ -1390,6 +1440,11 @@ func TestMethodNotAllowed(t *testing.T) {
 }
 
 func TestInvalidArgument(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+		return
+	}
+
 	apiURL := "http://localhost:8080/v1/example/echo/myid/not_int64"
 	resp, err := http.Get(apiURL)
 	if err != nil {
@@ -1479,6 +1534,10 @@ func testResponseStrings(t *testing.T, port int) {
 		}
 	}()
 
+	if err := waitForGateway(ctx, 8081); err != nil {
+		t.Fatalf("waitForGateway(ctx, 8081) failed with %v; want success", err)
+	}
+
 	port = 8081
 
 	for i, spec := range []struct {
@@ -1530,6 +1589,11 @@ func testResponseStrings(t *testing.T, port int) {
 }
 
 func TestRequestQueryParams(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+		return
+	}
+
 	port := 8080
 
 	formValues := url.Values{}
@@ -1551,6 +1615,14 @@ func TestRequestQueryParams(t *testing.T) {
 			contentType: "application/json",
 			apiURL:      fmt.Sprintf("http://localhost:%d/v1/example/a_bit_of_everything/params/get/foo?double_value=%v&bool_value=%v", port, 1234.56, true),
 			wantContent: `{"single_nested":{"name":"foo"},"double_value":1234.56,"bool_value":true}`,
+		},
+		{
+			name:        "get nested enum url parameter",
+			httpMethod:  "GET",
+			contentType: "application/json",
+			// If nested_enum.OK were FALSE, the content of single_nested would be {} due to how 0 values are serialized
+			apiURL:      fmt.Sprintf("http://localhost:%d/v1/example/a_bit_of_everything/params/get/nested_enum/TRUE", port),
+			wantContent: `{"single_nested":{"ok":"TRUE"}}`,
 		},
 		{
 			name:           "post url query values",
@@ -1603,5 +1675,109 @@ func TestRequestQueryParams(t *testing.T) {
 				t.Errorf("http.method (%q) http.url (%q) response = %q; want %q", tc.httpMethod, tc.apiURL, gotContent, tc.wantContent)
 			}
 		})
+	}
+}
+
+func TestNonStandardNames(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+		return
+	}
+
+	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	go func() {
+		if err := runGateway(
+			ctx,
+			":8081",
+			runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{OrigName: true, EmitDefaults: true}),
+		); err != nil {
+			t.Errorf("runGateway() failed with %v; want success", err)
+			return
+		}
+	}()
+	go func() {
+		if err := runGateway(
+			ctx,
+			":8082",
+			runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{OrigName: false, EmitDefaults: true}),
+		); err != nil {
+			t.Errorf("runGateway() failed with %v; want success", err)
+			return
+		}
+	}()
+
+	if err := waitForGateway(ctx, 8081); err != nil {
+		t.Errorf("waitForGateway(ctx, 8081) failed with %v; want success", err)
+	}
+	if err := waitForGateway(ctx, 8082); err != nil {
+		t.Errorf("waitForGateway(ctx, 8082) failed with %v; want success", err)
+	}
+
+	for _, tc := range []struct {
+		name     string
+		port     int
+		method   string
+		jsonBody string
+	}{
+		{
+			"Test standard update method",
+			8081,
+			"update",
+			`{"id":"foo","Num":"1","line_num":"42","langIdent":"English","STATUS":"good","en_GB":"1","no":"yes","thing":{"subThing":{"sub_value":"hi"}}}`,
+		},
+		{
+			"Test update method using json_names in message",
+			8081,
+			"update_with_json_names",
+			// N.B. json_names have no effect if not using OrigName: false
+			`{"id":"foo","Num":"1","line_num":"42","langIdent":"English","STATUS":"good","en_GB":"1","no":"yes","thing":{"subThing":{"sub_value":"hi"}}}`,
+		},
+		{
+			"Test standard update method with OrigName: false marshaller option",
+			8082,
+			"update",
+			`{"id":"foo","Num":"1","lineNum":"42","langIdent":"English","STATUS":"good","enGB":"1","no":"yes","thing":{"subThing":{"subValue":"hi"}}}`,
+		},
+		{
+			"Test update method using json_names in message with OrigName: false marshaller option",
+			8082,
+			"update_with_json_names",
+			`{"ID":"foo","Num":"1","LineNum":"42","langIdent":"English","status":"good","En_GB":"1","yes":"no","Thingy":{"SubThing":{"sub_Value":"hi"}}}`,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			testNonStandardNames(t, tc.port, tc.method, tc.jsonBody)
+		})
+	}
+}
+
+func testNonStandardNames(t *testing.T, port int, method string, jsonBody string) {
+	req, err := http.NewRequest(
+		http.MethodPatch,
+		fmt.Sprintf("http://localhost:%d/v1/example/non_standard/%s", port, method),
+		strings.NewReader(jsonBody),
+	)
+	if err != nil {
+		t.Fatalf("http.NewRequest(PATCH) failed with %v; want success", err)
+	}
+	patchResp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("failed to issue PATCH request: %v", err)
+	}
+
+	body, err := ioutil.ReadAll(patchResp.Body)
+	if err != nil {
+		t.Errorf("patchResp body couldn't be read: %v", err)
+	}
+
+	if got, want := patchResp.StatusCode, http.StatusOK; got != want {
+		t.Errorf("patchResp.StatusCode= %d; want %d resp: %v", got, want, string(body))
+	}
+
+	if got, want := string(body), jsonBody; got != want {
+		t.Errorf("got %q; want %q", got, want)
 	}
 }
