@@ -54,6 +54,7 @@ type Upgrader interface {
 	EtcdRestoreDeleteMasterScaleSet(ctx context.Context) *api.PluginError
 	EtcdRestoreDeleteMasterScaleSetHashes(ctx context.Context) *api.PluginError
 	ResetUpdateBlob() error
+	Restart(ctx context.Context, scaleset, instanceID string) error
 	Reimage(ctx context.Context, scaleset, instanceID string) error
 	ListVMHostnames(ctx context.Context) ([]string, error)
 	RunCommand(ctx context.Context, scaleset, instanceID, command string) error

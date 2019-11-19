@@ -585,6 +585,41 @@ func (p *plugin) ListClusterVMs(ctx context.Context, cs *api.OpenShiftManagedClu
 	return &api.GenevaActionListClusterVMs{VMs: &pods}, nil
 }
 
+func (p *plugin) Restart(ctx context.Context, cs *api.OpenShiftManagedCluster, hostname string) error {
+	if !validate.IsValidAgentPoolHostname(hostname) {
+		return fmt.Errorf("invalid hostname %q", hostname)
+	}
+	if err := p.checkIfClusterWillRefresh(ctx, cs); err != nil {
+		return err
+	}
+	scaleset, instanceID, err := names.GetScaleSetNameAndInstanceID(hostname)
+	if err != nil {
+		return err
+	}
+
+	p.log.Info("creating clients")
+	clusterUpgrader, err := p.upgraderFactory(ctx, p.log, cs, true, true, p.testConfig)
+	if err != nil {
+		return err
+	}
+
+	p.log.Infof("restarting %s", hostname)
+	err = clusterUpgrader.Restart(ctx, scaleset, instanceID)
+	if err != nil {
+		return err
+	}
+
+	// not sure if we should do the following here: if the cluster is hosed, it
+	// really might not help us.
+	p.log.Infof("waiting for %s to be ready", hostname)
+	if strings.HasPrefix(hostname, "master-") {
+		err = clusterUpgrader.WaitForReadyMaster(ctx, hostname)
+	} else {
+		err = clusterUpgrader.WaitForReadyWorker(ctx, hostname)
+	}
+	return err
+}
+
 func (p *plugin) Reimage(ctx context.Context, cs *api.OpenShiftManagedCluster, hostname string) error {
 	if !validate.IsValidAgentPoolHostname(hostname) {
 		return fmt.Errorf("invalid hostname %q", hostname)
