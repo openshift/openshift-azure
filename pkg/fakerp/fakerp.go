@@ -343,15 +343,7 @@ func enrichCs(p api.Plugin, cs *api.OpenShiftManagedCluster, conf *client.Config
 	cs.Properties.APICertProfile.KeyVaultSecretURL = vaultURL + "/secrets/" + vaultKeyNamePublicHostname
 	cs.Properties.RouterProfiles[0].RouterCertProfile.KeyVaultSecretURL = vaultURL + "/secrets/" + vaultKeyNameRouter
 
-	if cs.Properties.PrivateAPIServer {
-		// In private mode we just set FQDN and PublicHostname to a static IP.
-		apiServerIP, err := p.GetPrivateAPIServerIPAddress(cs)
-		if err != nil {
-			return err
-		}
-		cs.Properties.PublicHostname = apiServerIP
-		cs.Properties.FQDN = apiServerIP
-	} else {
+	if !cs.Properties.PrivateAPIServer {
 		cs.Properties.PublicHostname = "openshift." + conf.ResourceGroup + "." + conf.DNSDomain
 		if cs.Properties.FQDN == "" {
 			cs.Properties.FQDN, err = random.FQDN(cs.Location+".cloudapp.azure.com", 20)
