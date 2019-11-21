@@ -61,7 +61,8 @@ func validateProperties(p *api.Properties, location string, externalOnly bool) (
 			if p.FQDN != p.PublicHostname {
 				errs = append(errs, fmt.Errorf("invalid properties.fqdn %q: must be equal to properties.publicHostname", p.FQDN))
 			}
-			if !isIPWithinSubnet(p.FQDN, p.AgentPoolProfiles[0].SubnetCIDR) {
+			// allow an empty FQDN, as it can be set in GenerateConfig() and thus will be empty here.
+			if p.FQDN != "" && !isIPWithinSubnet(p.FQDN, p.AgentPoolProfiles[0].SubnetCIDR) {
 				errs = append(errs, fmt.Errorf("invalid properties.fqdn %q: must be in Master's subnet", p.FQDN))
 			}
 		} else {

@@ -12,6 +12,7 @@ import (
 
 	api "github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
+	"github.com/openshift/openshift-azure/pkg/util/enrich"
 	"github.com/openshift/openshift-azure/pkg/util/kubeconfig"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
@@ -21,6 +22,13 @@ func (g *simpleGenerator) Generate(template *pluginapi.Config, setVersionFields 
 	config, err := pluginapi.ToInternal(template, &g.cs.Config, setVersionFields)
 	if err != nil {
 		return err
+	}
+
+	if g.cs.Properties.PrivateAPIServer && (g.cs.Properties.FQDN == "" || g.cs.Properties.PublicHostname == "") {
+		err := enrich.PrivateAPIServerIPAddress(g.cs)
+		if err != nil {
+			return err
+		}
 	}
 
 	g.cs.Config = *config
