@@ -5,12 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net"
 	"reflect"
 	"strings"
 	"time"
 
-	"github.com/apparentlymart/go-cidr/cidr"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -117,28 +115,6 @@ func (p *plugin) ValidatePluginTemplate(ctx context.Context) []error {
 	p.log.Info("validating external plugin api data models")
 	validator := validate.NewPluginAPIValidator()
 	return validator.Validate(p.pluginConfig)
-}
-
-func (p *plugin) GetPrivateAPIServerIPAddress(cs *api.OpenShiftManagedCluster) (string, error) {
-	var subnetCIDR string
-	for _, app := range cs.Properties.AgentPoolProfiles {
-		if app.Role == api.AgentPoolProfileRoleMaster {
-			subnetCIDR = cs.Properties.AgentPoolProfiles[0].SubnetCIDR
-		}
-	}
-	if subnetCIDR == "" {
-		return "", fmt.Errorf("no master profile subnetCIDR")
-	}
-	_, ipSubnet, err := net.ParseCIDR(subnetCIDR)
-	if err != nil {
-		return "", err
-	}
-	count := cidr.AddressCount(ipSubnet)
-	apiIP, err := cidr.Host(ipSubnet, int(count-2))
-	if err != nil {
-		return "", err
-	}
-	return apiIP.String(), nil
 }
 
 func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) error {

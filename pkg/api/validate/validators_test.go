@@ -217,6 +217,13 @@ func TestValidate(t *testing.T) {
 			},
 			expectedErrs: []error{errors.New(`invalid properties.publicHostname ""`)},
 		},
+		"openshift config empty public hostname when private": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.PrivateAPIServer = true
+				oc.Properties.FQDN = ""
+				oc.Properties.PublicHostname = ""
+			},
+		},
 		"openshift config invalid public hostname": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Properties.PublicHostname = "bad!"
@@ -283,10 +290,10 @@ func TestValidate(t *testing.T) {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Properties.NetworkProfile.ManagementSubnetCIDR = nil
 				oc.Properties.PrivateAPIServer = true
+				oc.Properties.FQDN = "10.0.0.254"
+				oc.Properties.PublicHostname = "10.0.0.254"
 			},
 			expectedErrs: []error{
-				errors.New(`invalid properties.fqdn "example.eastus.cloudapp.azure.com": must be equal to properties.publicHostname`),
-				errors.New(`invalid properties.fqdn "example.eastus.cloudapp.azure.com": must be in Master's subnet`),
 				errors.New(`properties.networkProfile.managementSubnetCIDR cannot be nil with privateAPIServer enabled`),
 			},
 		},

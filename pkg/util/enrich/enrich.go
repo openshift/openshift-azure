@@ -2,9 +2,12 @@ package enrich
 
 import (
 	"context"
+	"fmt"
+	"net"
 	"time"
 
 	azstorage "github.com/Azure/azure-sdk-for-go/storage"
+	"github.com/apparentlymart/go-cidr/cidr"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/keyvault"
@@ -96,5 +99,29 @@ func MonitorIDAndKey(ctx context.Context, client operationalinsights.WorkspacesC
 	}
 	cs.Properties.MonitorProfile.WorkspaceID = wID
 	cs.Properties.MonitorProfile.WorkspaceKey = wKey
+	return nil
+}
+
+func PrivateAPIServerIPAddress(cs *api.OpenShiftManagedCluster) error {
+	var subnetCIDR string
+	for _, app := range cs.Properties.AgentPoolProfiles {
+		if app.Role == api.AgentPoolProfileRoleMaster {
+			subnetCIDR = cs.Properties.AgentPoolProfiles[0].SubnetCIDR
+		}
+	}
+	if subnetCIDR == "" {
+		return fmt.Errorf("no master profile subnetCIDR")
+	}
+	_, ipSubnet, err := net.ParseCIDR(subnetCIDR)
+	if err != nil {
+		return err
+	}
+	count := cidr.AddressCount(ipSubnet)
+	apiIP, err := cidr.Host(ipSubnet, int(count-2))
+	if err != nil {
+		return err
+	}
+	cs.Properties.PublicHostname = apiIP.String()
+	cs.Properties.FQDN = apiIP.String()
 	return nil
 }
