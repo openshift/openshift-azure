@@ -346,6 +346,74 @@ func TestReimage(t *testing.T) {
 		})
 	}
 }
+func TestRestart(t *testing.T) {
+	gmc := gomock.NewController(t)
+	defer gmc.Finish()
+
+	tests := []struct {
+		name     string
+		hostname string
+		isMaster bool
+	}{
+		{
+			name:     "restart master vm",
+			hostname: "master-000A00",
+			isMaster: true,
+		},
+		{
+			name:     "restart compute vm",
+			hostname: "compute-1550971226-000000",
+			isMaster: false,
+		},
+		{
+			name:     "restart infra vm",
+			hostname: "infra-1550971226-000000",
+			isMaster: false,
+		},
+	}
+	cs := &api.OpenShiftManagedCluster{
+		Properties: api.Properties{
+			AzProfile: api.AzProfile{
+				SubscriptionID: "foo",
+				ResourceGroup:  "bar",
+			},
+			NetworkProfile: api.NetworkProfile{
+				Nameservers: []string{"1.2.3.4"},
+			},
+			RefreshCluster: to.BoolPtr(false),
+		},
+	}
+	logger := logrus.NewEntry(logrus.StandardLogger())
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
+
+			scaleset, instanceID, err := names.GetScaleSetNameAndInstanceID(tt.hostname)
+			if err != nil {
+				t.Fatal(err)
+			}
+			c := clusterUpgrader.EXPECT().GetNameserversFromVnet(nil, logger, cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup).Return([]string{"1.2.3.4"}, nil)
+			c = clusterUpgrader.EXPECT().Restart(nil, scaleset, instanceID).Return(nil).After(c)
+
+			if tt.isMaster {
+				c = clusterUpgrader.EXPECT().WaitForReadyMaster(nil, tt.hostname).Return(nil).After(c)
+			} else {
+				c = clusterUpgrader.EXPECT().WaitForReadyWorker(nil, tt.hostname).Return(nil).After(c)
+			}
+
+			p := &plugin{
+				upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
+					return clusterUpgrader, nil
+				},
+				log: logger,
+			}
+
+			if err := p.Restart(nil, cs, tt.hostname); err != nil {
+				t.Errorf("plugin.Restart(%s) error = %v", tt.hostname, err)
+			}
+		})
+	}
+}
 
 func TestBackupEtcdCluster(t *testing.T) {
 	gmc := gomock.NewController(t)
