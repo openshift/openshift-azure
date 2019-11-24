@@ -17,6 +17,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/util/retry"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/random"
@@ -339,4 +340,85 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Ev
 		}
 	})
 	// Placeholder to test that a ded admin cannot delete pods in the default or openshift- namespaces
+
+	It("should not be able to create a non-whitelisted privileged container", func() {
+		namespace, err := random.LowerCaseAlphanumericString(5)
+		Expect(err).ToNot(HaveOccurred())
+		namespace = "e2e-test-" + namespace
+		err = sanity.Checker.Client.EndUser.CreateProject(namespace)
+		Expect(err).ToNot(HaveOccurred())
+		defer sanity.Checker.Client.EndUser.CleanupProject(namespace)
+
+		err = retry.RetryOnConflict(retry.DefaultRetry, func() error {
+			scc, err := sanity.Checker.Client.CustomerAdmin.SecurityV1.SecurityContextConstraints().Get("privileged", metav1.GetOptions{})
+			if err != nil {
+				return err
+			}
+
+			scc.Users = append(scc.Users, "system:serviceaccount:"+namespace+":default")
+
+			_, err = sanity.Checker.Client.CustomerAdmin.SecurityV1.SecurityContextConstraints().Update(scc)
+			return err
+		})
+		Expect(err).ToNot(HaveOccurred())
+
+		_, err = sanity.Checker.Client.EndUser.CoreV1.Pods(namespace).Create(&v1.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "test",
+			},
+			Spec: v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "test",
+						Image: "notwhitelisted",
+						SecurityContext: &v1.SecurityContext{
+							Privileged: &[]bool{true}[0],
+						},
+					},
+				},
+			},
+		})
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(Equal(`admission webhook "aro-admission-controller.aro.openshift.io" denied the request: spec.containers[0]: Forbidden: requires privileges but image is not whitelisted on platform`))
+
+		_, err = sanity.Checker.Client.EndUser.CoreV1.Pods(namespace).Create(&v1.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "test",
+			},
+			Spec: v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "test",
+						Image: "registry.aquasec.com/console:doesnotexist",
+						SecurityContext: &v1.SecurityContext{
+							Privileged: &[]bool{true}[0],
+						},
+					},
+				},
+			},
+		})
+		Expect(err).ToNot(HaveOccurred())
+
+		err = retry.RetryOnConflict(retry.DefaultRetry, func() error {
+			scc, err := sanity.Checker.Client.CustomerAdmin.SecurityV1.SecurityContextConstraints().Get("privileged", metav1.GetOptions{})
+			if err != nil {
+				return err
+			}
+
+			var newUsers []string
+			for _, user := range scc.Users {
+				if user == "system:serviceaccount:"+namespace+":default" {
+					continue
+				}
+
+				newUsers = append(newUsers, user)
+			}
+
+			scc.Users = newUsers
+
+			_, err = sanity.Checker.Client.CustomerAdmin.SecurityV1.SecurityContextConstraints().Update(scc)
+			return err
+		})
+		Expect(err).ToNot(HaveOccurred())
+	})
 })

@@ -24,7 +24,7 @@ func NewCommand() *cobra.Command {
 			return start(cfg)
 		},
 	}
-	cc.Flags().String("configfile", "/etc/aro-admission-controller/aro-admission-controller.yaml", "configuration file for ARO admission controller")
+	cc.Flags().String("configfile", "/_data/aro-admission-controller/aro-admission-controller.yaml", "configuration file for ARO admission controller")
 
 	return cc
 }

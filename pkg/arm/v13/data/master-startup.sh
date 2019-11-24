@@ -65,14 +65,12 @@ if ! grep /var/lib/etcd /etc/fstab; then
   restorecon -R /var/lib/etcd
 fi
 
-for dst in tcp,8444; do
+# accepting 8443 for the admission controller
+for dst in tcp,8443 tcp,8444; do
 	proto=${dst%%,*}
 	port=${dst##*,}
 	iptables -A OS_FIREWALL_ALLOW -p $proto -m state --state NEW -m $proto --dport $port -j ACCEPT -w
 done
-
-# accepting 8443 for the admission controller
-iptables -A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 8443 -j ACCEPT -w
 
 iptables-save >/etc/sysconfig/iptables
 

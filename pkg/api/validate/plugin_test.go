@@ -48,7 +48,6 @@ func TestPluginTemplateValidate(t *testing.T) {
 			errors.New(`invalid versions[""].images.logAnalyticsAgent ""`),
 			errors.New(`invalid versions[""].images.azureControllers ""`),
 			errors.New(`invalid versions[""].images.canary ""`),
-			errors.New(`invalid versions[""].images.aroAdmissionController ""`),
 			errors.New(`invalid versions[""].images.etcdBackup ""`),
 			errors.New(`invalid versions[""].images.metricsBridge ""`),
 			errors.New(`invalid versions[""].images.startup ""`),

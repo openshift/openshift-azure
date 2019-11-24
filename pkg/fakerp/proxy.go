@@ -2,6 +2,7 @@ package fakerp
 
 import (
 	"bufio"
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
@@ -46,8 +47,8 @@ func ConfigureProxyDialer() error {
 		return fmt.Errorf("error configuring proxy")
 	}
 
-	roundtrippers.PrivateEndpointDialHook = func(location string) func(network, address string) (net.Conn, error) {
-		return func(network, address string) (net.Conn, error) {
+	roundtrippers.PrivateEndpointDialHook = func(location string) func(context.Context, string, string) (net.Conn, error) {
+		return func(ctx context.Context, network, address string) (net.Conn, error) {
 			proxyEnvName := "PROXYURL_" + strings.ToUpper(location)
 			proxyURL := os.Getenv(proxyEnvName)
 			if proxyURL == "" {

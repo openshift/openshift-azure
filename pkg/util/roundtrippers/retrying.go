@@ -1,6 +1,7 @@
 package roundtrippers
 
 import (
+	"context"
 	"errors"
 	"net"
 	"net/http"
@@ -14,7 +15,10 @@ import (
 
 // PrivateEndpointDialHook is overridden in only the fake RP: in this case it
 // connects us via the development proxy infrastructure
-var PrivateEndpointDialHook = func(location string) func(network, address string) (net.Conn, error) { return net.Dial }
+var PrivateEndpointDialHook = func(location string) func(context.Context, string, string) (net.Conn, error) {
+	var d net.Dialer
+	return d.DialContext
+}
 
 // The RetryingRoundTripper implementation is customised to help with multiple
 // network connection-related issues seen in CI which we haven't necessarily
@@ -71,17 +75,6 @@ type RetryingRoundTripper struct {
 // For example: always in the RP context, never in the sync pod context.
 func NewRetryingRoundTripper(log *logrus.Entry, location string, privateEndpoint *string, disableKeepAlives bool) func(rt http.RoundTripper) http.RoundTripper {
 	return func(rt http.RoundTripper) http.RoundTripper {
-		if privateEndpoint != nil {
-			rt.(*http.Transport).Dial = func(network, addr string) (net.Conn, error) {
-				_, port, err := net.SplitHostPort(addr)
-				if err != nil {
-					return nil, err
-				}
-
-				return PrivateEndpointDialHook(location)(network, net.JoinHostPort(*privateEndpoint, port))
-			}
-		}
-
 		rt.(*http.Transport).DisableKeepAlives = disableKeepAlives
 
 		// now wrap our RetryingRoundTripper around the incoming RoundTripper.

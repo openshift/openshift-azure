@@ -41,3 +41,25 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (
 
 	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)
 }
+
+// hack: these additional functions are a bit of a violation (really they ought
+// to belong in Interface), but they can be (are) called with an unenriched
+// `cs`, which is not currently true of New().
+
+func AssetNames(cs *api.OpenShiftManagedCluster) ([]string, error) {
+	switch cs.Config.PluginVersion {
+	case "v13.0":
+		return v13.AssetNames(), nil
+	}
+
+	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)
+}
+
+func Asset(cs *api.OpenShiftManagedCluster, name string) ([]byte, error) {
+	switch cs.Config.PluginVersion {
+	case "v13.0":
+		return v13.Asset(name)
+	}
+
+	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)
+}

@@ -2,6 +2,7 @@ package arm
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-07-01/network"
@@ -19,10 +20,10 @@ func privateLinkService(cs *api.OpenShiftManagedCluster) *pl.PrivateLinkService 
 	return &pl.PrivateLinkService{
 		PrivateLinkServiceProperties: &pl.PrivateLinkServiceProperties{
 			Visibility: &pl.PrivateLinkServicePropertiesVisibility{
-				Subscriptions: &[]string{"*"},
+				Subscriptions: &[]string{os.Getenv("AZURE_SUBSCRIPTION_ID")},
 			},
 			AutoApproval: &pl.PrivateLinkServicePropertiesAutoApproval{
-				Subscriptions: &[]string{"*"},
+				Subscriptions: &[]string{os.Getenv("AZURE_SUBSCRIPTION_ID")},
 			},
 			LoadBalancerFrontendIPConfigurations: &[]network.FrontendIPConfiguration{
 				{

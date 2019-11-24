@@ -344,7 +344,7 @@ func (sc *SanityChecker) checkCanAccessService(ctx context.Context, url string, 
 				return nil, err
 			}
 
-			return roundtrippers.PrivateEndpointDialHook(sc.cs.Location)(network, net.JoinHostPort(*sc.cs.Properties.NetworkProfile.PrivateEndpoint, port))
+			return roundtrippers.PrivateEndpointDialHook(sc.cs.Location)(ctx, network, net.JoinHostPort(*sc.cs.Properties.NetworkProfile.PrivateEndpoint, port))
 		}
 	}
 

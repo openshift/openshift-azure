@@ -152,6 +152,10 @@ func clean(o unstructured.Unstructured) error {
 			cleanMetadata(vct.(map[string]interface{}))
 		}
 		jsonpath.MustCompile("$.spec.volumeClaimTemplates[*].status").Delete(o.Object)
+
+	case "ValidatingWebhookConfiguration.admissionregistration.k8s.io":
+		jsonpath.MustCompile("$.webhooks[*].clientConfig.caBundle").DeleteIfMatch(o.Object, nil)
+		jsonpath.MustCompile("$.webhooks[*].namespaceSelector").DeleteIfMatch(o.Object, map[string]interface{}{})
 	}
 
 	cleanMetadata(o.Object)

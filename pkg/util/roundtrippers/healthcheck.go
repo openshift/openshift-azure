@@ -1,6 +1,7 @@
 package roundtrippers
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"net"
@@ -25,7 +26,7 @@ func HealthCheck(dialHost string, cert *x509.Certificate, location string, priva
 			}
 			var c net.Conn
 			if privateEndpoint != nil {
-				c, err = PrivateEndpointDialHook(location)(network, net.JoinHostPort(*privateEndpoint, port))
+				c, err = PrivateEndpointDialHook(location)(context.TODO(), network, net.JoinHostPort(*privateEndpoint, port))
 				if err != nil {
 					return nil, err
 				}

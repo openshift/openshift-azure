@@ -350,47 +350,38 @@ func (s *sync) writeDB() error {
 	if err := s.applyResources(storageClassFilter, keys); err != nil {
 		return err
 	}
-
-	// refresh dynamic client
-	if err := s.updateDynamicClient(); err != nil {
-		return err
-	}
-
-	// create Service resources
-	// has to happen before waiting for the aro-admission-controller
-	s.log.Debug("applying Service resources")
+	// create services before validatingwebhookconfigurations
+	s.log.Debug("applying service resources")
 	if err := s.applyResources(serviceFilter, keys); err != nil {
 		return err
 	}
 
-	// wait for aro-admission-controller pods to be ready
-	podOpts := metav1.ListOptions{
-		LabelSelector: "openshift.io/component=aro-admission-controller",
-	}
+	// wait for aro-admission-controller pods to be ready before validatingwebhookconfigurations
 	s.log.Debug("waiting for admission controller pods")
 	err = wait.PollImmediateInfinite(5*time.Second, func() (bool, error) {
-		pods, err := s.kc.Core().Pods("kube-system").List(podOpts)
+		pods, err := s.kc.Core().Pods("kube-system").List(metav1.ListOptions{
+			LabelSelector: "openshift.io/component=aro-admission-controller",
+		})
 		if err != nil {
-			s.log.Errorf("Error when listing pods: %s", err)
 			return false, err
 		}
-		if len(pods.Items) == 3 {
-			allReady := true
-			for _, pod := range pods.Items {
-				if !ready.PodIsReady(&pod) {
-					allReady = false
-				}
-			}
-			if allReady {
-				s.log.Debug("Setup: Found 3 aro-admission-controller pods in Ready state, setup continues")
-				return true, nil
+		var count int
+		for _, pod := range pods.Items {
+			if ready.PodIsReady(&pod) {
+				count++
 			}
 		}
-		return false, nil
+		return count == 3, nil
 	})
+
 	// create ValidatingWebhookConfiguration resources
-	s.log.Debug("applying ValidatingWebhookConfiguration resources")
+	s.log.Debug("applying validatingwebhookconfiguration resources")
 	if err := s.applyResources(vwcFilter, keys); err != nil {
+		return err
+	}
+
+	// refresh dynamic client
+	if err := s.updateDynamicClient(); err != nil {
 		return err
 	}
 
