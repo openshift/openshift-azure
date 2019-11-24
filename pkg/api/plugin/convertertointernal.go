@@ -74,6 +74,7 @@ func ToInternal(in *Config, old *api.Config, setVersionFields bool) (*api.Config
 
 		c.Images.AzureControllers = inVersion.Images.AzureControllers
 		c.Images.Canary = inVersion.Images.Canary
+		c.Images.AroAdmissionController = inVersion.Images.AroAdmissionController
 		c.Images.EtcdBackup = inVersion.Images.EtcdBackup
 		c.Images.MetricsBridge = inVersion.Images.MetricsBridge
 		c.Images.Startup = inVersion.Images.Startup

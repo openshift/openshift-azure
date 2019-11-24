@@ -95,13 +95,14 @@ type ImageConfig struct {
 	GenevaStatsd  string `json:"genevaStatsd,omitempty"`
 	GenevaTDAgent string `json:"genevaTDAgent,omitempty"`
 
-	AzureControllers string `json:"azureControllers,omitempty"`
-	Canary           string `json:"canary,omitempty"`
-	EtcdBackup       string `json:"etcdBackup,omitempty"`
-	MetricsBridge    string `json:"metricsBridge,omitempty"`
-	Startup          string `json:"startup,omitempty"`
-	Sync             string `json:"sync,omitempty"`
-	TLSProxy         string `json:"tlsProxy,omitempty"`
+	AzureControllers       string `json:"azureControllers,omitempty"`
+	AroAdmissionController string `json:"aroAdmissionController,omitempty"`
+	Canary                 string `json:"canary,omitempty"`
+	EtcdBackup             string `json:"etcdBackup,omitempty"`
+	MetricsBridge          string `json:"metricsBridge,omitempty"`
+	Startup                string `json:"startup,omitempty"`
+	Sync                   string `json:"sync,omitempty"`
+	TLSProxy               string `json:"tlsProxy,omitempty"`
 
 	LogAnalyticsAgent string `json:"logAnalyticsAgent,omitempty"`
 }

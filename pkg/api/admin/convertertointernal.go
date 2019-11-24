@@ -492,6 +492,12 @@ func mergeCertificateConfig(in *CertificateConfig, out *api.CertificateConfig) {
 	if in.ServiceCatalogServer != nil {
 		mergeCertKeyPair(in.ServiceCatalogServer, &out.ServiceCatalogServer)
 	}
+	if in.AroAdmissionController != nil {
+		mergeCertKeyPair(in.AroAdmissionController, &out.AroAdmissionController)
+	}
+	if in.AroAdmissionControllerClient != nil {
+		mergeCertKeyPair(in.AroAdmissionControllerClient, &out.AroAdmissionControllerClient)
+	}
 	if in.BlackBoxMonitor != nil {
 		mergeCertKeyPair(in.BlackBoxMonitor, &out.BlackBoxMonitor)
 	}
@@ -608,6 +614,9 @@ func mergeImageConfig(in *ImageConfig, out *api.ImageConfig) {
 	}
 	if in.Canary != nil {
 		out.Canary = *in.Canary
+	}
+	if in.AroAdmissionController != nil {
+		out.AroAdmissionController = *in.AroAdmissionController
 	}
 	if in.Startup != nil {
 		out.Startup = *in.Startup

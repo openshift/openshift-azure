@@ -25,10 +25,11 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
+	dynamic "k8s.io/client-go/deprecated-dynamic"
 	"k8s.io/client-go/discovery"
-	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/util/flowcontrol"
 	kaggregator "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 
@@ -273,6 +274,12 @@ var (
 	storageClassFilter = func(o unstructured.Unstructured) bool {
 		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "storage.k8s.io", Kind: "StorageClass"}
 	}
+	serviceFilter = func(o unstructured.Unstructured) bool {
+		return o.GroupVersionKind().Kind == "Service"
+	}
+	vwcFilter = func(o unstructured.Unstructured) bool {
+		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "admissionregistration.k8s.io", Kind: "ValidatingWebhookConfiguration"}
+	}
 	everythingElseFilter = func(o unstructured.Unstructured) bool {
 		return !crdFilter(o) &&
 			!nsFilter(o) &&
@@ -280,7 +287,9 @@ var (
 			!cfgFilter(o) &&
 			!storageClassFilter(o) &&
 			!scFilter(o) &&
-			!monitoringCrdFilter(o)
+			!monitoringCrdFilter(o) &&
+			!vwcFilter(o) &&
+			!serviceFilter(o)
 	}
 	scFilter = func(o unstructured.Unstructured) bool {
 		return o.GroupVersionKind().Group == "servicecatalog.k8s.io"
@@ -344,6 +353,44 @@ func (s *sync) writeDB() error {
 
 	// refresh dynamic client
 	if err := s.updateDynamicClient(); err != nil {
+		return err
+	}
+
+	// create Service resources
+	// has to happen before waiting for the aro-admission-controller
+	s.log.Debug("applying Service resources")
+	if err := s.applyResources(serviceFilter, keys); err != nil {
+		return err
+	}
+
+	// wait for aro-admission-controller pods to be ready
+	podOpts := metav1.ListOptions{
+		LabelSelector: "openshift.io/component=aro-admission-controller",
+	}
+	s.log.Debug("waiting for admission controller pods")
+	err = wait.PollImmediateInfinite(5*time.Second, func() (bool, error) {
+		pods, err := s.kc.Core().Pods("kube-system").List(podOpts)
+		if err != nil {
+			s.log.Errorf("Error when listing pods: %s", err)
+			return false, err
+		}
+		if len(pods.Items) == 3 {
+			allReady := true
+			for _, pod := range pods.Items {
+				if !ready.PodIsReady(&pod) {
+					allReady = false
+				}
+			}
+			if allReady {
+				s.log.Debug("Setup: Found 3 aro-admission-controller pods in Ready state, setup continues")
+				return true, nil
+			}
+		}
+		return false, nil
+	})
+	// create ValidatingWebhookConfiguration resources
+	s.log.Debug("applying ValidatingWebhookConfiguration resources")
+	if err := s.applyResources(vwcFilter, keys); err != nil {
 		return err
 	}
 
@@ -486,7 +533,7 @@ type sync struct {
 	ae         *kapiextensions.Clientset
 	cli        *discovery.DiscoveryClient
 	dyn        dynamic.ClientPool
-	grs        []*discovery.APIGroupResources
+	grs        []*restmapper.APIGroupResources
 
 	managedSharedResources bool
 }

@@ -213,6 +213,26 @@ func (g *simpleGenerator) Generate(template *pluginapi.Config, setVersionFields 
 		{
 			params: tls.CertParams{
 				Subject: pkix.Name{
+					CommonName: "aro-admission-controller.kube-system.svc",
+				},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			},
+			key:  &c.Certificates.AroAdmissionController.Key,
+			cert: &c.Certificates.AroAdmissionController.Cert,
+		},
+		{
+			params: tls.CertParams{
+				Subject: pkix.Name{
+					CommonName: "aro-admission-controller-client",
+				},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+			},
+			key:  &c.Certificates.AroAdmissionControllerClient.Key,
+			cert: &c.Certificates.AroAdmissionControllerClient.Cert,
+		},
+		{
+			params: tls.CertParams{
+				Subject: pkix.Name{
 					CommonName: "system:serviceaccount:openshift-infra:node-bootstrapper",
 				},
 				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},

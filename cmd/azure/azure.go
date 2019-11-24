@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/spf13/cobra"
 
+	"github.com/openshift/openshift-azure/pkg/entrypoint/admissioncontroller"
 	azurecontrollers "github.com/openshift/openshift-azure/pkg/entrypoint/azure-controllers"
 	"github.com/openshift/openshift-azure/pkg/entrypoint/canary"
 	"github.com/openshift/openshift-azure/pkg/entrypoint/etcdbackup"
@@ -35,6 +36,7 @@ func run() error {
 	rootCmd.AddCommand(startup.NewCommand())
 	rootCmd.AddCommand(sync.NewCommand())
 	rootCmd.AddCommand(tlsproxy.NewCommand())
+	rootCmd.AddCommand(admissioncontroller.NewCommand())
 
 	return rootCmd.Execute()
 }

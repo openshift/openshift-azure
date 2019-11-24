@@ -1,0 +1,105 @@
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: aro-admission-controller.aro.openshift.io
+webhooks:
+- clientConfig:
+    caBundle: null
+    service:
+      name: aro-admission-controller
+      namespace: kube-system
+      path: /podwhitelist
+  failurePolicy: Fail
+  name: pods.aro-admission-controller.aro.openshift.io
+  namespaceSelector: {}
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - pods
+- clientConfig:
+    caBundle: null
+    service:
+      name: aro-admission-controller
+      namespace: kube-system
+      path: /podwhitelist
+  failurePolicy: Fail
+  name: appsv1.aro-admission-controller.aro.openshift.io
+  namespaceSelector: {}
+  rules:
+  - apiGroups:
+    - apps
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - daemonsets
+    - replicasets
+    - statefulsets
+    - deploymentconfigs
+    - deployments
+- clientConfig:
+    caBundle: null
+    service:
+      name: aro-admission-controller
+      namespace: kube-system
+      path: /podwhitelist
+  failurePolicy: Fail
+  name: jobs.aro-admission-controller.aro.openshift.io
+  namespaceSelector: {}
+  rules:
+  - apiGroups:
+    - batch
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - jobs
+- clientConfig:
+    caBundle: null
+    service:
+      name: aro-admission-controller
+      namespace: kube-system
+      path: /podwhitelist
+  failurePolicy: Fail
+  name: cronjobs.aro-admission-controller.aro.openshift.io
+  namespaceSelector: {}
+  rules:
+  - apiGroups:
+    - batch
+    apiVersions:
+    - v1beta1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - cronjobs
+- clientConfig:
+    caBundle: null
+    service:
+      name: aro-admission-controller
+      namespace: kube-system
+      path: /sccs
+  failurePolicy: Fail
+  name: sccs.aro-admission-controller.aro.openshift.io
+  namespaceSelector: {}
+  rules:
+  - apiGroups:
+    - security.openshift.io
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    - DELETE
+    resources:
+    - securitycontextconstraints

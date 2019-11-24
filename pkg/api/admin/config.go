@@ -80,23 +80,24 @@ type ImageConfig struct {
 	KubeRbacProxy             *string `json:"kubeRbacProxy,omitempty"`
 	OAuthProxy                *string `json:"oAuthProxy,omitempty"`
 
-	MasterEtcd            *string `json:"masterEtcd,omitempty"`
-	ControlPlane          *string `json:"controlPlane,omitempty"`
-	Node                  *string `json:"node,omitempty"`
-	ServiceCatalog        *string `json:"serviceCatalog,omitempty"`
-	Sync                  *string `json:"sync,omitempty"`
-	Startup               *string `json:"startup,omitempty"`
-	TemplateServiceBroker *string `json:"templateServiceBroker,omitempty"`
-	TLSProxy              *string `json:"tlsProxy,omitempty"`
-	Registry              *string `json:"registry,omitempty"`
-	Router                *string `json:"router,omitempty"`
-	RegistryConsole       *string `json:"registryConsole,omitempty"`
-	AnsibleServiceBroker  *string `json:"ansibleServiceBroker,omitempty"`
-	WebConsole            *string `json:"webConsole,omitempty"`
-	Console               *string `json:"console,omitempty"`
-	EtcdBackup            *string `json:"etcdBackup,omitempty"`
-	Httpd                 *string `json:"httpd,omitempty"`
-	Canary                *string `json:"canary,omitempty"`
+	MasterEtcd             *string `json:"masterEtcd,omitempty"`
+	ControlPlane           *string `json:"controlPlane,omitempty"`
+	Node                   *string `json:"node,omitempty"`
+	ServiceCatalog         *string `json:"serviceCatalog,omitempty"`
+	Sync                   *string `json:"sync,omitempty"`
+	Startup                *string `json:"startup,omitempty"`
+	TemplateServiceBroker  *string `json:"templateServiceBroker,omitempty"`
+	TLSProxy               *string `json:"tlsProxy,omitempty"`
+	Registry               *string `json:"registry,omitempty"`
+	Router                 *string `json:"router,omitempty"`
+	RegistryConsole        *string `json:"registryConsole,omitempty"`
+	AnsibleServiceBroker   *string `json:"ansibleServiceBroker,omitempty"`
+	WebConsole             *string `json:"webConsole,omitempty"`
+	Console                *string `json:"console,omitempty"`
+	EtcdBackup             *string `json:"etcdBackup,omitempty"`
+	Httpd                  *string `json:"httpd,omitempty"`
+	Canary                 *string `json:"canary,omitempty"`
+	AroAdmissionController *string `json:"aroAdmissionController,omitempty"`
 
 	// Geneva integration images
 	GenevaLogging *string `json:"genevaLogging,omitempty"`
@@ -136,10 +137,12 @@ type CertificateConfig struct {
 	SDN                  *Certificate      `json:"sdn,omitempty"`
 
 	// infra certificates
-	Registry             *Certificate      `json:"registry,omitempty"`
-	RegistryConsole      *Certificate      `json:"registryConsole,omitempty"`
-	Router               *CertificateChain `json:"router,omitempty"`
-	ServiceCatalogServer *Certificate      `json:"serviceCatalogServer,omitempty"`
+	Registry                     *Certificate      `json:"registry,omitempty"`
+	RegistryConsole              *Certificate      `json:"registryConsole,omitempty"`
+	Router                       *CertificateChain `json:"router,omitempty"`
+	ServiceCatalogServer         *Certificate      `json:"serviceCatalogServer,omitempty"`
+	AroAdmissionController       *Certificate      `json:"aroAdmissionController,omitempty"`
+	AroAdmissionControllerClient *Certificate      `json:"aroAdmissionControllerClient,omitempty"`
 
 	// misc certificates
 	BlackBoxMonitor *Certificate `json:"blackBoxMonitor,omitempty"`
