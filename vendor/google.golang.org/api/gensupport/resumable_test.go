@@ -5,7 +5,6 @@
 package gensupport
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -13,6 +12,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"golang.org/x/net/context"
 )
 
 type unexpectedReader struct{}

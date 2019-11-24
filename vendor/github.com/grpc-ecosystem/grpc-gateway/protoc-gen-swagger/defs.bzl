@@ -30,7 +30,7 @@ def _collect_includes(gen_dir, srcs):
 
     return includes
 
-def _run_proto_gen_swagger(ctx, direct_proto_srcs, transitive_proto_srcs, actions, protoc, protoc_gen_swagger, grpc_api_configuration, single_output):
+def _run_proto_gen_swagger(ctx, direct_proto_srcs, transitive_proto_srcs, actions, protoc, protoc_gen_swagger, grpc_api_configuration, single_output, json_names_for_fields):
     swagger_files = []
 
     inputs = direct_proto_srcs + transitive_proto_srcs
@@ -40,6 +40,9 @@ def _run_proto_gen_swagger(ctx, direct_proto_srcs, transitive_proto_srcs, action
     if grpc_api_configuration:
         options.append("grpc_api_configuration=%s" % grpc_api_configuration.path)
         inputs.append(grpc_api_configuration)
+
+    if json_names_for_fields:
+        options.append("json_names_for_fields=true")
 
     includes = _collect_includes(ctx.genfiles_dir.path, direct_proto_srcs + transitive_proto_srcs)
 
@@ -53,12 +56,11 @@ def _run_proto_gen_swagger(ctx, direct_proto_srcs, transitive_proto_srcs, action
             output_dir = "/".join([output_dir, direct_proto_srcs[0].owner.workspace_root])
 
         output_dir = "/".join([output_dir, direct_proto_srcs[0].dirname])
-
         options.append("allow_merge=true")
         options.append("merge_file_name=%s" % ctx.attr.name)
 
         args = actions.args()
-        args.add("--plugin=%s" % protoc_gen_swagger.path)
+        args.add("--plugin=protoc-gen-swagger=%s" % protoc_gen_swagger.path)
         args.add("--swagger_out=%s:%s" % (",".join(options), output_dir))
         args.add_all(["-I%s" % include for include in includes])
         args.add_all([src.path for src in direct_proto_srcs])
@@ -74,6 +76,9 @@ def _run_proto_gen_swagger(ctx, direct_proto_srcs, transitive_proto_srcs, action
         swagger_files.append(swagger_file)
     else:
         for proto in direct_proto_srcs:
+            if proto.basename == "use_go_template.proto":
+                options.append("use_go_templates=true")
+
             swagger_file = actions.declare_file(
                 "%s.swagger.json" % proto.basename[:-len(".proto")],
                 sibling = proto,
@@ -84,7 +89,7 @@ def _run_proto_gen_swagger(ctx, direct_proto_srcs, transitive_proto_srcs, action
                 output_dir = "/".join([output_dir, proto.owner.workspace_root])
 
             args = actions.args()
-            args.add("--plugin=%s" % protoc_gen_swagger.path)
+            args.add("--plugin=protoc-gen-swagger=%s" % protoc_gen_swagger.path)
             args.add("--swagger_out=%s:%s" % (",".join(options), output_dir))
             args.add_all(["-I%s" % include for include in includes])
             args.add(proto.path)
@@ -96,7 +101,6 @@ def _run_proto_gen_swagger(ctx, direct_proto_srcs, transitive_proto_srcs, action
                 outputs = [swagger_file],
                 arguments = [args],
             )
-
             swagger_files.append(swagger_file)
 
     return swagger_files
@@ -116,6 +120,7 @@ def _proto_gen_swagger_impl(ctx):
                 protoc_gen_swagger = ctx.executable._protoc_gen_swagger,
                 grpc_api_configuration = grpc_api_configuration,
                 single_output = ctx.attr.single_output,
+                json_names_for_fields = ctx.attr.json_names_for_fields,
             ),
         ),
     )]
@@ -132,6 +137,10 @@ protoc_gen_swagger = rule(
             mandatory = False,
         ),
         "single_output": attr.bool(
+            default = False,
+            mandatory = False,
+        ),
+        "json_names_for_fields": attr.bool(
             default = False,
             mandatory = False,
         ),

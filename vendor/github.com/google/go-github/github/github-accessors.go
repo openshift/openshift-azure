@@ -501,9 +501,17 @@ func (b *BranchCommit) GetName() string {
 }
 
 // GetProtected returns the Protected field if it's non-nil, zero value otherwise.
-func (b *BranchCommit) GetProtected() string {
+func (b *BranchCommit) GetProtected() bool {
 	if b == nil || b.Protected == nil {
-		return ""
+		return false
+	}
+	return *b.Protected
+}
+
+// GetProtected returns the Protected field if it's non-nil, zero value otherwise.
+func (b *BranchListOptions) GetProtected() bool {
+	if b == nil || b.Protected == nil {
+		return false
 	}
 	return *b.Protected
 }
@@ -636,12 +644,12 @@ func (c *CheckRunAnnotation) GetAnnotationLevel() string {
 	return *c.AnnotationLevel
 }
 
-// GetBlobHRef returns the BlobHRef field if it's non-nil, zero value otherwise.
-func (c *CheckRunAnnotation) GetBlobHRef() string {
-	if c == nil || c.BlobHRef == nil {
-		return ""
+// GetEndColumn returns the EndColumn field if it's non-nil, zero value otherwise.
+func (c *CheckRunAnnotation) GetEndColumn() int {
+	if c == nil || c.EndColumn == nil {
+		return 0
 	}
-	return *c.BlobHRef
+	return *c.EndColumn
 }
 
 // GetEndLine returns the EndLine field if it's non-nil, zero value otherwise.
@@ -674,6 +682,14 @@ func (c *CheckRunAnnotation) GetRawDetails() string {
 		return ""
 	}
 	return *c.RawDetails
+}
+
+// GetStartColumn returns the StartColumn field if it's non-nil, zero value otherwise.
+func (c *CheckRunAnnotation) GetStartColumn() int {
+	if c == nil || c.StartColumn == nil {
+		return 0
+	}
+	return *c.StartColumn
 }
 
 // GetStartLine returns the StartLine field if it's non-nil, zero value otherwise.
@@ -3884,12 +3900,28 @@ func (i *InstallationToken) GetExpiresAt() time.Time {
 	return *i.ExpiresAt
 }
 
+// GetPermissions returns the Permissions field.
+func (i *InstallationToken) GetPermissions() *InstallationPermissions {
+	if i == nil {
+		return nil
+	}
+	return i.Permissions
+}
+
 // GetToken returns the Token field if it's non-nil, zero value otherwise.
 func (i *InstallationToken) GetToken() string {
 	if i == nil || i.Token == nil {
 		return ""
 	}
 	return *i.Token
+}
+
+// GetPermissions returns the Permissions field.
+func (i *InstallationTokenOptions) GetPermissions() *InstallationPermissions {
+	if i == nil {
+		return nil
+	}
+	return i.Permissions
 }
 
 // GetExpiresAt returns the ExpiresAt field if it's non-nil, zero value otherwise.
@@ -4610,6 +4642,14 @@ func (i *IssueStats) GetTotalIssues() int {
 		return 0
 	}
 	return *i.TotalIssues
+}
+
+// GetCreatedAt returns the CreatedAt field if it's non-nil, zero value otherwise.
+func (k *Key) GetCreatedAt() Timestamp {
+	if k == nil || k.CreatedAt == nil {
+		return Timestamp{}
+	}
+	return *k.CreatedAt
 }
 
 // GetID returns the ID field if it's non-nil, zero value otherwise.
@@ -6340,6 +6380,14 @@ func (o *OrganizationEvent) GetSender() *User {
 	return o.Sender
 }
 
+// GetTotalCount returns the TotalCount field if it's non-nil, zero value otherwise.
+func (o *OrganizationInstallations) GetTotalCount() int {
+	if o == nil || o.TotalCount == nil {
+		return 0
+	}
+	return *o.TotalCount
+}
+
 // GetAction returns the Action field if it's non-nil, zero value otherwise.
 func (o *OrgBlockEvent) GetAction() string {
 	if o == nil || o.Action == nil {
@@ -7444,14 +7492,6 @@ func (p *PublicEvent) GetSender() *User {
 	return p.Sender
 }
 
-// GetExpectedHeadSHA returns the ExpectedHeadSHA field if it's non-nil, zero value otherwise.
-func (p *PullReqestBranchUpdateOptions) GetExpectedHeadSHA() string {
-	if p == nil || p.ExpectedHeadSHA == nil {
-		return ""
-	}
-	return *p.ExpectedHeadSHA
-}
-
 // GetActiveLockReason returns the ActiveLockReason field if it's non-nil, zero value otherwise.
 func (p *PullRequest) GetActiveLockReason() string {
 	if p == nil || p.ActiveLockReason == nil {
@@ -7620,6 +7660,14 @@ func (p *PullRequest) GetLinks() *PRLinks {
 	return p.Links
 }
 
+// GetLocked returns the Locked field if it's non-nil, zero value otherwise.
+func (p *PullRequest) GetLocked() bool {
+	if p == nil || p.Locked == nil {
+		return false
+	}
+	return *p.Locked
+}
+
 // GetMaintainerCanModify returns the MaintainerCanModify field if it's non-nil, zero value otherwise.
 func (p *PullRequest) GetMaintainerCanModify() bool {
 	if p == nil || p.MaintainerCanModify == nil {
@@ -7706,6 +7754,14 @@ func (p *PullRequest) GetPatchURL() string {
 		return ""
 	}
 	return *p.PatchURL
+}
+
+// GetRebaseable returns the Rebaseable field if it's non-nil, zero value otherwise.
+func (p *PullRequest) GetRebaseable() bool {
+	if p == nil || p.Rebaseable == nil {
+		return false
+	}
+	return *p.Rebaseable
 }
 
 // GetReviewComments returns the ReviewComments field if it's non-nil, zero value otherwise.
@@ -7818,6 +7874,14 @@ func (p *PullRequestBranch) GetUser() *User {
 		return nil
 	}
 	return p.User
+}
+
+// GetExpectedHeadSHA returns the ExpectedHeadSHA field if it's non-nil, zero value otherwise.
+func (p *PullRequestBranchUpdateOptions) GetExpectedHeadSHA() string {
+	if p == nil || p.ExpectedHeadSHA == nil {
+		return ""
+	}
+	return *p.ExpectedHeadSHA
 }
 
 // GetMessage returns the Message field if it's non-nil, zero value otherwise.
@@ -8860,6 +8924,14 @@ func (p *PushEventRepository) GetPrivate() bool {
 	return *p.Private
 }
 
+// GetPullsURL returns the PullsURL field if it's non-nil, zero value otherwise.
+func (p *PushEventRepository) GetPullsURL() string {
+	if p == nil || p.PullsURL == nil {
+		return ""
+	}
+	return *p.PullsURL
+}
+
 // GetPushedAt returns the PushedAt field if it's non-nil, zero value otherwise.
 func (p *PushEventRepository) GetPushedAt() Timestamp {
 	if p == nil || p.PushedAt == nil {
@@ -9612,6 +9684,14 @@ func (r *Repository) GetIssuesURL() string {
 	return *r.IssuesURL
 }
 
+// GetIsTemplate returns the IsTemplate field if it's non-nil, zero value otherwise.
+func (r *Repository) GetIsTemplate() bool {
+	if r == nil || r.IsTemplate == nil {
+		return false
+	}
+	return *r.IsTemplate
+}
+
 // GetKeysURL returns the KeysURL field if it's non-nil, zero value otherwise.
 func (r *Repository) GetKeysURL() string {
 	if r == nil || r.KeysURL == nil {
@@ -9898,6 +9978,14 @@ func (r *Repository) GetTeamsURL() string {
 		return ""
 	}
 	return *r.TeamsURL
+}
+
+// GetTemplateRepository returns the TemplateRepository field.
+func (r *Repository) GetTemplateRepository() *Repository {
+	if r == nil {
+		return nil
+	}
+	return r.TemplateRepository
 }
 
 // GetTreesURL returns the TreesURL field if it's non-nil, zero value otherwise.
@@ -11666,6 +11754,38 @@ func (t *TeamProjectOptions) GetPermission() string {
 		return ""
 	}
 	return *t.Permission
+}
+
+// GetDescription returns the Description field if it's non-nil, zero value otherwise.
+func (t *TemplateRepoRequest) GetDescription() string {
+	if t == nil || t.Description == nil {
+		return ""
+	}
+	return *t.Description
+}
+
+// GetName returns the Name field if it's non-nil, zero value otherwise.
+func (t *TemplateRepoRequest) GetName() string {
+	if t == nil || t.Name == nil {
+		return ""
+	}
+	return *t.Name
+}
+
+// GetOwner returns the Owner field if it's non-nil, zero value otherwise.
+func (t *TemplateRepoRequest) GetOwner() string {
+	if t == nil || t.Owner == nil {
+		return ""
+	}
+	return *t.Owner
+}
+
+// GetPrivate returns the Private field if it's non-nil, zero value otherwise.
+func (t *TemplateRepoRequest) GetPrivate() bool {
+	if t == nil || t.Private == nil {
+		return false
+	}
+	return *t.Private
 }
 
 // GetFragment returns the Fragment field if it's non-nil, zero value otherwise.

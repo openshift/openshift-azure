@@ -15,7 +15,7 @@
   "description": "Accesses your bidding-account information, submits creatives for validation, finds available direct deals, and retrieves performance reports.",
   "discoveryVersion": "v1",
   "documentationLink": "https://developers.google.com/ad-exchange/buyer-rest",
-  "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/CMOrSNVn1gPVhDl3l-t_ud1epbY\"",
+  "etag": "\"Zkyw9ACJZUvcYmlFaKGChzhmtnE/PLPghsfiZYCQb1-eNuy6JcUnzJ4\"",
   "icons": {
     "x16": "https://www.google.com/images/icons/product/doubleclick-16.gif",
     "x32": "https://www.google.com/images/icons/product/doubleclick-32.gif"
@@ -1255,7 +1255,7 @@
       }
     }
   },
-  "revision": "20190614",
+  "revision": "20180222",
   "rootUrl": "https://www.googleapis.com/",
   "schemas": {
     "Account": {
@@ -1570,21 +1570,6 @@
           "description": "The link to the Ad Preferences page. This is only supported for native ads.",
           "type": "string"
         },
-        "adTechnologyProviders": {
-          "properties": {
-            "detectedProviderIds": {
-              "items": {
-                "format": "int64",
-                "type": "string"
-              },
-              "type": "array"
-            },
-            "hasUnidentifiedProvider": {
-              "type": "boolean"
-            }
-          },
-          "type": "object"
-        },
         "advertiserId": {
           "description": "Detected advertiser id, if any. Read-only. This field should not be set in requests.",
           "items": {
@@ -1695,10 +1680,6 @@
             "type": "object"
           },
           "type": "array"
-        },
-        "creativeStatusIdentityType": {
-          "description": "Creative status identity type that the creative item applies to. Ad Exchange real-time bidding is migrating to the sizeless creative verification. Originally, Ad Exchange assigned creative verification status to a unique combination of a buyer creative ID and creative dimensions. Post-migration, a single verification status will be assigned at the buyer creative ID level. This field allows to distinguish whether a given creative status applies to a unique combination of a buyer creative ID and creative dimensions, or to a buyer creative ID as a whole.",
-          "type": "string"
         },
         "dealsStatus": {
           "description": "Top-level deals status. Read-only. This field should not be set in requests. If disapproved, an entry for auctionType=DIRECT_DEALS (or ALL) in servingRestrictions will also exist. Note that this may be nuanced with other contextual restrictions, in which case it may be preferable to read from servingRestrictions directly.",
@@ -1861,6 +1842,10 @@
               "description": "The app rating in the app store. Must be in the range [0-5].",
               "format": "double",
               "type": "number"
+            },
+            "store": {
+              "description": "The URL to the app store to purchase/download the promoted app.",
+              "type": "string"
             },
             "videoURL": {
               "description": "The URL of the XML VAST for a native ad. Note this is a separate field from resource.video_url.",
@@ -3361,6 +3346,10 @@
     "PublisherProfileApiProto": {
       "id": "PublisherProfileApiProto",
       "properties": {
+        "accountId": {
+          "description": "Deprecated: use the seller.account_id. The account id of the seller.",
+          "type": "string"
+        },
         "audience": {
           "description": "Publisher provided info on its audience.",
           "type": "string"

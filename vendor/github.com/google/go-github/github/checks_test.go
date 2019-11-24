@@ -148,9 +148,10 @@ func TestChecksService_ListCheckRunAnnotations(t *testing.T) {
 		})
 		fmt.Fprint(w, `[{
 		                           "path": "README.md",
-		                           "blob_href": "https://github.com/octocat/Hello-World/blob/837db83be4137ca555d9a5598d0a1ea2987ecfee/README.md",
 		                           "start_line": 2,
 		                           "end_line": 2,
+		                           "start_column": 1,
+		                           "end_column": 5,									
 		                           "annotation_level": "warning",
 		                           "message": "Check your spelling for 'banaas'.",
                                            "title": "Spell check",
@@ -165,13 +166,14 @@ func TestChecksService_ListCheckRunAnnotations(t *testing.T) {
 
 	want := []*CheckRunAnnotation{{
 		Path:            String("README.md"),
-		BlobHRef:        String("https://github.com/octocat/Hello-World/blob/837db83be4137ca555d9a5598d0a1ea2987ecfee/README.md"),
 		StartLine:       Int(2),
 		EndLine:         Int(2),
+		StartColumn:     Int(1),
+		EndColumn:       Int(5),
 		AnnotationLevel: String("warning"),
 		Message:         String("Check your spelling for 'banaas'."),
-		RawDetails:      String("Do you mean 'bananas' or 'banana'?"),
 		Title:           String("Spell check"),
+		RawDetails:      String("Do you mean 'bananas' or 'banana'?"),
 	}}
 
 	if !reflect.DeepEqual(checkRunAnnotations, want) {
@@ -502,7 +504,6 @@ func Test_CheckRunMarshal(t *testing.T) {
 			Annotations: []*CheckRunAnnotation{
 				{
 					AnnotationLevel: String("a"),
-					BlobHRef:        String("b"),
 					EndLine:         Int(1),
 					Message:         String("m"),
 					Path:            String("p"),
@@ -594,7 +595,6 @@ func Test_CheckRunMarshal(t *testing.T) {
 			"annotations": [
 				{
 					"path": "p",
-					"blob_href": "b",
 					"start_line": 1,
 					"end_line": 1,
 					"annotation_level": "a",

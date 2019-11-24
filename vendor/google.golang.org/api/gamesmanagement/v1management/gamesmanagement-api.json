@@ -3,7 +3,10 @@
     "oauth2": {
       "scopes": {
         "https://www.googleapis.com/auth/games": {
-          "description": "Create, edit, and delete your Google Play Games activity"
+          "description": "Share your Google+ profile information and view and manage your game activity"
+        },
+        "https://www.googleapis.com/auth/plus.login": {
+          "description": "Know the list of people in your circles, your age range, and language"
         }
       }
     }
@@ -15,7 +18,7 @@
   "description": "The Management API for Google Play Game Services.",
   "discoveryVersion": "v1",
   "documentationLink": "https://developers.google.com/games/services",
-  "etag": "\"J3WqvAcMk4eQjJXvfSI4Yr8VouA/fbu2xixSl1VJRlkPZJJp8HH5rXU\"",
+  "etag": "\"Zkyw9ACJZUvcYmlFaKGChzhmtnE/P50b5Cp0Ehm94vMte123y-qgocs\"",
   "icons": {
     "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
     "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
@@ -94,7 +97,8 @@
             "$ref": "AchievementResetResponse"
           },
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         },
         "resetAll": {
@@ -106,7 +110,8 @@
             "$ref": "AchievementResetAllResponse"
           },
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         },
         "resetAllForAllPlayers": {
@@ -115,7 +120,8 @@
           "id": "gamesManagement.achievements.resetAllForAllPlayers",
           "path": "achievements/resetAllForAllPlayers",
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         },
         "resetForAllPlayers": {
@@ -135,7 +141,8 @@
           },
           "path": "achievements/{achievementId}/resetForAllPlayers",
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         },
         "resetMultipleForAllPlayers": {
@@ -147,7 +154,8 @@
             "$ref": "AchievementResetMultipleForAllRequest"
           },
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         }
       }
@@ -187,7 +195,8 @@
             "$ref": "HiddenPlayerList"
           },
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         }
       }
@@ -211,7 +220,8 @@
           },
           "path": "events/{eventId}/reset",
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         },
         "resetAll": {
@@ -220,7 +230,8 @@
           "id": "gamesManagement.events.resetAll",
           "path": "events/reset",
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         },
         "resetAllForAllPlayers": {
@@ -229,7 +240,8 @@
           "id": "gamesManagement.events.resetAllForAllPlayers",
           "path": "events/resetAllForAllPlayers",
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         },
         "resetForAllPlayers": {
@@ -249,7 +261,8 @@
           },
           "path": "events/{eventId}/resetForAllPlayers",
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         },
         "resetMultipleForAllPlayers": {
@@ -261,7 +274,8 @@
             "$ref": "EventsResetMultipleForAllRequest"
           },
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         }
       }
@@ -292,7 +306,8 @@
           },
           "path": "applications/{applicationId}/players/hidden/{playerId}",
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         },
         "unhide": {
@@ -319,7 +334,8 @@
           },
           "path": "applications/{applicationId}/players/hidden/{playerId}",
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         }
       }
@@ -343,7 +359,8 @@
           },
           "path": "quests/{questId}/reset",
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         },
         "resetAll": {
@@ -352,7 +369,8 @@
           "id": "gamesManagement.quests.resetAll",
           "path": "quests/reset",
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         },
         "resetAllForAllPlayers": {
@@ -361,7 +379,8 @@
           "id": "gamesManagement.quests.resetAllForAllPlayers",
           "path": "quests/resetAllForAllPlayers",
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         },
         "resetForAllPlayers": {
@@ -381,7 +400,8 @@
           },
           "path": "quests/{questId}/resetForAllPlayers",
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         },
         "resetMultipleForAllPlayers": {
@@ -393,7 +413,8 @@
             "$ref": "QuestsResetMultipleForAllRequest"
           },
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         }
       }
@@ -406,7 +427,8 @@
           "id": "gamesManagement.rooms.reset",
           "path": "rooms/reset",
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         },
         "resetForAllPlayers": {
@@ -415,7 +437,8 @@
           "id": "gamesManagement.rooms.resetForAllPlayers",
           "path": "rooms/resetForAllPlayers",
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         }
       }
@@ -442,7 +465,8 @@
             "$ref": "PlayerScoreResetResponse"
           },
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         },
         "resetAll": {
@@ -454,7 +478,8 @@
             "$ref": "PlayerScoreResetAllResponse"
           },
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         },
         "resetAllForAllPlayers": {
@@ -463,7 +488,8 @@
           "id": "gamesManagement.scores.resetAllForAllPlayers",
           "path": "scores/resetAllForAllPlayers",
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         },
         "resetForAllPlayers": {
@@ -483,7 +509,8 @@
           },
           "path": "leaderboards/{leaderboardId}/scores/resetForAllPlayers",
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         },
         "resetMultipleForAllPlayers": {
@@ -495,7 +522,8 @@
             "$ref": "ScoresResetMultipleForAllRequest"
           },
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         }
       }
@@ -508,7 +536,8 @@
           "id": "gamesManagement.turnBasedMatches.reset",
           "path": "turnbasedmatches/reset",
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         },
         "resetForAllPlayers": {
@@ -517,13 +546,14 @@
           "id": "gamesManagement.turnBasedMatches.resetForAllPlayers",
           "path": "turnbasedmatches/resetForAllPlayers",
           "scopes": [
-            "https://www.googleapis.com/auth/games"
+            "https://www.googleapis.com/auth/games",
+            "https://www.googleapis.com/auth/plus.login"
           ]
         }
       }
     }
   },
-  "revision": "20190222",
+  "revision": "20180417",
   "rootUrl": "https://www.googleapis.com/",
   "schemas": {
     "AchievementResetAllResponse": {

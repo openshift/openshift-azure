@@ -1,4 +1,4 @@
-// Copyright 2016 Google LLC
+// Copyright 2016 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@ package internal
 
 import (
 	"bytes"
-	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -24,6 +23,7 @@ import (
 	"sync"
 	"testing"
 
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
 	pb "google.golang.org/genproto/googleapis/bytestream"
