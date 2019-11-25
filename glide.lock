@@ -1,5 +1,5 @@
 hash: 073e72c904a3a520e12de168d14972c4c568ad07c8167215d0e1107110acee80
-updated: 2019-11-06T09:23:18.853578309-06:00
+updated: 2019-11-25T16:33:40.341497Z
 imports:
 - name: code.cloudfoundry.org/clock
   version: 02e53af36e6c978af692887ed449b74026d76fec
@@ -12,7 +12,7 @@ imports:
   subpackages:
   - cidr
 - name: github.com/appscode/jsonpatch
-  version: 7c0e3b262f30165a8ec3d0b4c6059fd92703bfb2
+  version: 7f760186a63d02954613b9b22de68a5b2cb2b1bf
 - name: github.com/Azure/azure-sdk-for-go
   version: 1951233eb944a49aa5f7278cba8e3e32a8c958af
   subpackages:
@@ -47,7 +47,7 @@ imports:
   - tracing
   - version
 - name: github.com/beorn7/perks
-  version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
+  version: 37c8de3658fcb183f997c4e13e8337516ab753e6
   subpackages:
   - quantile
 - name: github.com/blang/semver
@@ -66,7 +66,7 @@ imports:
 - name: github.com/certifi/gocertifi
   version: deb3ae2ef2610fde3330947281941c562861188b
 - name: github.com/cespare/xxhash
-  version: 2372543dd2bbab7a55ce14c54eb357abe23a42f5
+  version: d7df74196a9e781ede915320c11c378c1b2f3a1f
 - name: github.com/coreos/etcd
   version: 420a452267a7ce45b3fcbed04d54030d69964fc1
   subpackages:
@@ -103,7 +103,7 @@ imports:
   subpackages:
   - middleware
 - name: github.com/go-kit/kit
-  version: 9f5354e50d79d79d865f684fe139811cf309870f
+  version: c0f85106313b6e8cb564f91c8a57d87c79efbc1e
   subpackages:
   - log
   - log/level
@@ -152,7 +152,7 @@ imports:
   - cmp/internal/function
   - cmp/internal/value
 - name: github.com/google/go-github
-  version: c020c3ffe3ed6b1a9e95430384f4e8e3005c43bf
+  version: 04a52c26bbdd106ed23331c4d61fde482ffb9413
   subpackages:
   - github
 - name: github.com/google/go-querystring
@@ -275,32 +275,22 @@ imports:
 - name: github.com/openshift/api
   version: 8741ff068a473be041d7bafb4502c12e4f10aab5
   subpackages:
-  - apps
   - apps/v1
-  - authorization
   - authorization/v1
-  - build
   - build/v1
   - image
   - image/docker10
   - image/dockerpre012
   - image/v1
-  - network
   - network/v1
-  - oauth
   - oauth/v1
   - pkg/serialization
-  - project
   - project/v1
-  - quota
   - quota/v1
-  - route
   - route/v1
   - security
   - security/v1
-  - template
   - template/v1
-  - user
   - user/v1
 - name: github.com/openshift/client-go
   version: 431ec9a26e5021f35fa41ee9a89842db9bfdb370
@@ -334,10 +324,8 @@ imports:
 - name: github.com/openshift/origin
   version: bd0bee4d76a6d96ec08f09e04b39507d8c05b009
   subpackages:
-  - pkg/api
   - pkg/api/apihelpers
   - pkg/api/install
-  - pkg/api/legacy
   - pkg/apps/apis/apps
   - pkg/apps/apis/apps/install
   - pkg/apps/apis/apps/v1
@@ -353,7 +341,6 @@ imports:
   - pkg/cmd/server/apis/config
   - pkg/cmd/server/apis/config/install
   - pkg/cmd/server/apis/config/v1
-  - pkg/cmd/server/bootstrappolicy
   - pkg/cmd/util
   - pkg/cmd/util/pem
   - pkg/image/apis/image
@@ -431,7 +418,7 @@ imports:
 - name: github.com/peterbourgon/diskv
   version: 5f041e8faa004a95c88a202771f4cc3e991971e6
 - name: github.com/pkg/errors
-  version: 645ef00459ed84a119197bfb8d8205042c6df63d
+  version: 7f95ac13edff643b8ce5398b6ccab125f8a20c1a
 - name: github.com/pkg/profile
   version: 057bc52a47ec3c79498dda63f4a6f8298725e976
 - name: github.com/prometheus/client_golang
@@ -444,7 +431,7 @@ imports:
   - prometheus/promauto
   - prometheus/promhttp
 - name: github.com/prometheus/client_model
-  version: fa8ad6fec33561be4280a8f0514318c79d7f6cb6
+  version: 14fe0d1b01d4d5fc031dd4bec1823bd3ebbe8016
   subpackages:
   - go
 - name: github.com/prometheus/common
@@ -488,9 +475,9 @@ imports:
 - name: github.com/spf13/cobra
   version: ef82de70bb3f60c65fb8eebacbb2d122ef517385
 - name: github.com/spf13/pflag
-  version: 583c0c0531f06d5278b7d917446061adc344b5cd
+  version: 2e9d26c8c37aae03e3f9d4e90b7116f5accb7cab
 - name: go.opencensus.io
-  version: 3b5a343282fe4b4fccdb0f24cbd1d7169d20858a
+  version: aad2c527c5defcf89b5afab7f37274304195a6b2
   subpackages:
   - internal
   - internal/tagencoding
@@ -510,7 +497,7 @@ imports:
   - trace/propagation
   - trace/tracestate
 - name: go.uber.org/atomic
-  version: 9dc4df04d0d1c39369750a9f6c32c39560672089
+  version: 40ae6a40a970ef4cdbffa7b24b280e316db8accc
 - name: go.uber.org/multierr
   version: 824d08f79702fe5f54aca8400aa0d754318786e7
 - name: go.uber.org/tools
@@ -528,10 +515,17 @@ imports:
 - name: golang.org/x/crypto
   version: 49796115aa4b964c318aad4f3084fdb41e9aa067
   subpackages:
+  - cast5
   - curve25519
   - ed25519
   - ed25519/internal/edwards25519
   - internal/chacha20
+  - openpgp
+  - openpgp/armor
+  - openpgp/elgamal
+  - openpgp/errors
+  - openpgp/packet
+  - openpgp/s2k
   - pkcs12
   - pkcs12/internal/rc2
   - poly1305
@@ -670,9 +664,9 @@ imports:
 - name: gopkg.in/tomb.v1
   version: c131134a1947e9afd9cecfe11f4c6dff0732ae58
 - name: gopkg.in/yaml.v2
-  version: 670d4cfef0544295bc27a114dbac37980d83185a
+  version: 1f64d6156d11335c3f22d9330b0ad14fc1e789ce
 - name: honnef.co/go/tools
-  version: f51cd49dbadb98d60043a445a177e72f0cc62e6b
+  version: dfe37feaecf7b73ce53f4fb8fa347265a77c6c4b
   subpackages:
   - arg
   - cmd/staticcheck
@@ -809,7 +803,6 @@ imports:
   - pkg/apis/audit
   - pkg/apis/audit/v1alpha1
   - pkg/apis/audit/v1beta1
-  - pkg/authentication/serviceaccount
   - pkg/authentication/user
   - pkg/authorization/authorizer
   - pkg/features
@@ -1059,7 +1052,6 @@ imports:
   - pkg/util/net/sets
   - pkg/util/parsers
   - pkg/util/pointer
-  - plugin/pkg/auth/authorizer/rbac/bootstrappolicy
 - name: sigs.k8s.io/controller-runtime
   version: 5fd1e9e9fac5261e9ad9d47c375afc014fc31d21
   subpackages:
