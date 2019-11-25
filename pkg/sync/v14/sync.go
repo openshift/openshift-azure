@@ -280,6 +280,12 @@ var (
 	vwcFilter = func(o unstructured.Unstructured) bool {
 		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "admissionregistration.k8s.io", Kind: "ValidatingWebhookConfiguration"}
 	}
+	roleFilter = func(o unstructured.Unstructured) bool {
+		return o.GroupVersionKind().Kind == "ClusterRole" || o.GroupVersionKind().Kind == "Role"
+	}
+	roleBindingFilter = func(o unstructured.Unstructured) bool {
+		return o.GroupVersionKind().Kind == "ClusterRoleBinding" || o.GroupVersionKind().Kind == "RoleBinding"
+	}
 	everythingElseFilter = func(o unstructured.Unstructured) bool {
 		return !crdFilter(o) &&
 			!nsFilter(o) &&
@@ -289,7 +295,9 @@ var (
 			!scFilter(o) &&
 			!monitoringCrdFilter(o) &&
 			!vwcFilter(o) &&
-			!serviceFilter(o)
+			!serviceFilter(o) &&
+			!roleFilter(o) &&
+			!roleBindingFilter(o)
 	}
 	scFilter = func(o unstructured.Unstructured) bool {
 		return o.GroupVersionKind().Group == "servicecatalog.k8s.io"
@@ -353,6 +361,18 @@ func (s *sync) writeDB() error {
 	// create services before validatingwebhookconfigurations
 	s.log.Debug("applying service resources")
 	if err := s.applyResources(serviceFilter, keys); err != nil {
+		return err
+	}
+
+	// create roles and clusterRoles
+	s.log.Debug("applying role and clusterRole resources")
+	if err := s.applyResources(roleFilter, keys); err != nil {
+		return err
+	}
+
+	// create role and clusterRole bindings
+	s.log.Debug("applying roleBinding and clusterRoleBinding resources")
+	if err := s.applyResources(roleBindingFilter, keys); err != nil {
 		return err
 	}
 

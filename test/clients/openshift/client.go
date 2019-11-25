@@ -10,6 +10,7 @@ import (
 	securityv1client "github.com/openshift/client-go/security/clientset/versioned/typed/security/v1"
 	templatev1client "github.com/openshift/client-go/template/clientset/versioned/typed/template/v1"
 	userv1client "github.com/openshift/client-go/user/clientset/versioned/typed/user/v1"
+	metricsserverv1beta1client "github.com/openshift/kubernetes-metrics/pkg/client/clientset_generated/clientset/typed/metrics/v1beta1"
 	"github.com/sirupsen/logrus"
 	"k8s.io/client-go/discovery"
 	appsv1client "k8s.io/client-go/kubernetes/typed/apps/v1"
@@ -36,6 +37,7 @@ type Client struct {
 	PolicyV1beta1         policyv1beta1client.PolicyV1beta1Interface
 	RbacV1                rbacv1client.RbacV1Interface
 	ServicecatalogV1beta1 servicecatalogv1beta1client.ServicecatalogV1beta1Interface
+	MetricsServerV1beta1  metricsserverv1beta1client.MetricsV1beta1Interface
 
 	OAppsV1    oappsv1client.AppsV1Interface
 	BuildV1    buildv1client.BuildV1Interface
@@ -58,6 +60,7 @@ func newClientFromRestConfig(config *rest.Config) *Client {
 		RbacV1:                rbacv1client.NewForConfigOrDie(config),
 		BatchV1:               batchv1client.NewForConfigOrDie(config),
 		ServicecatalogV1beta1: servicecatalogv1beta1client.NewForConfigOrDie(config),
+		MetricsServerV1beta1:  metricsserverv1beta1client.NewForConfigOrDie(config),
 
 		OAppsV1:    oappsv1client.NewForConfigOrDie(config),
 		BuildV1:    buildv1client.NewForConfigOrDie(config),

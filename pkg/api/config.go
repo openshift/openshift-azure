@@ -138,6 +138,7 @@ type ImageConfig struct {
 	MetricsBridge string `json:"metricsBridge,omitempty"`
 
 	LogAnalyticsAgent string `json:"logAnalyticsAgent,omitempty"`
+	MetricsServer     string `json:"metricsServer,omitempty"`
 
 	// ImagePullSecret defines the secret used to pull from the private registries, used system-wide
 	ImagePullSecret []byte `json:"imagePullSecret,omitempty"`
@@ -175,6 +176,7 @@ type CertificateConfig struct {
 	ServiceCatalogServer         CertKeyPair      `json:"serviceCatalogServer,omitempty"`
 	AroAdmissionController       CertKeyPair      `json:"aroAdmissionController,omitempty"`
 	AroAdmissionControllerClient CertKeyPair      `json:"aroAdmissionControllerClient,omitempty"`
+	MetricsServer                CertKeyPair      `json:"metricsServer,omitempty"`
 
 	// misc certificates
 	BlackBoxMonitor CertKeyPair `json:"blackBoxMonitor,omitempty"`

@@ -5,8 +5,9 @@ The following are ginkgo test focuses supported by openshift on azure e2e tests
 * `[EveryPR]` - These tests should be run on every PR
 * `[LongRunning]` - These tests are long running and should be run periodically
 * `[CustomerAdmin]` - These test run with `make e2e` and focus on Customer Admin capabilities
-* `[EndUser]` - These test run with `make e2e` and focus on End User capabilities
-* `[Apps]` - These test creates and validates a test application in an OpenShift cluster _(this test gets ran with `[EndUser]` focus as well)_
+* `[EndUser]` - These tests run with `make e2e` and focus on End User capabilities
+* `[Apps]` - This test creates and validates a test application in an OpenShift cluster _(this test gets ran with `[EndUser]` focus as well)_
+* `[MetricsServer]` - These tests validate that metrics server is deployed and returns valid results for pods and nodes usage metrics
 
 #### Customizing e2e test scope with focuses
 

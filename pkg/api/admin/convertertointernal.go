@@ -510,6 +510,9 @@ func mergeCertificateConfig(in *CertificateConfig, out *api.CertificateConfig) {
 	if in.PackageRepository != nil {
 		mergeCertKeyPair(in.PackageRepository, &out.PackageRepository)
 	}
+	if in.MetricsServer != nil {
+		mergeCertKeyPair(in.MetricsServer, &out.MetricsServer)
+	}
 	return
 }
 
@@ -635,6 +638,9 @@ func mergeImageConfig(in *ImageConfig, out *api.ImageConfig) {
 	}
 	if in.LogAnalyticsAgent != nil {
 		out.LogAnalyticsAgent = *in.LogAnalyticsAgent
+	}
+	if in.MetricsServer != nil {
+		out.MetricsServer = *in.MetricsServer
 	}
 	return
 }

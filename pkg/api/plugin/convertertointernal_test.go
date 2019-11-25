@@ -104,6 +104,7 @@ func internalPluginConfig() api.Config {
 			GenevaStatsd:              "Versions.key.Images.GenevaStatsd",
 			MetricsBridge:             "Versions.key.Images.MetricsBridge",
 			LogAnalyticsAgent:         "Versions.key.Images.LogAnalyticsAgent",
+			MetricsServer:             "Versions.key.Images.MetricsServer",
 		},
 	}
 }

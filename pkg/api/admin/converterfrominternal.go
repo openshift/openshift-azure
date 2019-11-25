@@ -175,6 +175,7 @@ func convertCertificateConfigToAdmin(in api.CertificateConfig) *CertificateConfi
 		GenevaLogging:                convertCertKeyPairToAdmin(in.GenevaLogging),
 		GenevaMetrics:                convertCertKeyPairToAdmin(in.GenevaMetrics),
 		PackageRepository:            convertCertKeyPairToAdmin(in.PackageRepository),
+		MetricsServer:                convertCertKeyPairToAdmin(in.MetricsServer),
 	}
 }
 
@@ -228,5 +229,6 @@ func convertImageConfigToAdmin(in api.ImageConfig) *ImageConfig {
 		MetricsBridge:             &in.MetricsBridge,
 		LogAnalyticsAgent:         &in.LogAnalyticsAgent,
 		AroAdmissionController:    &in.AroAdmissionController,
+		MetricsServer:             &in.MetricsServer,
 	}
 }
