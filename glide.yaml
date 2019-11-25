@@ -1,19 +1,29 @@
 package: github.com/openshift/openshift-azure
 import:
+- package: github.com/openshift/origin
+  version: release-3.11
 - package: github.com/openshift/api
   version: release-3.11
 - package: github.com/openshift/client-go
   version: release-3.11
+- package: k8s.io/kubernetes
+  repo: https://github.com/openshift/kubernetes.git
+  version: origin-3.11-kubernetes-1.11.1
 - package: k8s.io/api
-  version: kubernetes-1.10.6
+  repo: https://github.com/openshift/kubernetes-api.git
+  version: origin-3.11-kubernetes-1.11.1
 - package: k8s.io/client-go
-  version: kubernetes-1.10.6
+  repo: https://github.com/openshift/kubernetes-client-go.git
+  version: origin-3.11-kubernetes-1.11.1
 - package: k8s.io/kube-aggregator
-  version: kubernetes-1.10.6
+  repo: https://github.com/openshift/kube-aggregator.git
+  version: origin-3.11-kubernetes-1.11.1
 - package: k8s.io/apiextensions-apiserver
-  version: kubernetes-1.10.6
+  repo: https://github.com/openshift/apiextensions-apiserver.git
+  version: origin-3.11-kubernetes-1.11.1
 - package: k8s.io/apimachinery
-  version: kubernetes-1.10.6
+  repo: https://github.com/openshift/kubernetes-apimachinery.git
+  version: origin-3.11-kubernetes-1.11.1
 - package: github.com/davecgh/go-spew
   version: ^1.1.0
 - package: github.com/Azure/azure-sdk-for-go
@@ -45,7 +55,9 @@ import:
 - package: github.com/coreos/etcd
   version: v3.2.24
 - package: sigs.k8s.io/controller-runtime
-  version: v0.1.1
+  version: v0.1.7
+- package: github.com/appscode/jsonpatch
+  version: release-1.0
 - package: github.com/prometheus/client_model
   subpackages:
   - go
@@ -71,6 +83,8 @@ import:
   version: v1.16.0
 - package: golang.org/x/sys
   version: d69651ed3497faee15a5363a89578e9991f6d5e2
+- package: golang.org/x/tools
+  version: release-branch.go1.12
 - package: go.uber.org/zap
   version: v1.8.0
 - package: github.com/beorn7/perks

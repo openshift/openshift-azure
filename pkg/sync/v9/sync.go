@@ -26,10 +26,11 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
+	dynamic "k8s.io/client-go/deprecated-dynamic"
 	"k8s.io/client-go/discovery"
-	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/util/flowcontrol"
 	kaggregator "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 
@@ -496,7 +497,7 @@ type sync struct {
 	ae         *kapiextensions.Clientset
 	cli        *discovery.DiscoveryClient
 	dyn        dynamic.ClientPool
-	grs        []*discovery.APIGroupResources
+	grs        []*restmapper.APIGroupResources
 
 	managedSharedResources bool
 }

@@ -12,6 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/microsoft/ApplicationInsights-Go/appinsights"
+	"github.com/onsi/gomega/format"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/fakerp"
@@ -42,6 +43,8 @@ func TestE2E(t *testing.T) {
 	c := appinsights.NewTelemetryClient(os.Getenv("AZURE_APP_INSIGHTS_KEY"))
 	c.Context().CommonProperties["type"] = "ginkgo"
 	c.Context().CommonProperties["resourcegroup"] = os.Getenv("RESOURCEGROUP")
+
+	format.TruncatedDiff = false
 
 	if os.Getenv("AZURE_APP_INSIGHTS_KEY") != "" {
 		ar := reporters.NewAzureAppInsightsReporter(c)

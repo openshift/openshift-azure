@@ -83,18 +83,39 @@ You might not like [the default mapping rule](http://godoc.org/github.com/grpc-e
 1. Write a [`HeaderMatcherFunc`](http://godoc.org/github.com/grpc-ecosystem/grpc-gateway/runtime#HeaderMatcherFunc).
 2. Register the function with [`WithIncomingHeaderMatcher`](http://godoc.org/github.com/grpc-ecosystem/grpc-gateway/runtime#WithIncomingHeaderMatcher)
 
-   e.g.
-   ```go
-   func yourMatcher(headerName string) (mdName string, ok bool) {
-   	...
-   }
-   ...
-   mux := runtime.NewServeMux(runtime.WithIncomingHeaderMatcher(yourMatcher))
+  e.g.
+  ```go
+  func CustomMatcher(key string) (string, bool) {
+    switch key {
+    case "x-custom-header1":
+      return key, true
+    case "x-custom-header2":
+      return "custom-header2", true
+    default:
+      return key, false
+    }
+  }
+  ...
 
-   ```
+  mux := runtime.NewServeMux(runtime.WithIncomingHeaderMatcher(CustomMatcher))
+
+  ```
 
 ## Mapping from gRPC server metadata to HTTP response headers
-ditto. Use [`WithOutgoingHeaderMatcher`](http://godoc.org/github.com/grpc-ecosystem/grpc-gateway/runtime#WithOutgoingHeaderMatcher)
+ditto. Use [`WithOutgoingHeaderMatcher`](http://godoc.org/github.com/grpc-ecosystem/grpc-gateway/runtime#WithOutgoingHeaderMatcher).
+See [gRPC metadata docs](https://github.com/grpc/grpc-go/blob/master/Documentation/grpc-metadata.md)
+for more info on sending / receiving gRPC metadata.
+
+  e.g.
+
+  ```go
+  ...
+  if appendCustomHeader {
+    grpc.SendHeader(ctx, metadata.New(map[string]string{
+			"x-custom-header1": "value",
+		}))
+  }
+  ```
 
 ## Mutate response messages or set response headers
 You might want to return a subset of response fields as HTTP response headers; 
@@ -104,8 +125,13 @@ Or you might want to mutate the response messages to be returned.
 1. Write a filter function.
    ```go
    func myFilter(ctx context.Context, w http.ResponseWriter, resp proto.Message) error {
-   	w.Header().Set("X-My-Tracking-Token", resp.Token)
-   	resp.Token = ""
+        t, ok := resp.(*externalpb.Tokenizer)
+
+	if ok {
+	  w.Header().Set("X-My-Tracking-Token", t.Token)
+	  t.Token = ""
+	}
+
    	return nil
    }
    ```
@@ -151,6 +177,28 @@ func tracingWrapper(h http.Handler) http.Handler {
 // Then just wrap the mux returned by runtime.NewServeMux() like this
 if err := http.ListenAndServe(":8080", tracingWrapper(mux)); err != nil {
   log.Fatalf("failed to start gateway server on 8080: %v", err)
+}
+```
+
+Finally, don't forget to add a tracing interceptor when registering
+the services. E.g.
+
+```go
+import (
+   ...
+   "google.golang.org/grpc"
+   "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
+)
+
+opts := []grpc.DialOption{
+  grpc.WithUnaryInterceptor(
+    grpc_opentracing.UnaryClientInterceptor(
+      grpc_opentracing.WithTracer(opentracing.GlobalTracer()),
+    ),
+  ),
+}
+if err := pb.RegisterMyServiceHandlerFromEndpoint(ctx, mux, serviceEndpoint, opts); err != nil {
+	log.Fatalf("could not register HTTP service: %v", err)
 }
 ```
 

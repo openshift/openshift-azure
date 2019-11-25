@@ -1,8 +1,11 @@
 package main
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
 
+	"github.com/openshift/openshift-azure/pkg/entrypoint/admissioncontroller"
 	azurecontrollers "github.com/openshift/openshift-azure/pkg/entrypoint/azure-controllers"
 	"github.com/openshift/openshift-azure/pkg/entrypoint/canary"
 	"github.com/openshift/openshift-azure/pkg/entrypoint/etcdbackup"
@@ -16,7 +19,7 @@ var gitCommit = "unknown"
 
 func main() {
 	if err := run(); err != nil {
-		panic(err)
+		os.Exit(1)
 	}
 }
 
@@ -25,6 +28,7 @@ func run() error {
 		Use:  "./azure [component]",
 		Long: "Azure Red Hat OpenShift dispatcher",
 	}
+	rootCmd.SilenceUsage = true
 	rootCmd.PersistentFlags().StringP("loglevel", "l", "Debug", "Valid values are [Debug, Info, Warning, Error]")
 	rootCmd.Printf("gitCommit %s\n", gitCommit)
 
@@ -35,6 +39,7 @@ func run() error {
 	rootCmd.AddCommand(startup.NewCommand())
 	rootCmd.AddCommand(sync.NewCommand())
 	rootCmd.AddCommand(tlsproxy.NewCommand())
+	rootCmd.AddCommand(admissioncontroller.NewCommand())
 
 	return rootCmd.Execute()
 }

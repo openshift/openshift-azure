@@ -75,6 +75,7 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.Images.EtcdBackup != "", "etcdbackup image")
 	assert(c.Images.Httpd != "", "httpd image")
 	assert(c.Images.Canary != "", "canary image")
+	assert(c.Images.AroAdmissionController != "", "aro admission controller image")
 	assert(c.Images.ClusterMonitoringOperator != "", "cluster monitoring operator image")
 	assert(c.Images.PrometheusOperator != "", "cluster monitoring operator image")
 	assert(c.Images.PrometheusConfigReloader != "", "prometheus config reloader image")
@@ -121,6 +122,7 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assertCert(c.Certificates.Registry, "Registry")
 	assertCert(c.Certificates.RegistryConsole, "RegistryConsole")
 	assertCert(c.Certificates.ServiceCatalogServer, "ServiceCatalogServer")
+	assertCert(c.Certificates.AroAdmissionController, "AroAdmissionController")
 	assertCert(c.Certificates.BlackBoxMonitor, "BlackBoxMonitor")
 
 	assert(len(c.SessionSecretAuth) != 0, "SessionSecretAuth")

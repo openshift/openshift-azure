@@ -153,6 +153,9 @@ const (
 
 	// https://developer.github.com/v3/previews/#repository-creation-permissions
 	mediaTypeMemberAllowedRepoCreationTypePreview = "application/vnd.github.surtur-preview+json"
+
+	// https://developer.github.com/v3/previews/#create-and-use-repository-templates
+	mediaTypeRepositoryTemplatePreview = "application/vnd.github.baptiste-preview+json"
 )
 
 // A Client manages communication with the GitHub API.
@@ -297,13 +300,16 @@ func NewClient(httpClient *http.Client) *Client {
 }
 
 // NewEnterpriseClient returns a new GitHub API client with provided
-// base URL and upload URL (often the same URL).
-// If either URL does not have a trailing slash, one is added automatically.
-// If a nil httpClient is provided, a new http.Client will be used.
+// base URL and upload URL (often the same URL and is your GitHub Enterprise hostname).
+// If either URL does not have the suffix "/api/v3/", it will be added automatically.
+// If a nil httpClient is provided, http.DefaultClient will be used.
 //
 // Note that NewEnterpriseClient is a convenience helper only;
 // its behavior is equivalent to using NewClient, followed by setting
 // the BaseURL and UploadURL fields.
+//
+// Another important thing is that by default, the GitHub Enterprise URL format
+// should be http(s)://[hostname]/api/v3 or you will always receive the 406 status code.
 func NewEnterpriseClient(baseURL, uploadURL string, httpClient *http.Client) (*Client, error) {
 	baseEndpoint, err := url.Parse(baseURL)
 	if err != nil {
@@ -312,6 +318,9 @@ func NewEnterpriseClient(baseURL, uploadURL string, httpClient *http.Client) (*C
 	if !strings.HasSuffix(baseEndpoint.Path, "/") {
 		baseEndpoint.Path += "/"
 	}
+	if !strings.HasSuffix(baseEndpoint.Path, "/api/v3/") {
+		baseEndpoint.Path += "api/v3/"
+	}
 
 	uploadEndpoint, err := url.Parse(uploadURL)
 	if err != nil {
@@ -319,6 +328,9 @@ func NewEnterpriseClient(baseURL, uploadURL string, httpClient *http.Client) (*C
 	}
 	if !strings.HasSuffix(uploadEndpoint.Path, "/") {
 		uploadEndpoint.Path += "/"
+	}
+	if !strings.HasSuffix(uploadEndpoint.Path, "/api/v3/") {
+		uploadEndpoint.Path += "api/v3/"
 	}
 
 	c := NewClient(httpClient)
@@ -646,7 +658,7 @@ type RateLimitError struct {
 func (r *RateLimitError) Error() string {
 	return fmt.Sprintf("%v %v: %d %v %v",
 		r.Response.Request.Method, sanitizeURL(r.Response.Request.URL),
-		r.Response.StatusCode, r.Message, formatRateReset(r.Rate.Reset.Time.Sub(time.Now())))
+		r.Response.StatusCode, r.Message, formatRateReset(time.Until(r.Rate.Reset.Time)))
 }
 
 // AcceptedError occurs when GitHub returns 202 Accepted response with an

@@ -43,9 +43,7 @@ func (m *privateAPI) name() string {
 }
 
 func (m *privateAPI) getDialContext() func(ctx context.Context, network, address string) (net.Conn, error) {
-	return func(ctx context.Context, network, address string) (net.Conn, error) {
-		return roundtrippers.PrivateEndpointDialHook(m.location)(network, address)
-	}
+	return roundtrippers.PrivateEndpointDialHook(m.location)
 }
 
 func (m *privateAPI) getHostnames(ctx context.Context, oc *api.OpenShiftManagedCluster) (hostnames []string, err error) {

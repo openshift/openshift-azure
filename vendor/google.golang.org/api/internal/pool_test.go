@@ -17,10 +17,9 @@ limitations under the License.
 package internal
 
 import (
+	"google.golang.org/grpc/naming"
 	"testing"
 	"time"
-
-	"google.golang.org/grpc/naming"
 )
 
 func TestConnectionPool(t *testing.T) {
@@ -50,9 +49,9 @@ func TestConnectionPool(t *testing.T) {
 		}
 		metaSeen[u.Metadata] = true
 	}
-
 	// Test that Next blocks until Close and returns nil.
 	nextc := make(chan []*naming.Update)
+	closedc := make(chan bool)
 	go func() {
 		next, err := watcher.Next()
 		if err != nil {
@@ -60,19 +59,24 @@ func TestConnectionPool(t *testing.T) {
 		}
 		nextc <- next
 	}()
-	time.Sleep(50 * time.Millisecond) // wait for watcher.Next goroutine
+	go func() {
+		time.Sleep(50 * time.Millisecond)
+		watcher.Close()
+		close(closedc)
+	}()
+
 	select {
 	case <-nextc:
-		t.Fatal("next should not have been called yet")
-	default:
+		t.Fatalf("Next: second invocation didn't block, returned before Close()")
+	case <-closedc:
+		// OK, watcher was closed before Next() returned.
 	}
-	watcher.Close()
 	select {
 	case next := <-nextc:
 		if next != nil {
 			t.Errorf("Next: expected nil, got %v", next)
 		}
-	case <-time.After(50 * time.Millisecond):
+	case <-time.After(100 * time.Millisecond):
 		t.Error("Next: did not return after 100ms")
 	}
 }

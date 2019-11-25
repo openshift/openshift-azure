@@ -101,6 +101,7 @@ rules:
   - list
   - watch
 - apiGroups:
+  - ""
   - security.openshift.io
   resources:
   - securitycontextconstraints
@@ -108,6 +109,10 @@ rules:
   - get
   - list
   - watch
+  - update
+  - patch
+  - delete
+  - create
 - apiGroups:
   - ""
   - quota.openshift.io

@@ -5,7 +5,6 @@
 package gensupport
 
 import (
-	"context"
 	"net/http"
 	"testing"
 )
@@ -14,7 +13,7 @@ func TestSendRequest(t *testing.T) {
 	// Setting Accept-Encoding should give an error immediately.
 	req, _ := http.NewRequest("GET", "url", nil)
 	req.Header.Set("Accept-Encoding", "")
-	_, err := SendRequest(context.Background(), nil, req)
+	_, err := SendRequest(nil, nil, req)
 	if err == nil {
 		t.Error("got nil, want error")
 	}

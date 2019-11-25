@@ -71,6 +71,7 @@ func internalPluginConfig() api.Config {
 			Format:                    "Versions.key.Images.Format",
 			ClusterMonitoringOperator: "Versions.key.Images.ClusterMonitoringOperator",
 			AzureControllers:          "Versions.key.Images.AzureControllers",
+			AroAdmissionController:    "Versions.key.Images.AroAdmissionController",
 			Canary:                    "Versions.key.Images.Canary",
 			PrometheusOperator:        "Versions.key.Images.PrometheusOperator",
 			Prometheus:                "Versions.key.Images.Prometheus",

@@ -7,12 +7,11 @@ import (
 
 	"github.com/sirupsen/logrus"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/client-go/discovery"
-	"k8s.io/client-go/dynamic"
+	dynamic "k8s.io/client-go/deprecated-dynamic"
+	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/util/retry"
 
 	"github.com/openshift/openshift-azure/pkg/util/cmp"
@@ -21,13 +20,13 @@ import (
 // updateDynamicClient updates the client's server API group resource
 // information and dynamic client pool.
 func (s *sync) updateDynamicClient() error {
-	grs, err := discovery.GetAPIGroupResources(s.cli)
+	grs, err := restmapper.GetAPIGroupResources(s.cli)
 	if err != nil {
 		return err
 	}
 	s.grs = grs
 
-	rm := discovery.NewRESTMapper(s.grs, meta.InterfacesForUnstructured)
+	rm := restmapper.NewDiscoveryRESTMapper(s.grs)
 	s.dyn = dynamic.NewClientPool(s.restconfig, rm, dynamic.LegacyAPIPathResolverFunc)
 
 	return nil
@@ -139,7 +138,7 @@ func (s *sync) write(o *unstructured.Unstructured) error {
 		return err
 	}
 
-	var gr *discovery.APIGroupResources
+	var gr *restmapper.APIGroupResources
 	for _, g := range s.grs {
 		if g.Group.Name == o.GroupVersionKind().Group {
 			gr = g

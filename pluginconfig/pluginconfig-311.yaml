@@ -13,7 +13,7 @@ componentLogLevel:
 ## Change this for an address range using CIDR notation (e.g. 192.168.99.0/24); an IP address (e.g. 192.168.99.0);
 ## or a list of address ranges or IP addresses (e.g. 192.168.99.0/24,10.0.0.0/24,44.66.0.0/24)
 ## having access to system nodes: default (any ip address)
-sshSourceAddressPrefixes: ['0.0.0.0/0']
+sshSourceAddressPrefixes: ["0.0.0.0/0"]
 versions:
   v7.0:
     imageOffer: osa
@@ -419,6 +419,7 @@ versions:
       genevaTDAgent: osarpint.azurecr.io/acs/td-agent:master.20190228.1
       logAnalyticsAgent: mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod11012019
       azureControllers: quay.io/openshift-on-azure/ci-azure:latest
+      aroAdmissionController: quay.io/openshift-on-azure/ci-azure:latest
       canary: quay.io/openshift-on-azure/ci-azure:latest
       etcdBackup: quay.io/openshift-on-azure/ci-azure:latest
       metricsBridge: quay.io/openshift-on-azure/ci-azure:latest
@@ -427,17 +428,17 @@ versions:
       tlsProxy: quay.io/openshift-on-azure/ci-azure:latest
 ## certificates, used to authenticate to external systems
 ## Red Hat CDN client certificates
-  #packageRepository:
-  #  key: <Red Hat CDN client key value. Format: Base64 in YAML, rsa.PrivateKey in struct>
-  #  cert: <Red Hat CDN client certificate Format: Base64 in YAML, x509.Certificate struct>
+#packageRepository:
+#  key: <Red Hat CDN client key value. Format: Base64 in YAML, rsa.PrivateKey in struct>
+#  cert: <Red Hat CDN client certificate Format: Base64 in YAML, x509.Certificate struct>
 ## Geneva integration certificates. Example:
 #certificates:
-  #genevaLogging:
-  #  key: <Geneva logging key value. Format: Base64 in YAML, rsa.PrivateKey in struct>
-  #  cert: <Geneva logging certificate Format: Base64 in YAML, x509.Certificate struct>
-  #genevaMetrics:
-  #  key: <Geneva metrics key value. Base64 in YAML, rsa.PrivateKey in struct>
-  #  cert: <Geneva metrics certificate value. Format: Base64 in YAML, x509.Certificate struct>
+#genevaLogging:
+#  key: <Geneva logging key value. Format: Base64 in YAML, rsa.PrivateKey in struct>
+#  cert: <Geneva logging certificate Format: Base64 in YAML, x509.Certificate struct>
+#genevaMetrics:
+#  key: <Geneva metrics key value. Base64 in YAML, rsa.PrivateKey in struct>
+#  cert: <Geneva metrics certificate value. Format: Base64 in YAML, x509.Certificate struct>
 ## Geneva integration other details
 genevaLoggingSector: US-Test
 genevaLoggingAccount: ccpopenshiftdiag

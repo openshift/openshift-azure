@@ -12,10 +12,10 @@
   "baseUrl": "https://www.googleapis.com/androidpublisher/v2/applications/",
   "batchPath": "batch/androidpublisher/v2",
   "canonicalName": "Android Publisher",
-  "description": "Accesses Android application developers' Google Play accounts.",
+  "description": "Lets Android application developers access their Google Play accounts.",
   "discoveryVersion": "v1",
   "documentationLink": "https://developers.google.com/android-publisher",
-  "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/eA9uCYnVj_lGdL5C2QozYYgTfro\"",
+  "etag": "\"Zkyw9ACJZUvcYmlFaKGChzhmtnE/r2WLPVRIIuO-Zkq6LCqo2JQITH4\"",
   "icons": {
     "x16": "https://www.google.com/images/icons/product/android-16.png",
     "x32": "https://www.google.com/images/icons/product/android-32.png"
@@ -624,7 +624,6 @@
               ]
             },
             "upload": {
-              "description": "Uploads a new Android App Bundle to this edit. If you are using the Google API client libraries, please increase the timeout of the http request before calling this endpoint (a timeout of 2 minutes is recommended). See: https://developers.google.com/api-client-library/java/google-api-java-client/errors for an example in java.",
               "httpMethod": "POST",
               "id": "androidpublisher.edits.bundles.upload",
               "mediaUpload": {
@@ -648,11 +647,6 @@
                 "editId"
               ],
               "parameters": {
-                "ackBundleInstallationWarning": {
-                  "description": "Must be set to true if the bundle installation may trigger a warning on user devices (for example, if installation size may be over a threshold, typically 100 MB).",
-                  "location": "query",
-                  "type": "boolean"
-                },
                 "editId": {
                   "description": "Unique identifier for this edit.",
                   "location": "path",
@@ -1604,8 +1598,9 @@
                   "type": "string"
                 },
                 "track": {
-                  "description": "The track to read or modify.",
+                  "description": "The track to read or modify. Acceptable values are: \"alpha\", \"beta\", \"production\", \"rollout\" or \"internal\".",
                   "location": "path",
+                  "pattern": "(alpha|beta|production|rollout|internal)",
                   "required": true,
                   "type": "string"
                 }
@@ -1640,8 +1635,9 @@
                   "type": "string"
                 },
                 "track": {
-                  "description": "The track to read or modify.",
+                  "description": "The track to read or modify. Acceptable values are: \"alpha\", \"beta\", \"production\", \"rollout\" or \"internal\".",
                   "location": "path",
+                  "pattern": "(alpha|beta|production|rollout|internal)",
                   "required": true,
                   "type": "string"
                 }
@@ -1679,8 +1675,9 @@
                   "type": "string"
                 },
                 "track": {
-                  "description": "The track to read or modify.",
+                  "description": "The track to read or modify. Acceptable values are: \"alpha\", \"beta\", \"production\", \"rollout\" or \"internal\".",
                   "location": "path",
+                  "pattern": "(alpha|beta|production|rollout|internal)",
                   "required": true,
                   "type": "string"
                 }
@@ -1768,7 +1765,7 @@
               ]
             },
             "patch": {
-              "description": "Updates the track configuration for the specified track type. This method supports patch semantics.",
+              "description": "Updates the track configuration for the specified track type. When halted, the rollout track cannot be updated without adding new APKs, and adding new APKs will cause it to resume. This method supports patch semantics.",
               "httpMethod": "PATCH",
               "id": "androidpublisher.edits.tracks.patch",
               "parameterOrder": [
@@ -1808,7 +1805,7 @@
               ]
             },
             "update": {
-              "description": "Updates the track configuration for the specified track type.",
+              "description": "Updates the track configuration for the specified track type. When halted, the rollout track cannot be updated without adding new APKs, and adding new APKs will cause it to resume.",
               "httpMethod": "PUT",
               "id": "androidpublisher.edits.tracks.update",
               "parameterOrder": [
@@ -2483,7 +2480,7 @@
       }
     }
   },
-  "revision": "20190618",
+  "revision": "20180530",
   "rootUrl": "https://www.googleapis.com/",
   "schemas": {
     "Apk": {
@@ -2946,10 +2943,6 @@
           "$ref": "Price",
           "description": "Default price cannot be zero. In-app products can never be free. Default price is always in the developer's Checkout merchant currency."
         },
-        "gracePeriod": {
-          "description": "Grace period of the subscription, specified in ISO 8601 format. It will allow developers to give their subscribers a grace period when the payment for the new recurrence period is declined. Acceptable values = \"P3D\" (three days) and \"P7D\" (seven days)",
-          "type": "string"
-        },
         "listings": {
           "additionalProperties": {
             "$ref": "InAppProductListing",
@@ -3145,7 +3138,7 @@
           "type": "string"
         },
         "purchaseState": {
-          "description": "The purchase state of the order. Possible values are:  \n- Purchased \n- Canceled \n- Pending",
+          "description": "The purchase state of the order. Possible values are:  \n- Purchased \n- Canceled",
           "format": "int32",
           "type": "integer"
         },
@@ -3155,7 +3148,7 @@
           "type": "string"
         },
         "purchaseType": {
-          "description": "The type of purchase of the inapp product. This field is only set if this purchase was not made using the standard in-app billing flow. Possible values are:  \n- Test (i.e. purchased from a license testing account) \n- Promo (i.e. purchased using a promo code) \n- Rewarded (i.e. from watching a video ad instead of paying)",
+          "description": "The type of purchase of the inapp product. This field is only set if this purchase was not made using the standard in-app billing flow. Possible values are:  \n- Test (i.e. purchased from a license testing account) \n- Promo (i.e. purchased using a promo code)",
           "format": "int32",
           "type": "integer"
         }
@@ -3302,22 +3295,6 @@
       },
       "type": "object"
     },
-    "SubscriptionPriceChange": {
-      "description": "Contains the price change information for a subscription that can be used to control the user journey for the price change in the app. This can be in the form of seeking confirmation from the user or tailoring the experience for a successful conversion.",
-      "id": "SubscriptionPriceChange",
-      "properties": {
-        "newPrice": {
-          "$ref": "Price",
-          "description": "The new price the subscription will renew with if the price change is accepted by the user."
-        },
-        "state": {
-          "description": "The current state of the price change. Possible values are:  \n- Outstanding: State for a pending price change waiting for the user to agree. In this state, you can optionally seek confirmation from the user using the In-App API. \n- Accepted: State for an accepted price change that the subscription will renew with unless it's canceled. The price change takes effect on a future date when the subscription renews. Note that the change might not occur when the subscription is renewed next.",
-          "format": "int32",
-          "type": "integer"
-        }
-      },
-      "type": "object"
-    },
     "SubscriptionPurchase": {
       "description": "A SubscriptionPurchase resource indicates the status of a user's subscription purchase.",
       "id": "SubscriptionPurchase",
@@ -3374,7 +3351,7 @@
           "type": "string"
         },
         "paymentState": {
-          "description": "The payment state of the subscription. Possible values are:  \n- Payment pending \n- Payment received \n- Free trial \n- Pending deferred upgrade/downgrade",
+          "description": "The payment state of the subscription. Possible values are:  \n- Payment pending \n- Payment received \n- Free trial",
           "format": "int32",
           "type": "integer"
         },
@@ -3383,16 +3360,12 @@
           "format": "int64",
           "type": "string"
         },
-        "priceChange": {
-          "$ref": "SubscriptionPriceChange",
-          "description": "The latest price change information available. This is present only when there is an upcoming price change for the subscription yet to be applied.\n\nOnce the subscription renews with the new price or the subscription is canceled, no price change information will be returned."
-        },
         "priceCurrencyCode": {
           "description": "ISO 4217 currency code for the subscription price. For example, if the price is specified in British pounds sterling, price_currency_code is \"GBP\".",
           "type": "string"
         },
         "profileId": {
-          "description": "The Google profile id of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.",
+          "description": "The profile id of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.",
           "type": "string"
         },
         "profileName": {
@@ -3442,14 +3415,12 @@
       "id": "Testers",
       "properties": {
         "googleGroups": {
-          "description": "A list of all Google Groups, as email addresses, that define testers for this track.",
           "items": {
             "type": "string"
           },
           "type": "array"
         },
         "googlePlusCommunities": {
-          "description": "A list of all Google+ Communities, as URLs, that define testers for this track.",
           "items": {
             "type": "string"
           },

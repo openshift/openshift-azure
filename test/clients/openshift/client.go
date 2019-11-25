@@ -7,6 +7,7 @@ import (
 	networkv1client "github.com/openshift/client-go/network/clientset/versioned/typed/network/v1"
 	projectv1client "github.com/openshift/client-go/project/clientset/versioned/typed/project/v1"
 	routev1client "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
+	securityv1client "github.com/openshift/client-go/security/clientset/versioned/typed/security/v1"
 	templatev1client "github.com/openshift/client-go/template/clientset/versioned/typed/template/v1"
 	userv1client "github.com/openshift/client-go/user/clientset/versioned/typed/user/v1"
 	"github.com/sirupsen/logrus"
@@ -40,6 +41,7 @@ type Client struct {
 	BuildV1    buildv1client.BuildV1Interface
 	ProjectV1  projectv1client.ProjectV1Interface
 	RouteV1    routev1client.RouteV1Interface
+	SecurityV1 securityv1client.SecurityV1Interface
 	TemplateV1 templatev1client.TemplateV1Interface
 	UserV1     userv1client.UserV1Interface
 }
@@ -61,6 +63,7 @@ func newClientFromRestConfig(config *rest.Config) *Client {
 		BuildV1:    buildv1client.NewForConfigOrDie(config),
 		ProjectV1:  projectv1client.NewForConfigOrDie(config),
 		RouteV1:    routev1client.NewForConfigOrDie(config),
+		SecurityV1: securityv1client.NewForConfigOrDie(config),
 		TemplateV1: templatev1client.NewForConfigOrDie(config),
 		UserV1:     userv1client.NewForConfigOrDie(config),
 	}

@@ -1,6 +1,9 @@
 package kubeclient
 
 import (
+	"context"
+	"net"
+
 	security "github.com/openshift/client-go/security/clientset/versioned"
 	"github.com/sirupsen/logrus"
 	"k8s.io/client-go/kubernetes"
@@ -45,6 +48,17 @@ func NewRestConfig(log *logrus.Entry, config *v1.Config, cs *api.OpenShiftManage
 	}
 
 	restconfig.WrapTransport = roundtrippers.NewRetryingRoundTripper(log, cs.Location, cs.Properties.NetworkProfile.PrivateEndpoint, disableKeepAlives)
+
+	if cs.Properties.NetworkProfile.PrivateEndpoint != nil {
+		restconfig.Dial = func(ctx context.Context, network, addr string) (net.Conn, error) {
+			_, port, err := net.SplitHostPort(addr)
+			if err != nil {
+				return nil, err
+			}
+
+			return roundtrippers.PrivateEndpointDialHook(cs.Location)(ctx, network, net.JoinHostPort(*cs.Properties.NetworkProfile.PrivateEndpoint, port))
+		}
+	}
 
 	return restconfig, nil
 }

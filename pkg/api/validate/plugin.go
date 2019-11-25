@@ -5,6 +5,7 @@ import (
 	"net"
 
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
+	"github.com/openshift/openshift-azure/pkg/util/pluginversion"
 )
 
 // PluginAPIValidator validator for external Plugin API
@@ -265,6 +266,12 @@ func validateImageConfig(path, version string, i *pluginapi.ImageConfig) (errs [
 
 	if i.Canary == "" {
 		errs = append(errs, fmt.Errorf("invalid %s.canary %q", path, i.Canary))
+	}
+
+	// TODO: remove when v13 is the oldest deployed plugin
+	major, _, _ := pluginversion.Parse(version)
+	if major >= 13 && i.AroAdmissionController == "" {
+		errs = append(errs, fmt.Errorf("invalid %s.aroAdmissionController %q", path, i.Canary))
 	}
 
 	if i.EtcdBackup == "" {

@@ -1,0 +1,19 @@
+reviewers:
+  - smarterclayton
+  - deads2k
+  - bparees
+  - stevekuznetsov
+  - soltysh
+  - tbielawa
+  - sjenning
+approvers:
+  - smarterclayton
+  - deads2k
+  - bparees
+  - mfojtik
+  - eparis
+  - derekwaynecarr
+  - stevekuznetsov # for build and tooling changes
+  - tbielawa # also for build and automated release tooling changes
+  - knobunc # for backports
+  - sjenning

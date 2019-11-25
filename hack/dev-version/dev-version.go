@@ -8,11 +8,11 @@ import (
 	"github.com/ghodss/yaml"
 
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
+	"github.com/openshift/openshift-azure/pkg/util/pluginversion"
 )
 
 func pluginToDevVersion(pluginVersion string, previous int) (string, error) {
-	var major, minor int
-	fmt.Sscanf(pluginVersion, "v%d.%d", &major, &minor)
+	major, minor, _ := pluginversion.Parse(pluginVersion)
 	if minor > 0 {
 		minor -= previous
 	}

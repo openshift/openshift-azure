@@ -98,6 +98,7 @@ func overridePluginTemplate(template *pluginapi.Config) {
 		v.Images.Canary = os.Getenv("AZURE_IMAGE")
 		v.Images.AzureControllers = os.Getenv("AZURE_IMAGE")
 		v.Images.Startup = os.Getenv("AZURE_IMAGE")
+		v.Images.AroAdmissionController = os.Getenv("AZURE_IMAGE")
 	}
 	if os.Getenv("OREG_URL") != "" {
 		v.Images.Format = os.Getenv("OREG_URL")

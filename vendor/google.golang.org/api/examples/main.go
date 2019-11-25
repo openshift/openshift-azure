@@ -5,7 +5,6 @@
 package main
 
 import (
-	"context"
 	"encoding/gob"
 	"errors"
 	"flag"
@@ -23,6 +22,7 @@ import (
 	"strings"
 	"time"
 
+	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )

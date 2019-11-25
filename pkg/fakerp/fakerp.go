@@ -21,6 +21,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/compute"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
 	"github.com/openshift/openshift-azure/pkg/util/enrich"
+	"github.com/openshift/openshift-azure/pkg/util/pluginversion"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
@@ -176,11 +177,6 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, conf *clien
 	}
 }
 
-func parsePluginVersion(pluginVersion string) (major, minor int, err error) {
-	_, err = fmt.Sscanf(pluginVersion, "v%d.%d", &major, &minor)
-	return
-}
-
 func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, oldCs *api.OpenShiftManagedCluster, isAdmin bool, conf *client.Config, testConfig api.TestConfig) (*api.OpenShiftManagedCluster, error) {
 	isUpdate := (oldCs != nil) // this is until we have called writeHelpers()
 
@@ -216,7 +212,7 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 	switch {
 	case cs.Properties.ClusterVersion == "":
 	case isAdmin && cs.Properties.ClusterVersion == "latest":
-		oldMajor, _, err := parsePluginVersion(cs.Config.PluginVersion)
+		oldMajor, _, err := pluginversion.Parse(cs.Config.PluginVersion)
 		if err != nil {
 			return nil, err
 		}

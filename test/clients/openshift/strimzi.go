@@ -5,8 +5,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/client-go/discovery"
-	"k8s.io/client-go/dynamic"
+	dynamic "k8s.io/client-go/deprecated-dynamic"
+	"k8s.io/client-go/restmapper"
 )
 
 var (
@@ -19,12 +19,12 @@ var (
 
 // GetKafka return the kafka CR with the given name and namespace
 func (cli *Client) GetKafka(name, namespace string) (*unstructured.Unstructured, error) {
-	groupresources, err := discovery.GetAPIGroupResources(cli.Discovery)
+	groupresources, err := restmapper.GetAPIGroupResources(cli.Discovery)
 	if err != nil {
 		return nil, err
 	}
 
-	rmapper := discovery.NewRESTMapper(groupresources, meta.InterfacesForUnstructured)
+	rmapper := restmapper.NewDiscoveryRESTMapper(groupresources)
 	dynamicclientpool := dynamic.NewClientPool(cli.config, rmapper, dynamic.LegacyAPIPathResolverFunc)
 
 	dynamicclient, err := dynamicclientpool.ClientForGroupVersionKind(kafkaClusterGVK)
@@ -38,7 +38,7 @@ func (cli *Client) GetKafka(name, namespace string) (*unstructured.Unstructured,
 	}
 
 	apiresource := &metav1.APIResource{
-		Name:       restmapping.Resource,
+		Name:       restmapping.Resource.Resource,
 		Namespaced: restmapping.Scope.Name() == meta.RESTScopeNameNamespace,
 	}
 
@@ -47,12 +47,12 @@ func (cli *Client) GetKafka(name, namespace string) (*unstructured.Unstructured,
 
 // DeleteKafka delete the cluster
 func (cli *Client) DeleteKafka(name, namespace string) error {
-	groupresources, err := discovery.GetAPIGroupResources(cli.Discovery)
+	groupresources, err := restmapper.GetAPIGroupResources(cli.Discovery)
 	if err != nil {
 		return err
 	}
 
-	rmapper := discovery.NewRESTMapper(groupresources, meta.InterfacesForUnstructured)
+	rmapper := restmapper.NewDiscoveryRESTMapper(groupresources)
 	dynamicclientpool := dynamic.NewClientPool(cli.config, rmapper, dynamic.LegacyAPIPathResolverFunc)
 
 	dynamicclient, err := dynamicclientpool.ClientForGroupVersionKind(kafkaClusterGVK)
@@ -66,7 +66,7 @@ func (cli *Client) DeleteKafka(name, namespace string) error {
 	}
 
 	apiresource := &metav1.APIResource{
-		Name:       restmapping.Resource,
+		Name:       restmapping.Resource.Resource,
 		Namespaced: restmapping.Scope.Name() == meta.RESTScopeNameNamespace,
 	}
 

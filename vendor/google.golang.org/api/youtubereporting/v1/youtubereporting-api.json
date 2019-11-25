@@ -62,6 +62,11 @@
       "location": "query",
       "type": "string"
     },
+    "bearer_token": {
+      "description": "OAuth bearer token.",
+      "location": "query",
+      "type": "string"
+    },
     "callback": {
       "description": "JSONP",
       "location": "query",
@@ -81,6 +86,12 @@
       "description": "OAuth 2.0 token for the current user.",
       "location": "query",
       "type": "string"
+    },
+    "pp": {
+      "default": "true",
+      "description": "Pretty-print response.",
+      "location": "query",
+      "type": "boolean"
     },
     "prettyPrint": {
       "default": "true",
@@ -362,8 +373,7 @@
             "https://www.googleapis.com/auth/yt-analytics-monetary.readonly",
             "https://www.googleapis.com/auth/yt-analytics.readonly"
           ],
-          "supportsMediaDownload": true,
-          "useMediaDownloadService": true
+          "supportsMediaDownload": true
         }
       }
     },
@@ -410,7 +420,7 @@
       }
     }
   },
-  "revision": "20190406",
+  "revision": "20180326",
   "rootUrl": "https://youtubereporting.googleapis.com/",
   "schemas": {
     "Empty": {
@@ -900,7 +910,7 @@
       "id": "ListReportTypesResponse",
       "properties": {
         "nextPageToken": {
-          "description": "A token to retrieve next page of results.\nPass this value in the\nListReportTypesRequest.page_token\nfield in the subsequent call to `ListReportTypes` method to retrieve the\nnext page of results.",
+          "description": "A token to retrieve next page of results.\nPass this value in the\nListReportTypesRequest.page_token\nfield in the subsequent call to `ListReportTypes` method to retrieve the next\npage of results.",
           "type": "string"
         },
         "reportTypes": {

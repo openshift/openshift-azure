@@ -1,4 +1,4 @@
-// Copyright 2017 Google LLC
+// Copyright 2017 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@ package bytestream
 
 import (
 	"bytes"
-	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -24,6 +23,7 @@ import (
 	"net"
 	"testing"
 
+	"golang.org/x/net/context"
 	"google.golang.org/api/transport/bytestream/internal"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -170,6 +170,7 @@ func TestClientWrite(t *testing.T) {
 	testCases := []struct {
 		name         string
 		resourceName string
+		maxBufSize   int
 		data         string
 		results      []int
 		wantWriteErr bool
@@ -293,11 +294,11 @@ func (w *UnsendableWriteClient) Trailer() metadata.MD {
 	log.Fatalf("UnsendableWriteClient.Trailer() should never be called")
 	return metadata.MD{}
 }
-func (w *UnsendableWriteClient) SendMsg(m interface{}) error {
+func (fake *UnsendableWriteClient) SendMsg(m interface{}) error {
 	log.Fatalf("UnsendableWriteClient.SendMsg() should never be called")
 	return nil
 }
-func (w *UnsendableWriteClient) RecvMsg(m interface{}) error {
+func (fake *UnsendableWriteClient) RecvMsg(m interface{}) error {
 	log.Fatalf("UnsendableWriteClient.RecvMsg() should never be called")
 	return nil
 }

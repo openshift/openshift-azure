@@ -1,5 +1,15 @@
 admissionConfig:
   pluginConfig:
+    DenyEscalatingExec:
+      configuration:
+        kind: DefaultAdmissionConfig
+        apiVersion: v1
+        disable: false
+    ValidatingAdmissionWebhook:
+      configuration:
+        apiVersion: apiserver.config.k8s.io/v1alpha1
+        kubeConfigFile: /etc/origin/master/admission-webhook.kubeconfig
+        kind: WebhookAdmission
     BuildDefaults:
       configuration:
         apiVersion: v1
