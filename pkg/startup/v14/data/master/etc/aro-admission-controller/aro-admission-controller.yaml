@@ -1,0 +1,3 @@
+whitelist:
+  - "^registry-auth.twistlock.com/tw_[^/]+/twistlock/[a-z_-]+:"
+  - "^registry.aquasec.com/(console|enforcer|database|gateway|scanner):"
