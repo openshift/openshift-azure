@@ -14,6 +14,7 @@ import (
 	v10 "github.com/openshift/openshift-azure/pkg/config/v10"
 	v12 "github.com/openshift/openshift-azure/pkg/config/v12"
 	v13 "github.com/openshift/openshift-azure/pkg/config/v13"
+	v14 "github.com/openshift/openshift-azure/pkg/config/v14"
 	v7 "github.com/openshift/openshift-azure/pkg/config/v7"
 	v71 "github.com/openshift/openshift-azure/pkg/config/v71"
 	v9 "github.com/openshift/openshift-azure/pkg/config/v9"
@@ -39,6 +40,8 @@ func New(cs *api.OpenShiftManagedCluster) (Interface, error) {
 		return v12.New(cs), nil
 	case "v13.0":
 		return v13.New(cs), nil
+	case "v14.0":
+		return v14.New(cs), nil
 	}
 
 	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)
