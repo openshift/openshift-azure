@@ -1,0 +1,1 @@
+{{ CertChainAsBytes .Config.Certificates.OpenShiftConsole.Certs | String }}

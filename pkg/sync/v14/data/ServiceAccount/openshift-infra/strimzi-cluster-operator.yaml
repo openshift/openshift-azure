@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: strimzi
+  name: strimzi-cluster-operator
+  namespace: openshift-infra
