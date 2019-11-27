@@ -79,6 +79,7 @@ func TestValidate(t *testing.T) {
 		expectedErrs []error
 		externalOnly bool
 		simulateProd bool // this defaults to false, that way I don't have to define it everywhere
+		roles        []string
 	}{
 		"test yaml parsing": { // test yaml parsing
 
@@ -630,6 +631,22 @@ func TestValidate(t *testing.T) {
 				errors.New(`invalid properties.monitorProfile.workspaceKey`),
 			},
 		},
+		"customer admin aad role not set": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.AuthProfile.IdentityProviders[0].Provider.(*api.AADIdentityProvider).CustomerAdminGroupID = to.StringPtr("00000000-0000-0000-0000-000000000000")
+			},
+			externalOnly: true,
+			expectedErrs: []error{
+				errors.New(`invalid properties.authProfile.identityProviders["Azure AD"]: application does not have Azure Active Directory Graph / Directory.Read.All role granted`),
+			},
+		},
+		"customer admin aad role set": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.AuthProfile.IdentityProviders[0].Provider.(*api.AADIdentityProvider).CustomerAdminGroupID = to.StringPtr("00000000-0000-0000-0000-000000000000")
+			},
+			externalOnly: true,
+			roles:        []string{"Directory.Read.All"},
+		},
 	}
 
 	for name, test := range tests {
@@ -644,7 +661,7 @@ func TestValidate(t *testing.T) {
 		}
 
 		{
-			v := APIValidator{runningUnderTest: !test.simulateProd}
+			v := APIValidator{runningUnderTest: !test.simulateProd, roleLister: &DummyRoleLister{roles: test.roles}}
 			errs := v.Validate(cs, cs, test.externalOnly)
 			if !reflect.DeepEqual(errs, test.expectedErrs) {
 				t.Logf("api test case %q", name)

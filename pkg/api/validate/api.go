@@ -11,11 +11,12 @@ import (
 // APIValidator validator for external API
 type APIValidator struct {
 	runningUnderTest bool
+	roleLister       RoleLister
 }
 
 // NewAPIValidator return instance of external API validator
-func NewAPIValidator(runningUnderTest bool) *APIValidator {
-	return &APIValidator{runningUnderTest: runningUnderTest}
+func NewAPIValidator(runningUnderTest bool, roleLister RoleLister) *APIValidator {
+	return &APIValidator{runningUnderTest: runningUnderTest, roleLister: roleLister}
 }
 
 // Validate validates a OpenShiftManagedCluster struct
@@ -36,6 +37,12 @@ func (v *APIValidator) Validate(cs, oldCs *api.OpenShiftManagedCluster, external
 	for _, app := range cs.Properties.AgentPoolProfiles {
 		errs = append(errs, validateVMSize(&app, v.runningUnderTest)...)
 	}
+
+	if len(errs) != 0 {
+		return
+	}
+
+	errs = append(errs, v.validateAADIdentityProvider(cs)...)
 
 	return
 }
@@ -89,4 +96,26 @@ func (v *APIValidator) validateUpdateContainerService(cs, oldCs *api.OpenShiftMa
 	}
 
 	return
+}
+
+func (v *APIValidator) validateAADIdentityProvider(cs *api.OpenShiftManagedCluster) []error {
+	ip := cs.Properties.AuthProfile.IdentityProviders[0]
+	aadip := ip.Provider.(*api.AADIdentityProvider)
+
+	roles, err := v.roleLister.ListAADApplicationRoles(aadip)
+	if err != nil {
+		return []error{fmt.Errorf(`invalid properties.authProfile.identityProviders[%q]: could not authenticate: %v`, ip.Name, err)}
+	}
+
+	if aadip.CustomerAdminGroupID == nil {
+		return nil
+	}
+
+	for _, role := range roles {
+		if role == "Directory.Read.All" {
+			return nil
+		}
+	}
+
+	return []error{fmt.Errorf(`invalid properties.authProfile.identityProviders[%q]: application does not have Azure Active Directory Graph / Directory.Read.All role granted`, ip.Name)}
 }

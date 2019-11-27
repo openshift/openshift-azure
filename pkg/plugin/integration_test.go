@@ -33,6 +33,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
+	"github.com/openshift/openshift-azure/pkg/api/validate"
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
@@ -362,6 +363,7 @@ func setupNewCluster(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftMa
 		},
 		configInterfaceFactory: config.New,
 		log:                    log,
+		roleLister:             &validate.DummyRoleLister{},
 		now:                    time.Now,
 	}
 	err = enrichCs(cs)

@@ -68,7 +68,7 @@ func TestAPIValidateUpdate(t *testing.T) {
 		if test.f != nil {
 			test.f(cs)
 		}
-		var v APIValidator
+		v := &APIValidator{roleLister: &DummyRoleLister{}}
 		errs := v.Validate(cs, oldCs, false)
 		if len(test.expectedErrs) != len(errs) {
 			t.Errorf("%s: expected %d errors, got %d", name, len(test.expectedErrs), len(errs))
