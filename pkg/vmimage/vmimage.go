@@ -42,6 +42,8 @@ type Builder struct {
 	ImageResourceGroup         string
 	ImageStorageAccount        string
 	ImageContainer             string
+	ImagePublisher             string
+	ImageOffer                 string
 	ImageSku                   string
 	ImageVersion               string
 	SSHKey                     *rsa.PrivateKey
@@ -143,8 +145,8 @@ func (builder *Builder) vmImageReference() *compute.ImageReference {
 	// Validating an existing marketplace image
 	if builder.hasMarketplaceVMImageRef() {
 		return &compute.ImageReference{
-			Publisher: to.StringPtr("redhat"),
-			Offer:     to.StringPtr("osa"),
+			Publisher: to.StringPtr(builder.ImagePublisher),
+			Offer:     to.StringPtr(builder.ImageOffer),
 			Sku:       to.StringPtr(builder.ImageSku),
 			Version:   to.StringPtr(builder.ImageVersion),
 		}
@@ -162,7 +164,7 @@ func (builder *Builder) vmImageReference() *compute.ImageReference {
 }
 
 func (builder *Builder) hasMarketplaceVMImageRef() bool {
-	return builder.ImageSku != "" && builder.ImageVersion != ""
+	return builder.ImagePublisher != "" && builder.ImageOffer != "" && builder.ImageSku != "" && builder.ImageVersion != ""
 }
 
 func (builder *Builder) hasCustomVMIMageRef() bool {
@@ -175,7 +177,7 @@ func (builder *Builder) hasCustomVMIMageRef() bool {
 
 // ValidateFields makes sure that the builder struct has correct values in fields
 func (builder *Builder) ValidateFields() error {
-	vmImageRefFields := []string{"ImageSku", "ImageVersion"}
+	vmImageRefFields := []string{"ImagePublisher", "ImageOffer", "ImageSku", "ImageVersion"}
 	customVMIMageRefFields := []string{"Image", "ImageResourceGroup", "ImageStorageAccount", "ImageContainer"}
 
 	if !builder.hasMarketplaceVMImageRef() && !builder.hasCustomVMIMageRef() {
@@ -188,7 +190,7 @@ func (builder *Builder) ValidateFields() error {
 
 	if builder.hasMarketplaceVMImageRef() && builder.hasCustomVMIMageRef() {
 		return fmt.Errorf(
-			"confilicting fields: you must provide values for either %s fields or %s fields",
+			"conflicting fields: you must provide values for either %s fields or %s fields",
 			strings.Join(vmImageRefFields, ", "),
 			strings.Join(customVMIMageRefFields, ", "),
 		)
@@ -202,7 +204,7 @@ func (builder *Builder) Run(ctx context.Context) error {
 	if builder.hasCustomVMIMageRef() {
 		builder.Log.Debugf("using %s image in %s resource group", builder.Image, builder.ImageResourceGroup)
 	} else {
-		builder.Log.Debugf("using: redhat osa image (SKU: %s; Version: %s)", builder.ImageSku, builder.ImageVersion)
+		builder.Log.Debugf("using: redhat osa image (Publisher: %s, Offer: %s, SKU: %s; Version: %s)", builder.ImagePublisher, builder.ImageOffer, builder.ImageSku, builder.ImageVersion)
 	}
 
 	template, err := builder.generateTemplate()

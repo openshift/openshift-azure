@@ -23,10 +23,10 @@ then
   IMAGE_RESOURCENAME=$(az image list -g $IMAGE_RESOURCEGROUP --query '[-1].name' -o tsv)
 fi
 
-if [ -n "$IMAGE_VERSION" ] && [ -n "$IMAGE_SKU" ] ;
+if [ -n "$IMAGE_PUBLISHER" ] && [ -n "$IMAGE_OFFER" ] && [ -n "$IMAGE_SKU" ] && [ -n "$IMAGE_VERSION" ];
 then
-  echo "Validating: redhat osa image (SKU: ${IMAGE_SKU}; Version: ${IMAGE_VERSION})"
-  CMD_VMIMAGE_ARGS="-imageSku $IMAGE_SKU -imageVersion $IMAGE_VERSION"
+  echo "Validating: redhat osa image (Publisher: ${IMAGE_PUBLISHER}, Offer: ${IMAGE_OFFER}, SKU: ${IMAGE_SKU}; Version: ${IMAGE_VERSION})"
+  CMD_VMIMAGE_ARGS="-imagePublisher $IMAGE_PUBLISHER -imageOffer $IMAGE_OFFER -imageSku $IMAGE_SKU -imageVersion $IMAGE_VERSION"
 else
   echo "Validating: ${IMAGE_RESOURCENAME} image in ${IMAGE_RESOURCEGROUP} resource group"
   CMD_VMIMAGE_ARGS="-imageResourceGroup ${IMAGE_RESOURCEGROUP} -image ${IMAGE_RESOURCENAME} -imageStorageAccount ${IMAGE_STORAGEACCOUNT} -location ${AZURE_REGION}"

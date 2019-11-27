@@ -119,18 +119,27 @@ func validateComponentLogLevel(c *pluginapi.ComponentLogLevel) (errs []error) {
 }
 
 func validateVersionConfig(path string, version string, vc *pluginapi.VersionConfig) (errs []error) {
-	if vc.ImageOffer != "osa" {
-		errs = append(errs, fmt.Errorf("invalid %s.imageOffer %q", path, vc.ImageOffer))
-	}
+	switch vc.ImagePublisher {
+	case "redhat":
+		if vc.ImageOffer != "osa" {
+			errs = append(errs, fmt.Errorf("invalid %s.imageOffer %q", path, vc.ImageOffer))
+		}
 
-	if vc.ImagePublisher != "redhat" {
-		errs = append(errs, fmt.Errorf("invalid %s.imagePublisher %q", path, vc.ImagePublisher))
-	}
+		if vc.ImageSKU != "osa_311" {
+			errs = append(errs, fmt.Errorf("invalid %s.imageSKU %q", path, vc.ImageSKU))
+		}
 
-	switch vc.ImageSKU {
-	case "osa_311":
+	case "azureopenshift":
+		if vc.ImageOffer != "azureredhatopenshift" {
+			errs = append(errs, fmt.Errorf("invalid %s.imageOffer %q", path, vc.ImageOffer))
+		}
+
+		if vc.ImageSKU != "aro_311" {
+			errs = append(errs, fmt.Errorf("invalid %s.imageSKU %q", path, vc.ImageSKU))
+		}
+
 	default:
-		errs = append(errs, fmt.Errorf("invalid %s.imageSKU %q", path, vc.ImageSKU))
+		errs = append(errs, fmt.Errorf("invalid %s.imagePublisher %q", path, vc.ImagePublisher))
 	}
 
 	if !rxImageVersion.MatchString(vc.ImageVersion) {

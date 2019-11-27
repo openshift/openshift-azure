@@ -514,9 +514,9 @@ func vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 			Capacity: to.Int64Ptr(app.Count),
 		},
 		Plan: &compute.Plan{
-			Name:      to.StringPtr(cs.Config.ImageSKU),
-			Publisher: to.StringPtr(cs.Config.ImagePublisher),
-			Product:   to.StringPtr(cs.Config.ImageOffer),
+			Name:      to.StringPtr("osa_311"),
+			Publisher: to.StringPtr("redhat"),
+			Product:   to.StringPtr("osa"),
 		},
 		VirtualMachineScaleSetProperties: &compute.VirtualMachineScaleSetProperties{
 			UpgradePolicy: &compute.UpgradePolicy{

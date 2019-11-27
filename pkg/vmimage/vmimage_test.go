@@ -41,8 +41,10 @@ func TestValidateFields(t *testing.T) {
 		{
 			name: "has marketplace image reference",
 			builder: &Builder{
-				ImageSku:     "osa_111",
-				ImageVersion: "latest",
+				ImagePublisher: "redhat",
+				ImageOffer:     "osa",
+				ImageSku:       "osa_111",
+				ImageVersion:   "latest",
 			},
 		},
 		{
@@ -52,10 +54,12 @@ func TestValidateFields(t *testing.T) {
 				ImageResourceGroup:  "images",
 				ImageStorageAccount: "foo",
 				ImageContainer:      "images",
+				ImagePublisher:      "redhat",
+				ImageOffer:          "osa",
 				ImageSku:            "osa_111",
 				ImageVersion:        "latest",
 			},
-			expectedContains: "confilicting fields",
+			expectedContains: "conflicting fields",
 		},
 		{
 			name: "has incomplete marketplace image reference",
@@ -129,9 +133,11 @@ func TestVMImageReference(t *testing.T) {
 		{
 			name: "marketplace vm image to validation",
 			builder: &Builder{
-				ImageSku:     "osa_111",
-				ImageVersion: "latest",
-				Validate:     true,
+				ImagePublisher: "redhat",
+				ImageOffer:     "osa",
+				ImageSku:       "osa_111",
+				ImageVersion:   "latest",
+				Validate:       true,
 			},
 			expected: compute.ImageReference{
 				Publisher: to.StringPtr("redhat"),
