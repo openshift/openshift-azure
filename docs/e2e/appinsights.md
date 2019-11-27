@@ -2,7 +2,7 @@
 
 All E2E test result are being sent to `Application Insights"
 
-`Azure Portal -> ResourceGroups -> fakerp-upgrades-insights -> osa-fakeRP-upgrades -> Analytics`
+`Azure Portal -> ResourceGroups -> insights -> ci -> Logs (Analytics)`
 
 
 Example queries:
