@@ -18,5 +18,3 @@ reviewers:
 - pnasrat
 - thekad
 - troy0820
-labels:
-- sig/azure
