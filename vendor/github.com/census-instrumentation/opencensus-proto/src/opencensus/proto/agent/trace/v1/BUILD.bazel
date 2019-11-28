@@ -14,8 +14,8 @@
 
 package(default_visibility = ["//visibility:public"])
 
+load("@grpc_java//:java_grpc_library.bzl", "java_grpc_library")
 load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
-load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
 
 proto_library(
     name = "trace_service_proto",
@@ -33,11 +33,15 @@ cc_proto_library(
     deps = [":trace_service_proto"],
 )
 
-cc_grpc_library(
-    name = "trace_service_grpc_cc",
+java_proto_library(
+    name = "trace_service_proto_java",
+    deps = [":trace_service_proto"],
+)
+
+java_grpc_library(
+    name = "trace_service_grpc_java",
     srcs = [":trace_service_proto"],
-    deps = [":trace_service_proto_cc"],
-    grpc_only = True,
+    deps = [":trace_service_proto_java"],
 )
 
 go_proto_library(

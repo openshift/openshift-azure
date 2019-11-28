@@ -1,11 +1,10 @@
 package endpoints
 
-import (
-	"context"
+import "context"
 
-	"github.com/go-kit/kit/cmd/kitgen/testdata/anonfields/default/service"
-	"github.com/go-kit/kit/endpoint"
-)
+import "github.com/go-kit/kit/endpoint"
+
+import "github.com/go-kit/kit/cmd/kitgen/testdata/anonfields/default/service"
 
 type FooRequest struct {
 	I int

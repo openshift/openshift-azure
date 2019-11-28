@@ -1,12 +1,12 @@
-hash: a753c7fda11ad0fec415ad64987ded97ed2e3c21777b50e64a0f1ee6960c2ea9
-updated: 2019-11-29T11:24:58.411634Z
+hash: 21c7ee44eb31fc9d2cd3a0cb7adba830a0a36f0319b071870712571ca408a2ec
+updated: 2019-12-02T11:58:42.213013674+11:00
 imports:
 - name: code.cloudfoundry.org/clock
   version: 02e53af36e6c978af692887ed449b74026d76fec
 - name: contrib.go.opencensus.io/exporter/ocagent
-  version: a8a6f458bbc1d5042322ad1f9b65eeb0b69be9ea
+  version: 8110e6c0236bb231b19119275a6be6ec666d05c8
 - name: github.com/alecthomas/units
-  version: f65c72e2690dc4b403c8bd637baf4611cd4c069b
+  version: c3de453c63f4bdb4dadffab9805ec00426c505f7
 - name: github.com/apparentlymart/go-cidr
   version: c0fb5fbe0acb592411e2db59add389a43260ad44
   subpackages:
@@ -47,7 +47,7 @@ imports:
   - tracing
   - version
 - name: github.com/beorn7/perks
-  version: 37c8de3658fcb183f997c4e13e8337516ab753e6
+  version: 4b2b341e8d7715fae06375aa633dbb6e91b3fb46
   subpackages:
   - quantile
 - name: github.com/blang/semver
@@ -55,7 +55,7 @@ imports:
 - name: github.com/BurntSushi/toml
   version: 3012a1dbe2e4bd1391d42b32f0577cb7bbc7f005
 - name: github.com/census-instrumentation/opencensus-proto
-  version: 5cec5ea58c3efa81fa808f2bd38ce182da9ee731
+  version: 97194d1225539f817404bac07e965fd6d8f2a289
   subpackages:
   - gen-go/agent/common/v1
   - gen-go/agent/metrics/v1
@@ -66,7 +66,7 @@ imports:
 - name: github.com/certifi/gocertifi
   version: deb3ae2ef2610fde3330947281941c562861188b
 - name: github.com/cespare/xxhash
-  version: d7df74196a9e781ede915320c11c378c1b2f3a1f
+  version: 32f3a100fff237d14029d34ec8579ef02aaaf87c
 - name: github.com/coreos/etcd
   version: 420a452267a7ce45b3fcbed04d54030d69964fc1
   subpackages:
@@ -87,7 +87,7 @@ imports:
 - name: github.com/dgrijalva/jwt-go
   version: 06ea1031745cb8b3dab3f6a236daf2b0aa468b7e
 - name: github.com/dimchansky/utfbom
-  version: d2133a1ce379ef6fa992b0514a77146c60db9d1c
+  version: 6c6132ff69f0f6c088739067407b5d32c52e1d0f
 - name: github.com/docker/distribution
   version: d4c35485a70df4dce2179bc227b1393a69edb809
   repo: https://github.com/openshift/docker-distribution.git
@@ -103,16 +103,16 @@ imports:
   subpackages:
   - middleware
 - name: github.com/go-kit/kit
-  version: c0f85106313b6e8cb564f91c8a57d87c79efbc1e
+  version: 150a65a7ec6156b4b640c1fd55f26fd3d475d656
   subpackages:
   - log
   - log/level
 - name: github.com/go-logfmt/logfmt
   version: 07c9b44f60d7ffdfb7d8efe1ad539965737836dc
 - name: github.com/go-logr/logr
-  version: a1ebd699b1950beb1da0752cbb5559662018f798
+  version: 9fb12b3b21c5415d16ac18dc5cd42c1cfdd40c4e
 - name: github.com/go-logr/zapr
-  version: 8f2487342d52a33a1793e50e3ca04bc1767aa65c
+  version: 7536572e8d55209135cd5e7ccf7fce43dca217ab
 - name: github.com/gogo/protobuf
   version: c0656edd0d9eab7c66d1eb0c568f9039345796f7
   subpackages:
@@ -128,6 +128,7 @@ imports:
   version: 9fa652df1129bef0e734c9cf9bf6dbae9ef3b9fa
   subpackages:
   - gomock
+  - mockgen/model
 - name: github.com/golang/protobuf
   version: 6c65a5562fc06764971b7c5d05c76c75e84bdbf7
   subpackages:
@@ -152,7 +153,7 @@ imports:
   - cmp/internal/function
   - cmp/internal/value
 - name: github.com/google/go-github
-  version: 04a52c26bbdd106ed23331c4d61fde482ffb9413
+  version: c756c329c19dbbadba0675b42af693093c3f2c45
   subpackages:
   - github
 - name: github.com/google/go-querystring
@@ -184,7 +185,7 @@ imports:
   subpackages:
   - simplelru
 - name: github.com/hpcloud/tail
-  version: a1dbeea552b7c8df4b542c66073e393de198a800
+  version: a30252cb686a21eb2d0b98132633053ec2f7f1e5
   subpackages:
   - ratelimiter
   - util
@@ -222,7 +223,7 @@ imports:
   subpackages:
   - pbutil
 - name: github.com/microsoft/ApplicationInsights-Go
-  version: d813d7725313000ad1b71627b8951323635f0572
+  version: 83da4dfd6ba2cd5f1a2bd83c931fa1dd7a419bd7
   subpackages:
   - appinsights
   - appinsights/contracts
@@ -233,7 +234,7 @@ imports:
 - name: github.com/modern-go/reflect2
   version: 05fbef0ca5da472bbf96c9322b84a53edc03c9fd
 - name: github.com/oklog/ulid
-  version: a41d229797d91e914323f27d52d1053d2e709119
+  version: e51a56f2a4c1bf73c967ca6d45d5366bade31943
 - name: github.com/onsi/ginkgo
   version: eea6ad008b96acdaa524f5b409513bf062b500ad
   subpackages:
@@ -317,6 +318,10 @@ imports:
   - user/clientset/versioned/scheme
   - user/clientset/versioned/typed/user/v1
   - user/clientset/versioned/typed/user/v1/fake
+- name: github.com/openshift/kubernetes-metrics
+  version: 685524df5cb7bf3d3a6cdc7e7045c8ad4f84792b
+  subpackages:
+  - pkg/client/clientset_generated/clientset/typed/metrics/v1beta1
 - name: github.com/openshift/library-go
   version: 0b8367a4679859036c27a30dbe010d76409e7075
   subpackages:
@@ -410,7 +415,7 @@ imports:
   - pkg/user/apis/user/v1
   - pkg/user/apis/user/validation
 - name: github.com/opentracing/opentracing-go
-  version: a7454ce5950e83caac9774ef32cc8979e5975f30
+  version: 135aa78c6f95b4a199daf2f0470d231136cbbd0c
   subpackages:
   - log
 - name: github.com/pborman/uuid
@@ -418,7 +423,7 @@ imports:
 - name: github.com/peterbourgon/diskv
   version: 5f041e8faa004a95c88a202771f4cc3e991971e6
 - name: github.com/pkg/errors
-  version: 7f95ac13edff643b8ce5398b6ccab125f8a20c1a
+  version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/pkg/profile
   version: 057bc52a47ec3c79498dda63f4a6f8298725e976
 - name: github.com/prometheus/client_golang
@@ -431,7 +436,7 @@ imports:
   - prometheus/promauto
   - prometheus/promhttp
 - name: github.com/prometheus/client_model
-  version: 14fe0d1b01d4d5fc031dd4bec1823bd3ebbe8016
+  version: 5c3871d89910bfb32f5fcab2aa4b9ec68e65a99f
   subpackages:
   - go
 - name: github.com/prometheus/common
@@ -475,9 +480,9 @@ imports:
 - name: github.com/spf13/cobra
   version: ef82de70bb3f60c65fb8eebacbb2d122ef517385
 - name: github.com/spf13/pflag
-  version: 2e9d26c8c37aae03e3f9d4e90b7116f5accb7cab
+  version: 583c0c0531f06d5278b7d917446061adc344b5cd
 - name: go.opencensus.io
-  version: aad2c527c5defcf89b5afab7f37274304195a6b2
+  version: df6e2001952312404b06f5f6f03fcb4aec1648e5
   subpackages:
   - internal
   - internal/tagencoding
@@ -554,7 +559,7 @@ imports:
   subpackages:
   - internal
 - name: golang.org/x/sync
-  version: cd5d95a43a6e21273425c7ae415d3df9ea832eeb
+  version: 42b317875d0fa942474b76e1b46a6060d720ae6e
   subpackages:
   - errgroup
   - semaphore
@@ -657,14 +662,14 @@ imports:
   - stats
   - status
   - tap
-- name: gopkg.in/fsnotify/fsnotify.v1
-  version: c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9
+- name: gopkg.in/fsnotify.v1
+  version: 7be54206639f256967dd82fa767397ba5f8f48f5
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/tomb.v1
   version: c131134a1947e9afd9cecfe11f4c6dff0732ae58
 - name: gopkg.in/yaml.v2
-  version: 1f64d6156d11335c3f22d9330b0ad14fc1e789ce
+  version: 670d4cfef0544295bc27a114dbac37980d83185a
 - name: honnef.co/go/tools
   version: dfe37feaecf7b73ce53f4fb8fa347265a77c6c4b
   subpackages:
@@ -1052,6 +1057,14 @@ imports:
   - pkg/util/net/sets
   - pkg/util/parsers
   - pkg/util/pointer
+- name: k8s.io/metrics
+  version: 685524df5cb7bf3d3a6cdc7e7045c8ad4f84792b
+  repo: https://github.com/openshift/kubernetes-metrics.git
+  subpackages:
+  - pkg/apis/metrics
+  - pkg/apis/metrics/v1alpha1
+  - pkg/apis/metrics/v1beta1
+  - pkg/client/clientset_generated/clientset/scheme
 - name: sigs.k8s.io/controller-runtime
   version: 5fd1e9e9fac5261e9ad9d47c375afc014fc31d21
   subpackages:

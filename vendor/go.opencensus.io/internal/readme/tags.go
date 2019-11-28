@@ -24,11 +24,17 @@ import (
 func tagsExamples() {
 	ctx := context.Background()
 
-	osKey := tag.MustNewKey("example.com/keys/user-os")
-	userIDKey := tag.MustNewKey("example.com/keys/user-id")
+	osKey, err := tag.NewKey("example.com/keys/user-os")
+	if err != nil {
+		log.Fatal(err)
+	}
+	userIDKey, err := tag.NewKey("example.com/keys/user-id")
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// START new
-	ctx, err := tag.New(ctx,
+	ctx, err = tag.New(ctx,
 		tag.Insert(osKey, "macOS-10.12.5"),
 		tag.Upsert(userIDKey, "cde36753ed"),
 	)

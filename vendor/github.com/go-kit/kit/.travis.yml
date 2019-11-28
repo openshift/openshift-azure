@@ -12,5 +12,6 @@ script:
   - ./coveralls.bash
 
 go:
-  - 1.x
+  - 1.10.x
+  - 1.11.x
   - tip
