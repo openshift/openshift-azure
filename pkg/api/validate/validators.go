@@ -68,7 +68,7 @@ func validateProperties(p *api.Properties, location string, externalOnly bool) (
 		} else {
 			// TODO: consider ensuring that PublicSubdomain is of the form
 			// openshift.<random>.<location>.azmosa.io
-			if !isValidHostname(p.PublicHostname) {
+			if !isValidLowerCaseHostname(p.PublicHostname) {
 				errs = append(errs, fmt.Errorf("invalid properties.publicHostname %q", p.PublicHostname))
 			}
 
@@ -223,7 +223,7 @@ func validateRouterProfile(path string, rp *api.RouterProfile, location string, 
 	if !externalOnly {
 		// TODO: consider ensuring that PublicSubdomain is of the form
 		// apps.<random>.<location>.azmosa.io
-		if !isValidHostname(rp.PublicSubdomain) {
+		if !isValidLowerCaseHostname(rp.PublicSubdomain) {
 			errs = append(errs, fmt.Errorf("invalid %s.publicSubdomain %q", path, rp.PublicSubdomain))
 		}
 

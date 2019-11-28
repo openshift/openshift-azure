@@ -75,7 +75,7 @@ func getFakeDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, az *fak
 }
 
 func enrichCs(cs *api.OpenShiftManagedCluster) error {
-	rg := "testRG"
+	rg := "testrg"
 	dnsDomain := "cloudapp.azure.com"
 	tenantID := uuid.NewV4().String()
 	clientID := uuid.NewV4().String()

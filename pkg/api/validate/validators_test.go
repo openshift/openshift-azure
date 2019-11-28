@@ -230,6 +230,12 @@ func TestValidate(t *testing.T) {
 			},
 			expectedErrs: []error{errors.New(`invalid properties.publicHostname "bad!"`)},
 		},
+		"openshift config invalid public hostname (upper case)": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.PublicHostname = "BAD.DOMAIN"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.publicHostname "BAD.DOMAIN"`)},
+		},
 		"openshift config matching public hostname": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Properties.PublicHostname = oc.Properties.FQDN
@@ -348,6 +354,12 @@ func TestValidate(t *testing.T) {
 				oc.Properties.RouterProfiles[0].PublicSubdomain = "()"
 			},
 			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"].publicSubdomain "()"`)},
+		},
+		"router invalid public subdomain (upper case)": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.RouterProfiles[0].PublicSubdomain = "BAD.DOMAIN"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"].publicSubdomain "BAD.DOMAIN"`)},
 		},
 		"router matching public subdomain": {
 			f: func(oc *api.OpenShiftManagedCluster) {
