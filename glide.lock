@@ -1,5 +1,5 @@
-hash: 073e72c904a3a520e12de168d14972c4c568ad07c8167215d0e1107110acee80
-updated: 2019-11-27T09:05:42.212296918-06:00
+hash: a753c7fda11ad0fec415ad64987ded97ed2e3c21777b50e64a0f1ee6960c2ea9
+updated: 2019-11-29T11:24:58.411634Z
 imports:
 - name: code.cloudfoundry.org/clock
   version: 02e53af36e6c978af692887ed449b74026d76fec
@@ -47,7 +47,7 @@ imports:
   - tracing
   - version
 - name: github.com/beorn7/perks
-  version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
+  version: 37c8de3658fcb183f997c4e13e8337516ab753e6
   subpackages:
   - quantile
 - name: github.com/blang/semver
@@ -322,7 +322,7 @@ imports:
   subpackages:
   - pkg/serviceability
 - name: github.com/openshift/origin
-  version: d2c3d0d855d28fd092940b004ec15c5918050f71
+  version: 0731b2fcad40a90ddecbe3adf0880460389735cc
   subpackages:
   - pkg/api/apihelpers
   - pkg/api/install
@@ -418,7 +418,7 @@ imports:
 - name: github.com/peterbourgon/diskv
   version: 5f041e8faa004a95c88a202771f4cc3e991971e6
 - name: github.com/pkg/errors
-  version: 645ef00459ed84a119197bfb8d8205042c6df63d
+  version: 7f95ac13edff643b8ce5398b6ccab125f8a20c1a
 - name: github.com/pkg/profile
   version: 057bc52a47ec3c79498dda63f4a6f8298725e976
 - name: github.com/prometheus/client_golang
@@ -431,7 +431,7 @@ imports:
   - prometheus/promauto
   - prometheus/promhttp
 - name: github.com/prometheus/client_model
-  version: fa8ad6fec33561be4280a8f0514318c79d7f6cb6
+  version: 14fe0d1b01d4d5fc031dd4bec1823bd3ebbe8016
   subpackages:
   - go
 - name: github.com/prometheus/common
@@ -475,7 +475,7 @@ imports:
 - name: github.com/spf13/cobra
   version: ef82de70bb3f60c65fb8eebacbb2d122ef517385
 - name: github.com/spf13/pflag
-  version: 583c0c0531f06d5278b7d917446061adc344b5cd
+  version: 2e9d26c8c37aae03e3f9d4e90b7116f5accb7cab
 - name: go.opencensus.io
   version: aad2c527c5defcf89b5afab7f37274304195a6b2
   subpackages:
@@ -664,7 +664,7 @@ imports:
 - name: gopkg.in/tomb.v1
   version: c131134a1947e9afd9cecfe11f4c6dff0732ae58
 - name: gopkg.in/yaml.v2
-  version: 670d4cfef0544295bc27a114dbac37980d83185a
+  version: 1f64d6156d11335c3f22d9330b0ad14fc1e789ce
 - name: honnef.co/go/tools
   version: dfe37feaecf7b73ce53f4fb8fa347265a77c6c4b
   subpackages:
@@ -795,7 +795,7 @@ imports:
   - third_party/forked/golang/json
   - third_party/forked/golang/reflect
 - name: k8s.io/apiserver
-  version: c6aca565d348e53b6bd4cceb0c9fb3a67ccf6b2e
+  version: f82dd9e18de043955b5032249835cff86c5bdf13
   repo: https://github.com/openshift/kubernetes-apiserver.git
   subpackages:
   - pkg/apis/apiserver
@@ -923,7 +923,7 @@ imports:
   subpackages:
   - pkg/util/proto
 - name: k8s.io/kubernetes
-  version: 20d43513fea79ab313826e815bc6fa6dddc77aba
+  version: 0d84639bd6fd5dd9dd64890165c5df6db60fc5be
   repo: https://github.com/openshift/kubernetes.git
   subpackages:
   - pkg/api/legacyscheme
