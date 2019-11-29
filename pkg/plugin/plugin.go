@@ -28,6 +28,7 @@ type plugin struct {
 	testConfig             api.TestConfig
 	upgraderFactory        func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error)
 	configInterfaceFactory func(cs *api.OpenShiftManagedCluster) (config.Interface, error)
+	roleLister             validate.RoleLister
 	now                    func() time.Time
 }
 
@@ -46,13 +47,14 @@ func NewPlugin(log *logrus.Entry, pluginConfig *pluginapi.Config, optionalTestCo
 		testConfig:             testConfig,
 		upgraderFactory:        cluster.NewSimpleUpgrader,
 		configInterfaceFactory: config.New,
+		roleLister:             validate.SimpleRoleLister{},
 		now:                    time.Now,
 	}, nil
 }
 
 func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
 	p.log.Info("validating internal data models")
-	validator := validate.NewAPIValidator(p.testConfig.RunningUnderTest)
+	validator := validate.NewAPIValidator(p.testConfig.RunningUnderTest, p.roleLister)
 	errs = validator.Validate(new, old, externalOnly)
 
 	// if this is an update and not an upgrade, check if we can service it, and
