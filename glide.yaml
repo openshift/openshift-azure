@@ -108,3 +108,5 @@ import:
   version: ^1.0.1
   subpackages:
   - cidr
+- package: github.com/dgrijalva/jwt-go
+  version: v3.2.0
