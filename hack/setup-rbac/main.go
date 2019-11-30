@@ -64,7 +64,7 @@ func ensureRoleDefinitions(ctx context.Context, log *logrus.Entry) error {
 	})
 
 	_, err = cli.CreateOrUpdate(ctx, "/subscriptions/"+os.Getenv("AZURE_SUBSCRIPTION_ID"), fakerp.OSAWorkerRoleDefinitionID, azauthorization.RoleDefinition{
-		Name: to.StringPtr(fakerp.OSAMasterRoleDefinitionID),
+		Name: to.StringPtr(fakerp.OSAWorkerRoleDefinitionID),
 		Properties: &azauthorization.RoleDefinitionProperties{
 			RoleName: to.StringPtr("OSA Worker"),
 			Permissions: &[]azauthorization.Permission{
