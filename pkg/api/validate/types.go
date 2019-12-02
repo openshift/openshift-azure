@@ -132,8 +132,12 @@ func isValidLocation(l string) bool {
 	return rxLocation.MatchString(l)
 }
 
-func isValidHostname(h string) bool {
-	return len(h) <= 255 && rxRfc1123.MatchString(h)
+func isValidLowerCaseHostname(h string) bool {
+	// OpenShift master will not start if (for example) routingConfig.subdomain
+	// or servingInfo.namedCertificates.names have upper case characters.  I
+	// don't believe that's RFC1123 compliant, hence adding the strings.ToLower
+	// check and not changing the regex
+	return len(h) <= 255 && rxRfc1123.MatchString(h) && strings.ToLower(h) == h
 }
 
 func isValidCloudAppHostname(h, location string) bool {
