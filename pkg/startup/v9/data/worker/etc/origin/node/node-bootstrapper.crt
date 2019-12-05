@@ -1,1 +1,0 @@
-{{ CertAsBytes .Config.Certificates.NodeBootstrap.Cert | String }}

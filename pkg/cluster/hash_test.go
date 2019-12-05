@@ -49,23 +49,6 @@ func TestHashScaleSetStability(t *testing.T) {
 				expectedHash: "b02af291c3fe22fb1e289493959a17d42d5bcd69af1166d1dbb24bf80c69da93",
 			},
 		},
-		"v9.0": {
-			{
-				role: api.AgentPoolProfileRoleMaster,
-				// this value should not change
-				expectedHash: "5a95b011d1d39d4a4b98a5617ae18fa0a90dacc884d251280ee9785c89668b56",
-			},
-			{
-				role: api.AgentPoolProfileRoleInfra,
-				// this value should not change
-				expectedHash: "9271c1678f629b0dde716fb696726e8c3eb3431fee7102e3257781c2d05cb254",
-			},
-			{
-				role: api.AgentPoolProfileRoleCompute,
-				// this value should not change
-				expectedHash: "695fcd5966728dbcb47bf553e1db0ea921934f67414cd912cb627f6822021bd7",
-			},
-		},
 		"v10.0": {
 			{
 				role: api.AgentPoolProfileRoleMaster,
@@ -236,7 +219,7 @@ func TestHashScaleSetStability(t *testing.T) {
 
 	for version, tests := range tests {
 		switch version {
-		case "v9.0", "v7.1":
+		case "v7.1":
 			cs.Config.Images.ImagePullSecret = []byte{}
 			cs.Config.Images.GenevaImagePullSecret = []byte{}
 		default:
@@ -281,10 +264,6 @@ func TestHashSyncPodStability(t *testing.T) {
 		"v7.1": {
 			// this value should not change
 			expectedHash: "13606ac122bf615190ff88d5c358709aaba9228c9e8cab031c058184bd016444",
-		},
-		"v9.0": {
-			// this value should not change
-			expectedHash: "6a8bc3cc2340bea2a7a1e9d63da4390a8134eedd517774a6f7b83c2c6941ee47",
 		},
 		"v10.0": {
 			// this value should not change
