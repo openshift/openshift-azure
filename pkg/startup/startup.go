@@ -17,7 +17,6 @@ import (
 	v12 "github.com/openshift/openshift-azure/pkg/startup/v12"
 	v13 "github.com/openshift/openshift-azure/pkg/startup/v13"
 	v14 "github.com/openshift/openshift-azure/pkg/startup/v14"
-	v7 "github.com/openshift/openshift-azure/pkg/startup/v7"
 	v71 "github.com/openshift/openshift-azure/pkg/startup/v71"
 	v9 "github.com/openshift/openshift-azure/pkg/startup/v9"
 )
@@ -32,8 +31,6 @@ type Interface interface {
 // New returns a new startup Interface according to the cluster version running
 func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (Interface, error) {
 	switch cs.Config.PluginVersion {
-	case "v7.0":
-		return v7.New(log, cs, testConfig), nil
 	case "v7.1":
 		return v71.New(log, cs, testConfig), nil
 	case "v9.0":

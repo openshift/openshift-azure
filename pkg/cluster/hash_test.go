@@ -32,23 +32,6 @@ func TestHashScaleSetStability(t *testing.T) {
 		role         api.AgentPoolProfileRole
 		expectedHash string
 	}{
-		"v7.0": {
-			{
-				role: api.AgentPoolProfileRoleMaster,
-				// this value should not change
-				expectedHash: "51df71b5d8b4586dbdb5736f54f65d201b31ee5d7facd0378a4c59507aaa2e61",
-			},
-			{
-				role: api.AgentPoolProfileRoleInfra,
-				// this value should not change
-				expectedHash: "84c7e8f1ec270a1685a08542746a6c000306217562d9d475baf52b22eb05e490",
-			},
-			{
-				role: api.AgentPoolProfileRoleCompute,
-				// this value should not change
-				expectedHash: "78dd1e1c4d1c80cb1aa20d448daebe9cc378c50c8c65c300814eb2a944046362",
-			},
-		},
 		"v7.1": {
 			{
 				role: api.AgentPoolProfileRoleMaster,
@@ -253,7 +236,7 @@ func TestHashScaleSetStability(t *testing.T) {
 
 	for version, tests := range tests {
 		switch version {
-		case "v7.0", "v9.0", "v7.1":
+		case "v9.0", "v7.1":
 			cs.Config.Images.ImagePullSecret = []byte{}
 			cs.Config.Images.GenevaImagePullSecret = []byte{}
 		default:
@@ -295,10 +278,6 @@ func TestHashSyncPodStability(t *testing.T) {
 	tests := map[string]struct {
 		expectedHash string
 	}{
-		"v7.0": {
-			// this value should not change
-			expectedHash: "40f9a51d8328ad65e4cdda62e460b53a6b2a5b71908f43220f4a17685c49d562",
-		},
 		"v7.1": {
 			// this value should not change
 			expectedHash: "13606ac122bf615190ff88d5c358709aaba9228c9e8cab031c058184bd016444",
@@ -390,7 +369,7 @@ func TestHashSyncPodStability(t *testing.T) {
 	for version, tt := range tests {
 		cs.Config.PluginVersion = version
 		switch cs.Config.PluginVersion {
-		case "v7.0", "v7.1":
+		case "v7.1":
 			cs.Config.Images.Console = ""
 		default:
 			// needed by derived.OpenShiftClientVersion()
