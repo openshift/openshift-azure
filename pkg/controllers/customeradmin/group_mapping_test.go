@@ -52,6 +52,12 @@ func TestFromMSGraphGroup(t *testing.T) {
 				Name: "bob_owner@home.com",
 			},
 		},
+		//case 5
+		&v1.User{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "user@userprincipalname.com",
+			},
+		},
 	).UserV1()
 	tests := []struct {
 		name           string
@@ -264,7 +270,7 @@ func TestFromMSGraphGroup(t *testing.T) {
 			},
 		},
 		{
-			name:          "guest user (case 4)",
+			name:          "guest user with Mail field matching (case 4)",
 			kubeGroupName: osaCustomerAdmins,
 			want1:         false,
 			kubeGroup: &v1.Group{
@@ -371,6 +377,82 @@ func TestFromMSGraphGroup(t *testing.T) {
 					Name: osaCustomerAdmins,
 				},
 				Users: []string{"User@home.com"},
+			},
+		},
+		//case 5 userPrincipalName matches
+		{
+			name:          "user with UserPrincipalName field matching (case 5)",
+			kubeGroupName: osaCustomerAdmins,
+			want1:         true,
+			kubeGroup: &v1.Group{
+				ObjectMeta: meta_v1.ObjectMeta{
+					Name: osaCustomerAdmins,
+				},
+				Users: []string{},
+			},
+			msGroupMembers: []graphrbac.User{
+				{
+					Mail:              to.StringPtr("notmatching@userprincipalname.com"),
+					UserType:          graphrbac.Guest,
+					GivenName:         nil,
+					UserPrincipalName: to.StringPtr("user@userprincipalname.com"),
+				},
+			},
+			want: &v1.Group{
+				ObjectMeta: meta_v1.ObjectMeta{
+					Name: osaCustomerAdmins,
+				},
+				Users: []string{"user@userprincipalname.com"},
+			},
+		},
+		//case 6 - no users matching the Mail or UserPrincipalName yet
+		{
+			name:          "default, Mail set (case 6)",
+			kubeGroupName: osaCustomerAdmins,
+			want1:         true,
+			kubeGroup: &v1.Group{
+				ObjectMeta: meta_v1.ObjectMeta{
+					Name: osaCustomerAdmins,
+				},
+				Users: []string{},
+			},
+			msGroupMembers: []graphrbac.User{
+				{
+					Mail:              to.StringPtr("notmatching@nomatch.com"),
+					UserType:          graphrbac.Guest,
+					GivenName:         nil,
+					UserPrincipalName: to.StringPtr("notmatching2@nomatch.com"),
+				},
+			},
+			want: &v1.Group{
+				ObjectMeta: meta_v1.ObjectMeta{
+					Name: osaCustomerAdmins,
+				},
+				Users: []string{"notmatching@nomatch.com"},
+			},
+		},
+		{
+			name:          "default, mail not set (case 6)",
+			kubeGroupName: osaCustomerAdmins,
+			want1:         true,
+			kubeGroup: &v1.Group{
+				ObjectMeta: meta_v1.ObjectMeta{
+					Name: osaCustomerAdmins,
+				},
+				Users: []string{},
+			},
+			msGroupMembers: []graphrbac.User{
+				{
+					UserType:          graphrbac.Guest,
+					GivenName:         nil,
+					UserPrincipalName: to.StringPtr("notmatching2@nomatch.com"),
+				},
+			},
+			want: &v1.Group{
+				ObjectMeta: meta_v1.ObjectMeta{
+					Name: osaCustomerAdmins,
+				},
+				Users: []string{"notmatching2@nomatch.com"},
 			},
 		},
 	}
