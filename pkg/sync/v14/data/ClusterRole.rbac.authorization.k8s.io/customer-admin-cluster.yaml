@@ -95,7 +95,7 @@ rules:
   - events
   - nodes
   - persistentvolumes
-  - pod
+  - pods
   verbs:
   - get
   - list
