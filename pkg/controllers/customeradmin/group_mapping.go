@@ -62,13 +62,13 @@ func mailEqual(s, t string) bool {
 // tryOverride checks a given e-mail address against the user list, and if it
 // finds a name in the user list that matches (subject to mailEqual above), it
 // uses it
-func tryOverride(mail string, ocpUserList []v1.User) string {
+func tryOverride(mail string, ocpUserList []v1.User) (string, bool) {
 	for _, usr := range ocpUserList {
 		if mailEqual(usr.Name, mail) {
-			return usr.Name
+			return usr.Name, true
 		}
 	}
-	return mail
+	return mail, false
 }
 
 // reconcileUsers will take an external user reference from AAD
@@ -78,7 +78,9 @@ func tryOverride(mail string, ocpUserList []v1.User) string {
 // 2. Guest user with prefix live.com#user@guest.com in OCP users but not in AAD
 // 2.b Guest user with prefix live.com#user@guest.com in OCP users but not in AAD and Mail is nil
 // 3. Guest user with no prefix user@trustedGuest.com
-// 4. Normal user/ other usecases - Default: Mail
+// 4. AAD Mail field matched a cluster user
+// 5. AAD UserPrincipalName field matched a cluster user
+// 6. Normal user/ other usecases - Default: Mail if set; UserPrincipalName if Mail not set
 // To check structure:
 // az ad group member list -g 44e69b4e-2e70-42df-bb97-3a890730d7b0
 // External links:
@@ -99,7 +101,8 @@ func reconcileUsers(log *logrus.Entry, ocpUserList []v1.User, AADUser graphrbac.
 			idx := strings.LastIndex(s, "_")
 			email := s[:idx] + "@" + s[idx+1:]
 			if mail.Validate(email) && strings.EqualFold(email, *AADUser.GivenName) {
-				return tryOverride(*AADUser.GivenName, ocpUserList)
+				username, _ := tryOverride(*AADUser.GivenName, ocpUserList)
+				return username
 			}
 		}
 	}
@@ -123,12 +126,29 @@ func reconcileUsers(log *logrus.Entry, ocpUserList []v1.User, AADUser graphrbac.
 			}
 		}
 	}
-	// returning Mail handles use-case 3-4 here and is default behaviour is none
+
+	//Case 4 AADUser Mail field matched a cluster username
+	if AADUser.Mail != nil {
+		username, found := tryOverride(*AADUser.Mail, ocpUserList)
+		if found {
+			return username
+		}
+	}
+
+	//Case 5 AADUser UserPrincipalName matched a cluster username, even when Mail is set
+	if AADUser.UserPrincipalName != nil {
+		username, found := tryOverride(*AADUser.UserPrincipalName, ocpUserList)
+		if found {
+			return username
+		}
+	}
+
+	// returning Mail if set is default behaviour if none
 	// of the use-cases where matched
 	if AADUser.Mail != nil {
-		return tryOverride(*AADUser.Mail, ocpUserList)
+		return *AADUser.Mail
 	}
-	// default
+	// if Mail is not set, return UserPrincipalName
 	return *AADUser.UserPrincipalName
 }
 
