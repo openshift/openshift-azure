@@ -77,6 +77,17 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Ev
 		Expect(kerrors.IsForbidden(err)).To(Equal(true))
 	})
 
+	It("should be able to list pods in infra namespaces", func() {
+		res, err := sanity.Checker.Client.CustomerAdmin.CoreV1.Pods("openshift-sdn").List(metav1.ListOptions{})
+		Expect(err).ToNot(HaveOccurred())
+		Expect(len(res.Items) > 0)
+	})
+
+	It("should not be able to delete pods in infra namespaces", func() {
+		err := sanity.Checker.Client.CustomerAdmin.CoreV1.Pods("openshift-sdn").Delete("sdn-master-000000", &metav1.DeleteOptions{})
+		Expect(kerrors.ReasonForError(err)).To(Equal(metav1.StatusReasonForbidden))
+	})
+
 	It("should be able to query groups", func() {
 		_, err := sanity.Checker.Client.CustomerAdmin.UserV1.Groups().Get("osa-customer-admins", metav1.GetOptions{})
 		Expect(err).ToNot(HaveOccurred())
