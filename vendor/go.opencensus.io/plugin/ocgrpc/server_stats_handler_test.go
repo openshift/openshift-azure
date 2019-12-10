@@ -19,8 +19,8 @@ import (
 	"reflect"
 	"testing"
 
-	"context"
 	"go.opencensus.io/trace"
+	"golang.org/x/net/context"
 
 	"go.opencensus.io/metric/metricdata"
 	"go.opencensus.io/stats/view"
@@ -32,8 +32,8 @@ import (
 )
 
 func TestServerDefaultCollections(t *testing.T) {
-	k1 := tag.MustNewKey("k1")
-	k2 := tag.MustNewKey("k2")
+	k1, _ := tag.NewKey("k1")
+	k2, _ := tag.NewKey("k2")
 
 	type tagPair struct {
 		k tag.Key
@@ -338,7 +338,7 @@ func newDistributionData(countPerBucket []int64, count int64, min, max, mean, su
 }
 
 func TestServerRecordExemplar(t *testing.T) {
-	key := tag.MustNewKey("test_key")
+	key, _ := tag.NewKey("test_key")
 	tagInfo := &stats.RPCTagInfo{FullMethodName: "/package.service/method"}
 	out := &stats.OutPayload{Length: 2000}
 	end := &stats.End{Error: nil}

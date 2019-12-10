@@ -7,23 +7,23 @@ import:
 - package: github.com/openshift/client-go
   version: release-3.11
 - package: k8s.io/kubernetes
+  version: origin-3.11-kubernetes-1.11.1
   repo: https://github.com/openshift/kubernetes.git
-  version: origin-3.11-kubernetes-1.11.1
 - package: k8s.io/api
+  version: origin-3.11-kubernetes-1.11.1
   repo: https://github.com/openshift/kubernetes-api.git
-  version: origin-3.11-kubernetes-1.11.1
 - package: k8s.io/client-go
+  version: origin-3.11-kubernetes-1.11.1
   repo: https://github.com/openshift/kubernetes-client-go.git
-  version: origin-3.11-kubernetes-1.11.1
 - package: k8s.io/kube-aggregator
+  version: origin-3.11-kubernetes-1.11.1
   repo: https://github.com/openshift/kube-aggregator.git
-  version: origin-3.11-kubernetes-1.11.1
 - package: k8s.io/apiextensions-apiserver
+  version: origin-3.11-kubernetes-1.11.1
   repo: https://github.com/openshift/apiextensions-apiserver.git
-  version: origin-3.11-kubernetes-1.11.1
 - package: k8s.io/apimachinery
-  repo: https://github.com/openshift/kubernetes-apimachinery.git
   version: origin-3.11-kubernetes-1.11.1
+  repo: https://github.com/openshift/kubernetes-apimachinery.git
 - package: github.com/davecgh/go-spew
   version: ^1.1.0
 - package: github.com/Azure/azure-sdk-for-go
@@ -110,3 +110,5 @@ import:
   - cidr
 - package: github.com/dgrijalva/jwt-go
   version: v3.2.0
+- package: github.com/openshift/kubernetes-metrics
+  version: origin-3.11-kubernetes-1.11.1

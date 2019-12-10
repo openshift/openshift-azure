@@ -348,7 +348,7 @@ func TestPullRequestsService_UpdateBranch(t *testing.T) {
 			}`)
 	})
 
-	opts := &PullRequestBranchUpdateOptions{
+	opts := &PullReqestBranchUpdateOptions{
 		ExpectedHeadSHA: String("s"),
 	}
 

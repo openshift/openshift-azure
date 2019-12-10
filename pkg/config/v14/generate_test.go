@@ -90,6 +90,7 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.Images.GenevaLogging != "", "azure logging image")
 	assert(c.Images.GenevaTDAgent != "", "azure TDAgent image")
 	assert(c.Images.MetricsBridge != "", "metrics-bridge image")
+	assert(c.Images.MetricsServer != "", "metrics-server image")
 
 	assert(c.ServiceAccountKey != nil, "service account key")
 

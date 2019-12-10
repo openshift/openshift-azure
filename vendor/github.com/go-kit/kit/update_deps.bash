@@ -5,11 +5,11 @@
 # failure on continuous integration.
 
 function deps {
-	go list -deps -f '{{if and .DepOnly (not .Standard)}}{{.ImportPath}}{{end}}' ./...
+	go list -f '{{join .Deps "\n"}}' ./...
 }
 
-function unique_repos {
-	cut -d '/' -f-3 | sort | uniq
+function not_stdlib {
+	xargs go list -f '{{if not .Standard}}{{.ImportPath}}{{end}}'
 }
 
 function not_gokit {
@@ -20,8 +20,9 @@ function go_get_update {
 	while read d
 	do
 		echo $d
-		go get -u $d/... || echo "failed, trying again with master" && cd $GOPATH/src/$d && git checkout master && go get -u $d
+		go get -u $d || echo "failed, trying again with master" && cd $GOPATH/src/$d && git checkout master && go get -u $d
 	done
 }
 
-deps | unique_repos | not_gokit | go_get_update
+deps | not_stdlib | not_gokit | go_get_update
+

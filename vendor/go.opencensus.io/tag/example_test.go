@@ -37,14 +37,15 @@ func ExampleNewKey() {
 	_ = key // use key
 }
 
-func ExampleMustNewKey() {
-	key := tag.MustNewKey("example.com/keys/user-os")
-	_ = key // use key
-}
-
 func ExampleNew() {
-	osKey := tag.MustNewKey("example.com/keys/user-os")
-	userIDKey := tag.MustNewKey("example.com/keys/user-id")
+	osKey, err := tag.NewKey("example.com/keys/user-os")
+	if err != nil {
+		log.Fatal(err)
+	}
+	userIDKey, err := tag.NewKey("example.com/keys/user-id")
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	ctx, err := tag.New(ctx,
 		tag.Insert(osKey, "macOS-10.12.5"),

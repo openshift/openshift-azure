@@ -1,9 +1,8 @@
 package service
 
-import (
-	"context"
-	"errors"
-)
+import "context"
+
+import "errors"
 
 type Profile struct {
 	ID        string    `json:"id"`

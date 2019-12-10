@@ -106,6 +106,7 @@ type ImageConfig struct {
 	MetricsBridge *string `json:"metricsBridge,omitempty"`
 
 	LogAnalyticsAgent *string `json:"logAnalyticsAgent,omitempty"`
+	MetricsServer     *string `json:"metricsServer,omitempty"`
 }
 
 // CertificateConfig contains all certificate configuration for the cluster.
@@ -143,6 +144,7 @@ type CertificateConfig struct {
 	ServiceCatalogServer         *Certificate      `json:"serviceCatalogServer,omitempty"`
 	AroAdmissionController       *Certificate      `json:"aroAdmissionController,omitempty"`
 	AroAdmissionControllerClient *Certificate      `json:"aroAdmissionControllerClient,omitempty"`
+	MetricsServer                *Certificate      `json:"metricsServer,omitempty"`
 
 	// misc certificates
 	BlackBoxMonitor *Certificate `json:"blackBoxMonitor,omitempty"`

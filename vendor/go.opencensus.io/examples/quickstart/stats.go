@@ -45,10 +45,10 @@ var (
 	mLatencyMs = stats.Float64("repl/latency", "The latency in milliseconds per REPL loop", stats.UnitMilliseconds)
 
 	// Counts the number of lines read in from standard input
-	mLinesIn = stats.Int64("repl/lines_in", "The number of lines read in", stats.UnitDimensionless)
+	mLinesIn = stats.Int64("repl/lines_in", "The number of lines read in", stats.UnitNone)
 
 	// Encounters the number of non EOF(end-of-file) errors.
-	mErrors = stats.Int64("repl/errors", "The number of errors encountered", stats.UnitDimensionless)
+	mErrors = stats.Int64("repl/errors", "The number of errors encountered", stats.UnitNone)
 
 	// Counts/groups the lengths of lines read in.
 	mLineLengths = stats.Int64("repl/line_lengths", "The distribution of line lengths", stats.UnitBytes)
@@ -56,7 +56,7 @@ var (
 
 // TagKeys for the stats quickstart.
 var (
-	keyMethod = tag.MustNewKey("method")
+	keyMethod, _ = tag.NewKey("method")
 )
 
 // Views for the stats quickstart.
@@ -100,7 +100,7 @@ func main() {
 
 	// Using log exporter here to export metrics but you can choose any supported exporter.
 	exporter, err := exporter.NewLogExporter(exporter.Options{
-		ReportingInterval: 10 * time.Second,
+		ReportingInterval: time.Duration(10 * time.Second),
 		MetricsLogFile:    metricsLogFile,
 	})
 	if err != nil {

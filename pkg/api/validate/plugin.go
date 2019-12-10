@@ -274,6 +274,11 @@ func validateImageConfig(path, version string, i *pluginapi.ImageConfig) (errs [
 		errs = append(errs, fmt.Errorf("invalid %s.aroAdmissionController %q", path, i.Canary))
 	}
 
+	// TODO: remove when v14 is the oldest deployed plugin
+	if major >= 14 && i.MetricsServer == "" {
+		errs = append(errs, fmt.Errorf("invalid %s.metricsServer %q", path, i.MetricsServer))
+	}
+
 	if i.EtcdBackup == "" {
 		errs = append(errs, fmt.Errorf("invalid %s.etcdBackup %q", path, i.EtcdBackup))
 	}

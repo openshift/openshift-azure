@@ -26,10 +26,7 @@ import (
 )
 
 func TestDataClone(t *testing.T) {
-	agg := &Aggregation{
-		Buckets: []float64{1, 2, 3, 4},
-	}
-	dist := newDistributionData(agg)
+	dist := newDistributionData([]float64{1, 2, 3, 4})
 	dist.Count = 7
 	dist.Max = 11
 	dist.Min = 1
@@ -69,10 +66,7 @@ func TestDataClone(t *testing.T) {
 }
 
 func TestDistributionData_addSample(t *testing.T) {
-	agg := &Aggregation{
-		Buckets: []float64{1, 2},
-	}
-	dd := newDistributionData(agg)
+	dd := newDistributionData([]float64{1, 2})
 	attachments1 := map[string]interface{}{"key1": "value1"}
 	t1 := time.Now()
 	dd.addSample(0.5, attachments1, t1)

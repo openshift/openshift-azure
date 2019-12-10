@@ -452,6 +452,12 @@ var translations = map[string][]struct {
 			},
 		},
 	},
+	"Deployment.apps/openshift-monitoring/metrics-server": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.Images.MetricsServer}}",
+		},
+	},
 	"Deployment.apps/openshift-web-console/webconsole": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
@@ -645,6 +651,16 @@ var translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'password'"),
 			Template: "{{ .Config.EtcdMetricsPassword }}",
+		},
+	},
+	"Secret/openshift-monitoring/metrics-server-certs": {
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'tls.crt'"),
+			Template: "{{ String (CertAsBytes .Config.Certificates.MetricsServer.Cert) }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'tls.key'"),
+			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.MetricsServer.Key) }}",
 		},
 	},
 	"Service/default/router": {

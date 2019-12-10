@@ -14,7 +14,7 @@ import (
 	"github.com/go-kit/kit/log/syslog"
 )
 
-func ExampleNewSyslogLogger_defaultPrioritySelector() {
+func ExampleNewLogger_defaultPrioritySelector() {
 	// Normal syslog writer
 	w, err := gosyslog.New(gosyslog.LOG_INFO, "experiment")
 	if err != nil {

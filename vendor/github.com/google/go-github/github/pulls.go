@@ -24,7 +24,6 @@ type PullRequest struct {
 	ID                  *int64     `json:"id,omitempty"`
 	Number              *int       `json:"number,omitempty"`
 	State               *string    `json:"state,omitempty"`
-	Locked              *bool      `json:"locked,omitempty"`
 	Title               *string    `json:"title,omitempty"`
 	Body                *string    `json:"body,omitempty"`
 	CreatedAt           *time.Time `json:"created_at,omitempty"`
@@ -39,7 +38,6 @@ type PullRequest struct {
 	MergeableState      *string    `json:"mergeable_state,omitempty"`
 	MergedBy            *User      `json:"merged_by,omitempty"`
 	MergeCommitSHA      *string    `json:"merge_commit_sha,omitempty"`
-	Rebaseable          *bool      `json:"rebaseable,omitempty"`
 	Comments            *int       `json:"comments,omitempty"`
 	Commits             *int       `json:"commits,omitempty"`
 	Additions           *int       `json:"additions,omitempty"`
@@ -273,9 +271,9 @@ func (s *PullRequestsService) Create(ctx context.Context, owner string, repo str
 	return p, resp, nil
 }
 
-// PullRequestBranchUpdateOptions specifies the optional parameters to the
+// PullReqestBranchUpdateOptions specifies the optional parameters to the
 // PullRequestsService.UpdateBranch method.
-type PullRequestBranchUpdateOptions struct {
+type PullReqestBranchUpdateOptions struct {
 	// ExpectedHeadSHA specifies the most recent commit on the pull request's branch.
 	// Default value is the SHA of the pull request's current HEAD ref.
 	ExpectedHeadSHA *string `json:"expected_head_sha,omitempty"`
@@ -296,7 +294,7 @@ type PullRequestBranchUpdateResponse struct {
 // in a successful request.
 //
 // GitHub API docs: https://developer.github.com/v3/pulls/#update-a-pull-request-branch
-func (s *PullRequestsService) UpdateBranch(ctx context.Context, owner, repo string, number int, opts *PullRequestBranchUpdateOptions) (*PullRequestBranchUpdateResponse, *Response, error) {
+func (s *PullRequestsService) UpdateBranch(ctx context.Context, owner, repo string, number int, opts *PullReqestBranchUpdateOptions) (*PullRequestBranchUpdateResponse, *Response, error) {
 	u := fmt.Sprintf("repos/%v/%v/pulls/%d/update-branch", owner, repo, number)
 
 	req, err := s.client.NewRequest("PUT", u, opts)
@@ -344,10 +342,7 @@ func (s *PullRequestsService) Edit(ctx context.Context, owner string, repo strin
 		State:               pull.State,
 		MaintainerCanModify: pull.MaintainerCanModify,
 	}
-	// avoid updating the base branch when closing the Pull Request
-	// - otherwise the GitHub API server returns a "Validation Failed" error:
-	// "Cannot change base branch of closed pull request".
-	if pull.Base != nil && pull.GetState() != "closed" {
+	if pull.Base != nil {
 		update.Base = pull.Base.Ref
 	}
 

@@ -44,7 +44,7 @@ func main() {
 
 	// Register an exporter to be able to retrieve
 	// the data from the subscribed views.
-	e, err := exporter.NewLogExporter(exporter.Options{ReportingInterval: time.Second})
+	e, err := exporter.NewLogExporter(exporter.Options{ReportingInterval: time.Duration(time.Second)})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -54,7 +54,10 @@ func main() {
 
 	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
 
-	frontendKey = tag.MustNewKey("example.com/keys/frontend")
+	frontendKey, err = tag.NewKey("example.com/keys/frontend")
+	if err != nil {
+		log.Fatal(err)
+	}
 	videoSize = stats.Int64("example.com/measure/video_size", "size of processed videos", stats.UnitBytes)
 	view.SetReportingPeriod(2 * time.Second)
 

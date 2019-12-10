@@ -296,6 +296,16 @@ func (g *simpleGenerator) Generate(template *pluginapi.Config, setVersionFields 
 			key:  &c.Certificates.RegistryConsole.Key,
 			cert: &c.Certificates.RegistryConsole.Cert,
 		},
+		{
+			params: tls.CertParams{
+				Subject: pkix.Name{
+					CommonName: "metrics-server.openshift-monitoring.svc",
+				},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			},
+			key:  &c.Certificates.MetricsServer.Key,
+			cert: &c.Certificates.MetricsServer.Cert,
+		},
 	}
 	for _, cert := range certs {
 		if cert.params.SigningKey == nil && cert.params.SigningCert == nil {

@@ -130,7 +130,7 @@ func (q *queue) Size() int64 {
 func (q *queue) Elapsed() float64 {
 	q.mu.Lock()
 	defer q.mu.Unlock()
-	return time.Since(q.lastConsumed).Seconds()
+	return time.Now().Sub(q.lastConsumed).Seconds()
 }
 
 // END tofloat64
@@ -172,7 +172,7 @@ func doWork() {
 func main() {
 	// Using logexporter but you can choose any supported exporter.
 	exporter, err := exporter.NewLogExporter(exporter.Options{
-		ReportingInterval: 10 * time.Second,
+		ReportingInterval: time.Duration(10 * time.Second),
 		MetricsLogFile:    metricsLogFile,
 	})
 	if err != nil {

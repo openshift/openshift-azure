@@ -353,7 +353,7 @@ func serveHTTP(handler *Handler, done chan struct{}, wait chan time.Time, status
 		// Simulate a slow-responding server.
 		sleepUntil := <-wait
 		for time.Now().Before(sleepUntil) {
-			time.Sleep(time.Until(sleepUntil))
+			time.Sleep(sleepUntil.Sub(time.Now()))
 		}
 
 		io.WriteString(w, "expected-response")
@@ -668,9 +668,6 @@ func TestStatusUnitTest(t *testing.T) {
 		{204, trace.Status{Code: trace.StatusCodeOK, Message: `OK`}},
 		{100, trace.Status{Code: trace.StatusCodeUnknown, Message: `UNKNOWN`}},
 		{500, trace.Status{Code: trace.StatusCodeUnknown, Message: `UNKNOWN`}},
-		{400, trace.Status{Code: trace.StatusCodeInvalidArgument, Message: `INVALID_ARGUMENT`}},
-		{422, trace.Status{Code: trace.StatusCodeInvalidArgument, Message: `INVALID_ARGUMENT`}},
-		{499, trace.Status{Code: trace.StatusCodeCancelled, Message: `CANCELLED`}},
 		{404, trace.Status{Code: trace.StatusCodeNotFound, Message: `NOT_FOUND`}},
 		{600, trace.Status{Code: trace.StatusCodeUnknown, Message: `UNKNOWN`}},
 		{401, trace.Status{Code: trace.StatusCodeUnauthenticated, Message: `UNAUTHENTICATED`}},
