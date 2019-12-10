@@ -196,6 +196,7 @@
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/strimzi-cluster-operator-topic-operator-delegation.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/system-auth-delegator-binding.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/system-aws-cloud-provider.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-basic-user-strimzi-binding.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/system-basic-user.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/system-build-strategy-docker-binding.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/system-build-strategy-jenkinspipeline-binding.yaml
@@ -4720,6 +4721,26 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemAwsCloudProviderYaml() (*asse
 	}
 
 	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-aws-cloud-provider.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserStrimziBindingYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x94\x8e\x31\x6e\xc3\x30\x0c\x45\x77\x9e\x42\x17\x90\x8b\x6e\x85\xc6\x76\xe8\xee\xa1\x3b\x2d\xb1\x2d\x63\x8b\x32\x48\x2a\x40\x7c\xfa\xc0\xc9\x10\x20\x01\x02\x64\x7f\xff\xbd\x8f\x2b\xff\x90\x1a\x37\x49\x41\x27\xcc\x03\x76\xff\x6f\xca\x1b\x3a\x37\x19\xe6\x0f\x1b\xb8\xbd\x1d\xdf\x61\x66\x29\x29\x7c\x2d\xdd\x9c\x74\x6c\x0b\x7d\xb2\x14\x96\x3f\xa8\xe4\x58\xd0\x31\x41\x08\x82\x95\x52\xb0\x93\x39\xd5\x38\xa1\x71\x8e\xdd\x48\xa3\xb9\x72\xdd\x18\xb4\x2d\x34\xd2\xef\x8e\xe2\xca\xdf\xda\xfa\xfa\x24\x0b\x21\x3c\x54\x6f\x91\xab\x32\x62\xa9\x2c\x60\x7d\x3a\x50\x76\x4b\x10\x5f\x32\x5f\xc0\xbb\xe3\x69\x5f\x90\x38\x67\x74\x2a\x70\x0e\x00\x00\xff\xff\x48\xd2\x60\xb2\x22\x01\x00\x00")
+
+func clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserStrimziBindingYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserStrimziBindingYaml,
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-basic-user-strimzi-binding.yaml",
+	)
+}
+
+func clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserStrimziBindingYaml() (*asset, error) {
+	bytes, err := clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserStrimziBindingYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-basic-user-strimzi-binding.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -15612,6 +15633,7 @@ var _bindata = map[string]func() (*asset, error){
 	"ClusterRoleBinding.rbac.authorization.k8s.io/strimzi-cluster-operator-topic-operator-delegation.yaml":                       clusterrolebindingRbacAuthorizationK8sIoStrimziClusterOperatorTopicOperatorDelegationYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/system-auth-delegator-binding.yaml":                                            clusterrolebindingRbacAuthorizationK8sIoSystemAuthDelegatorBindingYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/system-aws-cloud-provider.yaml":                                                clusterrolebindingRbacAuthorizationK8sIoSystemAwsCloudProviderYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-basic-user-strimzi-binding.yaml":                                        clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserStrimziBindingYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/system-basic-user.yaml":                                                        clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/system-build-strategy-docker-binding.yaml":                                     clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyDockerBindingYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/system-build-strategy-jenkinspipeline-binding.yaml":                            clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyJenkinspipelineBindingYaml,
@@ -16388,6 +16410,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"strimzi-cluster-operator-topic-operator-delegation.yaml":                       {clusterrolebindingRbacAuthorizationK8sIoStrimziClusterOperatorTopicOperatorDelegationYaml, map[string]*bintree{}},
 		"system-auth-delegator-binding.yaml":                                            {clusterrolebindingRbacAuthorizationK8sIoSystemAuthDelegatorBindingYaml, map[string]*bintree{}},
 		"system-aws-cloud-provider.yaml":                                                {clusterrolebindingRbacAuthorizationK8sIoSystemAwsCloudProviderYaml, map[string]*bintree{}},
+		"system-basic-user-strimzi-binding.yaml":                                        {clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserStrimziBindingYaml, map[string]*bintree{}},
 		"system-basic-user.yaml":                                                        {clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserYaml, map[string]*bintree{}},
 		"system-build-strategy-docker-binding.yaml":                                     {clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyDockerBindingYaml, map[string]*bintree{}},
 		"system-build-strategy-jenkinspipeline-binding.yaml":                            {clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyJenkinspipelineBindingYaml, map[string]*bintree{}},
