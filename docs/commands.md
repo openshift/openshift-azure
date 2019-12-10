@@ -38,8 +38,6 @@
 
 /test upgrade-v7.1
 
-/test upgrade-v9.0
-
 /test vmimage
 
 /test images
