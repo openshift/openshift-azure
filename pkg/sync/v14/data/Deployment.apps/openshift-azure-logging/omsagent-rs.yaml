@@ -78,7 +78,7 @@ spec:
           name: log-analytics
           readOnly: true
         - mountPath: /etc/config
-          name: log-analytics-cluster-agent-config
+          name: omsagent-rs-config
         - mountPath: /etc/config/settings
           name: settings-vol-config
           readOnly: true
@@ -118,8 +118,8 @@ spec:
           defaultMode: 288
           secretName: log-analytics
       - configMap:
-          name: log-analytics-cluster-agent-config
-        name: log-analytics-cluster-agent-config
+          name: omsagent-rs-config
+        name: omsagent-rs-config
       - configMap:
           name: container-azm-ms-agentconfig
           optional: true

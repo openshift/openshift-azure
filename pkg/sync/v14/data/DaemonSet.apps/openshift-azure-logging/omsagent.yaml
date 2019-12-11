@@ -90,7 +90,7 @@ spec:
       nodeSelector:
         beta.kubernetes.io/os: linux
         node-role.kubernetes.io/compute: "true"
-      serviceAccountName: log-analytics-agent
+      serviceAccountName: omsagent
       tolerations:
       - effect: NoExecute
         operator: Exists
