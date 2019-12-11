@@ -8,4 +8,4 @@ spec:
   - port: 25227
     targetPort: in-rs-tcp
   selector:
-    app: log-analytics-cluster-agent
+    rsName: omsagent-rs

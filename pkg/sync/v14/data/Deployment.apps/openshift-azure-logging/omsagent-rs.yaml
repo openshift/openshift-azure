@@ -4,21 +4,21 @@ metadata:
   labels:
     azure.openshift.io/sync-pod-optionally-apply: '*** GENERATED ***'
     azure.openshift.io/sync-pod-wait-for-readiness: "false"
-  name: log-analytics-cluster-agent
+  name: omsagent-rs
   namespace: openshift-azure-logging
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: log-analytics-cluster-agent
+      rsName: omsagent-rs
   template:
     metadata:
       annotations:
         agentVersion: 1.10.0.1
-        dockerProviderVersion: 7.0.0-6
+        dockerProviderVersion: 8.0.0-1
         schema-versions: v1
       labels:
-        app: log-analytics-cluster-agent
+        app: omsagent-rs
     spec:
       containers:
       - command:
@@ -44,7 +44,7 @@ spec:
             - /opt/livenessprobe.sh
           initialDelaySeconds: 60
           periodSeconds: 60
-        name: log-analytics-cluster-agent
+        name: omsagent
         ports:
         - containerPort: 25226
         - containerPort: 25225
@@ -54,11 +54,11 @@ spec:
           name: in-rs-tcp
         resources:
           limits:
-            cpu: 150m
-            memory: 600Mi
+            cpu: 1
+            memory: 740Mi
           requests:
-            cpu: 75m
-            memory: 225Mi
+            cpu: 150m
+            memory: 250Mi
         securityContext:
           privileged: true
           runAsUser: 0
@@ -88,7 +88,7 @@ spec:
       nodeSelector:
         beta.kubernetes.io/os: linux
         node-role.kubernetes.io/compute: "true"
-      serviceAccountName: log-analytics-agent
+      serviceAccountName: omsagent
       tolerations:
       - effect: NoExecute
         operator: Exists

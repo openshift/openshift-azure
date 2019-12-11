@@ -4,20 +4,20 @@ metadata:
   labels:
     azure.openshift.io/sync-pod-optionally-apply: '*** GENERATED ***'
     azure.openshift.io/sync-pod-wait-for-readiness: "false"
-  name: log-analytics-node-agent
+  name: omsagent
   namespace: openshift-azure-logging
 spec:
   selector:
     matchLabels:
-      app: log-analytics-node-agent
+      dsName: omsagent-ds
   template:
     metadata:
       annotations:
         agentVersion: 1.10.0.1
-        dockerProviderVersion: 7.0.0-6
+        dockerProviderVersion: 8.0.0-1
         schema-versions: v1
       labels:
-        app: log-analytics-node-agent
+        dsName: omsagent-ds
     spec:
       containers:
       - command:
@@ -45,7 +45,7 @@ spec:
             - /opt/livenessprobe.sh
           initialDelaySeconds: 60
           periodSeconds: 60
-        name: log-analytics-node-agent
+        name: omsagent
         ports:
         - containerPort: 25226
           hostPort: 25226

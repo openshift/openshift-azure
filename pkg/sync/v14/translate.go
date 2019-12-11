@@ -322,7 +322,7 @@ var translations = map[string][]struct {
 			Template: "{{ .Config.Images.ServiceCatalog }}",
 		},
 	},
-	"DaemonSet.apps/openshift-azure-logging/log-analytics-node-agent": {
+	"DaemonSet.apps/openshift-azure-logging/omsagent": {
 		{
 			Path:     jsonpath.MustCompile("$.metadata.labels['azure.openshift.io/sync-pod-optionally-apply']"),
 			Template: "{{ .ContainerService.Properties.MonitorProfile.Enabled }}",
@@ -368,7 +368,7 @@ var translations = map[string][]struct {
 			Template: "{{ .Config.Images.TLSProxy }}",
 		},
 	},
-	"Deployment.apps/openshift-azure-logging/log-analytics-cluster-agent": {
+	"Deployment.apps/openshift-azure-logging/omsagent-rs": {
 		{
 			Path:     jsonpath.MustCompile("$.metadata.labels['azure.openshift.io/sync-pod-optionally-apply']"),
 			Template: "{{ .ContainerService.Properties.MonitorProfile.Enabled }}",
