@@ -27,9 +27,9 @@ import (
 var whitelistWhole = []string{
 	"data/DaemonSet.apps/default/docker-registry.yaml",
 	"data/DaemonSet.apps/default/router.yaml",
-	"data/DaemonSet.apps/openshift-azure-logging/log-analytics-node-agent.yaml",
+	"data/DaemonSet.apps/openshift-azure-logging/omsagent.yaml",
 	"data/DaemonSet.apps/openshift-azure-monitoring/etcd-metrics.yaml", // FIXME we control this
-	"data/Deployment.apps/openshift-azure-logging/log-analytics-cluster-agent.yaml",
+	"data/Deployment.apps/openshift-azure-logging/omsagent-rs.yaml",
 	"data/Deployment.apps/default/registry-console.yaml",
 }
 
