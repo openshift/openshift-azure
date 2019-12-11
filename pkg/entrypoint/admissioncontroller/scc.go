@@ -58,7 +58,7 @@ func (ac *admissionController) validateSCCRequest(req *admission.AdmissionReques
 	}
 	scc.Users = template.Users
 
-	delete(scc.Labels, "openshift.io/reconcile-protect")
+	delete(scc.Annotations, "openshift.io/reconcile-protect")
 
 	scc.SelfLink = template.SelfLink
 	scc.UID = template.UID
@@ -68,7 +68,7 @@ func (ac *admissionController) validateSCCRequest(req *admission.AdmissionReques
 
 	// TODO: should do this field-wise
 	if !reflect.DeepEqual(scc, template) {
-		errs = append(errs, field.Invalid(field.NewPath(""), "", fmt.Sprint("may not modify fields other than users, groups and label labels.openshift.io/reconcile-protect")))
+		errs = append(errs, field.Invalid(field.NewPath(""), "", fmt.Sprint("may not modify fields other than users, groups and annotation openshift.io/reconcile-protect")))
 	}
 
 	return errors.NewAggregate(errs), nil

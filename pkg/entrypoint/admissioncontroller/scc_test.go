@@ -85,7 +85,7 @@ func TestSCC(t *testing.T) {
 			name: "add user to privileged scc allowed",
 			request: func() *admission.AdmissionReview {
 				scc := sccs["privileged"].DeepCopy()
-				scc.Labels["openshift.io/reconcile-protect"] = "true"
+				scc.Annotations["openshift.io/reconcile-protect"] = "true"
 				scc.Users = append(scc.Users, "testuser")
 
 				return &admission.AdmissionReview{
@@ -100,7 +100,7 @@ func TestSCC(t *testing.T) {
 			name: "remove user from privileged scc not allowed",
 			request: func() *admission.AdmissionReview {
 				scc := sccs["privileged"].DeepCopy()
-				scc.Labels["openshift.io/reconcile-protect"] = "true"
+				scc.Annotations["openshift.io/reconcile-protect"] = "true"
 				scc.Users = scc.Users[1:]
 
 				return &admission.AdmissionReview{
@@ -116,7 +116,7 @@ func TestSCC(t *testing.T) {
 			name: "add group to privileged scc allowed",
 			request: func() *admission.AdmissionReview {
 				scc := sccs["privileged"].DeepCopy()
-				scc.Labels["openshift.io/reconcile-protect"] = "true"
+				scc.Annotations["openshift.io/reconcile-protect"] = "true"
 				scc.Groups = append(scc.Groups, "testgroup")
 
 				return &admission.AdmissionReview{
@@ -131,7 +131,7 @@ func TestSCC(t *testing.T) {
 			name: "remove group from privileged scc not allowed",
 			request: func() *admission.AdmissionReview {
 				scc := sccs["privileged"].DeepCopy()
-				scc.Labels["openshift.io/reconcile-protect"] = "true"
+				scc.Annotations["openshift.io/reconcile-protect"] = "true"
 				scc.Groups = scc.Groups[1:]
 
 				return &admission.AdmissionReview{
@@ -156,7 +156,7 @@ func TestSCC(t *testing.T) {
 					},
 				}
 			},
-			wantMessage: `[]: Invalid value: "": may not modify fields other than users, groups and label labels.openshift.io/reconcile-protect`,
+			wantMessage: `[]: Invalid value: "": may not modify fields other than users, groups and annotation openshift.io/reconcile-protect`,
 		},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
