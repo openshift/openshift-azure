@@ -18,7 +18,7 @@ spec:
         dockerProviderVersion: 8.0.0-1
         schema-versions: v1
       labels:
-        app: omsagent-rs
+        rsName: omsagent-rs
     spec:
       containers:
       - command:
