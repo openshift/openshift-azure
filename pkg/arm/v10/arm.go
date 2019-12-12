@@ -106,13 +106,14 @@ func (g *simpleGenerator) Hash(app *api.AgentPoolProfile) ([]byte, error) {
 		return nil, err
 	}
 
-	err = json.NewEncoder(hash).Encode(vmss)
+	fixupVmss := &fixupArmResource{vmss}
+	err = json.NewEncoder(hash).Encode(fixupVmss)
 	if err != nil {
 		return nil, err
 	}
 
 	if g.testConfig.DebugHashFunctions {
-		b, err := json.Marshal(vmss)
+		b, err := json.MarshalIndent(fixupVmss, "", " ")
 		if err != nil {
 			return nil, err
 		}
