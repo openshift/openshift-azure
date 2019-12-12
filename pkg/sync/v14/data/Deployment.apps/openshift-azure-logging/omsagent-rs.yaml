@@ -75,7 +75,7 @@ spec:
         - mountPath: /etc/kubernetes/host
           name: azure-json-path
         - mountPath: /etc/omsagent-secret
-          name: log-analytics
+          name: omsagent-secret
           readOnly: true
         - mountPath: /etc/config
           name: omsagent-rs-config
@@ -113,10 +113,10 @@ spec:
       - hostPath:
           path: /etc/kubernetes
         name: azure-json-path
-      - name: log-analytics
+      - name: omsagent-secret
         secret:
           defaultMode: 288
-          secretName: log-analytics
+          secretName: omsagent-secret
       - configMap:
           name: omsagent-rs-config
         name: omsagent-rs-config
