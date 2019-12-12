@@ -43,13 +43,6 @@ type netDefinition struct {
 }
 
 var (
-	// The versions referenced here must be kept in lockstep with the imports
-	// above.
-	versionMap = map[string]string{
-		"Microsoft.Compute": "2018-10-01",
-		"Microsoft.Network": "2018-07-01",
-	}
-
 	// subnets split logic:
 	// vnet - contains all network addresses used for manamagement infrastructure.
 	// at the moment it has 1024 addresses allocated.
@@ -214,7 +207,7 @@ func ensureResources(log *logrus.Entry, conf *Config) error {
 }
 
 // Generate generates fakeRP callback function objects for. This function mocks realRP
-// impementation for required objects
+// implementation for required objects
 func generate(ctx context.Context, conf *Config) (map[string]interface{}, error) {
 	script, err := template.Template("start.sh", string(MustAsset("start.sh")), nil, map[string]interface{}{
 		"Config": conf,
@@ -228,7 +221,7 @@ func generate(ctx context.Context, conf *Config) (map[string]interface{}, error)
 		return nil, err
 	}
 
-	resources := []interface{}{
+	resources := []*arm.Resource{
 		vnet(conf),
 		ip(conf),
 		nsg(conf),
@@ -243,7 +236,6 @@ func generate(ctx context.Context, conf *Config) (map[string]interface{}, error)
 	}
 
 	arm.FixupAPIVersions(template, versionMap)
-	arm.FixupSDKMismatch(template)
 	arm.FixupDepends(os.Getenv("AZURE_SUBSCRIPTION_ID"), conf.resourceGroup, template, nil)
 
 	return template, nil

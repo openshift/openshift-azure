@@ -98,7 +98,7 @@ func (builder *Builder) generateTemplate() (map[string]interface{}, error) {
 	t := arm.Template{
 		Schema:         "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
 		ContentVersion: "1.0.0.0",
-		Resources: []interface{}{
+		Resources: []*arm.Resource{
 			vnet(builder.Location),
 			ip(builder.BuildResourceGroup, builder.Location, builder.DomainNameLabel),
 			nsg(builder.Location),

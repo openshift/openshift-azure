@@ -1,140 +1,135 @@
 package arm
 
 import (
+	"bytes"
 	"encoding/json"
-	"reflect"
+	"fmt"
 	"testing"
 
-	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-07-01/network"
 	"github.com/Azure/go-autorest/autorest/to"
-
-	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
-	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 )
 
-func TestFixupDepends(t *testing.T) {
-	subscriptionID := "subscriptionID"
-	resourceGroup := "resourceGroup"
-
+func TestResourceMarshal(t *testing.T) {
 	tests := []struct {
-		name      string
-		resources []interface{}
-		expect    []string
-		ignore    map[string]struct{}
+		name string
+		r    *Resource
+		want []byte
 	}{
 		{
-			name: "have deps, but missing resources",
-			resources: []interface{}{
-				&network.LoadBalancer{
-					LoadBalancerPropertiesFormat: &network.LoadBalancerPropertiesFormat{
-						FrontendIPConfigurations: &[]network.FrontendIPConfiguration{
-							{
-								FrontendIPConfigurationPropertiesFormat: &network.FrontendIPConfigurationPropertiesFormat{
-									PublicIPAddress: &network.PublicIPAddress{
-										ID: to.StringPtr(resourceid.ResourceID(
-											subscriptionID,
-											resourceGroup,
-											"Microsoft.Network/publicIPAddresses",
-											"ip-apiserver",
-										)),
-									},
-								},
-							},
-						},
+			name: "non-zero values",
+			r: &Resource{
+				Name: "test",
+				Resource: &testResource{
+					Bool:      true,
+					Int:       1,
+					Uint:      1,
+					Float:     1.1,
+					Array:     [1]*testResource{{Bool: true, Unmarshaled: 1}},
+					Interface: &testResource{Int: 1, Unmarshaled: 1},
+					Map: map[string]*testResource{
+						"zero": {Uint: 0, Unmarshaled: 1},
+						"one":  {Uint: 1, Unmarshaled: 1},
 					},
-					Name: to.StringPtr("lb-apiserver"),
-					Type: to.StringPtr("Microsoft.Network/loadBalancers"),
+					Ptr:         to.StringPtr("test"),
+					Slice:       []*testResource{{Float: 1.1, Unmarshaled: 1}},
+					ByteSlice:   []byte("test"),
+					String:      "test",
+					Struct:      &testResource{String: "test", Unmarshaled: 1},
+					Name:        "should be overwritten by parent name",
+					Unmarshaled: 1,
+					unexported:  1,
 				},
 			},
-			expect: []string{},
+			want: []byte(`{
+  "bool": true,
+  "int": 1,
+  "uint": 1,
+  "float": 1.1,
+  "array": [
+    {
+      "bool": true,
+      "tags": null
+    }
+  ],
+  "interface": {
+    "int": 1,
+    "tags": null
+  },
+  "map": {
+    "one": {
+      "uint": 1,
+      "tags": null
+    },
+    "zero": {
+      "tags": null
+    }
+  },
+  "ptr": "test",
+  "slice": [
+    {
+      "float": 1.1,
+      "tags": null
+    }
+  ],
+  "byte_slice": "dGVzdA==",
+  "string": "test",
+  "struct": {
+    "string": "test",
+    "tags": null
+  },
+  "name": "test"
+}`),
 		},
 		{
-			name: "have deps and dependent resources",
-			resources: []interface{}{
-				&network.PublicIPAddress{
-					Name: to.StringPtr("ip-apiserver"),
-					Type: to.StringPtr("Microsoft.Network/publicIPAddresses"),
-				},
-				&network.LoadBalancer{
-					LoadBalancerPropertiesFormat: &network.LoadBalancerPropertiesFormat{
-						FrontendIPConfigurations: &[]network.FrontendIPConfiguration{
-							{
-								FrontendIPConfigurationPropertiesFormat: &network.FrontendIPConfigurationPropertiesFormat{
-									PublicIPAddress: &network.PublicIPAddress{
-										ID: to.StringPtr(resourceid.ResourceID(
-											subscriptionID,
-											resourceGroup,
-											"Microsoft.Network/publicIPAddresses",
-											"ip-apiserver",
-										)),
-									},
-								},
-							},
-						},
-					},
-					Name: to.StringPtr("lb-apiserver"),
-					Type: to.StringPtr("Microsoft.Network/loadBalancers"),
-				},
+			name: "zero values",
+			r: &Resource{
+				Name:     "test",
+				Resource: &testResource{},
 			},
-			expect: []string{"/subscriptions/subscriptionID/resourceGroups/resourceGroup/providers/Microsoft.Network/publicIPAddresses/ip-apiserver"},
-		},
-		{
-			name: "have deps and dependent resources, but ignore",
-			resources: []interface{}{
-				&network.PublicIPAddress{
-					Name: to.StringPtr("ip-apiserver"),
-					Type: to.StringPtr("Microsoft.Network/publicIPAddresses"),
-				},
-				&network.LoadBalancer{
-					LoadBalancerPropertiesFormat: &network.LoadBalancerPropertiesFormat{
-						FrontendIPConfigurations: &[]network.FrontendIPConfiguration{
-							{
-								FrontendIPConfigurationPropertiesFormat: &network.FrontendIPConfigurationPropertiesFormat{
-									PublicIPAddress: &network.PublicIPAddress{
-										ID: to.StringPtr(resourceid.ResourceID(
-											subscriptionID,
-											resourceGroup,
-											"Microsoft.Network/publicIPAddresses",
-											"ip-apiserver",
-										)),
-									},
-								},
-							},
-						},
-					},
-					Name: to.StringPtr("lb-apiserver"),
-					Type: to.StringPtr("Microsoft.Network/loadBalancers"),
-				},
-			},
-			expect: []string{},
-			ignore: map[string]struct{}{"/subscriptions/subscriptionID/resourceGroups/resourceGroup/providers/Microsoft.Network/publicIPAddresses/ip-apiserver": {}},
+			want: []byte(`{
+  "name": "test"
+}`),
 		},
 	}
-	for _, tt := range tests {
-		armT := Template{
-			Schema:         "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-			ContentVersion: "1.0.0.0",
-			Resources:      tt.resources,
-		}
-		b, err := json.Marshal(armT)
-		if err != nil {
-			t.Fatal(err)
-		}
 
-		var azuretemplate map[string]interface{}
-		err = json.Unmarshal(b, &azuretemplate)
-		if err != nil {
-			t.Fatal(err)
-		}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			b, err := json.MarshalIndent(test.r, "", "  ")
+			if err != nil {
+				t.Fatal(err)
+			}
 
-		FixupDepends(subscriptionID, resourceGroup, azuretemplate, tt.ignore)
-		res := jsonpath.MustCompile("$.resources[?(@.name='lb-apiserver')]").MustGetObject(azuretemplate)
-		deps, found := res["dependsOn"].([]string)
-		if !found && len(tt.expect) > 0 {
-			t.Fatalf("expected %v, got %v", tt.expect, deps)
-		}
-		if found && !reflect.DeepEqual(deps, tt.expect) {
-			t.Fatalf("expected %v, got %v", tt.expect, deps)
-		}
+			if !bytes.Equal(b, test.want) {
+				t.Error(string(b))
+			}
+		})
 	}
+}
+
+type testResource struct {
+	Bool        bool                     `json:"bool,omitempty"`
+	Int         int                      `json:"int,omitempty"`
+	Uint        uint                     `json:"uint,omitempty"`
+	Float       float64                  `json:"float,omitempty"`
+	Array       [1]*testResource         `json:"array,omitempty"`
+	Interface   interface{}              `json:"interface,omitempty"`
+	Map         map[string]*testResource `json:"map,omitempty"`
+	Ptr         *string                  `json:"ptr,omitempty"`
+	Slice       []*testResource          `json:"slice,omitempty"`
+	ByteSlice   []byte                   `json:"byte_slice,omitempty"`
+	String      string                   `json:"string,omitempty"`
+	Struct      *testResource            `json:"struct,omitempty"`
+	Name        string                   `json:"name,omitempty"`
+	Unmarshaled int                      `json:"-"`
+	unexported  int
+	// Both `arm.Resource` and nested `testResource` have fields with name `Tags`.
+	// The `Tags` field from `arm.Resource` must override the one from `testResource`
+	// on the top-level of JSON.
+	Tags map[string]*string `json:"tags"`
+}
+
+// MarshalJSON contains custom marshaling logic which we expect to be dropped
+// during marshalling as part of arm.Resource type
+func (r *testResource) MarshalJSON() ([]byte, error) {
+	return nil, fmt.Errorf("should not be called")
 }

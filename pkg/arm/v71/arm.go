@@ -34,10 +34,10 @@ func New(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster
 }
 
 func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
-	t := arm.Template{
+	t := &arm.Template{
 		Schema:         "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
 		ContentVersion: "1.0.0.0",
-		Resources: []interface{}{
+		Resources: []*arm.Resource{
 			g.vnet(),
 			g.ipAPIServer(),
 			g.lbAPIServer(),
@@ -55,7 +55,7 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 	}
 	for _, app := range g.cs.Properties.AgentPoolProfiles {
 		if app.Role == api.AgentPoolProfileRoleMaster || !isUpdate {
-			vmss, err := g.Vmss(&app, backupBlob, suffix)
+			vmss, err := vmss(g.cs, &app, backupBlob, suffix, g.testConfig)
 			if err != nil {
 				return nil, err
 			}
