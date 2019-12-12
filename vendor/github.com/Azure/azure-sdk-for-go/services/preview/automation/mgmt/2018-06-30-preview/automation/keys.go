@@ -32,13 +32,13 @@ type KeysClient struct {
 }
 
 // NewKeysClient creates an instance of the KeysClient client.
-func NewKeysClient(subscriptionID string, countType1 CountType) KeysClient {
-	return NewKeysClientWithBaseURI(DefaultBaseURI, subscriptionID, countType1)
+func NewKeysClient(subscriptionID string) KeysClient {
+	return NewKeysClientWithBaseURI(DefaultBaseURI, subscriptionID)
 }
 
 // NewKeysClientWithBaseURI creates an instance of the KeysClient client.
-func NewKeysClientWithBaseURI(baseURI string, subscriptionID string, countType1 CountType) KeysClient {
-	return KeysClient{NewWithBaseURI(baseURI, subscriptionID, countType1)}
+func NewKeysClientWithBaseURI(baseURI string, subscriptionID string) KeysClient {
+	return KeysClient{NewWithBaseURI(baseURI, subscriptionID)}
 }
 
 // ListByAutomationAccount retrieve the automation keys for an account.
@@ -109,8 +109,8 @@ func (client KeysClient) ListByAutomationAccountPreparer(ctx context.Context, re
 // ListByAutomationAccountSender sends the ListByAutomationAccount request. The method will close the
 // http.Response Body if it receives an error.
 func (client KeysClient) ListByAutomationAccountSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListByAutomationAccountResponder handles the response to the ListByAutomationAccount request. The method always

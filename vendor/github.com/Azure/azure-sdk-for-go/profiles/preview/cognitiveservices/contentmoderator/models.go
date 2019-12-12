@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,7 +40,6 @@ type APIError = original.APIError
 type Address = original.Address
 type BaseClient = original.BaseClient
 type Body = original.Body
-type BodyModel = original.BodyModel
 type Candidate = original.Candidate
 type Classification = original.Classification
 type ClassificationCategory1 = original.ClassificationCategory1
@@ -69,6 +68,7 @@ type ImageAdditionalInfoItem = original.ImageAdditionalInfoItem
 type ImageIds = original.ImageIds
 type ImageList = original.ImageList
 type ImageModerationClient = original.ImageModerationClient
+type ImageURL = original.ImageURL
 type Job = original.Job
 type JobExecutionReportDetails = original.JobExecutionReportDetails
 type JobID = original.JobID
@@ -91,7 +91,6 @@ type Review = original.Review
 type ReviewsClient = original.ReviewsClient
 type SSN = original.SSN
 type Screen = original.Screen
-type SetObject = original.SetObject
 type Status = original.Status
 type String = original.String
 type Tag = original.Tag

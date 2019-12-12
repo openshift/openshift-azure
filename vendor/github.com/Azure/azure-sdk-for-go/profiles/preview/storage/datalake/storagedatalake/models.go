@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 package storagedatalake
 
-import original "github.com/Azure/azure-sdk-for-go/services/storage/datalake/2018-06-17/storagedatalake"
+import original "github.com/Azure/azure-sdk-for-go/services/storage/datalake/2019-10-31/storagedatalake"
 
 const (
 	DefaultDNSSuffix = original.DefaultDNSSuffix
@@ -28,7 +28,9 @@ const (
 type PathGetPropertiesAction = original.PathGetPropertiesAction
 
 const (
+	CheckAccess      PathGetPropertiesAction = original.CheckAccess
 	GetAccessControl PathGetPropertiesAction = original.GetAccessControl
+	GetStatus        PathGetPropertiesAction = original.GetStatus
 )
 
 type PathLeaseAction = original.PathLeaseAction
@@ -62,13 +64,6 @@ const (
 	Flush            PathUpdateAction = original.Flush
 	SetAccessControl PathUpdateAction = original.SetAccessControl
 	SetProperties    PathUpdateAction = original.SetProperties
-)
-
-type PathUpdateLeaseAction = original.PathUpdateLeaseAction
-
-const (
-	PathUpdateLeaseActionRelease PathUpdateLeaseAction = original.PathUpdateLeaseActionRelease
-	PathUpdateLeaseActionRenew   PathUpdateLeaseAction = original.PathUpdateLeaseActionRenew
 )
 
 type BaseClient = original.BaseClient
@@ -108,9 +103,6 @@ func PossiblePathResourceTypeValues() []PathResourceType {
 }
 func PossiblePathUpdateActionValues() []PathUpdateAction {
 	return original.PossiblePathUpdateActionValues()
-}
-func PossiblePathUpdateLeaseActionValues() []PathUpdateLeaseAction {
-	return original.PossiblePathUpdateLeaseActionValues()
 }
 func UserAgent() string {
 	return original.UserAgent() + " profiles/preview"

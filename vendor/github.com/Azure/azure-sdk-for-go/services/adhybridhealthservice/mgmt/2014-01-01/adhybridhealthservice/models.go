@@ -114,10 +114,10 @@ type DeltaOperationType string
 const (
 	// DeltaOperationTypeAdd ...
 	DeltaOperationTypeAdd DeltaOperationType = "Add"
-	// DeltaOperationTypeDeletAdd ...
-	DeltaOperationTypeDeletAdd DeltaOperationType = "DeletAdd"
 	// DeltaOperationTypeDelete ...
 	DeltaOperationTypeDelete DeltaOperationType = "Delete"
+	// DeltaOperationTypeDeleteAdd ...
+	DeltaOperationTypeDeleteAdd DeltaOperationType = "DeleteAdd"
 	// DeltaOperationTypeNone ...
 	DeltaOperationTypeNone DeltaOperationType = "None"
 	// DeltaOperationTypeObsolete ...
@@ -132,7 +132,7 @@ const (
 
 // PossibleDeltaOperationTypeValues returns an array of possible values for the DeltaOperationType const type.
 func PossibleDeltaOperationTypeValues() []DeltaOperationType {
-	return []DeltaOperationType{DeltaOperationTypeAdd, DeltaOperationTypeDeletAdd, DeltaOperationTypeDelete, DeltaOperationTypeNone, DeltaOperationTypeObsolete, DeltaOperationTypeReplace, DeltaOperationTypeUndefined, DeltaOperationTypeUpdate}
+	return []DeltaOperationType{DeltaOperationTypeAdd, DeltaOperationTypeDelete, DeltaOperationTypeDeleteAdd, DeltaOperationTypeNone, DeltaOperationTypeObsolete, DeltaOperationTypeReplace, DeltaOperationTypeUndefined, DeltaOperationTypeUpdate}
 }
 
 // HealthStatus enumerates the values for health status.
@@ -974,7 +974,7 @@ type ChangeNotReimportedDelta struct {
 	DnAttributes *[]AttributeDelta `json:"dnAttributes,omitempty"`
 	// Attributes - The attributes.
 	Attributes *[]AttributeDelta `json:"attributes,omitempty"`
-	// OperationType - The operation type. Possible values include: 'DeltaOperationTypeUndefined', 'DeltaOperationTypeNone', 'DeltaOperationTypeAdd', 'DeltaOperationTypeReplace', 'DeltaOperationTypeUpdate', 'DeltaOperationTypeDelete', 'DeltaOperationTypeObsolete', 'DeltaOperationTypeDeletAdd'
+	// OperationType - The operation type. Possible values include: 'DeltaOperationTypeUndefined', 'DeltaOperationTypeNone', 'DeltaOperationTypeAdd', 'DeltaOperationTypeReplace', 'DeltaOperationTypeUpdate', 'DeltaOperationTypeDelete', 'DeltaOperationTypeObsolete', 'DeltaOperationTypeDeleteAdd'
 	OperationType DeltaOperationType `json:"operationType,omitempty"`
 }
 
@@ -1054,6 +1054,23 @@ type ConnectorConnectionError struct {
 type ConnectorConnectionErrors struct {
 	// Value - The value returned by the operation.
 	Value *[]ConnectorConnectionError `json:"value,omitempty"`
+}
+
+// ConnectorMetadata gets the list of connectors and run profile names.
+type ConnectorMetadata struct {
+	autorest.Response `json:"-"`
+	// Connectors - The list of connectors.
+	Connectors *[]ConnectorMetadataDetails `json:"connectors,omitempty"`
+	// RunProfileNames - The list of run profile names.
+	RunProfileNames *[]string `json:"runProfileNames,omitempty"`
+}
+
+// ConnectorMetadataDetails details of the connector.
+type ConnectorMetadataDetails struct {
+	// ConnectorID - The Connector Id.
+	ConnectorID *string `json:"connectorId,omitempty"`
+	// ConnectorDisplayName - The Connector Display Name
+	ConnectorDisplayName *string `json:"connectorDisplayName,omitempty"`
 }
 
 // ConnectorObjectError the connector object error.
@@ -2255,9 +2272,9 @@ type Operation struct {
 // Health.
 type OperationListResponse struct {
 	autorest.Response `json:"-"`
-	// NextLink - URL to get the next set of operation list results if there are any.
+	// NextLink - READ-ONLY; URL to get the next set of operation list results if there are any.
 	NextLink *string `json:"nextLink,omitempty"`
-	// Value - List of operations supported by the Microsoft.ADHybridHealthService resource provider.
+	// Value - READ-ONLY; List of operations supported by the Microsoft.ADHybridHealthService resource provider.
 	Value *[]Operation `json:"value,omitempty"`
 	// TotalCount - The total count of operations.
 	TotalCount *int32 `json:"totalCount,omitempty"`
@@ -2522,6 +2539,29 @@ type Result struct {
 	autorest.Response `json:"-"`
 	// Value - The value.
 	Value *bool `json:"value,omitempty"`
+}
+
+// RiskyIPBlobURI the blob uri pointing to Risky IP Report.
+type RiskyIPBlobURI struct {
+	// TenantID - The tenant id for whom the report belongs to.
+	TenantID *string `json:"tenantId,omitempty"`
+	// ServiceID - The service id for whom the report belongs to.
+	ServiceID *string `json:"serviceId,omitempty"`
+	// ResultSasURI - The blob uri for the report.
+	ResultSasURI *string `json:"resultSasUri,omitempty"`
+	// BlobCreateDateTime - Time at which the new Risky IP report was requested.
+	BlobCreateDateTime *date.Time `json:"blobCreateDateTime,omitempty"`
+	// JobCompletionTime - Time at which the blob creation job for the new Risky IP report was completed.
+	JobCompletionTime *date.Time `json:"jobCompletionTime,omitempty"`
+	// Status - Status of the Risky IP report generation.
+	Status *string `json:"status,omitempty"`
+}
+
+// RiskyIPBlobUris the list containing blob uris.
+type RiskyIPBlobUris struct {
+	autorest.Response `json:"-"`
+	// Value - The list of blob uris.
+	Value *[]RiskyIPBlobURI `json:"value,omitempty"`
 }
 
 // RuleErrorInfo the error details in legacy rule processing.
@@ -3043,7 +3083,7 @@ type Tenant struct {
 	// DisabledReason - The reason due to which the tenant was disabled in Azure Active Directory Connect Health.
 	DisabledReason *int32 `json:"disabledReason,omitempty"`
 	// GlobalAdminsEmail - The list of global administrators for the tenant.
-	GlobalAdminsEmail interface{} `json:"globalAdminsEmail,omitempty"`
+	GlobalAdminsEmail *[]string `json:"globalAdminsEmail,omitempty"`
 	// InitialDomain - The initial domain of the tenant.
 	InitialDomain *string `json:"initialDomain,omitempty"`
 	// LastDisabled - The date and time, in UTC, when the tenant was last disabled in Azure Active Directory Connect Health.

@@ -44,6 +44,21 @@ func PossibleKeyNameValues() []KeyName {
 	return []KeyName{Key1, Key2}
 }
 
+// NetworkRuleAction enumerates the values for network rule action.
+type NetworkRuleAction string
+
+const (
+	// Allow ...
+	Allow NetworkRuleAction = "Allow"
+	// Deny ...
+	Deny NetworkRuleAction = "Deny"
+)
+
+// PossibleNetworkRuleActionValues returns an array of possible values for the NetworkRuleAction const type.
+func PossibleNetworkRuleActionValues() []NetworkRuleAction {
+	return []NetworkRuleAction{Allow, Deny}
+}
+
 // ProvisioningState enumerates the values for provisioning state.
 type ProvisioningState string
 
@@ -162,46 +177,37 @@ func PossibleUnitTypeValues() []UnitType {
 // location and SKU.
 type Account struct {
 	autorest.Response `json:"-"`
-	// Etag - Entity Tag
+	// Etag - READ-ONLY; Entity Tag
 	Etag *string `json:"etag,omitempty"`
-	// ID - The id of the created account
+	// ID - READ-ONLY; The id of the created account
 	ID *string `json:"id,omitempty"`
-	// Kind - Type of cognitive service account.
+	// Kind - The Kind of the resource.
 	Kind *string `json:"kind,omitempty"`
 	// Location - The location of the resource
 	Location *string `json:"location,omitempty"`
-	// Name - The name of the created account
+	// Name - READ-ONLY; The name of the created account
 	Name *string `json:"name,omitempty"`
-	// AccountProperties - Properties of Cognitive Services account.
-	*AccountProperties `json:"properties,omitempty"`
+	// Properties - Properties of Cognitive Services account.
+	Properties *AccountProperties `json:"properties,omitempty"`
 	// Sku - The SKU of Cognitive Services account.
 	Sku *Sku `json:"sku,omitempty"`
 	// Tags - Gets or sets a list of key value pairs that describe the resource. These tags can be used in viewing and grouping this resource (across resource groups). A maximum of 15 tags can be provided for a resource. Each tag must have a key no greater than 128 characters and value no greater than 256 characters.
 	Tags map[string]*string `json:"tags"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
 // MarshalJSON is the custom marshaler for Account.
 func (a Account) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
-	if a.Etag != nil {
-		objectMap["etag"] = a.Etag
-	}
-	if a.ID != nil {
-		objectMap["id"] = a.ID
-	}
 	if a.Kind != nil {
 		objectMap["kind"] = a.Kind
 	}
 	if a.Location != nil {
 		objectMap["location"] = a.Location
 	}
-	if a.Name != nil {
-		objectMap["name"] = a.Name
-	}
-	if a.AccountProperties != nil {
-		objectMap["properties"] = a.AccountProperties
+	if a.Properties != nil {
+		objectMap["properties"] = a.Properties
 	}
 	if a.Sku != nil {
 		objectMap["sku"] = a.Sku
@@ -209,147 +215,25 @@ func (a Account) MarshalJSON() ([]byte, error) {
 	if a.Tags != nil {
 		objectMap["tags"] = a.Tags
 	}
-	if a.Type != nil {
-		objectMap["type"] = a.Type
-	}
 	return json.Marshal(objectMap)
 }
 
-// UnmarshalJSON is the custom unmarshaler for Account struct.
-func (a *Account) UnmarshalJSON(body []byte) error {
-	var m map[string]*json.RawMessage
-	err := json.Unmarshal(body, &m)
-	if err != nil {
-		return err
-	}
-	for k, v := range m {
-		switch k {
-		case "etag":
-			if v != nil {
-				var etag string
-				err = json.Unmarshal(*v, &etag)
-				if err != nil {
-					return err
-				}
-				a.Etag = &etag
-			}
-		case "id":
-			if v != nil {
-				var ID string
-				err = json.Unmarshal(*v, &ID)
-				if err != nil {
-					return err
-				}
-				a.ID = &ID
-			}
-		case "kind":
-			if v != nil {
-				var kind string
-				err = json.Unmarshal(*v, &kind)
-				if err != nil {
-					return err
-				}
-				a.Kind = &kind
-			}
-		case "location":
-			if v != nil {
-				var location string
-				err = json.Unmarshal(*v, &location)
-				if err != nil {
-					return err
-				}
-				a.Location = &location
-			}
-		case "name":
-			if v != nil {
-				var name string
-				err = json.Unmarshal(*v, &name)
-				if err != nil {
-					return err
-				}
-				a.Name = &name
-			}
-		case "properties":
-			if v != nil {
-				var accountProperties AccountProperties
-				err = json.Unmarshal(*v, &accountProperties)
-				if err != nil {
-					return err
-				}
-				a.AccountProperties = &accountProperties
-			}
-		case "sku":
-			if v != nil {
-				var sku Sku
-				err = json.Unmarshal(*v, &sku)
-				if err != nil {
-					return err
-				}
-				a.Sku = &sku
-			}
-		case "tags":
-			if v != nil {
-				var tags map[string]*string
-				err = json.Unmarshal(*v, &tags)
-				if err != nil {
-					return err
-				}
-				a.Tags = tags
-			}
-		case "type":
-			if v != nil {
-				var typeVar string
-				err = json.Unmarshal(*v, &typeVar)
-				if err != nil {
-					return err
-				}
-				a.Type = &typeVar
-			}
-		}
-	}
-
-	return nil
-}
-
-// AccountCreateParameters the parameters to provide for the account.
-type AccountCreateParameters struct {
-	// Sku - Required. Gets or sets the SKU of the resource.
-	Sku *Sku `json:"sku,omitempty"`
-	// Kind - Required. Gets or sets the Kind of the resource.
-	Kind *string `json:"kind,omitempty"`
-	// Location - Required. Gets or sets the location of the resource. This will be one of the supported and registered Azure Geo Regions (e.g. West US, East US, Southeast Asia, etc.). The geo region of a resource cannot be changed once it is created, but if an identical geo region is specified on update the request will succeed.
-	Location *string `json:"location,omitempty"`
-	// Tags - Gets or sets a list of key value pairs that describe the resource. These tags can be used in viewing and grouping this resource (across resource groups). A maximum of 15 tags can be provided for a resource. Each tag must have a key no greater than 128 characters and value no greater than 256 characters.
-	Tags map[string]*string `json:"tags"`
-	// Properties - Must exist in the request. Must be an empty object. Must not be null.
-	Properties interface{} `json:"properties,omitempty"`
-}
-
-// MarshalJSON is the custom marshaler for AccountCreateParameters.
-func (acp AccountCreateParameters) MarshalJSON() ([]byte, error) {
-	objectMap := make(map[string]interface{})
-	if acp.Sku != nil {
-		objectMap["sku"] = acp.Sku
-	}
-	if acp.Kind != nil {
-		objectMap["kind"] = acp.Kind
-	}
-	if acp.Location != nil {
-		objectMap["location"] = acp.Location
-	}
-	if acp.Tags != nil {
-		objectMap["tags"] = acp.Tags
-	}
-	if acp.Properties != nil {
-		objectMap["properties"] = acp.Properties
-	}
-	return json.Marshal(objectMap)
+// AccountAPIProperties the api properties for special APIs.
+type AccountAPIProperties struct {
+	// QnaRuntimeEndpoint - (QnAMaker Only) The runtime endpoint of QnAMaker.
+	QnaRuntimeEndpoint *string `json:"qnaRuntimeEndpoint,omitempty"`
+	// StatisticsEnabled - (Bing Search Only) The flag to enable statistics of Bing Search.
+	StatisticsEnabled *bool `json:"statisticsEnabled,omitempty"`
+	// EventHubConnectionString - (Personalization Only) The flag to enable statistics of Bing Search.
+	EventHubConnectionString *string `json:"eventHubConnectionString,omitempty"`
+	// StorageAccountConnectionString - (Personalization Only) The storage account connection string.
+	StorageAccountConnectionString *string `json:"storageAccountConnectionString,omitempty"`
 }
 
 // AccountEnumerateSkusResult the list of cognitive services accounts operation response.
 type AccountEnumerateSkusResult struct {
 	autorest.Response `json:"-"`
-	// Value - Gets the list of Cognitive Services accounts and their properties.
+	// Value - READ-ONLY; Gets the list of Cognitive Services accounts and their properties.
 	Value *[]ResourceAndSku `json:"value,omitempty"`
 }
 
@@ -367,7 +251,7 @@ type AccountListResult struct {
 	autorest.Response `json:"-"`
 	// NextLink - The link used to get the next page of accounts.
 	NextLink *string `json:"nextLink,omitempty"`
-	// Value - Gets the list of Cognitive Services accounts and their properties.
+	// Value - READ-ONLY; Gets the list of Cognitive Services accounts and their properties.
 	Value *[]Account `json:"value,omitempty"`
 }
 
@@ -510,32 +394,39 @@ func NewAccountListResultPage(getNextPage func(context.Context, AccountListResul
 
 // AccountProperties properties of Cognitive Services account.
 type AccountProperties struct {
-	// ProvisioningState - Gets the status of the cognitive services account at the time the operation was called. Possible values include: 'Creating', 'ResolvingDNS', 'Moving', 'Deleting', 'Succeeded', 'Failed'
+	// ProvisioningState - READ-ONLY; Gets the status of the cognitive services account at the time the operation was called. Possible values include: 'Creating', 'ResolvingDNS', 'Moving', 'Deleting', 'Succeeded', 'Failed'
 	ProvisioningState ProvisioningState `json:"provisioningState,omitempty"`
-	// Endpoint - Endpoint of the created account.
+	// Endpoint - READ-ONLY; Endpoint of the created account.
 	Endpoint *string `json:"endpoint,omitempty"`
-	// InternalID - The internal identifier.
+	// InternalID - READ-ONLY; The internal identifier.
 	InternalID *string `json:"internalId,omitempty"`
+	// CustomSubDomainName - Optional subdomain name used for token-based authentication.
+	CustomSubDomainName *string `json:"customSubDomainName,omitempty"`
+	// NetworkAcls - A collection of rules governing the accessibility from specific network locations.
+	NetworkAcls *NetworkRuleSet `json:"networkAcls,omitempty"`
+	// APIProperties - The api properties for special APIs.
+	APIProperties *AccountAPIProperties `json:"apiProperties,omitempty"`
 }
 
-// AccountUpdateParameters the parameters to provide for the account.
-type AccountUpdateParameters struct {
-	// Sku - Gets or sets the SKU of the resource.
-	Sku *Sku `json:"sku,omitempty"`
-	// Tags - Gets or sets a list of key value pairs that describe the resource. These tags can be used in viewing and grouping this resource (across resource groups). A maximum of 15 tags can be provided for a resource. Each tag must have a key no greater than 128 characters and value no greater than 256 characters.
-	Tags map[string]*string `json:"tags"`
+// CheckDomainAvailabilityParameter check Domain availability parameter.
+type CheckDomainAvailabilityParameter struct {
+	// SubdomainName - The subdomain name to use.
+	SubdomainName *string `json:"subdomainName,omitempty"`
+	// Type - The Type of the resource.
+	Type *string `json:"type,omitempty"`
 }
 
-// MarshalJSON is the custom marshaler for AccountUpdateParameters.
-func (aup AccountUpdateParameters) MarshalJSON() ([]byte, error) {
-	objectMap := make(map[string]interface{})
-	if aup.Sku != nil {
-		objectMap["sku"] = aup.Sku
-	}
-	if aup.Tags != nil {
-		objectMap["tags"] = aup.Tags
-	}
-	return json.Marshal(objectMap)
+// CheckDomainAvailabilityResult check Domain availability result.
+type CheckDomainAvailabilityResult struct {
+	autorest.Response `json:"-"`
+	// IsSubdomainAvailable - Indicates the given SKU is available or not.
+	IsSubdomainAvailable *bool `json:"isSubdomainAvailable,omitempty"`
+	// Reason - Reason why the SKU is not available.
+	Reason *string `json:"reason,omitempty"`
+	// SubdomainName - The subdomain name to use.
+	SubdomainName *string `json:"subdomainName,omitempty"`
+	// Type - The Type of the resource.
+	Type *string `json:"type,omitempty"`
 }
 
 // CheckSkuAvailabilityParameter check SKU availability parameter.
@@ -585,12 +476,28 @@ type ErrorBody struct {
 	Message *string `json:"message,omitempty"`
 }
 
+// IPRule a rule governing the accessibility from a specific ip address or ip range.
+type IPRule struct {
+	// Value - An IPv4 address range in CIDR notation, such as '124.56.78.91' (simple IP address) or '124.56.78.0/24' (all addresses that start with 124.56.78).
+	Value *string `json:"value,omitempty"`
+}
+
 // MetricName a metric name.
 type MetricName struct {
-	// Value - The name of the metric.
+	// Value - READ-ONLY; The name of the metric.
 	Value *string `json:"value,omitempty"`
-	// LocalizedValue - The friendly name of the metric.
+	// LocalizedValue - READ-ONLY; The friendly name of the metric.
 	LocalizedValue *string `json:"localizedValue,omitempty"`
+}
+
+// NetworkRuleSet a set of rules governing the network accessibility.
+type NetworkRuleSet struct {
+	// DefaultAction - The default action when no rule from ipRules and from virtualNetworkRules match. This is only used after the bypass property has been evaluated. Possible values include: 'Allow', 'Deny'
+	DefaultAction NetworkRuleAction `json:"defaultAction,omitempty"`
+	// IPRules - The list of IP address rules.
+	IPRules *[]IPRule `json:"ipRules,omitempty"`
+	// VirtualNetworkRules - The list of virtual network rules.
+	VirtualNetworkRules *[]VirtualNetworkRule `json:"virtualNetworkRules,omitempty"`
 }
 
 // OperationDisplayInfo the operation supported by Cognitive Services.
@@ -779,37 +686,37 @@ type ResourceAndSku struct {
 
 // ResourceSku describes an available Cognitive Services SKU.
 type ResourceSku struct {
-	// ResourceType - The type of resource the SKU applies to.
+	// ResourceType - READ-ONLY; The type of resource the SKU applies to.
 	ResourceType *string `json:"resourceType,omitempty"`
-	// Name - The name of SKU.
+	// Name - READ-ONLY; The name of SKU.
 	Name *string `json:"name,omitempty"`
-	// Tier - Specifies the tier of Cognitive Services account.
+	// Tier - READ-ONLY; Specifies the tier of Cognitive Services account.
 	Tier *string `json:"tier,omitempty"`
-	// Kind - The Kind of resources that are supported in this SKU.
+	// Kind - READ-ONLY; The Kind of resources that are supported in this SKU.
 	Kind *string `json:"kind,omitempty"`
-	// Locations - The set of locations that the SKU is available.
+	// Locations - READ-ONLY; The set of locations that the SKU is available.
 	Locations *[]string `json:"locations,omitempty"`
-	// Restrictions - The restrictions because of which SKU cannot be used. This is empty if there are no restrictions.
+	// Restrictions - READ-ONLY; The restrictions because of which SKU cannot be used. This is empty if there are no restrictions.
 	Restrictions *[]ResourceSkuRestrictions `json:"restrictions,omitempty"`
 }
 
 // ResourceSkuRestrictionInfo ...
 type ResourceSkuRestrictionInfo struct {
-	// Locations - Locations where the SKU is restricted
+	// Locations - READ-ONLY; Locations where the SKU is restricted
 	Locations *[]string `json:"locations,omitempty"`
-	// Zones - List of availability zones where the SKU is restricted.
+	// Zones - READ-ONLY; List of availability zones where the SKU is restricted.
 	Zones *[]string `json:"zones,omitempty"`
 }
 
 // ResourceSkuRestrictions describes restrictions of a SKU.
 type ResourceSkuRestrictions struct {
-	// Type - The type of restrictions. Possible values include: 'Location', 'Zone'
+	// Type - READ-ONLY; The type of restrictions. Possible values include: 'Location', 'Zone'
 	Type ResourceSkuRestrictionsType `json:"type,omitempty"`
-	// Values - The value of restrictions. If the restriction type is set to location. This would be different locations where the SKU is restricted.
+	// Values - READ-ONLY; The value of restrictions. If the restriction type is set to location. This would be different locations where the SKU is restricted.
 	Values *[]string `json:"values,omitempty"`
-	// RestrictionInfo - The information about the restriction where the SKU cannot be used.
+	// RestrictionInfo - READ-ONLY; The information about the restriction where the SKU cannot be used.
 	RestrictionInfo *ResourceSkuRestrictionInfo `json:"restrictionInfo,omitempty"`
-	// ReasonCode - The reason for restriction. Possible values include: 'QuotaID', 'NotAvailableForSubscription'
+	// ReasonCode - READ-ONLY; The reason for restriction. Possible values include: 'QuotaID', 'NotAvailableForSubscription'
 	ReasonCode ResourceSkuRestrictionsReasonCode `json:"reasonCode,omitempty"`
 }
 
@@ -963,7 +870,7 @@ func NewResourceSkusResultPage(getNextPage func(context.Context, ResourceSkusRes
 type Sku struct {
 	// Name - Gets or sets the sku name. Required for account creation, optional for update.
 	Name *string `json:"name,omitempty"`
-	// Tier - Gets the sku tier. This is based on the SKU name. Possible values include: 'Free', 'Standard', 'Premium'
+	// Tier - READ-ONLY; Gets the sku tier. This is based on the SKU name. Possible values include: 'Free', 'Standard', 'Premium'
 	Tier SkuTier `json:"tier,omitempty"`
 }
 
@@ -971,15 +878,15 @@ type Sku struct {
 type Usage struct {
 	// Unit - The unit of the metric. Possible values include: 'Count', 'Bytes', 'Seconds', 'Percent', 'CountPerSecond', 'BytesPerSecond', 'Milliseconds'
 	Unit UnitType `json:"unit,omitempty"`
-	// Name - The name information for the metric.
+	// Name - READ-ONLY; The name information for the metric.
 	Name *MetricName `json:"name,omitempty"`
-	// QuotaPeriod - The quota period used to summarize the usage values.
+	// QuotaPeriod - READ-ONLY; The quota period used to summarize the usage values.
 	QuotaPeriod *string `json:"quotaPeriod,omitempty"`
-	// Limit - Maximum value for this metric.
+	// Limit - READ-ONLY; Maximum value for this metric.
 	Limit *float64 `json:"limit,omitempty"`
-	// CurrentValue - Current value for this metric.
+	// CurrentValue - READ-ONLY; Current value for this metric.
 	CurrentValue *float64 `json:"currentValue,omitempty"`
-	// NextResetTime - Next reset time for current quota.
+	// NextResetTime - READ-ONLY; Next reset time for current quota.
 	NextResetTime *string `json:"nextResetTime,omitempty"`
 	// Status - Cognitive Services account quota usage status. Possible values include: 'Included', 'Blocked', 'InOverage', 'Unknown'
 	Status QuotaUsageStatus `json:"status,omitempty"`
@@ -988,6 +895,16 @@ type Usage struct {
 // UsagesResult the response to a list usage request.
 type UsagesResult struct {
 	autorest.Response `json:"-"`
-	// Value - The list of usages for Cognitive Service account.
+	// Value - READ-ONLY; The list of usages for Cognitive Service account.
 	Value *[]Usage `json:"value,omitempty"`
+}
+
+// VirtualNetworkRule a rule governing the accessibility from a specific virtual network.
+type VirtualNetworkRule struct {
+	// ID - Full resource id of a vnet subnet, such as '/subscriptions/subid/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/test-vnet/subnets/subnet1'.
+	ID *string `json:"id,omitempty"`
+	// State - Gets the state of virtual network rule.
+	State *string `json:"state,omitempty"`
+	// IgnoreMissingVnetServiceEndpoint - Ignore missing vnet service endpoint or not.
+	IgnoreMissingVnetServiceEndpoint *bool `json:"ignoreMissingVnetServiceEndpoint,omitempty"`
 }

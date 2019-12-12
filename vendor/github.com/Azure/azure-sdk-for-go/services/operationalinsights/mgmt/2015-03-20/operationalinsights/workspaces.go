@@ -41,6 +41,92 @@ func NewWorkspacesClientWithBaseURI(baseURI string, subscriptionID string, purge
 	return WorkspacesClient{NewWithBaseURI(baseURI, subscriptionID, purgeID)}
 }
 
+// DeleteGateways delete a Log Analytics gateway.
+// Parameters:
+// resourceGroupName - the Resource Group name.
+// workspaceName - the Log Analytics Workspace name.
+// gatewayID - the Log Analytics gateway Id.
+func (client WorkspacesClient) DeleteGateways(ctx context.Context, resourceGroupName string, workspaceName string, gatewayID string) (result autorest.Response, err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/WorkspacesClient.DeleteGateways")
+		defer func() {
+			sc := -1
+			if result.Response != nil {
+				sc = result.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	if err := validation.Validate([]validation.Validation{
+		{TargetValue: resourceGroupName,
+			Constraints: []validation.Constraint{{Target: "resourceGroupName", Name: validation.MaxLength, Rule: 90, Chain: nil},
+				{Target: "resourceGroupName", Name: validation.MinLength, Rule: 1, Chain: nil},
+				{Target: "resourceGroupName", Name: validation.Pattern, Rule: `^[-\w\._\(\)]+$`, Chain: nil}}}}); err != nil {
+		return result, validation.NewError("operationalinsights.WorkspacesClient", "DeleteGateways", err.Error())
+	}
+
+	req, err := client.DeleteGatewaysPreparer(ctx, resourceGroupName, workspaceName, gatewayID)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "operationalinsights.WorkspacesClient", "DeleteGateways", nil, "Failure preparing request")
+		return
+	}
+
+	resp, err := client.DeleteGatewaysSender(req)
+	if err != nil {
+		result.Response = resp
+		err = autorest.NewErrorWithError(err, "operationalinsights.WorkspacesClient", "DeleteGateways", resp, "Failure sending request")
+		return
+	}
+
+	result, err = client.DeleteGatewaysResponder(resp)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "operationalinsights.WorkspacesClient", "DeleteGateways", resp, "Failure responding to request")
+	}
+
+	return
+}
+
+// DeleteGatewaysPreparer prepares the DeleteGateways request.
+func (client WorkspacesClient) DeleteGatewaysPreparer(ctx context.Context, resourceGroupName string, workspaceName string, gatewayID string) (*http.Request, error) {
+	pathParameters := map[string]interface{}{
+		"gatewayId":         autorest.Encode("path", gatewayID),
+		"resourceGroupName": autorest.Encode("path", resourceGroupName),
+		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
+		"workspaceName":     autorest.Encode("path", workspaceName),
+	}
+
+	const APIVersion = "2015-03-20"
+	queryParameters := map[string]interface{}{
+		"api-version": APIVersion,
+	}
+
+	preparer := autorest.CreatePreparer(
+		autorest.AsDelete(),
+		autorest.WithBaseURL(client.BaseURI),
+		autorest.WithPathParameters("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/gateways/{gatewayId}", pathParameters),
+		autorest.WithQueryParameters(queryParameters))
+	return preparer.Prepare((&http.Request{}).WithContext(ctx))
+}
+
+// DeleteGatewaysSender sends the DeleteGateways request. The method will close the
+// http.Response Body if it receives an error.
+func (client WorkspacesClient) DeleteGatewaysSender(req *http.Request) (*http.Response, error) {
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
+}
+
+// DeleteGatewaysResponder handles the response to the DeleteGateways request. The method always
+// closes the http.Response Body.
+func (client WorkspacesClient) DeleteGatewaysResponder(resp *http.Response) (result autorest.Response, err error) {
+	err = autorest.Respond(
+		resp,
+		client.ByInspecting(),
+		azure.WithErrorUnlessStatusCode(http.StatusOK),
+		autorest.ByClosing())
+	result.Response = resp
+	return
+}
+
 // GetPurgeStatus gets status of an ongoing purge operation.
 // Parameters:
 // resourceGroupName - the Resource Group name.
@@ -110,8 +196,8 @@ func (client WorkspacesClient) GetPurgeStatusPreparer(ctx context.Context, resou
 // GetPurgeStatusSender sends the GetPurgeStatus request. The method will close the
 // http.Response Body if it receives an error.
 func (client WorkspacesClient) GetPurgeStatusSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetPurgeStatusResponder handles the response to the GetPurgeStatus request. The method always
@@ -195,8 +281,8 @@ func (client WorkspacesClient) GetSchemaPreparer(ctx context.Context, resourceGr
 // GetSchemaSender sends the GetSchema request. The method will close the
 // http.Response Body if it receives an error.
 func (client WorkspacesClient) GetSchemaSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetSchemaResponder handles the response to the GetSchema request. The method always
@@ -206,98 +292,6 @@ func (client WorkspacesClient) GetSchemaResponder(resp *http.Response) (result S
 		resp,
 		client.ByInspecting(),
 		azure.WithErrorUnlessStatusCode(http.StatusOK),
-		autorest.ByUnmarshallingJSON(&result),
-		autorest.ByClosing())
-	result.Response = autorest.Response{Response: resp}
-	return
-}
-
-// GetSearchResults submit a search for a given workspace. The response will contain an id to track the search. User
-// can use the id to poll the search status and get the full search result later if the search takes long time to
-// finish.
-// Parameters:
-// resourceGroupName - the Resource Group name.
-// workspaceName - the Log Analytics Workspace name.
-// parameters - the parameters required to execute a search query.
-func (client WorkspacesClient) GetSearchResults(ctx context.Context, resourceGroupName string, workspaceName string, parameters SearchParameters) (result WorkspacesGetSearchResultsFuture, err error) {
-	if tracing.IsEnabled() {
-		ctx = tracing.StartSpan(ctx, fqdn+"/WorkspacesClient.GetSearchResults")
-		defer func() {
-			sc := -1
-			if result.Response() != nil {
-				sc = result.Response().StatusCode
-			}
-			tracing.EndSpan(ctx, sc, err)
-		}()
-	}
-	if err := validation.Validate([]validation.Validation{
-		{TargetValue: resourceGroupName,
-			Constraints: []validation.Constraint{{Target: "resourceGroupName", Name: validation.MaxLength, Rule: 90, Chain: nil},
-				{Target: "resourceGroupName", Name: validation.MinLength, Rule: 1, Chain: nil},
-				{Target: "resourceGroupName", Name: validation.Pattern, Rule: `^[-\w\._\(\)]+$`, Chain: nil}}},
-		{TargetValue: parameters,
-			Constraints: []validation.Constraint{{Target: "parameters.Query", Name: validation.Null, Rule: true, Chain: nil}}}}); err != nil {
-		return result, validation.NewError("operationalinsights.WorkspacesClient", "GetSearchResults", err.Error())
-	}
-
-	req, err := client.GetSearchResultsPreparer(ctx, resourceGroupName, workspaceName, parameters)
-	if err != nil {
-		err = autorest.NewErrorWithError(err, "operationalinsights.WorkspacesClient", "GetSearchResults", nil, "Failure preparing request")
-		return
-	}
-
-	result, err = client.GetSearchResultsSender(req)
-	if err != nil {
-		err = autorest.NewErrorWithError(err, "operationalinsights.WorkspacesClient", "GetSearchResults", result.Response(), "Failure sending request")
-		return
-	}
-
-	return
-}
-
-// GetSearchResultsPreparer prepares the GetSearchResults request.
-func (client WorkspacesClient) GetSearchResultsPreparer(ctx context.Context, resourceGroupName string, workspaceName string, parameters SearchParameters) (*http.Request, error) {
-	pathParameters := map[string]interface{}{
-		"resourceGroupName": autorest.Encode("path", resourceGroupName),
-		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
-		"workspaceName":     autorest.Encode("path", workspaceName),
-	}
-
-	const APIVersion = "2015-03-20"
-	queryParameters := map[string]interface{}{
-		"api-version": APIVersion,
-	}
-
-	preparer := autorest.CreatePreparer(
-		autorest.AsContentType("application/json; charset=utf-8"),
-		autorest.AsPost(),
-		autorest.WithBaseURL(client.BaseURI),
-		autorest.WithPathParameters("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/search", pathParameters),
-		autorest.WithJSON(parameters),
-		autorest.WithQueryParameters(queryParameters))
-	return preparer.Prepare((&http.Request{}).WithContext(ctx))
-}
-
-// GetSearchResultsSender sends the GetSearchResults request. The method will close the
-// http.Response Body if it receives an error.
-func (client WorkspacesClient) GetSearchResultsSender(req *http.Request) (future WorkspacesGetSearchResultsFuture, err error) {
-	var resp *http.Response
-	resp, err = autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
-	if err != nil {
-		return
-	}
-	future.Future, err = azure.NewFutureFromResponse(resp)
-	return
-}
-
-// GetSearchResultsResponder handles the response to the GetSearchResults request. The method always
-// closes the http.Response Body.
-func (client WorkspacesClient) GetSearchResultsResponder(resp *http.Response) (result SearchResultsResponse, err error) {
-	err = autorest.Respond(
-		resp,
-		client.ByInspecting(),
-		azure.WithErrorUnlessStatusCode(http.StatusOK, http.StatusAccepted),
 		autorest.ByUnmarshallingJSON(&result),
 		autorest.ByClosing())
 	result.Response = autorest.Response{Response: resp}
@@ -373,8 +367,8 @@ func (client WorkspacesClient) ListKeysPreparer(ctx context.Context, resourceGro
 // ListKeysSender sends the ListKeys request. The method will close the
 // http.Response Body if it receives an error.
 func (client WorkspacesClient) ListKeysSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListKeysResponder handles the response to the ListKeys request. The method always
@@ -446,8 +440,8 @@ func (client WorkspacesClient) ListLinkTargetsPreparer(ctx context.Context) (*ht
 // ListLinkTargetsSender sends the ListLinkTargets request. The method will close the
 // http.Response Body if it receives an error.
 func (client WorkspacesClient) ListLinkTargetsSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListLinkTargetsResponder handles the response to the ListLinkTargets request. The method always
@@ -464,6 +458,11 @@ func (client WorkspacesClient) ListLinkTargetsResponder(resp *http.Response) (re
 }
 
 // Purge purges data in an Log Analytics workspace by a set of user-defined filters.
+//
+// In order to manage system resources, purge requests are throttled at 50 requests per hour. You should batch the
+// execution of purge requests by sending a single command whose predicate includes all user identities that require
+// purging. Use the in operator to specify multiple identities. You should run the query prior to using for a purge
+// request to verify that the results are expected.
 // Parameters:
 // resourceGroupName - the Resource Group name.
 // workspaceName - the Log Analytics Workspace name.
@@ -537,8 +536,8 @@ func (client WorkspacesClient) PurgePreparer(ctx context.Context, resourceGroupN
 // PurgeSender sends the Purge request. The method will close the
 // http.Response Body if it receives an error.
 func (client WorkspacesClient) PurgeSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // PurgeResponder handles the response to the Purge request. The method always
@@ -623,101 +622,13 @@ func (client WorkspacesClient) RegenerateSharedKeysPreparer(ctx context.Context,
 // RegenerateSharedKeysSender sends the RegenerateSharedKeys request. The method will close the
 // http.Response Body if it receives an error.
 func (client WorkspacesClient) RegenerateSharedKeysSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // RegenerateSharedKeysResponder handles the response to the RegenerateSharedKeys request. The method always
 // closes the http.Response Body.
 func (client WorkspacesClient) RegenerateSharedKeysResponder(resp *http.Response) (result SharedKeys, err error) {
-	err = autorest.Respond(
-		resp,
-		client.ByInspecting(),
-		azure.WithErrorUnlessStatusCode(http.StatusOK),
-		autorest.ByUnmarshallingJSON(&result),
-		autorest.ByClosing())
-	result.Response = autorest.Response{Response: resp}
-	return
-}
-
-// UpdateSearchResults gets updated search results for a given search query.
-// Parameters:
-// resourceGroupName - the Resource Group name.
-// workspaceName - the Log Analytics Workspace name.
-// ID - the id of the search that will have results updated. You can get the id from the response of the
-// GetResults call.
-func (client WorkspacesClient) UpdateSearchResults(ctx context.Context, resourceGroupName string, workspaceName string, ID string) (result SearchResultsResponse, err error) {
-	if tracing.IsEnabled() {
-		ctx = tracing.StartSpan(ctx, fqdn+"/WorkspacesClient.UpdateSearchResults")
-		defer func() {
-			sc := -1
-			if result.Response.Response != nil {
-				sc = result.Response.Response.StatusCode
-			}
-			tracing.EndSpan(ctx, sc, err)
-		}()
-	}
-	if err := validation.Validate([]validation.Validation{
-		{TargetValue: resourceGroupName,
-			Constraints: []validation.Constraint{{Target: "resourceGroupName", Name: validation.MaxLength, Rule: 90, Chain: nil},
-				{Target: "resourceGroupName", Name: validation.MinLength, Rule: 1, Chain: nil},
-				{Target: "resourceGroupName", Name: validation.Pattern, Rule: `^[-\w\._\(\)]+$`, Chain: nil}}}}); err != nil {
-		return result, validation.NewError("operationalinsights.WorkspacesClient", "UpdateSearchResults", err.Error())
-	}
-
-	req, err := client.UpdateSearchResultsPreparer(ctx, resourceGroupName, workspaceName, ID)
-	if err != nil {
-		err = autorest.NewErrorWithError(err, "operationalinsights.WorkspacesClient", "UpdateSearchResults", nil, "Failure preparing request")
-		return
-	}
-
-	resp, err := client.UpdateSearchResultsSender(req)
-	if err != nil {
-		result.Response = autorest.Response{Response: resp}
-		err = autorest.NewErrorWithError(err, "operationalinsights.WorkspacesClient", "UpdateSearchResults", resp, "Failure sending request")
-		return
-	}
-
-	result, err = client.UpdateSearchResultsResponder(resp)
-	if err != nil {
-		err = autorest.NewErrorWithError(err, "operationalinsights.WorkspacesClient", "UpdateSearchResults", resp, "Failure responding to request")
-	}
-
-	return
-}
-
-// UpdateSearchResultsPreparer prepares the UpdateSearchResults request.
-func (client WorkspacesClient) UpdateSearchResultsPreparer(ctx context.Context, resourceGroupName string, workspaceName string, ID string) (*http.Request, error) {
-	pathParameters := map[string]interface{}{
-		"id":                autorest.Encode("path", ID),
-		"resourceGroupName": autorest.Encode("path", resourceGroupName),
-		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
-		"workspaceName":     autorest.Encode("path", workspaceName),
-	}
-
-	const APIVersion = "2015-03-20"
-	queryParameters := map[string]interface{}{
-		"api-version": APIVersion,
-	}
-
-	preparer := autorest.CreatePreparer(
-		autorest.AsPost(),
-		autorest.WithBaseURL(client.BaseURI),
-		autorest.WithPathParameters("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/search/{id}", pathParameters),
-		autorest.WithQueryParameters(queryParameters))
-	return preparer.Prepare((&http.Request{}).WithContext(ctx))
-}
-
-// UpdateSearchResultsSender sends the UpdateSearchResults request. The method will close the
-// http.Response Body if it receives an error.
-func (client WorkspacesClient) UpdateSearchResultsSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
-}
-
-// UpdateSearchResultsResponder handles the response to the UpdateSearchResults request. The method always
-// closes the http.Response Body.
-func (client WorkspacesClient) UpdateSearchResultsResponder(resp *http.Response) (result SearchResultsResponse, err error) {
 	err = autorest.Respond(
 		resp,
 		client.ByInspecting(),

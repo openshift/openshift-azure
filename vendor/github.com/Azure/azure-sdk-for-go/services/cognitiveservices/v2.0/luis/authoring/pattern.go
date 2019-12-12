@@ -97,8 +97,8 @@ func (client PatternClient) AddPatternPreparer(ctx context.Context, appID uuid.U
 // AddPatternSender sends the AddPattern request. The method will close the
 // http.Response Body if it receives an error.
 func (client PatternClient) AddPatternSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // AddPatternResponder handles the response to the AddPattern request. The method always
@@ -180,8 +180,8 @@ func (client PatternClient) BatchAddPatternsPreparer(ctx context.Context, appID 
 // BatchAddPatternsSender sends the BatchAddPatterns request. The method will close the
 // http.Response Body if it receives an error.
 func (client PatternClient) BatchAddPatternsSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // BatchAddPatternsResponder handles the response to the BatchAddPatterns request. The method always
@@ -256,8 +256,8 @@ func (client PatternClient) DeletePatternPreparer(ctx context.Context, appID uui
 // DeletePatternSender sends the DeletePattern request. The method will close the
 // http.Response Body if it receives an error.
 func (client PatternClient) DeletePatternSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // DeletePatternResponder handles the response to the DeletePattern request. The method always
@@ -339,8 +339,8 @@ func (client PatternClient) DeletePatternsPreparer(ctx context.Context, appID uu
 // DeletePatternsSender sends the DeletePatterns request. The method will close the
 // http.Response Body if it receives an error.
 func (client PatternClient) DeletePatternsSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // DeletePatternsResponder handles the response to the DeletePatterns request. The method always
@@ -356,16 +356,16 @@ func (client PatternClient) DeletePatternsResponder(resp *http.Response) (result
 	return
 }
 
-// GetIntentPatterns sends the get intent patterns request.
+// ListIntentPatterns sends the list intent patterns request.
 // Parameters:
 // appID - the application ID.
 // versionID - the version ID.
 // intentID - the intent classifier ID.
 // skip - the number of entries to skip. Default value is 0.
 // take - the number of entries to return. Maximum page size is 500. Default is 100.
-func (client PatternClient) GetIntentPatterns(ctx context.Context, appID uuid.UUID, versionID string, intentID uuid.UUID, skip *int32, take *int32) (result ListPatternRuleInfo, err error) {
+func (client PatternClient) ListIntentPatterns(ctx context.Context, appID uuid.UUID, versionID string, intentID uuid.UUID, skip *int32, take *int32) (result ListPatternRuleInfo, err error) {
 	if tracing.IsEnabled() {
-		ctx = tracing.StartSpan(ctx, fqdn+"/PatternClient.GetIntentPatterns")
+		ctx = tracing.StartSpan(ctx, fqdn+"/PatternClient.ListIntentPatterns")
 		defer func() {
 			sc := -1
 			if result.Response.Response != nil {
@@ -383,32 +383,32 @@ func (client PatternClient) GetIntentPatterns(ctx context.Context, appID uuid.UU
 				Chain: []validation.Constraint{{Target: "take", Name: validation.InclusiveMaximum, Rule: int64(500), Chain: nil},
 					{Target: "take", Name: validation.InclusiveMinimum, Rule: 0, Chain: nil},
 				}}}}}); err != nil {
-		return result, validation.NewError("authoring.PatternClient", "GetIntentPatterns", err.Error())
+		return result, validation.NewError("authoring.PatternClient", "ListIntentPatterns", err.Error())
 	}
 
-	req, err := client.GetIntentPatternsPreparer(ctx, appID, versionID, intentID, skip, take)
+	req, err := client.ListIntentPatternsPreparer(ctx, appID, versionID, intentID, skip, take)
 	if err != nil {
-		err = autorest.NewErrorWithError(err, "authoring.PatternClient", "GetIntentPatterns", nil, "Failure preparing request")
+		err = autorest.NewErrorWithError(err, "authoring.PatternClient", "ListIntentPatterns", nil, "Failure preparing request")
 		return
 	}
 
-	resp, err := client.GetIntentPatternsSender(req)
+	resp, err := client.ListIntentPatternsSender(req)
 	if err != nil {
 		result.Response = autorest.Response{Response: resp}
-		err = autorest.NewErrorWithError(err, "authoring.PatternClient", "GetIntentPatterns", resp, "Failure sending request")
+		err = autorest.NewErrorWithError(err, "authoring.PatternClient", "ListIntentPatterns", resp, "Failure sending request")
 		return
 	}
 
-	result, err = client.GetIntentPatternsResponder(resp)
+	result, err = client.ListIntentPatternsResponder(resp)
 	if err != nil {
-		err = autorest.NewErrorWithError(err, "authoring.PatternClient", "GetIntentPatterns", resp, "Failure responding to request")
+		err = autorest.NewErrorWithError(err, "authoring.PatternClient", "ListIntentPatterns", resp, "Failure responding to request")
 	}
 
 	return
 }
 
-// GetIntentPatternsPreparer prepares the GetIntentPatterns request.
-func (client PatternClient) GetIntentPatternsPreparer(ctx context.Context, appID uuid.UUID, versionID string, intentID uuid.UUID, skip *int32, take *int32) (*http.Request, error) {
+// ListIntentPatternsPreparer prepares the ListIntentPatterns request.
+func (client PatternClient) ListIntentPatternsPreparer(ctx context.Context, appID uuid.UUID, versionID string, intentID uuid.UUID, skip *int32, take *int32) (*http.Request, error) {
 	urlParameters := map[string]interface{}{
 		"Endpoint": client.Endpoint,
 	}
@@ -439,16 +439,16 @@ func (client PatternClient) GetIntentPatternsPreparer(ctx context.Context, appID
 	return preparer.Prepare((&http.Request{}).WithContext(ctx))
 }
 
-// GetIntentPatternsSender sends the GetIntentPatterns request. The method will close the
+// ListIntentPatternsSender sends the ListIntentPatterns request. The method will close the
 // http.Response Body if it receives an error.
-func (client PatternClient) GetIntentPatternsSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+func (client PatternClient) ListIntentPatternsSender(req *http.Request) (*http.Response, error) {
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
-// GetIntentPatternsResponder handles the response to the GetIntentPatterns request. The method always
+// ListIntentPatternsResponder handles the response to the ListIntentPatterns request. The method always
 // closes the http.Response Body.
-func (client PatternClient) GetIntentPatternsResponder(resp *http.Response) (result ListPatternRuleInfo, err error) {
+func (client PatternClient) ListIntentPatternsResponder(resp *http.Response) (result ListPatternRuleInfo, err error) {
 	err = autorest.Respond(
 		resp,
 		client.ByInspecting(),
@@ -459,15 +459,15 @@ func (client PatternClient) GetIntentPatternsResponder(resp *http.Response) (res
 	return
 }
 
-// GetPatterns sends the get patterns request.
+// ListPatterns sends the list patterns request.
 // Parameters:
 // appID - the application ID.
 // versionID - the version ID.
 // skip - the number of entries to skip. Default value is 0.
 // take - the number of entries to return. Maximum page size is 500. Default is 100.
-func (client PatternClient) GetPatterns(ctx context.Context, appID uuid.UUID, versionID string, skip *int32, take *int32) (result ListPatternRuleInfo, err error) {
+func (client PatternClient) ListPatterns(ctx context.Context, appID uuid.UUID, versionID string, skip *int32, take *int32) (result ListPatternRuleInfo, err error) {
 	if tracing.IsEnabled() {
-		ctx = tracing.StartSpan(ctx, fqdn+"/PatternClient.GetPatterns")
+		ctx = tracing.StartSpan(ctx, fqdn+"/PatternClient.ListPatterns")
 		defer func() {
 			sc := -1
 			if result.Response.Response != nil {
@@ -485,32 +485,32 @@ func (client PatternClient) GetPatterns(ctx context.Context, appID uuid.UUID, ve
 				Chain: []validation.Constraint{{Target: "take", Name: validation.InclusiveMaximum, Rule: int64(500), Chain: nil},
 					{Target: "take", Name: validation.InclusiveMinimum, Rule: 0, Chain: nil},
 				}}}}}); err != nil {
-		return result, validation.NewError("authoring.PatternClient", "GetPatterns", err.Error())
+		return result, validation.NewError("authoring.PatternClient", "ListPatterns", err.Error())
 	}
 
-	req, err := client.GetPatternsPreparer(ctx, appID, versionID, skip, take)
+	req, err := client.ListPatternsPreparer(ctx, appID, versionID, skip, take)
 	if err != nil {
-		err = autorest.NewErrorWithError(err, "authoring.PatternClient", "GetPatterns", nil, "Failure preparing request")
+		err = autorest.NewErrorWithError(err, "authoring.PatternClient", "ListPatterns", nil, "Failure preparing request")
 		return
 	}
 
-	resp, err := client.GetPatternsSender(req)
+	resp, err := client.ListPatternsSender(req)
 	if err != nil {
 		result.Response = autorest.Response{Response: resp}
-		err = autorest.NewErrorWithError(err, "authoring.PatternClient", "GetPatterns", resp, "Failure sending request")
+		err = autorest.NewErrorWithError(err, "authoring.PatternClient", "ListPatterns", resp, "Failure sending request")
 		return
 	}
 
-	result, err = client.GetPatternsResponder(resp)
+	result, err = client.ListPatternsResponder(resp)
 	if err != nil {
-		err = autorest.NewErrorWithError(err, "authoring.PatternClient", "GetPatterns", resp, "Failure responding to request")
+		err = autorest.NewErrorWithError(err, "authoring.PatternClient", "ListPatterns", resp, "Failure responding to request")
 	}
 
 	return
 }
 
-// GetPatternsPreparer prepares the GetPatterns request.
-func (client PatternClient) GetPatternsPreparer(ctx context.Context, appID uuid.UUID, versionID string, skip *int32, take *int32) (*http.Request, error) {
+// ListPatternsPreparer prepares the ListPatterns request.
+func (client PatternClient) ListPatternsPreparer(ctx context.Context, appID uuid.UUID, versionID string, skip *int32, take *int32) (*http.Request, error) {
 	urlParameters := map[string]interface{}{
 		"Endpoint": client.Endpoint,
 	}
@@ -540,16 +540,16 @@ func (client PatternClient) GetPatternsPreparer(ctx context.Context, appID uuid.
 	return preparer.Prepare((&http.Request{}).WithContext(ctx))
 }
 
-// GetPatternsSender sends the GetPatterns request. The method will close the
+// ListPatternsSender sends the ListPatterns request. The method will close the
 // http.Response Body if it receives an error.
-func (client PatternClient) GetPatternsSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+func (client PatternClient) ListPatternsSender(req *http.Request) (*http.Response, error) {
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
-// GetPatternsResponder handles the response to the GetPatterns request. The method always
+// ListPatternsResponder handles the response to the ListPatterns request. The method always
 // closes the http.Response Body.
-func (client PatternClient) GetPatternsResponder(resp *http.Response) (result ListPatternRuleInfo, err error) {
+func (client PatternClient) ListPatternsResponder(resp *http.Response) (result ListPatternRuleInfo, err error) {
 	err = autorest.Respond(
 		resp,
 		client.ByInspecting(),
@@ -622,8 +622,8 @@ func (client PatternClient) UpdatePatternPreparer(ctx context.Context, appID uui
 // UpdatePatternSender sends the UpdatePattern request. The method will close the
 // http.Response Body if it receives an error.
 func (client PatternClient) UpdatePatternSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // UpdatePatternResponder handles the response to the UpdatePattern request. The method always
@@ -705,8 +705,8 @@ func (client PatternClient) UpdatePatternsPreparer(ctx context.Context, appID uu
 // UpdatePatternsSender sends the UpdatePatterns request. The method will close the
 // http.Response Body if it receives an error.
 func (client PatternClient) UpdatePatternsSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // UpdatePatternsResponder handles the response to the UpdatePatterns request. The method always

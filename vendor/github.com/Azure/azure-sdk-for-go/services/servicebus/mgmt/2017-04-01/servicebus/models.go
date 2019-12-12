@@ -48,6 +48,21 @@ func PossibleAccessRightsValues() []AccessRights {
 	return []AccessRights{Listen, Manage, Send}
 }
 
+// DefaultAction enumerates the values for default action.
+type DefaultAction string
+
+const (
+	// Allow ...
+	Allow DefaultAction = "Allow"
+	// Deny ...
+	Deny DefaultAction = "Deny"
+)
+
+// PossibleDefaultActionValues returns an array of possible values for the DefaultAction const type.
+func PossibleDefaultActionValues() []DefaultAction {
+	return []DefaultAction{Allow, Deny}
+}
+
 // EncodingCaptureDescription enumerates the values for encoding capture description.
 type EncodingCaptureDescription string
 
@@ -107,21 +122,6 @@ func PossibleFilterTypeValues() []FilterType {
 	return []FilterType{FilterTypeCorrelationFilter, FilterTypeSQLFilter}
 }
 
-// IPAction enumerates the values for ip action.
-type IPAction string
-
-const (
-	// Accept ...
-	Accept IPAction = "Accept"
-	// Reject ...
-	Reject IPAction = "Reject"
-)
-
-// PossibleIPActionValues returns an array of possible values for the IPAction const type.
-func PossibleIPActionValues() []IPAction {
-	return []IPAction{Accept, Reject}
-}
-
 // KeyType enumerates the values for key type.
 type KeyType string
 
@@ -156,6 +156,19 @@ const (
 // PossibleNameSpaceTypeValues returns an array of possible values for the NameSpaceType const type.
 func PossibleNameSpaceTypeValues() []NameSpaceType {
 	return []NameSpaceType{EventHub, Messaging, Mixed, NotificationHub, Relay}
+}
+
+// NetworkRuleIPAction enumerates the values for network rule ip action.
+type NetworkRuleIPAction string
+
+const (
+	// NetworkRuleIPActionAllow ...
+	NetworkRuleIPActionAllow NetworkRuleIPAction = "Allow"
+)
+
+// PossibleNetworkRuleIPActionValues returns an array of possible values for the NetworkRuleIPAction const type.
+func PossibleNetworkRuleIPActionValues() []NetworkRuleIPAction {
+	return []NetworkRuleIPAction{NetworkRuleIPActionAllow}
 }
 
 // ProvisioningStateDR enumerates the values for provisioning state dr.
@@ -252,19 +265,19 @@ func PossibleUnavailableReasonValues() []UnavailableReason {
 // AccessKeys namespace/ServiceBus Connection String
 type AccessKeys struct {
 	autorest.Response `json:"-"`
-	// PrimaryConnectionString - Primary connection string of the created namespace authorization rule.
+	// PrimaryConnectionString - READ-ONLY; Primary connection string of the created namespace authorization rule.
 	PrimaryConnectionString *string `json:"primaryConnectionString,omitempty"`
-	// SecondaryConnectionString - Secondary connection string of the created namespace authorization rule.
+	// SecondaryConnectionString - READ-ONLY; Secondary connection string of the created namespace authorization rule.
 	SecondaryConnectionString *string `json:"secondaryConnectionString,omitempty"`
-	// AliasPrimaryConnectionString - Primary connection string of the alias if GEO DR is enabled
+	// AliasPrimaryConnectionString - READ-ONLY; Primary connection string of the alias if GEO DR is enabled
 	AliasPrimaryConnectionString *string `json:"aliasPrimaryConnectionString,omitempty"`
-	// AliasSecondaryConnectionString - Secondary  connection string of the alias if GEO DR is enabled
+	// AliasSecondaryConnectionString - READ-ONLY; Secondary  connection string of the alias if GEO DR is enabled
 	AliasSecondaryConnectionString *string `json:"aliasSecondaryConnectionString,omitempty"`
-	// PrimaryKey - A base64-encoded 256-bit primary key for signing and validating the SAS token.
+	// PrimaryKey - READ-ONLY; A base64-encoded 256-bit primary key for signing and validating the SAS token.
 	PrimaryKey *string `json:"primaryKey,omitempty"`
-	// SecondaryKey - A base64-encoded 256-bit primary key for signing and validating the SAS token.
+	// SecondaryKey - READ-ONLY; A base64-encoded 256-bit primary key for signing and validating the SAS token.
 	SecondaryKey *string `json:"secondaryKey,omitempty"`
-	// KeyName - A string that describes the authorization rule.
+	// KeyName - READ-ONLY; A string that describes the authorization rule.
 	KeyName *string `json:"keyName,omitempty"`
 }
 
@@ -284,11 +297,11 @@ type ArmDisasterRecovery struct {
 	autorest.Response `json:"-"`
 	// ArmDisasterRecoveryProperties - Properties required to the Create Or Update Alias(Disaster Recovery configurations)
 	*ArmDisasterRecoveryProperties `json:"properties,omitempty"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -297,15 +310,6 @@ func (adr ArmDisasterRecovery) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if adr.ArmDisasterRecoveryProperties != nil {
 		objectMap["properties"] = adr.ArmDisasterRecoveryProperties
-	}
-	if adr.ID != nil {
-		objectMap["id"] = adr.ID
-	}
-	if adr.Name != nil {
-		objectMap["name"] = adr.Name
-	}
-	if adr.Type != nil {
-		objectMap["type"] = adr.Type
 	}
 	return json.Marshal(objectMap)
 }
@@ -366,7 +370,7 @@ type ArmDisasterRecoveryListResult struct {
 	autorest.Response `json:"-"`
 	// Value - List of Alias(Disaster Recovery configurations)
 	Value *[]ArmDisasterRecovery `json:"value,omitempty"`
-	// NextLink - Link to the next set of results. Not empty if Value contains incomplete list of Alias(Disaster Recovery configuration)
+	// NextLink - READ-ONLY; Link to the next set of results. Not empty if Value contains incomplete list of Alias(Disaster Recovery configuration)
 	NextLink *string `json:"nextLink,omitempty"`
 }
 
@@ -511,15 +515,15 @@ func NewArmDisasterRecoveryListResultPage(getNextPage func(context.Context, ArmD
 // ArmDisasterRecoveryProperties properties required to the Create Or Update Alias(Disaster Recovery
 // configurations)
 type ArmDisasterRecoveryProperties struct {
-	// ProvisioningState - Provisioning state of the Alias(Disaster Recovery configuration) - possible values 'Accepted' or 'Succeeded' or 'Failed'. Possible values include: 'Accepted', 'Succeeded', 'Failed'
+	// ProvisioningState - READ-ONLY; Provisioning state of the Alias(Disaster Recovery configuration) - possible values 'Accepted' or 'Succeeded' or 'Failed'. Possible values include: 'Accepted', 'Succeeded', 'Failed'
 	ProvisioningState ProvisioningStateDR `json:"provisioningState,omitempty"`
-	// PendingReplicationOperationsCount - Number of entities pending to be replicated.
+	// PendingReplicationOperationsCount - READ-ONLY; Number of entities pending to be replicated.
 	PendingReplicationOperationsCount *int64 `json:"pendingReplicationOperationsCount,omitempty"`
-	// PartnerNamespace - ARM Id of the Primary/Secondary eventhub namespace name, which is part of GEO DR pairning
+	// PartnerNamespace - ARM Id of the Primary/Secondary eventhub namespace name, which is part of GEO DR pairing
 	PartnerNamespace *string `json:"partnerNamespace,omitempty"`
-	// AlternateName - Primary/Secondary eventhub namespace name, which is part of GEO DR pairning
+	// AlternateName - Primary/Secondary eventhub namespace name, which is part of GEO DR pairing
 	AlternateName *string `json:"alternateName,omitempty"`
-	// Role - role of namespace in GEO DR - possible values 'Primary' or 'PrimaryNotReplicating' or 'Secondary'. Possible values include: 'Primary', 'PrimaryNotReplicating', 'Secondary'
+	// Role - READ-ONLY; role of namespace in GEO DR - possible values 'Primary' or 'PrimaryNotReplicating' or 'Secondary'. Possible values include: 'Primary', 'PrimaryNotReplicating', 'Secondary'
 	Role RoleDisasterRecovery `json:"role,omitempty"`
 }
 
@@ -545,14 +549,14 @@ type CaptureDescription struct {
 
 // CheckNameAvailability description of a Check Name availability request properties.
 type CheckNameAvailability struct {
-	// Name - The Name to check the namespce name availability and The namespace name can contain only letters, numbers, and hyphens. The namespace must start with a letter, and it must end with a letter or number.
+	// Name - The Name to check the namespace name availability and The namespace name can contain only letters, numbers, and hyphens. The namespace must start with a letter, and it must end with a letter or number.
 	Name *string `json:"name,omitempty"`
 }
 
 // CheckNameAvailabilityResult description of a Check Name availability request properties.
 type CheckNameAvailabilityResult struct {
 	autorest.Response `json:"-"`
-	// Message - The detailed info regarding the reason associated with the namespace.
+	// Message - READ-ONLY; The detailed info regarding the reason associated with the namespace.
 	Message *string `json:"message,omitempty"`
 	// NameAvailable - Value indicating namespace is availability, true if the namespace is available; otherwise, false.
 	NameAvailable *bool `json:"nameAvailable,omitempty"`
@@ -624,7 +628,7 @@ func (cf CorrelationFilter) MarshalJSON() ([]byte, error) {
 type Destination struct {
 	// Name - Name for capture destination
 	Name *string `json:"name,omitempty"`
-	// DestinationProperties - Properties describing the storage account, blob container and acrchive name format for capture destination
+	// DestinationProperties - Properties describing the storage account, blob container and archive name format for capture destination
 	*DestinationProperties `json:"properties,omitempty"`
 }
 
@@ -673,7 +677,7 @@ func (d *Destination) UnmarshalJSON(body []byte) error {
 	return nil
 }
 
-// DestinationProperties properties describing the storage account, blob container and acrchive name format
+// DestinationProperties properties describing the storage account, blob container and archive name format
 // for capture destination
 type DestinationProperties struct {
 	// StorageAccountResourceID - Resource id of the storage account to be used to create the blobs
@@ -684,7 +688,7 @@ type DestinationProperties struct {
 	ArchiveNameFormat *string `json:"archiveNameFormat,omitempty"`
 }
 
-// ErrorResponse error reponse indicates ServiceBus service is not able to process the incoming request.
+// ErrorResponse error response indicates ServiceBus service is not able to process the incoming request.
 // The reason is provided in the error message.
 type ErrorResponse struct {
 	// Code - Error code.
@@ -697,11 +701,11 @@ type ErrorResponse struct {
 type Eventhub struct {
 	// EventhubProperties - Properties supplied to the Create Or Update Event Hub operation.
 	*EventhubProperties `json:"properties,omitempty"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -710,15 +714,6 @@ func (e Eventhub) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if e.EventhubProperties != nil {
 		objectMap["properties"] = e.EventhubProperties
-	}
-	if e.ID != nil {
-		objectMap["id"] = e.ID
-	}
-	if e.Name != nil {
-		objectMap["name"] = e.Name
-	}
-	if e.Type != nil {
-		objectMap["type"] = e.Type
 	}
 	return json.Marshal(objectMap)
 }
@@ -779,7 +774,7 @@ type EventHubListResult struct {
 	autorest.Response `json:"-"`
 	// Value - Result of the List EventHubs operation.
 	Value *[]Eventhub `json:"value,omitempty"`
-	// NextLink - Link to the next set of results. Not empty if Value contains incomplete list of EventHubs.
+	// NextLink - READ-ONLY; Link to the next set of results. Not empty if Value contains incomplete list of EventHubs.
 	NextLink *string `json:"nextLink,omitempty"`
 }
 
@@ -922,11 +917,11 @@ func NewEventHubListResultPage(getNextPage func(context.Context, EventHubListRes
 
 // EventhubProperties properties supplied to the Create Or Update Event Hub operation.
 type EventhubProperties struct {
-	// PartitionIds - Current number of shards on the Event Hub.
+	// PartitionIds - READ-ONLY; Current number of shards on the Event Hub.
 	PartitionIds *[]string `json:"partitionIds,omitempty"`
-	// CreatedAt - Exact time the Event Hub was created.
+	// CreatedAt - READ-ONLY; Exact time the Event Hub was created.
 	CreatedAt *date.Time `json:"createdAt,omitempty"`
-	// UpdatedAt - The exact time the message was updated.
+	// UpdatedAt - READ-ONLY; The exact time the message was updated.
 	UpdatedAt *date.Time `json:"updatedAt,omitempty"`
 	// MessageRetentionInDays - Number of days to retain the events for this Event Hub, value should be 1 to 7 days
 	MessageRetentionInDays *int64 `json:"messageRetentionInDays,omitempty"`
@@ -938,211 +933,17 @@ type EventhubProperties struct {
 	CaptureDescription *CaptureDescription `json:"captureDescription,omitempty"`
 }
 
-// IPFilterRule single item in a List or Get IpFilterRules operation
-type IPFilterRule struct {
-	autorest.Response `json:"-"`
-	// IPFilterRuleProperties - Properties supplied to create or update IpFilterRules
-	*IPFilterRuleProperties `json:"properties,omitempty"`
-	// ID - Resource Id
-	ID *string `json:"id,omitempty"`
-	// Name - Resource name
-	Name *string `json:"name,omitempty"`
-	// Type - Resource type
-	Type *string `json:"type,omitempty"`
-}
-
-// MarshalJSON is the custom marshaler for IPFilterRule.
-func (ifr IPFilterRule) MarshalJSON() ([]byte, error) {
-	objectMap := make(map[string]interface{})
-	if ifr.IPFilterRuleProperties != nil {
-		objectMap["properties"] = ifr.IPFilterRuleProperties
-	}
-	if ifr.ID != nil {
-		objectMap["id"] = ifr.ID
-	}
-	if ifr.Name != nil {
-		objectMap["name"] = ifr.Name
-	}
-	if ifr.Type != nil {
-		objectMap["type"] = ifr.Type
-	}
-	return json.Marshal(objectMap)
-}
-
-// UnmarshalJSON is the custom unmarshaler for IPFilterRule struct.
-func (ifr *IPFilterRule) UnmarshalJSON(body []byte) error {
-	var m map[string]*json.RawMessage
-	err := json.Unmarshal(body, &m)
-	if err != nil {
-		return err
-	}
-	for k, v := range m {
-		switch k {
-		case "properties":
-			if v != nil {
-				var IPFilterRuleProperties IPFilterRuleProperties
-				err = json.Unmarshal(*v, &IPFilterRuleProperties)
-				if err != nil {
-					return err
-				}
-				ifr.IPFilterRuleProperties = &IPFilterRuleProperties
-			}
-		case "id":
-			if v != nil {
-				var ID string
-				err = json.Unmarshal(*v, &ID)
-				if err != nil {
-					return err
-				}
-				ifr.ID = &ID
-			}
-		case "name":
-			if v != nil {
-				var name string
-				err = json.Unmarshal(*v, &name)
-				if err != nil {
-					return err
-				}
-				ifr.Name = &name
-			}
-		case "type":
-			if v != nil {
-				var typeVar string
-				err = json.Unmarshal(*v, &typeVar)
-				if err != nil {
-					return err
-				}
-				ifr.Type = &typeVar
-			}
-		}
-	}
-
-	return nil
-}
-
-// IPFilterRuleListResult the response from the List namespace operation.
-type IPFilterRuleListResult struct {
-	autorest.Response `json:"-"`
-	// Value - Result of the List IpFilter Rules operation.
-	Value *[]IPFilterRule `json:"value,omitempty"`
-	// NextLink - Link to the next set of results. Not empty if Value contains an incomplete list of IpFilter Rules
-	NextLink *string `json:"nextLink,omitempty"`
-}
-
-// IPFilterRuleListResultIterator provides access to a complete listing of IPFilterRule values.
-type IPFilterRuleListResultIterator struct {
-	i    int
-	page IPFilterRuleListResultPage
-}
-
-// Next advances to the next value.  If there was an error making
-// the request the iterator does not advance and the error is returned.
-func (iter *IPFilterRuleListResultIterator) Next() error {
-	iter.i++
-	if iter.i < len(iter.page.Values()) {
-		return nil
-	}
-	err := iter.page.Next()
-	if err != nil {
-		iter.i--
-		return err
-	}
-	iter.i = 0
-	return nil
-}
-
-// NotDone returns true if the enumeration should be started or is not yet complete.
-func (iter IPFilterRuleListResultIterator) NotDone() bool {
-	return iter.page.NotDone() && iter.i < len(iter.page.Values())
-}
-
-// Response returns the raw server response from the last page request.
-func (iter IPFilterRuleListResultIterator) Response() IPFilterRuleListResult {
-	return iter.page.Response()
-}
-
-// Value returns the current value or a zero-initialized value if the
-// iterator has advanced beyond the end of the collection.
-func (iter IPFilterRuleListResultIterator) Value() IPFilterRule {
-	if !iter.page.NotDone() {
-		return IPFilterRule{}
-	}
-	return iter.page.Values()[iter.i]
-}
-
-// IsEmpty returns true if the ListResult contains no values.
-func (ifrlr IPFilterRuleListResult) IsEmpty() bool {
-	return ifrlr.Value == nil || len(*ifrlr.Value) == 0
-}
-
-// iPFilterRuleListResultPreparer prepares a request to retrieve the next set of results.
-// It returns nil if no more results exist.
-func (ifrlr IPFilterRuleListResult) iPFilterRuleListResultPreparer() (*http.Request, error) {
-	if ifrlr.NextLink == nil || len(to.String(ifrlr.NextLink)) < 1 {
-		return nil, nil
-	}
-	return autorest.Prepare(&http.Request{},
-		autorest.AsJSON(),
-		autorest.AsGet(),
-		autorest.WithBaseURL(to.String(ifrlr.NextLink)))
-}
-
-// IPFilterRuleListResultPage contains a page of IPFilterRule values.
-type IPFilterRuleListResultPage struct {
-	fn    func(IPFilterRuleListResult) (IPFilterRuleListResult, error)
-	ifrlr IPFilterRuleListResult
-}
-
-// Next advances to the next page of values.  If there was an error making
-// the request the page does not advance and the error is returned.
-func (page *IPFilterRuleListResultPage) Next() error {
-	next, err := page.fn(page.ifrlr)
-	if err != nil {
-		return err
-	}
-	page.ifrlr = next
-	return nil
-}
-
-// NotDone returns true if the page enumeration should be started or is not yet complete.
-func (page IPFilterRuleListResultPage) NotDone() bool {
-	return !page.ifrlr.IsEmpty()
-}
-
-// Response returns the raw server response from the last page request.
-func (page IPFilterRuleListResultPage) Response() IPFilterRuleListResult {
-	return page.ifrlr
-}
-
-// Values returns the slice of values for the current page or nil if there are no values.
-func (page IPFilterRuleListResultPage) Values() []IPFilterRule {
-	if page.ifrlr.IsEmpty() {
-		return nil
-	}
-	return *page.ifrlr.Value
-}
-
-// IPFilterRuleProperties properties supplied to create or update IpFilterRules
-type IPFilterRuleProperties struct {
-	// IPMask - IP Mask
-	IPMask *string `json:"ipMask,omitempty"`
-	// Action - The IP Filter Action. Possible values include: 'Accept', 'Reject'
-	Action IPAction `json:"action,omitempty"`
-	// FilterName - IP Filter name
-	FilterName *string `json:"filterName,omitempty"`
-}
-
 // MessageCountDetails message Count Details.
 type MessageCountDetails struct {
-	// ActiveMessageCount - Number of active messages in the queue, topic, or subscription.
+	// ActiveMessageCount - READ-ONLY; Number of active messages in the queue, topic, or subscription.
 	ActiveMessageCount *int64 `json:"activeMessageCount,omitempty"`
-	// DeadLetterMessageCount - Number of messages that are dead lettered.
+	// DeadLetterMessageCount - READ-ONLY; Number of messages that are dead lettered.
 	DeadLetterMessageCount *int64 `json:"deadLetterMessageCount,omitempty"`
-	// ScheduledMessageCount - Number of scheduled messages.
+	// ScheduledMessageCount - READ-ONLY; Number of scheduled messages.
 	ScheduledMessageCount *int64 `json:"scheduledMessageCount,omitempty"`
-	// TransferMessageCount - Number of messages transferred to another queue, topic, or subscription.
+	// TransferMessageCount - READ-ONLY; Number of messages transferred to another queue, topic, or subscription.
 	TransferMessageCount *int64 `json:"transferMessageCount,omitempty"`
-	// TransferDeadLetterMessageCount - Number of messages transferred into dead letters.
+	// TransferDeadLetterMessageCount - READ-ONLY; Number of messages transferred into dead letters.
 	TransferDeadLetterMessageCount *int64 `json:"transferDeadLetterMessageCount,omitempty"`
 }
 
@@ -1151,7 +952,7 @@ type MigrationConfigListResult struct {
 	autorest.Response `json:"-"`
 	// Value - List of Migration Configs
 	Value *[]MigrationConfigProperties `json:"value,omitempty"`
-	// NextLink - Link to the next set of results. Not empty if Value contains incomplete list of migrationConfigurations
+	// NextLink - READ-ONLY; Link to the next set of results. Not empty if Value contains incomplete list of migrationConfigurations
 	NextLink *string `json:"nextLink,omitempty"`
 }
 
@@ -1298,11 +1099,11 @@ type MigrationConfigProperties struct {
 	autorest.Response `json:"-"`
 	// MigrationConfigPropertiesProperties - Properties required to the Create Migration Configuration
 	*MigrationConfigPropertiesProperties `json:"properties,omitempty"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -1311,15 +1112,6 @@ func (mcp MigrationConfigProperties) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if mcp.MigrationConfigPropertiesProperties != nil {
 		objectMap["properties"] = mcp.MigrationConfigPropertiesProperties
-	}
-	if mcp.ID != nil {
-		objectMap["id"] = mcp.ID
-	}
-	if mcp.Name != nil {
-		objectMap["name"] = mcp.Name
-	}
-	if mcp.Type != nil {
-		objectMap["type"] = mcp.Type
 	}
 	return json.Marshal(objectMap)
 }
@@ -1377,15 +1169,15 @@ func (mcp *MigrationConfigProperties) UnmarshalJSON(body []byte) error {
 
 // MigrationConfigPropertiesProperties properties required to the Create Migration Configuration
 type MigrationConfigPropertiesProperties struct {
-	// ProvisioningState - Provisioning state of Migration Configuration
+	// ProvisioningState - READ-ONLY; Provisioning state of Migration Configuration
 	ProvisioningState *string `json:"provisioningState,omitempty"`
-	// PendingReplicationOperationsCount - Number of entities pending to be replicated.
+	// PendingReplicationOperationsCount - READ-ONLY; Number of entities pending to be replicated.
 	PendingReplicationOperationsCount *int64 `json:"pendingReplicationOperationsCount,omitempty"`
 	// TargetNamespace - Existing premium Namespace ARM Id name which has no entities, will be used for migration
 	TargetNamespace *string `json:"targetNamespace,omitempty"`
 	// PostMigrationName - Name to access Standard Namespace after migration
 	PostMigrationName *string `json:"postMigrationName,omitempty"`
-	// MigrationState - State in which Standard to Premium Migration is, possible values : Unknown, Reverting, Completing, Initiating, Syncing, Active
+	// MigrationState - READ-ONLY; State in which Standard to Premium Migration is, possible values : Unknown, Reverting, Completing, Initiating, Syncing, Active
 	MigrationState *string `json:"migrationState,omitempty"`
 }
 
@@ -1399,7 +1191,7 @@ type MigrationConfigsCreateAndStartMigrationFuture struct {
 // If the operation has not completed it will return an error.
 func (future *MigrationConfigsCreateAndStartMigrationFuture) Result(client MigrationConfigsClient) (mcp MigrationConfigProperties, err error) {
 	var done bool
-	done, err = future.Done(client)
+	done, err = future.DoneWithContext(context.Background(), client)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "servicebus.MigrationConfigsCreateAndStartMigrationFuture", "Result", future.Response(), "Polling failure")
 		return
@@ -1428,7 +1220,7 @@ type NamespacesCreateOrUpdateFuture struct {
 // If the operation has not completed it will return an error.
 func (future *NamespacesCreateOrUpdateFuture) Result(client NamespacesClient) (sn SBNamespace, err error) {
 	var done bool
-	done, err = future.Done(client)
+	done, err = future.DoneWithContext(context.Background(), client)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "servicebus.NamespacesCreateOrUpdateFuture", "Result", future.Response(), "Polling failure")
 		return
@@ -1457,7 +1249,7 @@ type NamespacesDeleteFuture struct {
 // If the operation has not completed it will return an error.
 func (future *NamespacesDeleteFuture) Result(client NamespacesClient) (ar autorest.Response, err error) {
 	var done bool
-	done, err = future.Done(client)
+	done, err = future.DoneWithContext(context.Background(), client)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "servicebus.NamespacesDeleteFuture", "Result", future.Response(), "Polling failure")
 		return
@@ -1470,9 +1262,254 @@ func (future *NamespacesDeleteFuture) Result(client NamespacesClient) (ar autore
 	return
 }
 
+// NetworkRuleSet description of NetworkRuleSet resource.
+type NetworkRuleSet struct {
+	autorest.Response `json:"-"`
+	// NetworkRuleSetProperties - NetworkRuleSet properties
+	*NetworkRuleSetProperties `json:"properties,omitempty"`
+	// ID - READ-ONLY; Resource Id
+	ID *string `json:"id,omitempty"`
+	// Name - READ-ONLY; Resource name
+	Name *string `json:"name,omitempty"`
+	// Type - READ-ONLY; Resource type
+	Type *string `json:"type,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for NetworkRuleSet.
+func (nrs NetworkRuleSet) MarshalJSON() ([]byte, error) {
+	objectMap := make(map[string]interface{})
+	if nrs.NetworkRuleSetProperties != nil {
+		objectMap["properties"] = nrs.NetworkRuleSetProperties
+	}
+	return json.Marshal(objectMap)
+}
+
+// UnmarshalJSON is the custom unmarshaler for NetworkRuleSet struct.
+func (nrs *NetworkRuleSet) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "properties":
+			if v != nil {
+				var networkRuleSetProperties NetworkRuleSetProperties
+				err = json.Unmarshal(*v, &networkRuleSetProperties)
+				if err != nil {
+					return err
+				}
+				nrs.NetworkRuleSetProperties = &networkRuleSetProperties
+			}
+		case "id":
+			if v != nil {
+				var ID string
+				err = json.Unmarshal(*v, &ID)
+				if err != nil {
+					return err
+				}
+				nrs.ID = &ID
+			}
+		case "name":
+			if v != nil {
+				var name string
+				err = json.Unmarshal(*v, &name)
+				if err != nil {
+					return err
+				}
+				nrs.Name = &name
+			}
+		case "type":
+			if v != nil {
+				var typeVar string
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				nrs.Type = &typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
+// NetworkRuleSetListResult the response of the List NetworkRuleSet operation.
+type NetworkRuleSetListResult struct {
+	autorest.Response `json:"-"`
+	// Value - Result of the List NetworkRuleSet operation.
+	Value *[]NetworkRuleSet `json:"value,omitempty"`
+	// NextLink - Link to the next set of results. Not empty if Value contains incomplete list of NetworkRuleSet.
+	NextLink *string `json:"nextLink,omitempty"`
+}
+
+// NetworkRuleSetListResultIterator provides access to a complete listing of NetworkRuleSet values.
+type NetworkRuleSetListResultIterator struct {
+	i    int
+	page NetworkRuleSetListResultPage
+}
+
+// NextWithContext advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+func (iter *NetworkRuleSetListResultIterator) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/NetworkRuleSetListResultIterator.NextWithContext")
+		defer func() {
+			sc := -1
+			if iter.Response().Response.Response != nil {
+				sc = iter.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	iter.i++
+	if iter.i < len(iter.page.Values()) {
+		return nil
+	}
+	err = iter.page.NextWithContext(ctx)
+	if err != nil {
+		iter.i--
+		return err
+	}
+	iter.i = 0
+	return nil
+}
+
+// Next advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (iter *NetworkRuleSetListResultIterator) Next() error {
+	return iter.NextWithContext(context.Background())
+}
+
+// NotDone returns true if the enumeration should be started or is not yet complete.
+func (iter NetworkRuleSetListResultIterator) NotDone() bool {
+	return iter.page.NotDone() && iter.i < len(iter.page.Values())
+}
+
+// Response returns the raw server response from the last page request.
+func (iter NetworkRuleSetListResultIterator) Response() NetworkRuleSetListResult {
+	return iter.page.Response()
+}
+
+// Value returns the current value or a zero-initialized value if the
+// iterator has advanced beyond the end of the collection.
+func (iter NetworkRuleSetListResultIterator) Value() NetworkRuleSet {
+	if !iter.page.NotDone() {
+		return NetworkRuleSet{}
+	}
+	return iter.page.Values()[iter.i]
+}
+
+// Creates a new instance of the NetworkRuleSetListResultIterator type.
+func NewNetworkRuleSetListResultIterator(page NetworkRuleSetListResultPage) NetworkRuleSetListResultIterator {
+	return NetworkRuleSetListResultIterator{page: page}
+}
+
+// IsEmpty returns true if the ListResult contains no values.
+func (nrslr NetworkRuleSetListResult) IsEmpty() bool {
+	return nrslr.Value == nil || len(*nrslr.Value) == 0
+}
+
+// networkRuleSetListResultPreparer prepares a request to retrieve the next set of results.
+// It returns nil if no more results exist.
+func (nrslr NetworkRuleSetListResult) networkRuleSetListResultPreparer(ctx context.Context) (*http.Request, error) {
+	if nrslr.NextLink == nil || len(to.String(nrslr.NextLink)) < 1 {
+		return nil, nil
+	}
+	return autorest.Prepare((&http.Request{}).WithContext(ctx),
+		autorest.AsJSON(),
+		autorest.AsGet(),
+		autorest.WithBaseURL(to.String(nrslr.NextLink)))
+}
+
+// NetworkRuleSetListResultPage contains a page of NetworkRuleSet values.
+type NetworkRuleSetListResultPage struct {
+	fn    func(context.Context, NetworkRuleSetListResult) (NetworkRuleSetListResult, error)
+	nrslr NetworkRuleSetListResult
+}
+
+// NextWithContext advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+func (page *NetworkRuleSetListResultPage) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/NetworkRuleSetListResultPage.NextWithContext")
+		defer func() {
+			sc := -1
+			if page.Response().Response.Response != nil {
+				sc = page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	next, err := page.fn(ctx, page.nrslr)
+	if err != nil {
+		return err
+	}
+	page.nrslr = next
+	return nil
+}
+
+// Next advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (page *NetworkRuleSetListResultPage) Next() error {
+	return page.NextWithContext(context.Background())
+}
+
+// NotDone returns true if the page enumeration should be started or is not yet complete.
+func (page NetworkRuleSetListResultPage) NotDone() bool {
+	return !page.nrslr.IsEmpty()
+}
+
+// Response returns the raw server response from the last page request.
+func (page NetworkRuleSetListResultPage) Response() NetworkRuleSetListResult {
+	return page.nrslr
+}
+
+// Values returns the slice of values for the current page or nil if there are no values.
+func (page NetworkRuleSetListResultPage) Values() []NetworkRuleSet {
+	if page.nrslr.IsEmpty() {
+		return nil
+	}
+	return *page.nrslr.Value
+}
+
+// Creates a new instance of the NetworkRuleSetListResultPage type.
+func NewNetworkRuleSetListResultPage(getNextPage func(context.Context, NetworkRuleSetListResult) (NetworkRuleSetListResult, error)) NetworkRuleSetListResultPage {
+	return NetworkRuleSetListResultPage{fn: getNextPage}
+}
+
+// NetworkRuleSetProperties networkRuleSet properties
+type NetworkRuleSetProperties struct {
+	// DefaultAction - Default Action for Network Rule Set. Possible values include: 'Allow', 'Deny'
+	DefaultAction DefaultAction `json:"defaultAction,omitempty"`
+	// VirtualNetworkRules - List VirtualNetwork Rules
+	VirtualNetworkRules *[]NWRuleSetVirtualNetworkRules `json:"virtualNetworkRules,omitempty"`
+	// IPRules - List of IpRules
+	IPRules *[]NWRuleSetIPRules `json:"ipRules,omitempty"`
+}
+
+// NWRuleSetIPRules description of NetWorkRuleSet - IpRules resource.
+type NWRuleSetIPRules struct {
+	// IPMask - IP Mask
+	IPMask *string `json:"ipMask,omitempty"`
+	// Action - The IP Filter Action. Possible values include: 'NetworkRuleIPActionAllow'
+	Action NetworkRuleIPAction `json:"action,omitempty"`
+}
+
+// NWRuleSetVirtualNetworkRules description of VirtualNetworkRules - NetworkRules resource.
+type NWRuleSetVirtualNetworkRules struct {
+	// Subnet - Subnet properties
+	Subnet *Subnet `json:"subnet,omitempty"`
+	// IgnoreMissingVnetServiceEndpoint - Value that indicates whether to ignore missing VNet Service Endpoint
+	IgnoreMissingVnetServiceEndpoint *bool `json:"ignoreMissingVnetServiceEndpoint,omitempty"`
+}
+
 // Operation a ServiceBus REST API operation
 type Operation struct {
-	// Name - Operation name: {provider}/{resource}/{operation}
+	// Name - READ-ONLY; Operation name: {provider}/{resource}/{operation}
 	Name *string `json:"name,omitempty"`
 	// Display - The object that represents the operation.
 	Display *OperationDisplay `json:"display,omitempty"`
@@ -1480,11 +1517,11 @@ type Operation struct {
 
 // OperationDisplay the object that represents the operation.
 type OperationDisplay struct {
-	// Provider - Service provider: Microsoft.ServiceBus
+	// Provider - READ-ONLY; Service provider: Microsoft.ServiceBus
 	Provider *string `json:"provider,omitempty"`
-	// Resource - Resource on which the operation is performed: Invoice, etc.
+	// Resource - READ-ONLY; Resource on which the operation is performed: Invoice, etc.
 	Resource *string `json:"resource,omitempty"`
-	// Operation - Operation type: Read, write, delete, etc.
+	// Operation - READ-ONLY; Operation type: Read, write, delete, etc.
 	Operation *string `json:"operation,omitempty"`
 }
 
@@ -1492,9 +1529,9 @@ type OperationDisplay struct {
 // operations and a URL link to get the next set of results.
 type OperationListResult struct {
 	autorest.Response `json:"-"`
-	// Value - List of ServiceBus operations supported by the Microsoft.ServiceBus resource provider.
+	// Value - READ-ONLY; List of ServiceBus operations supported by the Microsoft.ServiceBus resource provider.
 	Value *[]Operation `json:"value,omitempty"`
-	// NextLink - URL to get the next set of operation list results if there are any.
+	// NextLink - READ-ONLY; URL to get the next set of operation list results if there are any.
 	NextLink *string `json:"nextLink,omitempty"`
 }
 
@@ -1642,11 +1679,11 @@ type PremiumMessagingRegions struct {
 	Location *string `json:"location,omitempty"`
 	// Tags - Resource tags
 	Tags map[string]*string `json:"tags"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -1662,15 +1699,6 @@ func (pmr PremiumMessagingRegions) MarshalJSON() ([]byte, error) {
 	if pmr.Tags != nil {
 		objectMap["tags"] = pmr.Tags
 	}
-	if pmr.ID != nil {
-		objectMap["id"] = pmr.ID
-	}
-	if pmr.Name != nil {
-		objectMap["name"] = pmr.Name
-	}
-	if pmr.Type != nil {
-		objectMap["type"] = pmr.Type
-	}
 	return json.Marshal(objectMap)
 }
 
@@ -1679,7 +1707,7 @@ type PremiumMessagingRegionsListResult struct {
 	autorest.Response `json:"-"`
 	// Value - Result of the List PremiumMessagingRegions type.
 	Value *[]PremiumMessagingRegions `json:"value,omitempty"`
-	// NextLink - Link to the next set of results. Not empty if Value contains incomplete list of PremiumMessagingRegions.
+	// NextLink - READ-ONLY; Link to the next set of results. Not empty if Value contains incomplete list of PremiumMessagingRegions.
 	NextLink *string `json:"nextLink,omitempty"`
 }
 
@@ -1823,14 +1851,14 @@ func NewPremiumMessagingRegionsListResultPage(getNextPage func(context.Context, 
 
 // PremiumMessagingRegionsProperties ...
 type PremiumMessagingRegionsProperties struct {
-	// Code - Region code
+	// Code - READ-ONLY; Region code
 	Code *string `json:"code,omitempty"`
-	// FullName - Full name of the region
+	// FullName - READ-ONLY; Full name of the region
 	FullName *string `json:"fullName,omitempty"`
 }
 
 // RegenerateAccessKeyParameters parameters supplied to the Regenerate Authorization Rule operation,
-// specifies which key neeeds to be reset.
+// specifies which key needs to be reset.
 type RegenerateAccessKeyParameters struct {
 	// KeyType - The access key to regenerate. Possible values include: 'PrimaryKey', 'SecondaryKey'
 	KeyType KeyType `json:"keyType,omitempty"`
@@ -1840,11 +1868,11 @@ type RegenerateAccessKeyParameters struct {
 
 // Resource the Resource definition for other than namespace.
 type Resource struct {
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -1854,11 +1882,11 @@ type ResourceNamespacePatch struct {
 	Location *string `json:"location,omitempty"`
 	// Tags - Resource tags
 	Tags map[string]*string `json:"tags"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -1871,15 +1899,6 @@ func (rnp ResourceNamespacePatch) MarshalJSON() ([]byte, error) {
 	if rnp.Tags != nil {
 		objectMap["tags"] = rnp.Tags
 	}
-	if rnp.ID != nil {
-		objectMap["id"] = rnp.ID
-	}
-	if rnp.Name != nil {
-		objectMap["name"] = rnp.Name
-	}
-	if rnp.Type != nil {
-		objectMap["type"] = rnp.Type
-	}
 	return json.Marshal(objectMap)
 }
 
@@ -1888,11 +1907,11 @@ type Rule struct {
 	autorest.Response `json:"-"`
 	// Ruleproperties - Properties of Rule resource
 	*Ruleproperties `json:"properties,omitempty"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -1901,15 +1920,6 @@ func (r Rule) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if r.Ruleproperties != nil {
 		objectMap["properties"] = r.Ruleproperties
-	}
-	if r.ID != nil {
-		objectMap["id"] = r.ID
-	}
-	if r.Name != nil {
-		objectMap["name"] = r.Name
-	}
-	if r.Type != nil {
-		objectMap["type"] = r.Type
 	}
 	return json.Marshal(objectMap)
 }
@@ -2128,11 +2138,11 @@ type SBAuthorizationRule struct {
 	autorest.Response `json:"-"`
 	// SBAuthorizationRuleProperties - AuthorizationRule properties.
 	*SBAuthorizationRuleProperties `json:"properties,omitempty"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -2141,15 +2151,6 @@ func (sar SBAuthorizationRule) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if sar.SBAuthorizationRuleProperties != nil {
 		objectMap["properties"] = sar.SBAuthorizationRuleProperties
-	}
-	if sar.ID != nil {
-		objectMap["id"] = sar.ID
-	}
-	if sar.Name != nil {
-		objectMap["name"] = sar.Name
-	}
-	if sar.Type != nil {
-		objectMap["type"] = sar.Type
 	}
 	return json.Marshal(objectMap)
 }
@@ -2361,7 +2362,7 @@ type SBAuthorizationRuleProperties struct {
 // SBNamespace description of a namespace resource.
 type SBNamespace struct {
 	autorest.Response `json:"-"`
-	// Sku - Porperties of Sku
+	// Sku - Properties of Sku
 	Sku *SBSku `json:"sku,omitempty"`
 	// SBNamespaceProperties - Properties of the namespace.
 	*SBNamespaceProperties `json:"properties,omitempty"`
@@ -2369,11 +2370,11 @@ type SBNamespace struct {
 	Location *string `json:"location,omitempty"`
 	// Tags - Resource tags
 	Tags map[string]*string `json:"tags"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -2391,15 +2392,6 @@ func (sn SBNamespace) MarshalJSON() ([]byte, error) {
 	}
 	if sn.Tags != nil {
 		objectMap["tags"] = sn.Tags
-	}
-	if sn.ID != nil {
-		objectMap["id"] = sn.ID
-	}
-	if sn.Name != nil {
-		objectMap["name"] = sn.Name
-	}
-	if sn.Type != nil {
-		objectMap["type"] = sn.Type
 	}
 	return json.Marshal(objectMap)
 }
@@ -2636,21 +2628,21 @@ type SBNamespaceMigrate struct {
 
 // SBNamespaceProperties properties of the namespace.
 type SBNamespaceProperties struct {
-	// ProvisioningState - Provisioning state of the namespace.
+	// ProvisioningState - READ-ONLY; Provisioning state of the namespace.
 	ProvisioningState *string `json:"provisioningState,omitempty"`
-	// CreatedAt - The time the namespace was created.
+	// CreatedAt - READ-ONLY; The time the namespace was created.
 	CreatedAt *date.Time `json:"createdAt,omitempty"`
-	// UpdatedAt - The time the namespace was updated.
+	// UpdatedAt - READ-ONLY; The time the namespace was updated.
 	UpdatedAt *date.Time `json:"updatedAt,omitempty"`
-	// ServiceBusEndpoint - Endpoint you can use to perform Service Bus operations.
+	// ServiceBusEndpoint - READ-ONLY; Endpoint you can use to perform Service Bus operations.
 	ServiceBusEndpoint *string `json:"serviceBusEndpoint,omitempty"`
-	// MetricID - Identifier for Azure Insights metrics
+	// MetricID - READ-ONLY; Identifier for Azure Insights metrics
 	MetricID *string `json:"metricId,omitempty"`
 }
 
 // SBNamespaceUpdateParameters description of a namespace resource.
 type SBNamespaceUpdateParameters struct {
-	// Sku - Porperties of Sku
+	// Sku - Properties of Sku
 	Sku *SBSku `json:"sku,omitempty"`
 	// SBNamespaceProperties - Properties of the namespace.
 	*SBNamespaceProperties `json:"properties,omitempty"`
@@ -2658,11 +2650,11 @@ type SBNamespaceUpdateParameters struct {
 	Location *string `json:"location,omitempty"`
 	// Tags - Resource tags
 	Tags map[string]*string `json:"tags"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -2680,15 +2672,6 @@ func (snup SBNamespaceUpdateParameters) MarshalJSON() ([]byte, error) {
 	}
 	if snup.Tags != nil {
 		objectMap["tags"] = snup.Tags
-	}
-	if snup.ID != nil {
-		objectMap["id"] = snup.ID
-	}
-	if snup.Name != nil {
-		objectMap["name"] = snup.Name
-	}
-	if snup.Type != nil {
-		objectMap["type"] = snup.Type
 	}
 	return json.Marshal(objectMap)
 }
@@ -2776,11 +2759,11 @@ type SBQueue struct {
 	autorest.Response `json:"-"`
 	// SBQueueProperties - Queue Properties
 	*SBQueueProperties `json:"properties,omitempty"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -2789,15 +2772,6 @@ func (sq SBQueue) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if sq.SBQueueProperties != nil {
 		objectMap["properties"] = sq.SBQueueProperties
-	}
-	if sq.ID != nil {
-		objectMap["id"] = sq.ID
-	}
-	if sq.Name != nil {
-		objectMap["name"] = sq.Name
-	}
-	if sq.Type != nil {
-		objectMap["type"] = sq.Type
 	}
 	return json.Marshal(objectMap)
 }
@@ -3001,17 +2975,17 @@ func NewSBQueueListResultPage(getNextPage func(context.Context, SBQueueListResul
 
 // SBQueueProperties the Queue Properties definition.
 type SBQueueProperties struct {
-	// CountDetails - Message Count Details.
+	// CountDetails - READ-ONLY; Message Count Details.
 	CountDetails *MessageCountDetails `json:"countDetails,omitempty"`
-	// CreatedAt - The exact time the message was created.
+	// CreatedAt - READ-ONLY; The exact time the message was created.
 	CreatedAt *date.Time `json:"createdAt,omitempty"`
-	// UpdatedAt - The exact time the message was updated.
+	// UpdatedAt - READ-ONLY; The exact time the message was updated.
 	UpdatedAt *date.Time `json:"updatedAt,omitempty"`
-	// AccessedAt - Last time a message was sent, or the last time there was a receive request to this queue.
+	// AccessedAt - READ-ONLY; Last time a message was sent, or the last time there was a receive request to this queue.
 	AccessedAt *date.Time `json:"accessedAt,omitempty"`
-	// SizeInBytes - The size of the queue, in bytes.
+	// SizeInBytes - READ-ONLY; The size of the queue, in bytes.
 	SizeInBytes *int64 `json:"sizeInBytes,omitempty"`
-	// MessageCount - The number of messages in the queue.
+	// MessageCount - READ-ONLY; The number of messages in the queue.
 	MessageCount *int64 `json:"messageCount,omitempty"`
 	// LockDuration - ISO 8601 timespan duration of a peek-lock; that is, the amount of time that the message is locked for other receivers. The maximum value for LockDuration is 5 minutes; the default value is 1 minute.
 	LockDuration *string `json:"lockDuration,omitempty"`
@@ -3060,11 +3034,11 @@ type SBSubscription struct {
 	autorest.Response `json:"-"`
 	// SBSubscriptionProperties - Properties of subscriptions resource.
 	*SBSubscriptionProperties `json:"properties,omitempty"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -3073,15 +3047,6 @@ func (ss SBSubscription) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if ss.SBSubscriptionProperties != nil {
 		objectMap["properties"] = ss.SBSubscriptionProperties
-	}
-	if ss.ID != nil {
-		objectMap["id"] = ss.ID
-	}
-	if ss.Name != nil {
-		objectMap["name"] = ss.Name
-	}
-	if ss.Type != nil {
-		objectMap["type"] = ss.Type
 	}
 	return json.Marshal(objectMap)
 }
@@ -3285,15 +3250,15 @@ func NewSBSubscriptionListResultPage(getNextPage func(context.Context, SBSubscri
 
 // SBSubscriptionProperties description of Subscription Resource.
 type SBSubscriptionProperties struct {
-	// MessageCount - Number of messages.
+	// MessageCount - READ-ONLY; Number of messages.
 	MessageCount *int64 `json:"messageCount,omitempty"`
-	// CreatedAt - Exact time the message was created.
+	// CreatedAt - READ-ONLY; Exact time the message was created.
 	CreatedAt *date.Time `json:"createdAt,omitempty"`
-	// AccessedAt - Last time there was a receive request to this subscription.
+	// AccessedAt - READ-ONLY; Last time there was a receive request to this subscription.
 	AccessedAt *date.Time `json:"accessedAt,omitempty"`
-	// UpdatedAt - The exact time the message was updated.
+	// UpdatedAt - READ-ONLY; The exact time the message was updated.
 	UpdatedAt *date.Time `json:"updatedAt,omitempty"`
-	// CountDetails - Message count details
+	// CountDetails - READ-ONLY; Message count details
 	CountDetails *MessageCountDetails `json:"countDetails,omitempty"`
 	// LockDuration - ISO 8061 lock duration timespan for the subscription. The default value is 1 minute.
 	LockDuration *string `json:"lockDuration,omitempty"`
@@ -3326,11 +3291,11 @@ type SBTopic struct {
 	autorest.Response `json:"-"`
 	// SBTopicProperties - Properties of topic resource.
 	*SBTopicProperties `json:"properties,omitempty"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -3339,15 +3304,6 @@ func (st SBTopic) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if st.SBTopicProperties != nil {
 		objectMap["properties"] = st.SBTopicProperties
-	}
-	if st.ID != nil {
-		objectMap["id"] = st.ID
-	}
-	if st.Name != nil {
-		objectMap["name"] = st.Name
-	}
-	if st.Type != nil {
-		objectMap["type"] = st.Type
 	}
 	return json.Marshal(objectMap)
 }
@@ -3549,19 +3505,19 @@ func NewSBTopicListResultPage(getNextPage func(context.Context, SBTopicListResul
 	return SBTopicListResultPage{fn: getNextPage}
 }
 
-// SBTopicProperties the Tpoic Properties definition.
+// SBTopicProperties the Topic Properties definition.
 type SBTopicProperties struct {
-	// SizeInBytes - Size of the topic, in bytes.
+	// SizeInBytes - READ-ONLY; Size of the topic, in bytes.
 	SizeInBytes *int64 `json:"sizeInBytes,omitempty"`
-	// CreatedAt - Exact time the message was created.
+	// CreatedAt - READ-ONLY; Exact time the message was created.
 	CreatedAt *date.Time `json:"createdAt,omitempty"`
-	// UpdatedAt - The exact time the message was updated.
+	// UpdatedAt - READ-ONLY; The exact time the message was updated.
 	UpdatedAt *date.Time `json:"updatedAt,omitempty"`
-	// AccessedAt - Last time the message was sent, or a request was received, for this topic.
+	// AccessedAt - READ-ONLY; Last time the message was sent, or a request was received, for this topic.
 	AccessedAt *date.Time `json:"accessedAt,omitempty"`
-	// SubscriptionCount - Number of subscriptions.
+	// SubscriptionCount - READ-ONLY; Number of subscriptions.
 	SubscriptionCount *int32 `json:"subscriptionCount,omitempty"`
-	// CountDetails - Message count deatils
+	// CountDetails - READ-ONLY; Message count details
 	CountDetails *MessageCountDetails `json:"countDetails,omitempty"`
 	// DefaultMessageTimeToLive - ISO 8601 Default message timespan to live value. This is the duration after which the message expires, starting from when the message is sent to Service Bus. This is the default value used when TimeToLive is not set on a message itself.
 	DefaultMessageTimeToLive *string `json:"defaultMessageTimeToLive,omitempty"`
@@ -3607,17 +3563,23 @@ type SQLRuleAction struct {
 	RequiresPreprocessing *bool `json:"requiresPreprocessing,omitempty"`
 }
 
+// Subnet properties supplied for Subnet
+type Subnet struct {
+	// ID - Resource ID of Virtual Network Subnet
+	ID *string `json:"id,omitempty"`
+}
+
 // TrackedResource the Resource definition.
 type TrackedResource struct {
 	// Location - The Geo-location where the resource lives
 	Location *string `json:"location,omitempty"`
 	// Tags - Resource tags
 	Tags map[string]*string `json:"tags"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -3630,204 +3592,5 @@ func (tr TrackedResource) MarshalJSON() ([]byte, error) {
 	if tr.Tags != nil {
 		objectMap["tags"] = tr.Tags
 	}
-	if tr.ID != nil {
-		objectMap["id"] = tr.ID
-	}
-	if tr.Name != nil {
-		objectMap["name"] = tr.Name
-	}
-	if tr.Type != nil {
-		objectMap["type"] = tr.Type
-	}
 	return json.Marshal(objectMap)
-}
-
-// VirtualNetworkRule single item in a List or Get VirtualNetworkRules operation
-type VirtualNetworkRule struct {
-	autorest.Response `json:"-"`
-	// VirtualNetworkRuleProperties - Properties supplied to create or update VirtualNetworkRules
-	*VirtualNetworkRuleProperties `json:"properties,omitempty"`
-	// ID - Resource Id
-	ID *string `json:"id,omitempty"`
-	// Name - Resource name
-	Name *string `json:"name,omitempty"`
-	// Type - Resource type
-	Type *string `json:"type,omitempty"`
-}
-
-// MarshalJSON is the custom marshaler for VirtualNetworkRule.
-func (vnr VirtualNetworkRule) MarshalJSON() ([]byte, error) {
-	objectMap := make(map[string]interface{})
-	if vnr.VirtualNetworkRuleProperties != nil {
-		objectMap["properties"] = vnr.VirtualNetworkRuleProperties
-	}
-	if vnr.ID != nil {
-		objectMap["id"] = vnr.ID
-	}
-	if vnr.Name != nil {
-		objectMap["name"] = vnr.Name
-	}
-	if vnr.Type != nil {
-		objectMap["type"] = vnr.Type
-	}
-	return json.Marshal(objectMap)
-}
-
-// UnmarshalJSON is the custom unmarshaler for VirtualNetworkRule struct.
-func (vnr *VirtualNetworkRule) UnmarshalJSON(body []byte) error {
-	var m map[string]*json.RawMessage
-	err := json.Unmarshal(body, &m)
-	if err != nil {
-		return err
-	}
-	for k, v := range m {
-		switch k {
-		case "properties":
-			if v != nil {
-				var virtualNetworkRuleProperties VirtualNetworkRuleProperties
-				err = json.Unmarshal(*v, &virtualNetworkRuleProperties)
-				if err != nil {
-					return err
-				}
-				vnr.VirtualNetworkRuleProperties = &virtualNetworkRuleProperties
-			}
-		case "id":
-			if v != nil {
-				var ID string
-				err = json.Unmarshal(*v, &ID)
-				if err != nil {
-					return err
-				}
-				vnr.ID = &ID
-			}
-		case "name":
-			if v != nil {
-				var name string
-				err = json.Unmarshal(*v, &name)
-				if err != nil {
-					return err
-				}
-				vnr.Name = &name
-			}
-		case "type":
-			if v != nil {
-				var typeVar string
-				err = json.Unmarshal(*v, &typeVar)
-				if err != nil {
-					return err
-				}
-				vnr.Type = &typeVar
-			}
-		}
-	}
-
-	return nil
-}
-
-// VirtualNetworkRuleListResult the response from the List namespace operation.
-type VirtualNetworkRuleListResult struct {
-	autorest.Response `json:"-"`
-	// Value - Result of the List VirtualNetwork Rules operation.
-	Value *[]VirtualNetworkRule `json:"value,omitempty"`
-	// NextLink - Link to the next set of results. Not empty if Value contains an incomplete list of VirtualNetwork Rules
-	NextLink *string `json:"nextLink,omitempty"`
-}
-
-// VirtualNetworkRuleListResultIterator provides access to a complete listing of VirtualNetworkRule values.
-type VirtualNetworkRuleListResultIterator struct {
-	i    int
-	page VirtualNetworkRuleListResultPage
-}
-
-// Next advances to the next value.  If there was an error making
-// the request the iterator does not advance and the error is returned.
-func (iter *VirtualNetworkRuleListResultIterator) Next() error {
-	iter.i++
-	if iter.i < len(iter.page.Values()) {
-		return nil
-	}
-	err := iter.page.Next()
-	if err != nil {
-		iter.i--
-		return err
-	}
-	iter.i = 0
-	return nil
-}
-
-// NotDone returns true if the enumeration should be started or is not yet complete.
-func (iter VirtualNetworkRuleListResultIterator) NotDone() bool {
-	return iter.page.NotDone() && iter.i < len(iter.page.Values())
-}
-
-// Response returns the raw server response from the last page request.
-func (iter VirtualNetworkRuleListResultIterator) Response() VirtualNetworkRuleListResult {
-	return iter.page.Response()
-}
-
-// Value returns the current value or a zero-initialized value if the
-// iterator has advanced beyond the end of the collection.
-func (iter VirtualNetworkRuleListResultIterator) Value() VirtualNetworkRule {
-	if !iter.page.NotDone() {
-		return VirtualNetworkRule{}
-	}
-	return iter.page.Values()[iter.i]
-}
-
-// IsEmpty returns true if the ListResult contains no values.
-func (vnrlr VirtualNetworkRuleListResult) IsEmpty() bool {
-	return vnrlr.Value == nil || len(*vnrlr.Value) == 0
-}
-
-// virtualNetworkRuleListResultPreparer prepares a request to retrieve the next set of results.
-// It returns nil if no more results exist.
-func (vnrlr VirtualNetworkRuleListResult) virtualNetworkRuleListResultPreparer() (*http.Request, error) {
-	if vnrlr.NextLink == nil || len(to.String(vnrlr.NextLink)) < 1 {
-		return nil, nil
-	}
-	return autorest.Prepare(&http.Request{},
-		autorest.AsJSON(),
-		autorest.AsGet(),
-		autorest.WithBaseURL(to.String(vnrlr.NextLink)))
-}
-
-// VirtualNetworkRuleListResultPage contains a page of VirtualNetworkRule values.
-type VirtualNetworkRuleListResultPage struct {
-	fn    func(VirtualNetworkRuleListResult) (VirtualNetworkRuleListResult, error)
-	vnrlr VirtualNetworkRuleListResult
-}
-
-// Next advances to the next page of values.  If there was an error making
-// the request the page does not advance and the error is returned.
-func (page *VirtualNetworkRuleListResultPage) Next() error {
-	next, err := page.fn(page.vnrlr)
-	if err != nil {
-		return err
-	}
-	page.vnrlr = next
-	return nil
-}
-
-// NotDone returns true if the page enumeration should be started or is not yet complete.
-func (page VirtualNetworkRuleListResultPage) NotDone() bool {
-	return !page.vnrlr.IsEmpty()
-}
-
-// Response returns the raw server response from the last page request.
-func (page VirtualNetworkRuleListResultPage) Response() VirtualNetworkRuleListResult {
-	return page.vnrlr
-}
-
-// Values returns the slice of values for the current page or nil if there are no values.
-func (page VirtualNetworkRuleListResultPage) Values() []VirtualNetworkRule {
-	if page.vnrlr.IsEmpty() {
-		return nil
-	}
-	return *page.vnrlr.Value
-}
-
-// VirtualNetworkRuleProperties properties supplied to create or update VirtualNetworkRules
-type VirtualNetworkRuleProperties struct {
-	// VirtualNetworkSubnetID - Resource ID of Virtual Network Subnet
-	VirtualNetworkSubnetID *string `json:"virtualNetworkSubnetId,omitempty"`
 }

@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,6 +34,13 @@ type KeyName = original.KeyName
 const (
 	Key1 KeyName = original.Key1
 	Key2 KeyName = original.Key2
+)
+
+type NetworkRuleAction = original.NetworkRuleAction
+
+const (
+	Allow NetworkRuleAction = original.Allow
+	Deny  NetworkRuleAction = original.Deny
 )
 
 type ProvisioningState = original.ProvisioningState
@@ -91,23 +98,25 @@ const (
 )
 
 type Account = original.Account
-type AccountCreateParameters = original.AccountCreateParameters
+type AccountAPIProperties = original.AccountAPIProperties
 type AccountEnumerateSkusResult = original.AccountEnumerateSkusResult
 type AccountKeys = original.AccountKeys
 type AccountListResult = original.AccountListResult
 type AccountListResultIterator = original.AccountListResultIterator
 type AccountListResultPage = original.AccountListResultPage
 type AccountProperties = original.AccountProperties
-type AccountUpdateParameters = original.AccountUpdateParameters
 type AccountsClient = original.AccountsClient
 type BaseClient = original.BaseClient
-type CheckSkuAvailabilityClient = original.CheckSkuAvailabilityClient
+type CheckDomainAvailabilityParameter = original.CheckDomainAvailabilityParameter
+type CheckDomainAvailabilityResult = original.CheckDomainAvailabilityResult
 type CheckSkuAvailabilityParameter = original.CheckSkuAvailabilityParameter
 type CheckSkuAvailabilityResult = original.CheckSkuAvailabilityResult
 type CheckSkuAvailabilityResultList = original.CheckSkuAvailabilityResultList
 type Error = original.Error
 type ErrorBody = original.ErrorBody
+type IPRule = original.IPRule
 type MetricName = original.MetricName
+type NetworkRuleSet = original.NetworkRuleSet
 type OperationDisplayInfo = original.OperationDisplayInfo
 type OperationEntity = original.OperationEntity
 type OperationEntityListResult = original.OperationEntityListResult
@@ -126,6 +135,7 @@ type ResourceSkusResultPage = original.ResourceSkusResultPage
 type Sku = original.Sku
 type Usage = original.Usage
 type UsagesResult = original.UsagesResult
+type VirtualNetworkRule = original.VirtualNetworkRule
 
 func New(subscriptionID string) BaseClient {
 	return original.New(subscriptionID)
@@ -141,12 +151,6 @@ func NewAccountsClient(subscriptionID string) AccountsClient {
 }
 func NewAccountsClientWithBaseURI(baseURI string, subscriptionID string) AccountsClient {
 	return original.NewAccountsClientWithBaseURI(baseURI, subscriptionID)
-}
-func NewCheckSkuAvailabilityClient(subscriptionID string) CheckSkuAvailabilityClient {
-	return original.NewCheckSkuAvailabilityClient(subscriptionID)
-}
-func NewCheckSkuAvailabilityClientWithBaseURI(baseURI string, subscriptionID string) CheckSkuAvailabilityClient {
-	return original.NewCheckSkuAvailabilityClientWithBaseURI(baseURI, subscriptionID)
 }
 func NewOperationEntityListResultIterator(page OperationEntityListResultPage) OperationEntityListResultIterator {
 	return original.NewOperationEntityListResultIterator(page)
@@ -177,6 +181,9 @@ func NewWithBaseURI(baseURI string, subscriptionID string) BaseClient {
 }
 func PossibleKeyNameValues() []KeyName {
 	return original.PossibleKeyNameValues()
+}
+func PossibleNetworkRuleActionValues() []NetworkRuleAction {
+	return original.PossibleNetworkRuleActionValues()
 }
 func PossibleProvisioningStateValues() []ProvisioningState {
 	return original.PossibleProvisioningStateValues()

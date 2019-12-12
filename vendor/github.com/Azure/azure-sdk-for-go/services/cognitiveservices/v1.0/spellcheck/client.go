@@ -178,7 +178,7 @@ func NewWithoutDefaults(endpoint string) BaseClient {
 // checked for grammar or spelling errors. The combined length of the text string, preContextText string, and
 // postContextText string may not exceed 10,000 characters. You may specify this parameter in the query string
 // of a GET request or in the body of a POST request.
-func (client BaseClient) SpellCheckerMethod(ctx context.Context, textParameter string, acceptLanguage string, pragma string, userAgent string, clientID string, clientIP string, location string, actionType ActionType, appName string, countryCode string, clientMachineName string, docID string, market string, sessionID string, setLang string, userID string, mode string, preContextText string, postContextText string) (result SpellCheck, err error) {
+func (client BaseClient) SpellCheckerMethod(ctx context.Context, textParameter string, acceptLanguage string, pragma string, userAgent string, clientID string, clientIP string, location string, actionType ActionType, appName string, countryCode string, clientMachineName string, docID string, market string, sessionID string, setLang string, userID string, mode Mode, preContextText string, postContextText string) (result SpellCheck, err error) {
 	if tracing.IsEnabled() {
 		ctx = tracing.StartSpan(ctx, fqdn+"/BaseClient.SpellCheckerMethod")
 		defer func() {
@@ -211,12 +211,14 @@ func (client BaseClient) SpellCheckerMethod(ctx context.Context, textParameter s
 }
 
 // SpellCheckerMethodPreparer prepares the SpellCheckerMethod request.
-func (client BaseClient) SpellCheckerMethodPreparer(ctx context.Context, textParameter string, acceptLanguage string, pragma string, userAgent string, clientID string, clientIP string, location string, actionType ActionType, appName string, countryCode string, clientMachineName string, docID string, market string, sessionID string, setLang string, userID string, mode string, preContextText string, postContextText string) (*http.Request, error) {
+func (client BaseClient) SpellCheckerMethodPreparer(ctx context.Context, textParameter string, acceptLanguage string, pragma string, userAgent string, clientID string, clientIP string, location string, actionType ActionType, appName string, countryCode string, clientMachineName string, docID string, market string, sessionID string, setLang string, userID string, mode Mode, preContextText string, postContextText string) (*http.Request, error) {
 	urlParameters := map[string]interface{}{
 		"Endpoint": client.Endpoint,
 	}
 
-	queryParameters := map[string]interface{}{}
+	queryParameters := map[string]interface{}{
+		"Text": autorest.Encode("query", textParameter),
+	}
 	if len(string(actionType)) > 0 {
 		queryParameters["ActionType"] = autorest.Encode("query", actionType)
 	}
@@ -244,18 +246,14 @@ func (client BaseClient) SpellCheckerMethodPreparer(ctx context.Context, textPar
 	if len(userID) > 0 {
 		queryParameters["UserId"] = autorest.Encode("query", userID)
 	}
-
-	formDataParameters := map[string]interface{}{
-		"Text": textParameter,
-	}
 	if len(string(mode)) > 0 {
-		formDataParameters["Mode"] = mode
+		queryParameters["Mode"] = autorest.Encode("query", mode)
 	}
 	if len(preContextText) > 0 {
-		formDataParameters["PreContextText"] = preContextText
+		queryParameters["PreContextText"] = autorest.Encode("query", preContextText)
 	}
 	if len(postContextText) > 0 {
-		formDataParameters["PostContextText"] = postContextText
+		queryParameters["PostContextText"] = autorest.Encode("query", postContextText)
 	}
 
 	preparer := autorest.CreatePreparer(
@@ -263,7 +261,6 @@ func (client BaseClient) SpellCheckerMethodPreparer(ctx context.Context, textPar
 		autorest.WithCustomBaseURL("{Endpoint}/bing/v7.0", urlParameters),
 		autorest.WithPath("/spellcheck"),
 		autorest.WithQueryParameters(queryParameters),
-		autorest.WithFormData(autorest.MapToValues(formDataParameters)),
 		autorest.WithHeader("X-BingApis-SDK", "true"))
 	if len(acceptLanguage) > 0 {
 		preparer = autorest.DecoratePreparer(preparer,
@@ -295,8 +292,8 @@ func (client BaseClient) SpellCheckerMethodPreparer(ctx context.Context, textPar
 // SpellCheckerMethodSender sends the SpellCheckerMethod request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) SpellCheckerMethodSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // SpellCheckerMethodResponder handles the response to the SpellCheckerMethod request. The method always

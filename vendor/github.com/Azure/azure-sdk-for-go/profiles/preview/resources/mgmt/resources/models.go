@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package resources
 import (
 	"context"
 
-	original "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
+	original "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-05-01/resources"
 )
 
 const (
@@ -57,6 +57,7 @@ type AliasType = original.AliasType
 type BaseClient = original.BaseClient
 type BasicDependency = original.BasicDependency
 type Client = original.Client
+type CloudError = original.CloudError
 type CreateOrUpdateByIDFuture = original.CreateOrUpdateByIDFuture
 type CreateOrUpdateFuture = original.CreateOrUpdateFuture
 type DebugSetting = original.DebugSetting
@@ -80,10 +81,14 @@ type DeploymentProperties = original.DeploymentProperties
 type DeploymentPropertiesExtended = original.DeploymentPropertiesExtended
 type DeploymentValidateResult = original.DeploymentValidateResult
 type DeploymentsClient = original.DeploymentsClient
+type DeploymentsCreateOrUpdateAtManagementGroupScopeFuture = original.DeploymentsCreateOrUpdateAtManagementGroupScopeFuture
 type DeploymentsCreateOrUpdateAtSubscriptionScopeFuture = original.DeploymentsCreateOrUpdateAtSubscriptionScopeFuture
 type DeploymentsCreateOrUpdateFuture = original.DeploymentsCreateOrUpdateFuture
+type DeploymentsDeleteAtManagementGroupScopeFuture = original.DeploymentsDeleteAtManagementGroupScopeFuture
 type DeploymentsDeleteAtSubscriptionScopeFuture = original.DeploymentsDeleteAtSubscriptionScopeFuture
 type DeploymentsDeleteFuture = original.DeploymentsDeleteFuture
+type ErrorAdditionalInfo = original.ErrorAdditionalInfo
+type ErrorResponse = original.ErrorResponse
 type ExportTemplateRequest = original.ExportTemplateRequest
 type GenericResource = original.GenericResource
 type GenericResourceFilter = original.GenericResourceFilter
@@ -134,6 +139,7 @@ type TagsListResult = original.TagsListResult
 type TagsListResultIterator = original.TagsListResultIterator
 type TagsListResultPage = original.TagsListResultPage
 type TargetResource = original.TargetResource
+type TemplateHashResult = original.TemplateHashResult
 type TemplateLink = original.TemplateLink
 type UpdateByIDFuture = original.UpdateByIDFuture
 type UpdateFuture = original.UpdateFuture

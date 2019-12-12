@@ -37,11 +37,23 @@ type AvailabilitySetsClientAPI interface {
 	Get(ctx context.Context, resourceGroupName string, availabilitySetName string) (result compute.AvailabilitySet, err error)
 	List(ctx context.Context, resourceGroupName string) (result compute.AvailabilitySetListResultPage, err error)
 	ListAvailableSizes(ctx context.Context, resourceGroupName string, availabilitySetName string) (result compute.VirtualMachineSizeListResult, err error)
-	ListBySubscription(ctx context.Context) (result compute.AvailabilitySetListResultPage, err error)
+	ListBySubscription(ctx context.Context, expand string) (result compute.AvailabilitySetListResultPage, err error)
 	Update(ctx context.Context, resourceGroupName string, availabilitySetName string, parameters compute.AvailabilitySetUpdate) (result compute.AvailabilitySet, err error)
 }
 
 var _ AvailabilitySetsClientAPI = (*compute.AvailabilitySetsClient)(nil)
+
+// ProximityPlacementGroupsClientAPI contains the set of methods on the ProximityPlacementGroupsClient type.
+type ProximityPlacementGroupsClientAPI interface {
+	CreateOrUpdate(ctx context.Context, resourceGroupName string, proximityPlacementGroupName string, parameters compute.ProximityPlacementGroup) (result compute.ProximityPlacementGroup, err error)
+	Delete(ctx context.Context, resourceGroupName string, proximityPlacementGroupName string) (result autorest.Response, err error)
+	Get(ctx context.Context, resourceGroupName string, proximityPlacementGroupName string) (result compute.ProximityPlacementGroup, err error)
+	ListByResourceGroup(ctx context.Context, resourceGroupName string) (result compute.ProximityPlacementGroupListResultPage, err error)
+	ListBySubscription(ctx context.Context) (result compute.ProximityPlacementGroupListResultPage, err error)
+	Update(ctx context.Context, resourceGroupName string, proximityPlacementGroupName string, parameters compute.ProximityPlacementGroupUpdate) (result compute.ProximityPlacementGroup, err error)
+}
+
+var _ ProximityPlacementGroupsClientAPI = (*compute.ProximityPlacementGroupsClient)(nil)
 
 // VirtualMachineExtensionImagesClientAPI contains the set of methods on the VirtualMachineExtensionImagesClient type.
 type VirtualMachineExtensionImagesClientAPI interface {

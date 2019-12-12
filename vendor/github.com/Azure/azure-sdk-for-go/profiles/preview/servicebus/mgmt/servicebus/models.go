@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,6 +35,13 @@ const (
 	Listen AccessRights = original.Listen
 	Manage AccessRights = original.Manage
 	Send   AccessRights = original.Send
+)
+
+type DefaultAction = original.DefaultAction
+
+const (
+	Allow DefaultAction = original.Allow
+	Deny  DefaultAction = original.Deny
 )
 
 type EncodingCaptureDescription = original.EncodingCaptureDescription
@@ -80,6 +87,12 @@ const (
 	Mixed           NameSpaceType = original.Mixed
 	NotificationHub NameSpaceType = original.NotificationHub
 	Relay           NameSpaceType = original.Relay
+)
+
+type NetworkRuleIPAction = original.NetworkRuleIPAction
+
+const (
+	NetworkRuleIPActionAllow NetworkRuleIPAction = original.NetworkRuleIPActionAllow
 )
 
 type ProvisioningStateDR = original.ProvisioningStateDR
@@ -156,9 +169,16 @@ type MigrationConfigProperties = original.MigrationConfigProperties
 type MigrationConfigPropertiesProperties = original.MigrationConfigPropertiesProperties
 type MigrationConfigsClient = original.MigrationConfigsClient
 type MigrationConfigsCreateAndStartMigrationFuture = original.MigrationConfigsCreateAndStartMigrationFuture
+type NWRuleSetIPRules = original.NWRuleSetIPRules
+type NWRuleSetVirtualNetworkRules = original.NWRuleSetVirtualNetworkRules
 type NamespacesClient = original.NamespacesClient
 type NamespacesCreateOrUpdateFuture = original.NamespacesCreateOrUpdateFuture
 type NamespacesDeleteFuture = original.NamespacesDeleteFuture
+type NetworkRuleSet = original.NetworkRuleSet
+type NetworkRuleSetListResult = original.NetworkRuleSetListResult
+type NetworkRuleSetListResultIterator = original.NetworkRuleSetListResultIterator
+type NetworkRuleSetListResultPage = original.NetworkRuleSetListResultPage
+type NetworkRuleSetProperties = original.NetworkRuleSetProperties
 type Operation = original.Operation
 type OperationDisplay = original.OperationDisplay
 type OperationListResult = original.OperationListResult
@@ -212,6 +232,7 @@ type SBTopicListResultPage = original.SBTopicListResultPage
 type SBTopicProperties = original.SBTopicProperties
 type SQLFilter = original.SQLFilter
 type SQLRuleAction = original.SQLRuleAction
+type Subnet = original.Subnet
 type SubscriptionsClient = original.SubscriptionsClient
 type TopicsClient = original.TopicsClient
 type TrackedResource = original.TrackedResource
@@ -260,6 +281,12 @@ func NewNamespacesClient(subscriptionID string) NamespacesClient {
 }
 func NewNamespacesClientWithBaseURI(baseURI string, subscriptionID string) NamespacesClient {
 	return original.NewNamespacesClientWithBaseURI(baseURI, subscriptionID)
+}
+func NewNetworkRuleSetListResultIterator(page NetworkRuleSetListResultPage) NetworkRuleSetListResultIterator {
+	return original.NewNetworkRuleSetListResultIterator(page)
+}
+func NewNetworkRuleSetListResultPage(getNextPage func(context.Context, NetworkRuleSetListResult) (NetworkRuleSetListResult, error)) NetworkRuleSetListResultPage {
+	return original.NewNetworkRuleSetListResultPage(getNextPage)
 }
 func NewOperationListResultIterator(page OperationListResultPage) OperationListResultIterator {
 	return original.NewOperationListResultIterator(page)
@@ -357,6 +384,9 @@ func NewWithBaseURI(baseURI string, subscriptionID string) BaseClient {
 func PossibleAccessRightsValues() []AccessRights {
 	return original.PossibleAccessRightsValues()
 }
+func PossibleDefaultActionValues() []DefaultAction {
+	return original.PossibleDefaultActionValues()
+}
 func PossibleEncodingCaptureDescriptionValues() []EncodingCaptureDescription {
 	return original.PossibleEncodingCaptureDescriptionValues()
 }
@@ -371,6 +401,9 @@ func PossibleKeyTypeValues() []KeyType {
 }
 func PossibleNameSpaceTypeValues() []NameSpaceType {
 	return original.PossibleNameSpaceTypeValues()
+}
+func PossibleNetworkRuleIPActionValues() []NetworkRuleIPAction {
+	return original.PossibleNetworkRuleIPActionValues()
 }
 func PossibleProvisioningStateDRValues() []ProvisioningStateDR {
 	return original.PossibleProvisioningStateDRValues()

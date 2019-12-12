@@ -95,8 +95,8 @@ func (client PermissionsClient) AddPreparer(ctx context.Context, appID uuid.UUID
 // AddSender sends the Add request. The method will close the
 // http.Response Body if it receives an error.
 func (client PermissionsClient) AddSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // AddResponder handles the response to the Add request. The method always
@@ -171,8 +171,8 @@ func (client PermissionsClient) DeletePreparer(ctx context.Context, appID uuid.U
 // DeleteSender sends the Delete request. The method will close the
 // http.Response Body if it receives an error.
 func (client PermissionsClient) DeleteSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // DeleteResponder handles the response to the Delete request. The method always
@@ -243,8 +243,8 @@ func (client PermissionsClient) ListPreparer(ctx context.Context, appID uuid.UUI
 // ListSender sends the List request. The method will close the
 // http.Response Body if it receives an error.
 func (client PermissionsClient) ListSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListResponder handles the response to the List request. The method always
@@ -260,11 +260,11 @@ func (client PermissionsClient) ListResponder(resp *http.Response) (result UserA
 	return
 }
 
-// Update replaces the current users access list with the one sent in the body. If an empty list is sent, all access to
-// other users will be removed.
+// Update replaces the current user access list with the new list sent in the body. If an empty list is sent, all
+// access to other users will be removed.
 // Parameters:
 // appID - the application ID.
-// collaborators - a model containing a list of user's email addresses.
+// collaborators - a model containing a list of user email addresses.
 func (client PermissionsClient) Update(ctx context.Context, appID uuid.UUID, collaborators CollaboratorsArray) (result OperationStatus, err error) {
 	if tracing.IsEnabled() {
 		ctx = tracing.StartSpan(ctx, fqdn+"/PermissionsClient.Update")
@@ -319,8 +319,8 @@ func (client PermissionsClient) UpdatePreparer(ctx context.Context, appID uuid.U
 // UpdateSender sends the Update request. The method will close the
 // http.Response Body if it receives an error.
 func (client PermissionsClient) UpdateSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // UpdateResponder handles the response to the Update request. The method always

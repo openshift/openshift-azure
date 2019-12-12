@@ -32,13 +32,13 @@ type ConnectionTypeClient struct {
 }
 
 // NewConnectionTypeClient creates an instance of the ConnectionTypeClient client.
-func NewConnectionTypeClient(subscriptionID string, countType1 CountType) ConnectionTypeClient {
-	return NewConnectionTypeClientWithBaseURI(DefaultBaseURI, subscriptionID, countType1)
+func NewConnectionTypeClient(subscriptionID string) ConnectionTypeClient {
+	return NewConnectionTypeClientWithBaseURI(DefaultBaseURI, subscriptionID)
 }
 
 // NewConnectionTypeClientWithBaseURI creates an instance of the ConnectionTypeClient client.
-func NewConnectionTypeClientWithBaseURI(baseURI string, subscriptionID string, countType1 CountType) ConnectionTypeClient {
-	return ConnectionTypeClient{NewWithBaseURI(baseURI, subscriptionID, countType1)}
+func NewConnectionTypeClientWithBaseURI(baseURI string, subscriptionID string) ConnectionTypeClient {
+	return ConnectionTypeClient{NewWithBaseURI(baseURI, subscriptionID)}
 }
 
 // CreateOrUpdate create a connection type.
@@ -118,8 +118,8 @@ func (client ConnectionTypeClient) CreateOrUpdatePreparer(ctx context.Context, r
 // CreateOrUpdateSender sends the CreateOrUpdate request. The method will close the
 // http.Response Body if it receives an error.
 func (client ConnectionTypeClient) CreateOrUpdateSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // CreateOrUpdateResponder handles the response to the CreateOrUpdate request. The method always
@@ -205,8 +205,8 @@ func (client ConnectionTypeClient) DeletePreparer(ctx context.Context, resourceG
 // DeleteSender sends the Delete request. The method will close the
 // http.Response Body if it receives an error.
 func (client ConnectionTypeClient) DeleteSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // DeleteResponder handles the response to the Delete request. The method always
@@ -291,8 +291,8 @@ func (client ConnectionTypeClient) GetPreparer(ctx context.Context, resourceGrou
 // GetSender sends the Get request. The method will close the
 // http.Response Body if it receives an error.
 func (client ConnectionTypeClient) GetSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetResponder handles the response to the Get request. The method always
@@ -377,8 +377,8 @@ func (client ConnectionTypeClient) ListByAutomationAccountPreparer(ctx context.C
 // ListByAutomationAccountSender sends the ListByAutomationAccount request. The method will close the
 // http.Response Body if it receives an error.
 func (client ConnectionTypeClient) ListByAutomationAccountSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListByAutomationAccountResponder handles the response to the ListByAutomationAccount request. The method always

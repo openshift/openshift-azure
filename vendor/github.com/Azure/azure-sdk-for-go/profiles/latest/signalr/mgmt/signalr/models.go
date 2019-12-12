@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,6 +27,13 @@ import (
 
 const (
 	DefaultBaseURI = original.DefaultBaseURI
+)
+
+type FeatureFlags = original.FeatureFlags
+
+const (
+	EnableConnectivityLogs FeatureFlags = original.EnableConnectivityLogs
+	ServiceMode            FeatureFlags = original.ServiceMode
 )
 
 type KeyType = original.KeyType
@@ -61,12 +68,17 @@ const (
 
 type BaseClient = original.BaseClient
 type Client = original.Client
+type CorsSettings = original.CorsSettings
 type CreateOrUpdateFuture = original.CreateOrUpdateFuture
 type CreateOrUpdateProperties = original.CreateOrUpdateProperties
 type CreateParameters = original.CreateParameters
 type DeleteFuture = original.DeleteFuture
 type Dimension = original.Dimension
+type ErrorResponse = original.ErrorResponse
+type ErrorResponseBody = original.ErrorResponseBody
+type Feature = original.Feature
 type Keys = original.Keys
+type LogSpecification = original.LogSpecification
 type MetricSpecification = original.MetricSpecification
 type NameAvailability = original.NameAvailability
 type NameAvailabilityParameters = original.NameAvailabilityParameters
@@ -86,6 +98,7 @@ type ResourceListIterator = original.ResourceListIterator
 type ResourceListPage = original.ResourceListPage
 type ResourceSku = original.ResourceSku
 type ResourceType = original.ResourceType
+type RestartFuture = original.RestartFuture
 type ServiceSpecification = original.ServiceSpecification
 type TrackedResource = original.TrackedResource
 type UpdateFuture = original.UpdateFuture
@@ -138,6 +151,9 @@ func NewUsagesClientWithBaseURI(baseURI string, subscriptionID string) UsagesCli
 }
 func NewWithBaseURI(baseURI string, subscriptionID string) BaseClient {
 	return original.NewWithBaseURI(baseURI, subscriptionID)
+}
+func PossibleFeatureFlagsValues() []FeatureFlags {
+	return original.PossibleFeatureFlagsValues()
 }
 func PossibleKeyTypeValues() []KeyType {
 	return original.PossibleKeyTypeValues()

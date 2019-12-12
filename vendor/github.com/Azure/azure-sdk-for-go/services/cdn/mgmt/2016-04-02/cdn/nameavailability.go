@@ -26,9 +26,7 @@ import (
 	"net/http"
 )
 
-// NameAvailabilityClient is the use these APIs to manage Azure CDN resources through the Azure Resource Manager. You
-// must make sure that requests made to these resources are secure. For more information, see
-// https://msdn.microsoft.com/en-us/library/azure/dn790557.aspx.
+// NameAvailabilityClient is the cdn Management Client
 type NameAvailabilityClient struct {
 	BaseClient
 }
@@ -105,8 +103,8 @@ func (client NameAvailabilityClient) CheckNameAvailabilityPreparer(ctx context.C
 // CheckNameAvailabilitySender sends the CheckNameAvailability request. The method will close the
 // http.Response Body if it receives an error.
 func (client NameAvailabilityClient) CheckNameAvailabilitySender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // CheckNameAvailabilityResponder handles the response to the CheckNameAvailability request. The method always

@@ -69,7 +69,8 @@ func NewWithoutDefaults(endpoint string) BaseClient {
 // or a line drawing. Color - determines the accent color, dominant color, and whether an image is black&white.
 // Adult - detects if the image is pornographic in nature (depicts nudity or a sex act).  Sexually suggestive
 // content is also detected. Objects - detects various objects within an image, including the approximate
-// location. The Objects argument is only available in English.
+// location. The Objects argument is only available in English. Brands - detects various brands within an
+// image, including the approximate location. The Brands argument is only available in English.
 // details - a string indicating which domain-specific details to return. Multiple values should be
 // comma-separated. Valid visual feature types include: Celebrities - identifies celebrities if detected in the
 // image, Landmarks - identifies notable landmarks in the image.
@@ -146,8 +147,8 @@ func (client BaseClient) AnalyzeImagePreparer(ctx context.Context, imageURL Imag
 // AnalyzeImageSender sends the AnalyzeImage request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) AnalyzeImageSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // AnalyzeImageResponder handles the response to the AnalyzeImage request. The method always
@@ -243,8 +244,8 @@ func (client BaseClient) AnalyzeImageByDomainPreparer(ctx context.Context, model
 // AnalyzeImageByDomainSender sends the AnalyzeImageByDomain request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) AnalyzeImageByDomainSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // AnalyzeImageByDomainResponder handles the response to the AnalyzeImageByDomain request. The method always
@@ -334,8 +335,8 @@ func (client BaseClient) AnalyzeImageByDomainInStreamPreparer(ctx context.Contex
 // AnalyzeImageByDomainInStreamSender sends the AnalyzeImageByDomainInStream request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) AnalyzeImageByDomainInStreamSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // AnalyzeImageByDomainInStreamResponder handles the response to the AnalyzeImageByDomainInStream request. The method always
@@ -367,7 +368,8 @@ func (client BaseClient) AnalyzeImageByDomainInStreamResponder(resp *http.Respon
 // or a line drawing. Color - determines the accent color, dominant color, and whether an image is black&white.
 // Adult - detects if the image is pornographic in nature (depicts nudity or a sex act).  Sexually suggestive
 // content is also detected. Objects - detects various objects within an image, including the approximate
-// location. The Objects argument is only available in English.
+// location. The Objects argument is only available in English. Brands - detects various brands within an
+// image, including the approximate location. The Brands argument is only available in English.
 // details - a string indicating which domain-specific details to return. Multiple values should be
 // comma-separated. Valid visual feature types include: Celebrities - identifies celebrities if detected in the
 // image, Landmarks - identifies notable landmarks in the image.
@@ -438,8 +440,8 @@ func (client BaseClient) AnalyzeImageInStreamPreparer(ctx context.Context, image
 // AnalyzeImageInStreamSender sends the AnalyzeImageInStream request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) AnalyzeImageInStreamSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // AnalyzeImageInStreamResponder handles the response to the AnalyzeImageInStream request. The method always
@@ -452,6 +454,156 @@ func (client BaseClient) AnalyzeImageInStreamResponder(resp *http.Response) (res
 		autorest.ByUnmarshallingJSON(&result),
 		autorest.ByClosing())
 	result.Response = autorest.Response{Response: resp}
+	return
+}
+
+// BatchReadFile use this interface to get the result of a Read operation, employing the state-of-the-art Optical
+// Character Recognition (OCR) algorithms optimized for text-heavy documents. When you use the Read File interface, the
+// response contains a field called 'Operation-Location'. The 'Operation-Location' field contains the URL that you must
+// use for your 'GetReadOperationResult' operation to access OCR results.​
+// Parameters:
+// imageURL - a JSON document with a URL pointing to the image that is to be analyzed.
+func (client BaseClient) BatchReadFile(ctx context.Context, imageURL ImageURL) (result autorest.Response, err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/BaseClient.BatchReadFile")
+		defer func() {
+			sc := -1
+			if result.Response != nil {
+				sc = result.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	if err := validation.Validate([]validation.Validation{
+		{TargetValue: imageURL,
+			Constraints: []validation.Constraint{{Target: "imageURL.URL", Name: validation.Null, Rule: true, Chain: nil}}}}); err != nil {
+		return result, validation.NewError("computervision.BaseClient", "BatchReadFile", err.Error())
+	}
+
+	req, err := client.BatchReadFilePreparer(ctx, imageURL)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "computervision.BaseClient", "BatchReadFile", nil, "Failure preparing request")
+		return
+	}
+
+	resp, err := client.BatchReadFileSender(req)
+	if err != nil {
+		result.Response = resp
+		err = autorest.NewErrorWithError(err, "computervision.BaseClient", "BatchReadFile", resp, "Failure sending request")
+		return
+	}
+
+	result, err = client.BatchReadFileResponder(resp)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "computervision.BaseClient", "BatchReadFile", resp, "Failure responding to request")
+	}
+
+	return
+}
+
+// BatchReadFilePreparer prepares the BatchReadFile request.
+func (client BaseClient) BatchReadFilePreparer(ctx context.Context, imageURL ImageURL) (*http.Request, error) {
+	urlParameters := map[string]interface{}{
+		"Endpoint": client.Endpoint,
+	}
+
+	preparer := autorest.CreatePreparer(
+		autorest.AsContentType("application/json; charset=utf-8"),
+		autorest.AsPost(),
+		autorest.WithCustomBaseURL("{Endpoint}/vision/v2.0", urlParameters),
+		autorest.WithPath("/read/core/asyncBatchAnalyze"),
+		autorest.WithJSON(imageURL))
+	return preparer.Prepare((&http.Request{}).WithContext(ctx))
+}
+
+// BatchReadFileSender sends the BatchReadFile request. The method will close the
+// http.Response Body if it receives an error.
+func (client BaseClient) BatchReadFileSender(req *http.Request) (*http.Response, error) {
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
+}
+
+// BatchReadFileResponder handles the response to the BatchReadFile request. The method always
+// closes the http.Response Body.
+func (client BaseClient) BatchReadFileResponder(resp *http.Response) (result autorest.Response, err error) {
+	err = autorest.Respond(
+		resp,
+		client.ByInspecting(),
+		azure.WithErrorUnlessStatusCode(http.StatusOK, http.StatusAccepted),
+		autorest.ByClosing())
+	result.Response = resp
+	return
+}
+
+// BatchReadFileInStream use this interface to get the result of a Read Document operation, employing the
+// state-of-the-art Optical Character Recognition (OCR) algorithms optimized for text-heavy documents. When you use the
+// Read Document interface, the response contains a field called 'Operation-Location'. The 'Operation-Location' field
+// contains the URL that you must use for your 'Get Read Result operation' to access OCR results.​
+// Parameters:
+// imageParameter - an image stream.
+func (client BaseClient) BatchReadFileInStream(ctx context.Context, imageParameter io.ReadCloser) (result autorest.Response, err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/BaseClient.BatchReadFileInStream")
+		defer func() {
+			sc := -1
+			if result.Response != nil {
+				sc = result.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	req, err := client.BatchReadFileInStreamPreparer(ctx, imageParameter)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "computervision.BaseClient", "BatchReadFileInStream", nil, "Failure preparing request")
+		return
+	}
+
+	resp, err := client.BatchReadFileInStreamSender(req)
+	if err != nil {
+		result.Response = resp
+		err = autorest.NewErrorWithError(err, "computervision.BaseClient", "BatchReadFileInStream", resp, "Failure sending request")
+		return
+	}
+
+	result, err = client.BatchReadFileInStreamResponder(resp)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "computervision.BaseClient", "BatchReadFileInStream", resp, "Failure responding to request")
+	}
+
+	return
+}
+
+// BatchReadFileInStreamPreparer prepares the BatchReadFileInStream request.
+func (client BaseClient) BatchReadFileInStreamPreparer(ctx context.Context, imageParameter io.ReadCloser) (*http.Request, error) {
+	urlParameters := map[string]interface{}{
+		"Endpoint": client.Endpoint,
+	}
+
+	preparer := autorest.CreatePreparer(
+		autorest.AsContentType("application/octet-stream"),
+		autorest.AsPost(),
+		autorest.WithCustomBaseURL("{Endpoint}/vision/v2.0", urlParameters),
+		autorest.WithPath("/read/core/asyncBatchAnalyze"),
+		autorest.WithFile(imageParameter))
+	return preparer.Prepare((&http.Request{}).WithContext(ctx))
+}
+
+// BatchReadFileInStreamSender sends the BatchReadFileInStream request. The method will close the
+// http.Response Body if it receives an error.
+func (client BaseClient) BatchReadFileInStreamSender(req *http.Request) (*http.Response, error) {
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
+}
+
+// BatchReadFileInStreamResponder handles the response to the BatchReadFileInStream request. The method always
+// closes the http.Response Body.
+func (client BaseClient) BatchReadFileInStreamResponder(resp *http.Response) (result autorest.Response, err error) {
+	err = autorest.Respond(
+		resp,
+		client.ByInspecting(),
+		azure.WithErrorUnlessStatusCode(http.StatusOK, http.StatusAccepted),
+		autorest.ByClosing())
+	result.Response = resp
 	return
 }
 
@@ -537,8 +689,8 @@ func (client BaseClient) DescribeImagePreparer(ctx context.Context, imageURL Ima
 // DescribeImageSender sends the DescribeImage request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) DescribeImageSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // DescribeImageResponder handles the response to the DescribeImage request. The method always
@@ -630,8 +782,8 @@ func (client BaseClient) DescribeImageInStreamPreparer(ctx context.Context, imag
 // DescribeImageInStreamSender sends the DescribeImageInStream request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) DescribeImageInStreamSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // DescribeImageInStreamResponder handles the response to the DescribeImageInStream request. The method always
@@ -709,8 +861,8 @@ func (client BaseClient) DetectObjectsPreparer(ctx context.Context, imageURL Ima
 // DetectObjectsSender sends the DetectObjects request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) DetectObjectsSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // DetectObjectsResponder handles the response to the DetectObjects request. The method always
@@ -782,8 +934,8 @@ func (client BaseClient) DetectObjectsInStreamPreparer(ctx context.Context, imag
 // DetectObjectsInStreamSender sends the DetectObjectsInStream request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) DetectObjectsInStreamSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // DetectObjectsInStreamResponder handles the response to the DetectObjectsInStream request. The method always
@@ -885,8 +1037,8 @@ func (client BaseClient) GenerateThumbnailPreparer(ctx context.Context, width in
 // GenerateThumbnailSender sends the GenerateThumbnail request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) GenerateThumbnailSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GenerateThumbnailResponder handles the response to the GenerateThumbnail request. The method always
@@ -986,8 +1138,8 @@ func (client BaseClient) GenerateThumbnailInStreamPreparer(ctx context.Context, 
 // GenerateThumbnailInStreamSender sends the GenerateThumbnailInStream request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) GenerateThumbnailInStreamSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GenerateThumbnailInStreamResponder handles the response to the GenerateThumbnailInStream request. The method always
@@ -1065,8 +1217,8 @@ func (client BaseClient) GetAreaOfInterestPreparer(ctx context.Context, imageURL
 // GetAreaOfInterestSender sends the GetAreaOfInterest request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) GetAreaOfInterestSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetAreaOfInterestResponder handles the response to the GetAreaOfInterest request. The method always
@@ -1139,13 +1291,86 @@ func (client BaseClient) GetAreaOfInterestInStreamPreparer(ctx context.Context, 
 // GetAreaOfInterestInStreamSender sends the GetAreaOfInterestInStream request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) GetAreaOfInterestInStreamSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetAreaOfInterestInStreamResponder handles the response to the GetAreaOfInterestInStream request. The method always
 // closes the http.Response Body.
 func (client BaseClient) GetAreaOfInterestInStreamResponder(resp *http.Response) (result AreaOfInterestResult, err error) {
+	err = autorest.Respond(
+		resp,
+		client.ByInspecting(),
+		azure.WithErrorUnlessStatusCode(http.StatusOK),
+		autorest.ByUnmarshallingJSON(&result),
+		autorest.ByClosing())
+	result.Response = autorest.Response{Response: resp}
+	return
+}
+
+// GetReadOperationResult this interface is used for getting OCR results of Read operation. The URL to this interface
+// should be retrieved from 'Operation-Location' field returned from Batch Read File interface.
+// Parameters:
+// operationID - id of read operation returned in the response of the 'Batch Read File' interface.
+func (client BaseClient) GetReadOperationResult(ctx context.Context, operationID string) (result ReadOperationResult, err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/BaseClient.GetReadOperationResult")
+		defer func() {
+			sc := -1
+			if result.Response.Response != nil {
+				sc = result.Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	req, err := client.GetReadOperationResultPreparer(ctx, operationID)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "computervision.BaseClient", "GetReadOperationResult", nil, "Failure preparing request")
+		return
+	}
+
+	resp, err := client.GetReadOperationResultSender(req)
+	if err != nil {
+		result.Response = autorest.Response{Response: resp}
+		err = autorest.NewErrorWithError(err, "computervision.BaseClient", "GetReadOperationResult", resp, "Failure sending request")
+		return
+	}
+
+	result, err = client.GetReadOperationResultResponder(resp)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "computervision.BaseClient", "GetReadOperationResult", resp, "Failure responding to request")
+	}
+
+	return
+}
+
+// GetReadOperationResultPreparer prepares the GetReadOperationResult request.
+func (client BaseClient) GetReadOperationResultPreparer(ctx context.Context, operationID string) (*http.Request, error) {
+	urlParameters := map[string]interface{}{
+		"Endpoint": client.Endpoint,
+	}
+
+	pathParameters := map[string]interface{}{
+		"operationId": autorest.Encode("path", operationID),
+	}
+
+	preparer := autorest.CreatePreparer(
+		autorest.AsGet(),
+		autorest.WithCustomBaseURL("{Endpoint}/vision/v2.0", urlParameters),
+		autorest.WithPathParameters("/read/operations/{operationId}", pathParameters))
+	return preparer.Prepare((&http.Request{}).WithContext(ctx))
+}
+
+// GetReadOperationResultSender sends the GetReadOperationResult request. The method will close the
+// http.Response Body if it receives an error.
+func (client BaseClient) GetReadOperationResultSender(req *http.Request) (*http.Response, error) {
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
+}
+
+// GetReadOperationResultResponder handles the response to the GetReadOperationResult request. The method always
+// closes the http.Response Body.
+func (client BaseClient) GetReadOperationResultResponder(resp *http.Response) (result ReadOperationResult, err error) {
 	err = autorest.Respond(
 		resp,
 		client.ByInspecting(),
@@ -1212,8 +1437,8 @@ func (client BaseClient) GetTextOperationResultPreparer(ctx context.Context, ope
 // GetTextOperationResultSender sends the GetTextOperationResult request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) GetTextOperationResultSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetTextOperationResultResponder handles the response to the GetTextOperationResult request. The method always
@@ -1281,8 +1506,8 @@ func (client BaseClient) ListModelsPreparer(ctx context.Context) (*http.Request,
 // ListModelsSender sends the ListModels request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) ListModelsSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListModelsResponder handles the response to the ListModels request. The method always
@@ -1376,8 +1601,8 @@ func (client BaseClient) RecognizePrintedTextPreparer(ctx context.Context, detec
 // RecognizePrintedTextSender sends the RecognizePrintedText request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) RecognizePrintedTextSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // RecognizePrintedTextResponder handles the response to the RecognizePrintedText request. The method always
@@ -1465,8 +1690,8 @@ func (client BaseClient) RecognizePrintedTextInStreamPreparer(ctx context.Contex
 // RecognizePrintedTextInStreamSender sends the RecognizePrintedTextInStream request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) RecognizePrintedTextInStreamSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // RecognizePrintedTextInStreamResponder handles the response to the RecognizePrintedTextInStream request. The method always
@@ -1549,8 +1774,8 @@ func (client BaseClient) RecognizeTextPreparer(ctx context.Context, imageURL Ima
 // RecognizeTextSender sends the RecognizeText request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) RecognizeTextSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // RecognizeTextResponder handles the response to the RecognizeText request. The method always
@@ -1626,8 +1851,8 @@ func (client BaseClient) RecognizeTextInStreamPreparer(ctx context.Context, imag
 // RecognizeTextInStreamSender sends the RecognizeTextInStream request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) RecognizeTextInStreamSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // RecognizeTextInStreamResponder handles the response to the RecognizeTextInStream request. The method always
@@ -1719,8 +1944,8 @@ func (client BaseClient) TagImagePreparer(ctx context.Context, imageURL ImageURL
 // TagImageSender sends the TagImage request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) TagImageSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // TagImageResponder handles the response to the TagImage request. The method always
@@ -1807,8 +2032,8 @@ func (client BaseClient) TagImageInStreamPreparer(ctx context.Context, imagePara
 // TagImageInStreamSender sends the TagImageInStream request. The method will close the
 // http.Response Body if it receives an error.
 func (client BaseClient) TagImageInStreamSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // TagImageInStreamResponder handles the response to the TagImageInStream request. The method always

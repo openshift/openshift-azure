@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 package databoxapi
 
-import original "github.com/Azure/azure-sdk-for-go/services/databox/mgmt/2018-01-01/databox/databoxapi"
+import original "github.com/Azure/azure-sdk-for-go/services/databox/mgmt/2019-09-01/databox/databoxapi"
 
 type JobsClientAPI = original.JobsClientAPI
 type OperationsClientAPI = original.OperationsClientAPI

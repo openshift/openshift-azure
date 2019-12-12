@@ -103,8 +103,8 @@ func (client ImageModerationClient) EvaluateFileInputPreparer(ctx context.Contex
 // EvaluateFileInputSender sends the EvaluateFileInput request. The method will close the
 // http.Response Body if it receives an error.
 func (client ImageModerationClient) EvaluateFileInputSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // EvaluateFileInputResponder handles the response to the EvaluateFileInput request. The method always
@@ -177,8 +177,8 @@ func (client ImageModerationClient) EvaluateMethodPreparer(ctx context.Context, 
 // EvaluateMethodSender sends the EvaluateMethod request. The method will close the
 // http.Response Body if it receives an error.
 func (client ImageModerationClient) EvaluateMethodSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // EvaluateMethodResponder handles the response to the EvaluateMethod request. The method always
@@ -199,7 +199,7 @@ func (client ImageModerationClient) EvaluateMethodResponder(resp *http.Response)
 // contentType - the content type.
 // imageURL - the image url.
 // cacheImage - whether to retain the submitted image for future use; defaults to false if omitted.
-func (client ImageModerationClient) EvaluateURLInput(ctx context.Context, contentType string, imageURL BodyModel, cacheImage *bool) (result Evaluate, err error) {
+func (client ImageModerationClient) EvaluateURLInput(ctx context.Context, contentType string, imageURL ImageURL, cacheImage *bool) (result Evaluate, err error) {
 	if tracing.IsEnabled() {
 		ctx = tracing.StartSpan(ctx, fqdn+"/ImageModerationClient.EvaluateURLInput")
 		defer func() {
@@ -232,7 +232,7 @@ func (client ImageModerationClient) EvaluateURLInput(ctx context.Context, conten
 }
 
 // EvaluateURLInputPreparer prepares the EvaluateURLInput request.
-func (client ImageModerationClient) EvaluateURLInputPreparer(ctx context.Context, contentType string, imageURL BodyModel, cacheImage *bool) (*http.Request, error) {
+func (client ImageModerationClient) EvaluateURLInputPreparer(ctx context.Context, contentType string, imageURL ImageURL, cacheImage *bool) (*http.Request, error) {
 	urlParameters := map[string]interface{}{
 		"Endpoint": client.Endpoint,
 	}
@@ -256,8 +256,8 @@ func (client ImageModerationClient) EvaluateURLInputPreparer(ctx context.Context
 // EvaluateURLInputSender sends the EvaluateURLInput request. The method will close the
 // http.Response Body if it receives an error.
 func (client ImageModerationClient) EvaluateURLInputSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // EvaluateURLInputResponder handles the response to the EvaluateURLInput request. The method always
@@ -330,8 +330,8 @@ func (client ImageModerationClient) FindFacesPreparer(ctx context.Context, cache
 // FindFacesSender sends the FindFaces request. The method will close the
 // http.Response Body if it receives an error.
 func (client ImageModerationClient) FindFacesSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // FindFacesResponder handles the response to the FindFaces request. The method always
@@ -407,8 +407,8 @@ func (client ImageModerationClient) FindFacesFileInputPreparer(ctx context.Conte
 // FindFacesFileInputSender sends the FindFacesFileInput request. The method will close the
 // http.Response Body if it receives an error.
 func (client ImageModerationClient) FindFacesFileInputSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // FindFacesFileInputResponder handles the response to the FindFacesFileInput request. The method always
@@ -429,7 +429,7 @@ func (client ImageModerationClient) FindFacesFileInputResponder(resp *http.Respo
 // contentType - the content type.
 // imageURL - the image url.
 // cacheImage - whether to retain the submitted image for future use; defaults to false if omitted.
-func (client ImageModerationClient) FindFacesURLInput(ctx context.Context, contentType string, imageURL BodyModel, cacheImage *bool) (result FoundFaces, err error) {
+func (client ImageModerationClient) FindFacesURLInput(ctx context.Context, contentType string, imageURL ImageURL, cacheImage *bool) (result FoundFaces, err error) {
 	if tracing.IsEnabled() {
 		ctx = tracing.StartSpan(ctx, fqdn+"/ImageModerationClient.FindFacesURLInput")
 		defer func() {
@@ -462,7 +462,7 @@ func (client ImageModerationClient) FindFacesURLInput(ctx context.Context, conte
 }
 
 // FindFacesURLInputPreparer prepares the FindFacesURLInput request.
-func (client ImageModerationClient) FindFacesURLInputPreparer(ctx context.Context, contentType string, imageURL BodyModel, cacheImage *bool) (*http.Request, error) {
+func (client ImageModerationClient) FindFacesURLInputPreparer(ctx context.Context, contentType string, imageURL ImageURL, cacheImage *bool) (*http.Request, error) {
 	urlParameters := map[string]interface{}{
 		"Endpoint": client.Endpoint,
 	}
@@ -486,8 +486,8 @@ func (client ImageModerationClient) FindFacesURLInputPreparer(ctx context.Contex
 // FindFacesURLInputSender sends the FindFacesURLInput request. The method will close the
 // http.Response Body if it receives an error.
 func (client ImageModerationClient) FindFacesURLInputSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // FindFacesURLInputResponder handles the response to the FindFacesURLInput request. The method always
@@ -574,8 +574,8 @@ func (client ImageModerationClient) MatchFileInputPreparer(ctx context.Context, 
 // MatchFileInputSender sends the MatchFileInput request. The method will close the
 // http.Response Body if it receives an error.
 func (client ImageModerationClient) MatchFileInputSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // MatchFileInputResponder handles the response to the MatchFileInput request. The method always
@@ -659,8 +659,8 @@ func (client ImageModerationClient) MatchMethodPreparer(ctx context.Context, lis
 // MatchMethodSender sends the MatchMethod request. The method will close the
 // http.Response Body if it receives an error.
 func (client ImageModerationClient) MatchMethodSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // MatchMethodResponder handles the response to the MatchMethod request. The method always
@@ -689,7 +689,7 @@ func (client ImageModerationClient) MatchMethodResponder(resp *http.Response) (r
 // imageURL - the image url.
 // listID - the list Id.
 // cacheImage - whether to retain the submitted image for future use; defaults to false if omitted.
-func (client ImageModerationClient) MatchURLInput(ctx context.Context, contentType string, imageURL BodyModel, listID string, cacheImage *bool) (result MatchResponse, err error) {
+func (client ImageModerationClient) MatchURLInput(ctx context.Context, contentType string, imageURL ImageURL, listID string, cacheImage *bool) (result MatchResponse, err error) {
 	if tracing.IsEnabled() {
 		ctx = tracing.StartSpan(ctx, fqdn+"/ImageModerationClient.MatchURLInput")
 		defer func() {
@@ -722,7 +722,7 @@ func (client ImageModerationClient) MatchURLInput(ctx context.Context, contentTy
 }
 
 // MatchURLInputPreparer prepares the MatchURLInput request.
-func (client ImageModerationClient) MatchURLInputPreparer(ctx context.Context, contentType string, imageURL BodyModel, listID string, cacheImage *bool) (*http.Request, error) {
+func (client ImageModerationClient) MatchURLInputPreparer(ctx context.Context, contentType string, imageURL ImageURL, listID string, cacheImage *bool) (*http.Request, error) {
 	urlParameters := map[string]interface{}{
 		"Endpoint": client.Endpoint,
 	}
@@ -749,8 +749,8 @@ func (client ImageModerationClient) MatchURLInputPreparer(ctx context.Context, c
 // MatchURLInputSender sends the MatchURLInput request. The method will close the
 // http.Response Body if it receives an error.
 func (client ImageModerationClient) MatchURLInputSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // MatchURLInputResponder handles the response to the MatchURLInput request. The method always
@@ -841,8 +841,8 @@ func (client ImageModerationClient) OCRFileInputPreparer(ctx context.Context, la
 // OCRFileInputSender sends the OCRFileInput request. The method will close the
 // http.Response Body if it receives an error.
 func (client ImageModerationClient) OCRFileInputSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // OCRFileInputResponder handles the response to the OCRFileInput request. The method always
@@ -930,8 +930,8 @@ func (client ImageModerationClient) OCRMethodPreparer(ctx context.Context, langu
 // OCRMethodSender sends the OCRMethod request. The method will close the
 // http.Response Body if it receives an error.
 func (client ImageModerationClient) OCRMethodSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // OCRMethodResponder handles the response to the OCRMethod request. The method always
@@ -960,7 +960,7 @@ func (client ImageModerationClient) OCRMethodResponder(resp *http.Response) (res
 // image/tiff is not supported when enhanced is set to true
 //
 // Note: This impacts the response time.
-func (client ImageModerationClient) OCRURLInput(ctx context.Context, language string, contentType string, imageURL BodyModel, cacheImage *bool, enhanced *bool) (result OCR, err error) {
+func (client ImageModerationClient) OCRURLInput(ctx context.Context, language string, contentType string, imageURL ImageURL, cacheImage *bool, enhanced *bool) (result OCR, err error) {
 	if tracing.IsEnabled() {
 		ctx = tracing.StartSpan(ctx, fqdn+"/ImageModerationClient.OCRURLInput")
 		defer func() {
@@ -993,7 +993,7 @@ func (client ImageModerationClient) OCRURLInput(ctx context.Context, language st
 }
 
 // OCRURLInputPreparer prepares the OCRURLInput request.
-func (client ImageModerationClient) OCRURLInputPreparer(ctx context.Context, language string, contentType string, imageURL BodyModel, cacheImage *bool, enhanced *bool) (*http.Request, error) {
+func (client ImageModerationClient) OCRURLInputPreparer(ctx context.Context, language string, contentType string, imageURL ImageURL, cacheImage *bool, enhanced *bool) (*http.Request, error) {
 	urlParameters := map[string]interface{}{
 		"Endpoint": client.Endpoint,
 	}
@@ -1024,8 +1024,8 @@ func (client ImageModerationClient) OCRURLInputPreparer(ctx context.Context, lan
 // OCRURLInputSender sends the OCRURLInput request. The method will close the
 // http.Response Body if it receives an error.
 func (client ImageModerationClient) OCRURLInputSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // OCRURLInputResponder handles the response to the OCRURLInput request. The method always

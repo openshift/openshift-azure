@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ type APISchemaClientAPI = original.APISchemaClientAPI
 type APIVersionSetClientAPI = original.APIVersionSetClientAPI
 type AuthorizationServerClientAPI = original.AuthorizationServerClientAPI
 type BackendClientAPI = original.BackendClientAPI
+type CacheClientAPI = original.CacheClientAPI
 type CertificateClientAPI = original.CertificateClientAPI
 type DelegationSettingsClientAPI = original.DelegationSettingsClientAPI
 type DiagnosticClientAPI = original.DiagnosticClientAPI
@@ -44,6 +45,7 @@ type EmailTemplateClientAPI = original.EmailTemplateClientAPI
 type GroupClientAPI = original.GroupClientAPI
 type GroupUserClientAPI = original.GroupUserClientAPI
 type IdentityProviderClientAPI = original.IdentityProviderClientAPI
+type IssueClientAPI = original.IssueClientAPI
 type LoggerClientAPI = original.LoggerClientAPI
 type NetworkStatusClientAPI = original.NetworkStatusClientAPI
 type NotificationClientAPI = original.NotificationClientAPI
@@ -62,7 +64,7 @@ type ProductSubscriptionsClientAPI = original.ProductSubscriptionsClientAPI
 type PropertyClientAPI = original.PropertyClientAPI
 type QuotaByCounterKeysClientAPI = original.QuotaByCounterKeysClientAPI
 type QuotaByPeriodKeysClientAPI = original.QuotaByPeriodKeysClientAPI
-type RegionsClientAPI = original.RegionsClientAPI
+type RegionClientAPI = original.RegionClientAPI
 type ReportsClientAPI = original.ReportsClientAPI
 type ServiceClientAPI = original.ServiceClientAPI
 type ServiceSkusClientAPI = original.ServiceSkusClientAPI
@@ -76,6 +78,7 @@ type TenantAccessClientAPI = original.TenantAccessClientAPI
 type TenantAccessGitClientAPI = original.TenantAccessGitClientAPI
 type TenantConfigurationClientAPI = original.TenantConfigurationClientAPI
 type UserClientAPI = original.UserClientAPI
+type UserConfirmationPasswordClientAPI = original.UserConfirmationPasswordClientAPI
 type UserGroupClientAPI = original.UserGroupClientAPI
 type UserIdentitiesClientAPI = original.UserIdentitiesClientAPI
 type UserSubscriptionClientAPI = original.UserSubscriptionClientAPI

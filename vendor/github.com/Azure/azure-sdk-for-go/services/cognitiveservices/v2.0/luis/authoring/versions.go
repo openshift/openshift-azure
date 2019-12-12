@@ -37,12 +37,12 @@ func NewVersionsClient(endpoint string) VersionsClient {
 	return VersionsClient{New(endpoint)}
 }
 
-// Clone creates a new version using the current snapshot of the selected application version.
+// Clone creates a new version from the selected version.
 // Parameters:
 // appID - the application ID.
 // versionID - the version ID.
 // versionCloneObject - a model containing the new version ID.
-func (client VersionsClient) Clone(ctx context.Context, appID uuid.UUID, versionID string, versionCloneObject *TaskUpdateObject) (result String, err error) {
+func (client VersionsClient) Clone(ctx context.Context, appID uuid.UUID, versionID string, versionCloneObject TaskUpdateObject) (result String, err error) {
 	if tracing.IsEnabled() {
 		ctx = tracing.StartSpan(ctx, fqdn+"/VersionsClient.Clone")
 		defer func() {
@@ -75,7 +75,7 @@ func (client VersionsClient) Clone(ctx context.Context, appID uuid.UUID, version
 }
 
 // ClonePreparer prepares the Clone request.
-func (client VersionsClient) ClonePreparer(ctx context.Context, appID uuid.UUID, versionID string, versionCloneObject *TaskUpdateObject) (*http.Request, error) {
+func (client VersionsClient) ClonePreparer(ctx context.Context, appID uuid.UUID, versionID string, versionCloneObject TaskUpdateObject) (*http.Request, error) {
 	urlParameters := map[string]interface{}{
 		"Endpoint": client.Endpoint,
 	}
@@ -89,19 +89,16 @@ func (client VersionsClient) ClonePreparer(ctx context.Context, appID uuid.UUID,
 		autorest.AsContentType("application/json; charset=utf-8"),
 		autorest.AsPost(),
 		autorest.WithCustomBaseURL("{Endpoint}/luis/api/v2.0", urlParameters),
-		autorest.WithPathParameters("/apps/{appId}/versions/{versionId}/clone", pathParameters))
-	if versionCloneObject != nil {
-		preparer = autorest.DecoratePreparer(preparer,
-			autorest.WithJSON(versionCloneObject))
-	}
+		autorest.WithPathParameters("/apps/{appId}/versions/{versionId}/clone", pathParameters),
+		autorest.WithJSON(versionCloneObject))
 	return preparer.Prepare((&http.Request{}).WithContext(ctx))
 }
 
 // CloneSender sends the Clone request. The method will close the
 // http.Response Body if it receives an error.
 func (client VersionsClient) CloneSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // CloneResponder handles the response to the Clone request. The method always
@@ -174,8 +171,8 @@ func (client VersionsClient) DeletePreparer(ctx context.Context, appID uuid.UUID
 // DeleteSender sends the Delete request. The method will close the
 // http.Response Body if it receives an error.
 func (client VersionsClient) DeleteSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // DeleteResponder handles the response to the Delete request. The method always
@@ -191,7 +188,7 @@ func (client VersionsClient) DeleteResponder(resp *http.Response) (result Operat
 	return
 }
 
-// DeleteUnlabelledUtterance deleted an unlabelled utterance.
+// DeleteUnlabelledUtterance deleted an unlabelled utterance in a version of the application.
 // Parameters:
 // appID - the application ID.
 // versionID - the version ID.
@@ -251,8 +248,8 @@ func (client VersionsClient) DeleteUnlabelledUtterancePreparer(ctx context.Conte
 // DeleteUnlabelledUtteranceSender sends the DeleteUnlabelledUtterance request. The method will close the
 // http.Response Body if it receives an error.
 func (client VersionsClient) DeleteUnlabelledUtteranceSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // DeleteUnlabelledUtteranceResponder handles the response to the DeleteUnlabelledUtterance request. The method always
@@ -325,8 +322,8 @@ func (client VersionsClient) ExportPreparer(ctx context.Context, appID uuid.UUID
 // ExportSender sends the Export request. The method will close the
 // http.Response Body if it receives an error.
 func (client VersionsClient) ExportSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ExportResponder handles the response to the Export request. The method always
@@ -342,7 +339,8 @@ func (client VersionsClient) ExportResponder(resp *http.Response) (result LuisAp
 	return
 }
 
-// Get gets the version info.
+// Get gets the version information such as date created, last modified date, endpoint URL, count of intents and
+// entities, training and publishing status.
 // Parameters:
 // appID - the application ID.
 // versionID - the version ID.
@@ -399,8 +397,8 @@ func (client VersionsClient) GetPreparer(ctx context.Context, appID uuid.UUID, v
 // GetSender sends the Get request. The method will close the
 // http.Response Body if it receives an error.
 func (client VersionsClient) GetSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetResponder handles the response to the Get request. The method always
@@ -482,8 +480,8 @@ func (client VersionsClient) ImportPreparer(ctx context.Context, appID uuid.UUID
 // ImportSender sends the Import request. The method will close the
 // http.Response Body if it receives an error.
 func (client VersionsClient) ImportSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ImportResponder handles the response to the Import request. The method always
@@ -499,7 +497,7 @@ func (client VersionsClient) ImportResponder(resp *http.Response) (result String
 	return
 }
 
-// List gets the application versions info.
+// List gets a list of versions for this application ID.
 // Parameters:
 // appID - the application ID.
 // skip - the number of entries to skip. Default value is 0.
@@ -581,8 +579,8 @@ func (client VersionsClient) ListPreparer(ctx context.Context, appID uuid.UUID, 
 // ListSender sends the List request. The method will close the
 // http.Response Body if it receives an error.
 func (client VersionsClient) ListSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListResponder handles the response to the List request. The method always
@@ -658,8 +656,8 @@ func (client VersionsClient) UpdatePreparer(ctx context.Context, appID uuid.UUID
 // UpdateSender sends the Update request. The method will close the
 // http.Response Body if it receives an error.
 func (client VersionsClient) UpdateSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // UpdateResponder handles the response to the Update request. The method always

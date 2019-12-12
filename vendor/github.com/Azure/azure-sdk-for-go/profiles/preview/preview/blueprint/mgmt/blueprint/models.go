@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package blueprint
 import (
 	"context"
 
-	original "github.com/Azure/azure-sdk-for-go/services/preview/blueprint/mgmt/2017-11-11-preview/blueprint"
+	original "github.com/Azure/azure-sdk-for-go/services/preview/blueprint/mgmt/2018-11-01-preview/blueprint"
 )
 
 const (
@@ -32,8 +32,9 @@ const (
 type AssignmentLockMode = original.AssignmentLockMode
 
 const (
-	AllResources AssignmentLockMode = original.AllResources
-	None         AssignmentLockMode = original.None
+	AllResourcesDoNotDelete AssignmentLockMode = original.AllResourcesDoNotDelete
+	AllResourcesReadOnly    AssignmentLockMode = original.AllResourcesReadOnly
+	None                    AssignmentLockMode = original.None
 )
 
 type AssignmentProvisioningState = original.AssignmentProvisioningState
@@ -95,14 +96,24 @@ type ArtifactModel = original.ArtifactModel
 type ArtifactPropertiesBase = original.ArtifactPropertiesBase
 type ArtifactsClient = original.ArtifactsClient
 type Assignment = original.Assignment
+type AssignmentDeploymentJob = original.AssignmentDeploymentJob
+type AssignmentDeploymentJobResult = original.AssignmentDeploymentJobResult
+type AssignmentJobCreatedResource = original.AssignmentJobCreatedResource
 type AssignmentList = original.AssignmentList
 type AssignmentListIterator = original.AssignmentListIterator
 type AssignmentListPage = original.AssignmentListPage
 type AssignmentLockSettings = original.AssignmentLockSettings
+type AssignmentOperation = original.AssignmentOperation
+type AssignmentOperationList = original.AssignmentOperationList
+type AssignmentOperationListIterator = original.AssignmentOperationListIterator
+type AssignmentOperationListPage = original.AssignmentOperationListPage
+type AssignmentOperationProperties = original.AssignmentOperationProperties
+type AssignmentOperationsClient = original.AssignmentOperationsClient
 type AssignmentProperties = original.AssignmentProperties
 type AssignmentStatus = original.AssignmentStatus
 type AssignmentsClient = original.AssignmentsClient
 type AzureResourceBase = original.AzureResourceBase
+type AzureResourceManagerError = original.AzureResourceManagerError
 type BaseClient = original.BaseClient
 type BasicArtifact = original.BasicArtifact
 type BlueprintsClient = original.BlueprintsClient
@@ -112,7 +123,6 @@ type ListIterator = original.ListIterator
 type ListPage = original.ListPage
 type ManagedServiceIdentity = original.ManagedServiceIdentity
 type Model = original.Model
-type OperationsClient = original.OperationsClient
 type ParameterDefinition = original.ParameterDefinition
 type ParameterDefinitionMetadata = original.ParameterDefinitionMetadata
 type ParameterValue = original.ParameterValue
@@ -143,6 +153,8 @@ type Status = original.Status
 type TemplateArtifact = original.TemplateArtifact
 type TemplateArtifactProperties = original.TemplateArtifactProperties
 type TrackedResource = original.TrackedResource
+type UserAssignedIdentity = original.UserAssignedIdentity
+type WhoIsBlueprintContract = original.WhoIsBlueprintContract
 
 func New() BaseClient {
 	return original.New()
@@ -165,6 +177,18 @@ func NewAssignmentListIterator(page AssignmentListPage) AssignmentListIterator {
 func NewAssignmentListPage(getNextPage func(context.Context, AssignmentList) (AssignmentList, error)) AssignmentListPage {
 	return original.NewAssignmentListPage(getNextPage)
 }
+func NewAssignmentOperationListIterator(page AssignmentOperationListPage) AssignmentOperationListIterator {
+	return original.NewAssignmentOperationListIterator(page)
+}
+func NewAssignmentOperationListPage(getNextPage func(context.Context, AssignmentOperationList) (AssignmentOperationList, error)) AssignmentOperationListPage {
+	return original.NewAssignmentOperationListPage(getNextPage)
+}
+func NewAssignmentOperationsClient() AssignmentOperationsClient {
+	return original.NewAssignmentOperationsClient()
+}
+func NewAssignmentOperationsClientWithBaseURI(baseURI string) AssignmentOperationsClient {
+	return original.NewAssignmentOperationsClientWithBaseURI(baseURI)
+}
 func NewAssignmentsClient() AssignmentsClient {
 	return original.NewAssignmentsClient()
 }
@@ -182,12 +206,6 @@ func NewListIterator(page ListPage) ListIterator {
 }
 func NewListPage(getNextPage func(context.Context, List) (List, error)) ListPage {
 	return original.NewListPage(getNextPage)
-}
-func NewOperationsClient() OperationsClient {
-	return original.NewOperationsClient()
-}
-func NewOperationsClientWithBaseURI(baseURI string) OperationsClient {
-	return original.NewOperationsClientWithBaseURI(baseURI)
 }
 func NewPublishedArtifactsClient() PublishedArtifactsClient {
 	return original.NewPublishedArtifactsClient()

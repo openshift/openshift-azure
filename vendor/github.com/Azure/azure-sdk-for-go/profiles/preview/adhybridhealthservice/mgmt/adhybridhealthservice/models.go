@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -70,8 +70,8 @@ type DeltaOperationType = original.DeltaOperationType
 
 const (
 	DeltaOperationTypeAdd       DeltaOperationType = original.DeltaOperationTypeAdd
-	DeltaOperationTypeDeletAdd  DeltaOperationType = original.DeltaOperationTypeDeletAdd
 	DeltaOperationTypeDelete    DeltaOperationType = original.DeltaOperationTypeDelete
+	DeltaOperationTypeDeleteAdd DeltaOperationType = original.DeltaOperationTypeDeleteAdd
 	DeltaOperationTypeNone      DeltaOperationType = original.DeltaOperationTypeNone
 	DeltaOperationTypeObsolete  DeltaOperationType = original.DeltaOperationTypeObsolete
 	DeltaOperationTypeReplace   DeltaOperationType = original.DeltaOperationTypeReplace
@@ -178,6 +178,8 @@ type ConfigurationClient = original.ConfigurationClient
 type Connector = original.Connector
 type ConnectorConnectionError = original.ConnectorConnectionError
 type ConnectorConnectionErrors = original.ConnectorConnectionErrors
+type ConnectorMetadata = original.ConnectorMetadata
+type ConnectorMetadataDetails = original.ConnectorMetadataDetails
 type ConnectorObjectError = original.ConnectorObjectError
 type ConnectorObjectErrors = original.ConnectorObjectErrors
 type Connectors = original.Connectors
@@ -244,6 +246,8 @@ type ReplicationSummary = original.ReplicationSummary
 type ReplicationSummaryList = original.ReplicationSummaryList
 type ReportsClient = original.ReportsClient
 type Result = original.Result
+type RiskyIPBlobURI = original.RiskyIPBlobURI
+type RiskyIPBlobUris = original.RiskyIPBlobUris
 type RuleErrorInfo = original.RuleErrorInfo
 type RunProfile = original.RunProfile
 type RunProfiles = original.RunProfiles

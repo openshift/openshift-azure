@@ -39,6 +39,8 @@ const (
 	Cost Category = "Cost"
 	// HighAvailability ...
 	HighAvailability Category = "HighAvailability"
+	// OperationalExcellence ...
+	OperationalExcellence Category = "OperationalExcellence"
 	// Performance ...
 	Performance Category = "Performance"
 	// Security ...
@@ -47,7 +49,7 @@ const (
 
 // PossibleCategoryValues returns an array of possible values for the Category const type.
 func PossibleCategoryValues() []Category {
-	return []Category{Cost, HighAvailability, Performance, Security}
+	return []Category{Cost, HighAvailability, OperationalExcellence, Performance, Security}
 }
 
 // Impact enumerates the values for impact.
@@ -258,7 +260,7 @@ func NewOperationEntityListResultPage(getNextPage func(context.Context, Operatio
 
 // RecommendationProperties the properties of the recommendation.
 type RecommendationProperties struct {
-	// Category - The category of the recommendation. Possible values include: 'HighAvailability', 'Security', 'Performance', 'Cost'
+	// Category - The category of the recommendation. Possible values include: 'HighAvailability', 'Security', 'Performance', 'Cost', 'OperationalExcellence'
 	Category Category `json:"category,omitempty"`
 	// Impact - The business impact of the recommendation. Possible values include: 'High', 'Medium', 'Low'
 	Impact Impact `json:"impact,omitempty"`
@@ -318,11 +320,11 @@ func (rp RecommendationProperties) MarshalJSON() ([]byte, error) {
 
 // Resource an Azure resource.
 type Resource struct {
-	// ID - The resource ID.
+	// ID - READ-ONLY; The resource ID.
 	ID *string `json:"id,omitempty"`
-	// Name - The name of the resource.
+	// Name - READ-ONLY; The name of the resource.
 	Name *string `json:"name,omitempty"`
-	// Type - The type of the resource.
+	// Type - READ-ONLY; The type of the resource.
 	Type *string `json:"type,omitempty"`
 }
 
@@ -331,11 +333,11 @@ type ResourceRecommendationBase struct {
 	autorest.Response `json:"-"`
 	// RecommendationProperties - The properties of the recommendation.
 	*RecommendationProperties `json:"properties,omitempty"`
-	// ID - The resource ID.
+	// ID - READ-ONLY; The resource ID.
 	ID *string `json:"id,omitempty"`
-	// Name - The name of the resource.
+	// Name - READ-ONLY; The name of the resource.
 	Name *string `json:"name,omitempty"`
-	// Type - The type of the resource.
+	// Type - READ-ONLY; The type of the resource.
 	Type *string `json:"type,omitempty"`
 }
 
@@ -344,15 +346,6 @@ func (rrb ResourceRecommendationBase) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if rrb.RecommendationProperties != nil {
 		objectMap["properties"] = rrb.RecommendationProperties
-	}
-	if rrb.ID != nil {
-		objectMap["id"] = rrb.ID
-	}
-	if rrb.Name != nil {
-		objectMap["name"] = rrb.Name
-	}
-	if rrb.Type != nil {
-		objectMap["type"] = rrb.Type
 	}
 	return json.Marshal(objectMap)
 }
@@ -569,11 +562,11 @@ type SuppressionContract struct {
 	autorest.Response `json:"-"`
 	// SuppressionProperties - The properties of the suppression.
 	*SuppressionProperties `json:"properties,omitempty"`
-	// ID - The resource ID.
+	// ID - READ-ONLY; The resource ID.
 	ID *string `json:"id,omitempty"`
-	// Name - The name of the resource.
+	// Name - READ-ONLY; The name of the resource.
 	Name *string `json:"name,omitempty"`
-	// Type - The type of the resource.
+	// Type - READ-ONLY; The type of the resource.
 	Type *string `json:"type,omitempty"`
 }
 
@@ -582,15 +575,6 @@ func (sc SuppressionContract) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if sc.SuppressionProperties != nil {
 		objectMap["properties"] = sc.SuppressionProperties
-	}
-	if sc.ID != nil {
-		objectMap["id"] = sc.ID
-	}
-	if sc.Name != nil {
-		objectMap["name"] = sc.Name
-	}
-	if sc.Type != nil {
-		objectMap["type"] = sc.Type
 	}
 	return json.Marshal(objectMap)
 }

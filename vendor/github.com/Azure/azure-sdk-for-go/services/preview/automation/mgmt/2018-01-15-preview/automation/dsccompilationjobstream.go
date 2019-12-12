@@ -33,13 +33,13 @@ type DscCompilationJobStreamClient struct {
 }
 
 // NewDscCompilationJobStreamClient creates an instance of the DscCompilationJobStreamClient client.
-func NewDscCompilationJobStreamClient(subscriptionID string, countType1 CountType) DscCompilationJobStreamClient {
-	return NewDscCompilationJobStreamClientWithBaseURI(DefaultBaseURI, subscriptionID, countType1)
+func NewDscCompilationJobStreamClient(subscriptionID string) DscCompilationJobStreamClient {
+	return NewDscCompilationJobStreamClientWithBaseURI(DefaultBaseURI, subscriptionID)
 }
 
 // NewDscCompilationJobStreamClientWithBaseURI creates an instance of the DscCompilationJobStreamClient client.
-func NewDscCompilationJobStreamClientWithBaseURI(baseURI string, subscriptionID string, countType1 CountType) DscCompilationJobStreamClient {
-	return DscCompilationJobStreamClient{NewWithBaseURI(baseURI, subscriptionID, countType1)}
+func NewDscCompilationJobStreamClientWithBaseURI(baseURI string, subscriptionID string) DscCompilationJobStreamClient {
+	return DscCompilationJobStreamClient{NewWithBaseURI(baseURI, subscriptionID)}
 }
 
 // ListByJob retrieve all the job streams for the compilation Job.
@@ -112,8 +112,8 @@ func (client DscCompilationJobStreamClient) ListByJobPreparer(ctx context.Contex
 // ListByJobSender sends the ListByJob request. The method will close the
 // http.Response Body if it receives an error.
 func (client DscCompilationJobStreamClient) ListByJobSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListByJobResponder handles the response to the ListByJob request. The method always

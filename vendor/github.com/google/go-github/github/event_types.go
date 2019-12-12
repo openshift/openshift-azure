@@ -707,6 +707,7 @@ type PushEventRepository struct {
 	PushedAt        *Timestamp `json:"pushed_at,omitempty"`
 	UpdatedAt       *Timestamp `json:"updated_at,omitempty"`
 	Homepage        *string    `json:"homepage,omitempty"`
+	PullsURL        *string    `json:"pulls_url,omitempty"`
 	Size            *int       `json:"size,omitempty"`
 	StargazersCount *int       `json:"stargazers_count,omitempty"`
 	WatchersCount   *int       `json:"watchers_count,omitempty"`
@@ -737,7 +738,7 @@ type PushEventRepoOwner struct {
 }
 
 // ReleaseEvent is triggered when a release is published, unpublished, created,
-// edited, deleted, or prerelased.
+// edited, deleted, or prereleased.
 // The Webhook event name is "release".
 //
 // GitHub API docs: https://developer.github.com/v3/activity/events/types/#releaseevent
@@ -869,6 +870,20 @@ type TeamAddEvent struct {
 	Org          *Organization `json:"organization,omitempty"`
 	Sender       *User         `json:"sender,omitempty"`
 	Installation *Installation `json:"installation,omitempty"`
+}
+
+// UserEvent is triggered when a user is created or deleted.
+// The Webhook event name is "user".
+//
+// Only global webhooks can subscribe to this event type.
+//
+// GitHub API docs: https://developer.github.com/enterprise/v3/activity/events/types/#userevent-enterprise
+type UserEvent struct {
+	User *User `json:"user,omitempty"`
+	// The action performed. Possible values are: "created" or "deleted".
+	Action     *string     `json:"action,omitempty"`
+	Enterprise *Enterprise `json:"enterprise,omitempty"`
+	Sender     *User       `json:"sender,omitempty"`
 }
 
 // WatchEvent is related to starring a repository, not watching. See this API

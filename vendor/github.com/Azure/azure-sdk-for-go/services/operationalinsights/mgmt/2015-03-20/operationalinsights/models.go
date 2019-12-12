@@ -21,7 +21,6 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/Azure/go-autorest/autorest"
-	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/date"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/Azure/go-autorest/tracing"
@@ -129,11 +128,11 @@ type OperationListResult struct {
 
 // ProxyResource common properties of proxy resource.
 type ProxyResource struct {
-	// ID - Resource ID.
+	// ID - READ-ONLY; Resource ID.
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name.
+	// Name - READ-ONLY; Resource name.
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type.
+	// Type - READ-ONLY; Resource type.
 	Type *string `json:"type,omitempty"`
 	// Tags - Resource tags
 	Tags map[string]*string `json:"tags"`
@@ -142,15 +141,6 @@ type ProxyResource struct {
 // MarshalJSON is the custom marshaler for ProxyResource.
 func (pr ProxyResource) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
-	if pr.ID != nil {
-		objectMap["id"] = pr.ID
-	}
-	if pr.Name != nil {
-		objectMap["name"] = pr.Name
-	}
-	if pr.Type != nil {
-		objectMap["type"] = pr.Type
-	}
 	if pr.Tags != nil {
 		objectMap["tags"] = pr.Tags
 	}
@@ -159,11 +149,11 @@ func (pr ProxyResource) MarshalJSON() ([]byte, error) {
 
 // Resource the resource definition.
 type Resource struct {
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 	// Location - Resource location
 	Location *string `json:"location,omitempty"`
@@ -174,15 +164,6 @@ type Resource struct {
 // MarshalJSON is the custom marshaler for Resource.
 func (r Resource) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
-	if r.ID != nil {
-		objectMap["id"] = r.ID
-	}
-	if r.Name != nil {
-		objectMap["name"] = r.Name
-	}
-	if r.Type != nil {
-		objectMap["type"] = r.Type
-	}
 	if r.Location != nil {
 		objectMap["location"] = r.Location
 	}
@@ -195,11 +176,11 @@ func (r Resource) MarshalJSON() ([]byte, error) {
 // SavedSearch value object for saved search results.
 type SavedSearch struct {
 	autorest.Response `json:"-"`
-	// ID - The id of the saved search.
+	// ID - READ-ONLY; The id of the saved search.
 	ID *string `json:"id,omitempty"`
-	// Name - The name of the saved search.
+	// Name - READ-ONLY; The name of the saved search.
 	Name *string `json:"name,omitempty"`
-	// Type - The type of the saved search.
+	// Type - READ-ONLY; The type of the saved search.
 	Type *string `json:"type,omitempty"`
 	// ETag - The ETag of the saved search.
 	ETag *string `json:"eTag,omitempty"`
@@ -210,15 +191,6 @@ type SavedSearch struct {
 // MarshalJSON is the custom marshaler for SavedSearch.
 func (ss SavedSearch) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
-	if ss.ID != nil {
-		objectMap["id"] = ss.ID
-	}
-	if ss.Name != nil {
-		objectMap["name"] = ss.Name
-	}
-	if ss.Type != nil {
-		objectMap["type"] = ss.Type
-	}
 	if ss.ETag != nil {
 		objectMap["eTag"] = ss.ETag
 	}
@@ -291,7 +263,7 @@ func (ss *SavedSearch) UnmarshalJSON(body []byte) error {
 // SavedSearchesListResult the saved search list operation response.
 type SavedSearchesListResult struct {
 	autorest.Response `json:"-"`
-	// Metadata - The metadata from search results.
+	// Metadata - Unused legacy property, kept here for backward compatibility.
 	Metadata *SearchMetadata `json:"__metadata,omitempty"`
 	// Value - The array of result values.
 	Value *[]SavedSearch `json:"value,omitempty"`
@@ -311,14 +283,6 @@ type SavedSearchProperties struct {
 	Tags *[]Tag `json:"tags,omitempty"`
 }
 
-// SearchError details for a search error.
-type SearchError struct {
-	// Type - The error type.
-	Type *string `json:"type,omitempty"`
-	// Message - The error message.
-	Message *string `json:"message,omitempty"`
-}
-
 // SearchGetSchemaResponse the get schema operation response.
 type SearchGetSchemaResponse struct {
 	autorest.Response `json:"-"`
@@ -326,14 +290,6 @@ type SearchGetSchemaResponse struct {
 	Metadata *SearchMetadata `json:"metadata,omitempty"`
 	// Value - The array of result values.
 	Value *[]SearchSchemaValue `json:"value,omitempty"`
-}
-
-// SearchHighlight highlight details.
-type SearchHighlight struct {
-	// Pre - The string that is put before a matched result.
-	Pre *string `json:"pre,omitempty"`
-	// Post - The string that is put after a matched result.
-	Post *string `json:"post,omitempty"`
 }
 
 // SearchMetadata metadata for search results.
@@ -380,33 +336,6 @@ type SearchMetadataSchema struct {
 	Name *string `json:"name,omitempty"`
 	// Version - The version of the metadata schema.
 	Version *int32 `json:"version,omitempty"`
-}
-
-// SearchParameters parameters specifying the search query and range.
-type SearchParameters struct {
-	// Top - The number to get from the top.
-	Top *int64 `json:"top,omitempty"`
-	// Highlight - The highlight that looks for all occurrences of a string.
-	Highlight *SearchHighlight `json:"highlight,omitempty"`
-	// Query - The query to search.
-	Query *string `json:"query,omitempty"`
-	// Start - The start date filter, so the only query results returned are after this date.
-	Start *date.Time `json:"start,omitempty"`
-	// End - The end date filter, so the only query results returned are before this date.
-	End *date.Time `json:"end,omitempty"`
-}
-
-// SearchResultsResponse the get search result operation response.
-type SearchResultsResponse struct {
-	autorest.Response `json:"-"`
-	// ID - The id of the search, which includes the full url.
-	ID *string `json:"id,omitempty"`
-	// Metadata - The metadata from search results.
-	Metadata *SearchMetadata `json:"metaData,omitempty"`
-	// Value - The array of result values.
-	Value *[]interface{} `json:"value,omitempty"`
-	// Error - The error.
-	Error *SearchError `json:"error,omitempty"`
 }
 
 // SearchSchemaValue value object for schema results.
@@ -459,11 +388,11 @@ type StorageInsight struct {
 	*StorageInsightProperties `json:"properties,omitempty"`
 	// ETag - The ETag of the storage insight.
 	ETag *string `json:"eTag,omitempty"`
-	// ID - Resource ID.
+	// ID - READ-ONLY; Resource ID.
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name.
+	// Name - READ-ONLY; Resource name.
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type.
+	// Type - READ-ONLY; Resource type.
 	Type *string `json:"type,omitempty"`
 	// Tags - Resource tags
 	Tags map[string]*string `json:"tags"`
@@ -477,15 +406,6 @@ func (si StorageInsight) MarshalJSON() ([]byte, error) {
 	}
 	if si.ETag != nil {
 		objectMap["eTag"] = si.ETag
-	}
-	if si.ID != nil {
-		objectMap["id"] = si.ID
-	}
-	if si.Name != nil {
-		objectMap["name"] = si.Name
-	}
-	if si.Type != nil {
-		objectMap["type"] = si.Type
 	}
 	if si.Tags != nil {
 		objectMap["tags"] = si.Tags
@@ -716,7 +636,7 @@ type StorageInsightProperties struct {
 	Tables *[]string `json:"tables,omitempty"`
 	// StorageAccount - The storage account connection details
 	StorageAccount *StorageAccount `json:"storageAccount,omitempty"`
-	// Status - The status of the storage insight
+	// Status - READ-ONLY; The status of the storage insight
 	Status *StorageInsightStatus `json:"status,omitempty"`
 }
 
@@ -748,7 +668,7 @@ type WorkspacePurgeBody struct {
 type WorkspacePurgeBodyFilters struct {
 	// Column - The column of the table over which the given query should run
 	Column *string `json:"column,omitempty"`
-	// Operator - A query operator to evaluate over the provided column and value(s).
+	// Operator - A query operator to evaluate over the provided column and value(s). Supported operators are ==, =~, in, in~, >, >=, <, <=, between, and have the same behavior as they would in a KQL query.
 	Operator *string `json:"operator,omitempty"`
 	// Value - the value for the operator to function over. This can be a number (e.g., > 100), a string (timestamp >= '2017-09-01') or array of values.
 	Value interface{} `json:"value,omitempty"`
@@ -768,33 +688,4 @@ type WorkspacePurgeStatusResponse struct {
 	autorest.Response `json:"-"`
 	// Status - Status of the operation represented by the requested Id. Possible values include: 'Pending', 'Completed'
 	Status PurgeState `json:"status,omitempty"`
-}
-
-// WorkspacesGetSearchResultsFuture an abstraction for monitoring and retrieving the results of a
-// long-running operation.
-type WorkspacesGetSearchResultsFuture struct {
-	azure.Future
-}
-
-// Result returns the result of the asynchronous operation.
-// If the operation has not completed it will return an error.
-func (future *WorkspacesGetSearchResultsFuture) Result(client WorkspacesClient) (srr SearchResultsResponse, err error) {
-	var done bool
-	done, err = future.Done(client)
-	if err != nil {
-		err = autorest.NewErrorWithError(err, "operationalinsights.WorkspacesGetSearchResultsFuture", "Result", future.Response(), "Polling failure")
-		return
-	}
-	if !done {
-		err = azure.NewAsyncOpIncompleteError("operationalinsights.WorkspacesGetSearchResultsFuture")
-		return
-	}
-	sender := autorest.DecorateSender(client, autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
-	if srr.Response.Response, err = future.GetResult(sender); err == nil && srr.Response.Response.StatusCode != http.StatusNoContent {
-		srr, err = client.GetSearchResultsResponder(srr.Response.Response)
-		if err != nil {
-			err = autorest.NewErrorWithError(err, "operationalinsights.WorkspacesGetSearchResultsFuture", "Result", srr.Response.Response, "Failure responding to request")
-		}
-	}
-	return
 }

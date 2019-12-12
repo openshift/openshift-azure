@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,10 @@ package datafactoryapi
 import original "github.com/Azure/azure-sdk-for-go/services/datafactory/mgmt/2018-06-01/datafactory/datafactoryapi"
 
 type ActivityRunsClientAPI = original.ActivityRunsClientAPI
+type DataFlowDebugSessionClientAPI = original.DataFlowDebugSessionClientAPI
+type DataFlowsClientAPI = original.DataFlowsClientAPI
 type DatasetsClientAPI = original.DatasetsClientAPI
+type ExposureControlClientAPI = original.ExposureControlClientAPI
 type FactoriesClientAPI = original.FactoriesClientAPI
 type IntegrationRuntimeNodesClientAPI = original.IntegrationRuntimeNodesClientAPI
 type IntegrationRuntimeObjectMetadataClientAPI = original.IntegrationRuntimeObjectMetadataClientAPI

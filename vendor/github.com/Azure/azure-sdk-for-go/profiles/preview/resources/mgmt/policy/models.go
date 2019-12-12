@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,19 +22,30 @@ package policy
 import (
 	"context"
 
-	original "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/policy"
+	original "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-09-01/policy"
 )
 
 const (
 	DefaultBaseURI = original.DefaultBaseURI
 )
 
-type Mode = original.Mode
+type EnforcementMode = original.EnforcementMode
 
 const (
-	All          Mode = original.All
-	Indexed      Mode = original.Indexed
-	NotSpecified Mode = original.NotSpecified
+	Default      EnforcementMode = original.Default
+	DoNotEnforce EnforcementMode = original.DoNotEnforce
+)
+
+type ParameterType = original.ParameterType
+
+const (
+	Array    ParameterType = original.Array
+	Boolean  ParameterType = original.Boolean
+	DateTime ParameterType = original.DateTime
+	Float    ParameterType = original.Float
+	Integer  ParameterType = original.Integer
+	Object   ParameterType = original.Object
+	String   ParameterType = original.String
 )
 
 type ResourceIdentityType = original.ResourceIdentityType
@@ -47,9 +58,10 @@ const (
 type Type = original.Type
 
 const (
-	TypeBuiltIn      Type = original.TypeBuiltIn
-	TypeCustom       Type = original.TypeCustom
-	TypeNotSpecified Type = original.TypeNotSpecified
+	BuiltIn      Type = original.BuiltIn
+	Custom       Type = original.Custom
+	NotSpecified Type = original.NotSpecified
+	Static       Type = original.Static
 )
 
 type Assignment = original.Assignment
@@ -59,15 +71,21 @@ type AssignmentListResultPage = original.AssignmentListResultPage
 type AssignmentProperties = original.AssignmentProperties
 type AssignmentsClient = original.AssignmentsClient
 type BaseClient = original.BaseClient
+type CloudError = original.CloudError
 type Definition = original.Definition
+type DefinitionGroup = original.DefinitionGroup
 type DefinitionListResult = original.DefinitionListResult
 type DefinitionListResultIterator = original.DefinitionListResultIterator
 type DefinitionListResultPage = original.DefinitionListResultPage
 type DefinitionProperties = original.DefinitionProperties
 type DefinitionReference = original.DefinitionReference
 type DefinitionsClient = original.DefinitionsClient
+type ErrorAdditionalInfo = original.ErrorAdditionalInfo
 type ErrorResponse = original.ErrorResponse
 type Identity = original.Identity
+type ParameterDefinitionsValue = original.ParameterDefinitionsValue
+type ParameterDefinitionsValueMetadata = original.ParameterDefinitionsValueMetadata
+type ParameterValuesValue = original.ParameterValuesValue
 type SetDefinition = original.SetDefinition
 type SetDefinitionListResult = original.SetDefinitionListResult
 type SetDefinitionListResultIterator = original.SetDefinitionListResultIterator
@@ -118,8 +136,11 @@ func NewSetDefinitionsClientWithBaseURI(baseURI string, subscriptionID string) S
 func NewWithBaseURI(baseURI string, subscriptionID string) BaseClient {
 	return original.NewWithBaseURI(baseURI, subscriptionID)
 }
-func PossibleModeValues() []Mode {
-	return original.PossibleModeValues()
+func PossibleEnforcementModeValues() []EnforcementMode {
+	return original.PossibleEnforcementModeValues()
+}
+func PossibleParameterTypeValues() []ParameterType {
+	return original.PossibleParameterTypeValues()
 }
 func PossibleResourceIdentityTypeValues() []ResourceIdentityType {
 	return original.PossibleResourceIdentityTypeValues()

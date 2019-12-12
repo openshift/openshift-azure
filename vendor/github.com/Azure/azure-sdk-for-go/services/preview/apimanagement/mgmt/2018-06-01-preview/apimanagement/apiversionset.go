@@ -67,7 +67,7 @@ func (client APIVersionSetClient) CreateOrUpdate(ctx context.Context, resourceGr
 		{TargetValue: versionSetID,
 			Constraints: []validation.Constraint{{Target: "versionSetID", Name: validation.MaxLength, Rule: 80, Chain: nil},
 				{Target: "versionSetID", Name: validation.MinLength, Rule: 1, Chain: nil},
-				{Target: "versionSetID", Name: validation.Pattern, Rule: `(^[\w]+$)|(^[\w][\w\-]+[\w]$)`, Chain: nil}}},
+				{Target: "versionSetID", Name: validation.Pattern, Rule: `^[^*#&+:<>?]+$`, Chain: nil}}},
 		{TargetValue: parameters,
 			Constraints: []validation.Constraint{{Target: "parameters.APIVersionSetContractProperties", Name: validation.Null, Rule: false,
 				Chain: []validation.Constraint{{Target: "parameters.APIVersionSetContractProperties.DisplayName", Name: validation.Null, Rule: true,
@@ -130,8 +130,8 @@ func (client APIVersionSetClient) CreateOrUpdatePreparer(ctx context.Context, re
 // CreateOrUpdateSender sends the CreateOrUpdate request. The method will close the
 // http.Response Body if it receives an error.
 func (client APIVersionSetClient) CreateOrUpdateSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // CreateOrUpdateResponder handles the response to the CreateOrUpdate request. The method always
@@ -173,7 +173,7 @@ func (client APIVersionSetClient) Delete(ctx context.Context, resourceGroupName 
 		{TargetValue: versionSetID,
 			Constraints: []validation.Constraint{{Target: "versionSetID", Name: validation.MaxLength, Rule: 80, Chain: nil},
 				{Target: "versionSetID", Name: validation.MinLength, Rule: 1, Chain: nil},
-				{Target: "versionSetID", Name: validation.Pattern, Rule: `(^[\w]+$)|(^[\w][\w\-]+[\w]$)`, Chain: nil}}}}); err != nil {
+				{Target: "versionSetID", Name: validation.Pattern, Rule: `^[^*#&+:<>?]+$`, Chain: nil}}}}); err != nil {
 		return result, validation.NewError("apimanagement.APIVersionSetClient", "Delete", err.Error())
 	}
 
@@ -224,8 +224,8 @@ func (client APIVersionSetClient) DeletePreparer(ctx context.Context, resourceGr
 // DeleteSender sends the Delete request. The method will close the
 // http.Response Body if it receives an error.
 func (client APIVersionSetClient) DeleteSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // DeleteResponder handles the response to the Delete request. The method always
@@ -264,7 +264,7 @@ func (client APIVersionSetClient) Get(ctx context.Context, resourceGroupName str
 		{TargetValue: versionSetID,
 			Constraints: []validation.Constraint{{Target: "versionSetID", Name: validation.MaxLength, Rule: 80, Chain: nil},
 				{Target: "versionSetID", Name: validation.MinLength, Rule: 1, Chain: nil},
-				{Target: "versionSetID", Name: validation.Pattern, Rule: `(^[\w]+$)|(^[\w][\w\-]+[\w]$)`, Chain: nil}}}}); err != nil {
+				{Target: "versionSetID", Name: validation.Pattern, Rule: `^[^*#&+:<>?]+$`, Chain: nil}}}}); err != nil {
 		return result, validation.NewError("apimanagement.APIVersionSetClient", "Get", err.Error())
 	}
 
@@ -314,8 +314,8 @@ func (client APIVersionSetClient) GetPreparer(ctx context.Context, resourceGroup
 // GetSender sends the Get request. The method will close the
 // http.Response Body if it receives an error.
 func (client APIVersionSetClient) GetSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetResponder handles the response to the Get request. The method always
@@ -355,7 +355,7 @@ func (client APIVersionSetClient) GetEntityTag(ctx context.Context, resourceGrou
 		{TargetValue: versionSetID,
 			Constraints: []validation.Constraint{{Target: "versionSetID", Name: validation.MaxLength, Rule: 80, Chain: nil},
 				{Target: "versionSetID", Name: validation.MinLength, Rule: 1, Chain: nil},
-				{Target: "versionSetID", Name: validation.Pattern, Rule: `(^[\w]+$)|(^[\w][\w\-]+[\w]$)`, Chain: nil}}}}); err != nil {
+				{Target: "versionSetID", Name: validation.Pattern, Rule: `^[^*#&+:<>?]+$`, Chain: nil}}}}); err != nil {
 		return result, validation.NewError("apimanagement.APIVersionSetClient", "GetEntityTag", err.Error())
 	}
 
@@ -405,8 +405,8 @@ func (client APIVersionSetClient) GetEntityTagPreparer(ctx context.Context, reso
 // GetEntityTagSender sends the GetEntityTag request. The method will close the
 // http.Response Body if it receives an error.
 func (client APIVersionSetClient) GetEntityTagSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetEntityTagResponder handles the response to the GetEntityTag request. The method always
@@ -425,15 +425,8 @@ func (client APIVersionSetClient) GetEntityTagResponder(resp *http.Response) (re
 // Parameters:
 // resourceGroupName - the name of the resource group.
 // serviceName - the name of the API Management service.
-// filter - | Field            | Supported operators    | Supported functions               |
-// |------------------|------------------------|-----------------------------------|
-// | id               | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
-// | firstName        | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
-// | lastName         | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
-// | email            | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
-// | state            | eq                     | N/A                               |
-// | registrationDate | ge, le, eq, ne, gt, lt | N/A                               |
-// | note             | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
+// filter - | Field       | Supported operators    | Supported functions               |
+// |-------------|------------------------|-----------------------------------|
 // top - number of records to return.
 // skip - number of records to skip.
 func (client APIVersionSetClient) ListByService(ctx context.Context, resourceGroupName string, serviceName string, filter string, top *int32, skip *int32) (result APIVersionSetCollectionPage, err error) {
@@ -516,8 +509,8 @@ func (client APIVersionSetClient) ListByServicePreparer(ctx context.Context, res
 // ListByServiceSender sends the ListByService request. The method will close the
 // http.Response Body if it receives an error.
 func (client APIVersionSetClient) ListByServiceSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListByServiceResponder handles the response to the ListByService request. The method always
@@ -597,7 +590,7 @@ func (client APIVersionSetClient) Update(ctx context.Context, resourceGroupName 
 		{TargetValue: versionSetID,
 			Constraints: []validation.Constraint{{Target: "versionSetID", Name: validation.MaxLength, Rule: 80, Chain: nil},
 				{Target: "versionSetID", Name: validation.MinLength, Rule: 1, Chain: nil},
-				{Target: "versionSetID", Name: validation.Pattern, Rule: `(^[\w]+$)|(^[\w][\w\-]+[\w]$)`, Chain: nil}}}}); err != nil {
+				{Target: "versionSetID", Name: validation.Pattern, Rule: `^[^*#&+:<>?]+$`, Chain: nil}}}}); err != nil {
 		return result, validation.NewError("apimanagement.APIVersionSetClient", "Update", err.Error())
 	}
 
@@ -650,8 +643,8 @@ func (client APIVersionSetClient) UpdatePreparer(ctx context.Context, resourceGr
 // UpdateSender sends the Update request. The method will close the
 // http.Response Body if it receives an error.
 func (client APIVersionSetClient) UpdateSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // UpdateResponder handles the response to the Update request. The method always

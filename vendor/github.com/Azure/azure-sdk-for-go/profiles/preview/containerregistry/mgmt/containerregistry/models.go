@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package containerregistry
 import (
 	"context"
 
-	original "github.com/Azure/azure-sdk-for-go/services/containerregistry/mgmt/2018-09-01/containerregistry"
+	original "github.com/Azure/azure-sdk-for-go/services/containerregistry/mgmt/2019-06-01-preview/containerregistry"
 )
 
 const (
@@ -38,9 +38,11 @@ const (
 type Architecture = original.Architecture
 
 const (
-	Amd64 Architecture = original.Amd64
-	Arm   Architecture = original.Arm
-	X86   Architecture = original.X86
+	Amd64         Architecture = original.Amd64
+	Arm           Architecture = original.Arm
+	Arm64         Architecture = original.Arm64
+	ThreeEightSix Architecture = original.ThreeEightSix
+	X86           Architecture = original.X86
 )
 
 type BaseImageDependencyType = original.BaseImageDependencyType
@@ -110,6 +112,15 @@ const (
 	Count RegistryUsageUnit = original.Count
 )
 
+type ResourceIdentityType = original.ResourceIdentityType
+
+const (
+	None                       ResourceIdentityType = original.None
+	SystemAssigned             ResourceIdentityType = original.SystemAssigned
+	SystemAssignedUserAssigned ResourceIdentityType = original.SystemAssignedUserAssigned
+	UserAssigned               ResourceIdentityType = original.UserAssigned
+)
+
 type RunStatus = original.RunStatus
 
 const (
@@ -130,6 +141,13 @@ const (
 	AutoRun    RunType = original.AutoRun
 	QuickBuild RunType = original.QuickBuild
 	QuickRun   RunType = original.QuickRun
+)
+
+type SecretObjectType = original.SecretObjectType
+
+const (
+	Opaque      SecretObjectType = original.Opaque
+	Vaultsecret SecretObjectType = original.Vaultsecret
 )
 
 type SkuName = original.SkuName
@@ -157,6 +175,13 @@ const (
 	VisualStudioTeamService SourceControlType = original.VisualStudioTeamService
 )
 
+type SourceRegistryLoginMode = original.SourceRegistryLoginMode
+
+const (
+	SourceRegistryLoginModeDefault SourceRegistryLoginMode = original.SourceRegistryLoginModeDefault
+	SourceRegistryLoginModeNone    SourceRegistryLoginMode = original.SourceRegistryLoginModeNone
+)
+
 type SourceTriggerEvent = original.SourceTriggerEvent
 
 const (
@@ -169,6 +194,27 @@ type TaskStatus = original.TaskStatus
 const (
 	TaskStatusDisabled TaskStatus = original.TaskStatusDisabled
 	TaskStatusEnabled  TaskStatus = original.TaskStatusEnabled
+)
+
+type TokenCertificateName = original.TokenCertificateName
+
+const (
+	Certificate1 TokenCertificateName = original.Certificate1
+	Certificate2 TokenCertificateName = original.Certificate2
+)
+
+type TokenPasswordName = original.TokenPasswordName
+
+const (
+	TokenPasswordNamePassword1 TokenPasswordName = original.TokenPasswordNamePassword1
+	TokenPasswordNamePassword2 TokenPasswordName = original.TokenPasswordNamePassword2
+)
+
+type TokenStatus = original.TokenStatus
+
+const (
+	TokenStatusDisabled TokenStatus = original.TokenStatusDisabled
+	TokenStatusEnabled  TokenStatus = original.TokenStatusEnabled
 )
 
 type TokenType = original.TokenType
@@ -219,6 +265,13 @@ const (
 	TypeBasicTaskStepUpdateParametersTypeTaskStepUpdateParameters TypeBasicTaskStepUpdateParameters = original.TypeBasicTaskStepUpdateParametersTypeTaskStepUpdateParameters
 )
 
+type UpdateTriggerPayloadType = original.UpdateTriggerPayloadType
+
+const (
+	UpdateTriggerPayloadTypeDefault UpdateTriggerPayloadType = original.UpdateTriggerPayloadTypeDefault
+	UpdateTriggerPayloadTypeToken   UpdateTriggerPayloadType = original.UpdateTriggerPayloadTypeToken
+)
+
 type Variant = original.Variant
 
 const (
@@ -257,6 +310,8 @@ type BasicRunRequest = original.BasicRunRequest
 type BasicTaskStepProperties = original.BasicTaskStepProperties
 type BasicTaskStepUpdateParameters = original.BasicTaskStepUpdateParameters
 type CallbackConfig = original.CallbackConfig
+type Credentials = original.Credentials
+type CustomRegistryCredentials = original.CustomRegistryCredentials
 type DockerBuildRequest = original.DockerBuildRequest
 type DockerBuildStep = original.DockerBuildStep
 type DockerBuildStepUpdateParameters = original.DockerBuildStepUpdateParameters
@@ -274,7 +329,10 @@ type EventResponseMessage = original.EventResponseMessage
 type FileTaskRunRequest = original.FileTaskRunRequest
 type FileTaskStep = original.FileTaskStep
 type FileTaskStepUpdateParameters = original.FileTaskStepUpdateParameters
+type GenerateCredentialsParameters = original.GenerateCredentialsParameters
+type GenerateCredentialsResult = original.GenerateCredentialsResult
 type IPRule = original.IPRule
+type IdentityProperties = original.IdentityProperties
 type ImageDescriptor = original.ImageDescriptor
 type ImageUpdateTrigger = original.ImageUpdateTrigger
 type ImportImageParameters = original.ImportImageParameters
@@ -290,20 +348,21 @@ type OperationMetricSpecificationDefinition = original.OperationMetricSpecificat
 type OperationPropertiesDefinition = original.OperationPropertiesDefinition
 type OperationServiceSpecificationDefinition = original.OperationServiceSpecificationDefinition
 type OperationsClient = original.OperationsClient
+type OverrideTaskStepProperties = original.OverrideTaskStepProperties
 type PlatformProperties = original.PlatformProperties
 type PlatformUpdateParameters = original.PlatformUpdateParameters
+type Policies = original.Policies
 type ProxyResource = original.ProxyResource
 type QuarantinePolicy = original.QuarantinePolicy
 type RegenerateCredentialParameters = original.RegenerateCredentialParameters
 type RegistriesClient = original.RegistriesClient
 type RegistriesCreateFuture = original.RegistriesCreateFuture
 type RegistriesDeleteFuture = original.RegistriesDeleteFuture
+type RegistriesGenerateCredentialsFuture = original.RegistriesGenerateCredentialsFuture
 type RegistriesImportImageFuture = original.RegistriesImportImageFuture
 type RegistriesScheduleRunFuture = original.RegistriesScheduleRunFuture
 type RegistriesUpdateFuture = original.RegistriesUpdateFuture
-type RegistriesUpdatePoliciesFuture = original.RegistriesUpdatePoliciesFuture
 type Registry = original.Registry
-type RegistryIdentity = original.RegistryIdentity
 type RegistryListCredentialsResult = original.RegistryListCredentialsResult
 type RegistryListResult = original.RegistryListResult
 type RegistryListResultIterator = original.RegistryListResultIterator
@@ -311,7 +370,6 @@ type RegistryListResultPage = original.RegistryListResultPage
 type RegistryNameCheckRequest = original.RegistryNameCheckRequest
 type RegistryNameStatus = original.RegistryNameStatus
 type RegistryPassword = original.RegistryPassword
-type RegistryPolicies = original.RegistryPolicies
 type RegistryProperties = original.RegistryProperties
 type RegistryPropertiesUpdateParameters = original.RegistryPropertiesUpdateParameters
 type RegistryUpdateParameters = original.RegistryUpdateParameters
@@ -329,6 +387,7 @@ type ReplicationsDeleteFuture = original.ReplicationsDeleteFuture
 type ReplicationsUpdateFuture = original.ReplicationsUpdateFuture
 type Request = original.Request
 type Resource = original.Resource
+type RetentionPolicy = original.RetentionPolicy
 type Run = original.Run
 type RunFilter = original.RunFilter
 type RunGetLogResult = original.RunGetLogResult
@@ -341,10 +400,23 @@ type RunUpdateParameters = original.RunUpdateParameters
 type RunsCancelFuture = original.RunsCancelFuture
 type RunsClient = original.RunsClient
 type RunsUpdateFuture = original.RunsUpdateFuture
+type ScopeMap = original.ScopeMap
+type ScopeMapListResult = original.ScopeMapListResult
+type ScopeMapListResultIterator = original.ScopeMapListResultIterator
+type ScopeMapListResultPage = original.ScopeMapListResultPage
+type ScopeMapProperties = original.ScopeMapProperties
+type ScopeMapPropertiesUpdateParameters = original.ScopeMapPropertiesUpdateParameters
+type ScopeMapUpdateParameters = original.ScopeMapUpdateParameters
+type ScopeMapsClient = original.ScopeMapsClient
+type ScopeMapsCreateFuture = original.ScopeMapsCreateFuture
+type ScopeMapsDeleteFuture = original.ScopeMapsDeleteFuture
+type ScopeMapsUpdateFuture = original.ScopeMapsUpdateFuture
+type SecretObject = original.SecretObject
 type SetValue = original.SetValue
 type Sku = original.Sku
 type Source = original.Source
 type SourceProperties = original.SourceProperties
+type SourceRegistryCredentials = original.SourceRegistryCredentials
 type SourceTrigger = original.SourceTrigger
 type SourceTriggerDescriptor = original.SourceTriggerDescriptor
 type SourceTriggerUpdateParameters = original.SourceTriggerUpdateParameters
@@ -367,9 +439,27 @@ type TasksClient = original.TasksClient
 type TasksCreateFuture = original.TasksCreateFuture
 type TasksDeleteFuture = original.TasksDeleteFuture
 type TasksUpdateFuture = original.TasksUpdateFuture
+type TimerTrigger = original.TimerTrigger
+type TimerTriggerDescriptor = original.TimerTriggerDescriptor
+type TimerTriggerUpdateParameters = original.TimerTriggerUpdateParameters
+type Token = original.Token
+type TokenCertificate = original.TokenCertificate
+type TokenCredentialsProperties = original.TokenCredentialsProperties
+type TokenListResult = original.TokenListResult
+type TokenListResultIterator = original.TokenListResultIterator
+type TokenListResultPage = original.TokenListResultPage
+type TokenPassword = original.TokenPassword
+type TokenProperties = original.TokenProperties
+type TokenUpdateParameters = original.TokenUpdateParameters
+type TokenUpdateProperties = original.TokenUpdateProperties
+type TokensClient = original.TokensClient
+type TokensCreateFuture = original.TokensCreateFuture
+type TokensDeleteFuture = original.TokensDeleteFuture
+type TokensUpdateFuture = original.TokensUpdateFuture
 type TriggerProperties = original.TriggerProperties
 type TriggerUpdateParameters = original.TriggerUpdateParameters
 type TrustPolicy = original.TrustPolicy
+type UserIdentityProperties = original.UserIdentityProperties
 type VirtualNetworkRule = original.VirtualNetworkRule
 type Webhook = original.Webhook
 type WebhookCreateParameters = original.WebhookCreateParameters
@@ -442,6 +532,18 @@ func NewRunsClient(subscriptionID string) RunsClient {
 func NewRunsClientWithBaseURI(baseURI string, subscriptionID string) RunsClient {
 	return original.NewRunsClientWithBaseURI(baseURI, subscriptionID)
 }
+func NewScopeMapListResultIterator(page ScopeMapListResultPage) ScopeMapListResultIterator {
+	return original.NewScopeMapListResultIterator(page)
+}
+func NewScopeMapListResultPage(getNextPage func(context.Context, ScopeMapListResult) (ScopeMapListResult, error)) ScopeMapListResultPage {
+	return original.NewScopeMapListResultPage(getNextPage)
+}
+func NewScopeMapsClient(subscriptionID string) ScopeMapsClient {
+	return original.NewScopeMapsClient(subscriptionID)
+}
+func NewScopeMapsClientWithBaseURI(baseURI string, subscriptionID string) ScopeMapsClient {
+	return original.NewScopeMapsClientWithBaseURI(baseURI, subscriptionID)
+}
 func NewTaskListResultIterator(page TaskListResultPage) TaskListResultIterator {
 	return original.NewTaskListResultIterator(page)
 }
@@ -453,6 +555,18 @@ func NewTasksClient(subscriptionID string) TasksClient {
 }
 func NewTasksClientWithBaseURI(baseURI string, subscriptionID string) TasksClient {
 	return original.NewTasksClientWithBaseURI(baseURI, subscriptionID)
+}
+func NewTokenListResultIterator(page TokenListResultPage) TokenListResultIterator {
+	return original.NewTokenListResultIterator(page)
+}
+func NewTokenListResultPage(getNextPage func(context.Context, TokenListResult) (TokenListResult, error)) TokenListResultPage {
+	return original.NewTokenListResultPage(getNextPage)
+}
+func NewTokensClient(subscriptionID string) TokensClient {
+	return original.NewTokensClient(subscriptionID)
+}
+func NewTokensClientWithBaseURI(baseURI string, subscriptionID string) TokensClient {
+	return original.NewTokensClientWithBaseURI(baseURI, subscriptionID)
 }
 func NewWebhookListResultIterator(page WebhookListResultPage) WebhookListResultIterator {
 	return original.NewWebhookListResultIterator(page)
@@ -502,11 +616,17 @@ func PossibleProvisioningStateValues() []ProvisioningState {
 func PossibleRegistryUsageUnitValues() []RegistryUsageUnit {
 	return original.PossibleRegistryUsageUnitValues()
 }
+func PossibleResourceIdentityTypeValues() []ResourceIdentityType {
+	return original.PossibleResourceIdentityTypeValues()
+}
 func PossibleRunStatusValues() []RunStatus {
 	return original.PossibleRunStatusValues()
 }
 func PossibleRunTypeValues() []RunType {
 	return original.PossibleRunTypeValues()
+}
+func PossibleSecretObjectTypeValues() []SecretObjectType {
+	return original.PossibleSecretObjectTypeValues()
 }
 func PossibleSkuNameValues() []SkuName {
 	return original.PossibleSkuNameValues()
@@ -517,11 +637,23 @@ func PossibleSkuTierValues() []SkuTier {
 func PossibleSourceControlTypeValues() []SourceControlType {
 	return original.PossibleSourceControlTypeValues()
 }
+func PossibleSourceRegistryLoginModeValues() []SourceRegistryLoginMode {
+	return original.PossibleSourceRegistryLoginModeValues()
+}
 func PossibleSourceTriggerEventValues() []SourceTriggerEvent {
 	return original.PossibleSourceTriggerEventValues()
 }
 func PossibleTaskStatusValues() []TaskStatus {
 	return original.PossibleTaskStatusValues()
+}
+func PossibleTokenCertificateNameValues() []TokenCertificateName {
+	return original.PossibleTokenCertificateNameValues()
+}
+func PossibleTokenPasswordNameValues() []TokenPasswordName {
+	return original.PossibleTokenPasswordNameValues()
+}
+func PossibleTokenStatusValues() []TokenStatus {
+	return original.PossibleTokenStatusValues()
 }
 func PossibleTokenTypeValues() []TokenType {
 	return original.PossibleTokenTypeValues()
@@ -540,6 +672,9 @@ func PossibleTypeBasicTaskStepUpdateParametersValues() []TypeBasicTaskStepUpdate
 }
 func PossibleTypeValues() []Type {
 	return original.PossibleTypeValues()
+}
+func PossibleUpdateTriggerPayloadTypeValues() []UpdateTriggerPayloadType {
+	return original.PossibleUpdateTriggerPayloadTypeValues()
 }
 func PossibleVariantValues() []Variant {
 	return original.PossibleVariantValues()

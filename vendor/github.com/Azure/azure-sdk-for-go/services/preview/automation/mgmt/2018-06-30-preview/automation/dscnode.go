@@ -32,13 +32,13 @@ type DscNodeClient struct {
 }
 
 // NewDscNodeClient creates an instance of the DscNodeClient client.
-func NewDscNodeClient(subscriptionID string, countType1 CountType) DscNodeClient {
-	return NewDscNodeClientWithBaseURI(DefaultBaseURI, subscriptionID, countType1)
+func NewDscNodeClient(subscriptionID string) DscNodeClient {
+	return NewDscNodeClientWithBaseURI(DefaultBaseURI, subscriptionID)
 }
 
 // NewDscNodeClientWithBaseURI creates an instance of the DscNodeClient client.
-func NewDscNodeClientWithBaseURI(baseURI string, subscriptionID string, countType1 CountType) DscNodeClient {
-	return DscNodeClient{NewWithBaseURI(baseURI, subscriptionID, countType1)}
+func NewDscNodeClientWithBaseURI(baseURI string, subscriptionID string) DscNodeClient {
+	return DscNodeClient{NewWithBaseURI(baseURI, subscriptionID)}
 }
 
 // Delete delete the dsc node identified by node id.
@@ -111,8 +111,8 @@ func (client DscNodeClient) DeletePreparer(ctx context.Context, resourceGroupNam
 // DeleteSender sends the Delete request. The method will close the
 // http.Response Body if it receives an error.
 func (client DscNodeClient) DeleteSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // DeleteResponder handles the response to the Delete request. The method always
@@ -198,8 +198,8 @@ func (client DscNodeClient) GetPreparer(ctx context.Context, resourceGroupName s
 // GetSender sends the Get request. The method will close the
 // http.Response Body if it receives an error.
 func (client DscNodeClient) GetSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetResponder handles the response to the Get request. The method always
@@ -221,7 +221,7 @@ func (client DscNodeClient) GetResponder(resp *http.Response) (result DscNode, e
 // automationAccountName - the name of the automation account.
 // filter - the filter to apply on the operation.
 // skip - the number of rows to skip.
-// top - the the number of rows to take.
+// top - the number of rows to take.
 // inlinecount - return total rows.
 func (client DscNodeClient) ListByAutomationAccount(ctx context.Context, resourceGroupName string, automationAccountName string, filter string, skip *int32, top *int32, inlinecount string) (result DscNodeListResultPage, err error) {
 	if tracing.IsEnabled() {
@@ -300,8 +300,8 @@ func (client DscNodeClient) ListByAutomationAccountPreparer(ctx context.Context,
 // ListByAutomationAccountSender sends the ListByAutomationAccount request. The method will close the
 // http.Response Body if it receives an error.
 func (client DscNodeClient) ListByAutomationAccountSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListByAutomationAccountResponder handles the response to the ListByAutomationAccount request. The method always
@@ -427,8 +427,8 @@ func (client DscNodeClient) UpdatePreparer(ctx context.Context, resourceGroupNam
 // UpdateSender sends the Update request. The method will close the
 // http.Response Body if it receives an error.
 func (client DscNodeClient) UpdateSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // UpdateResponder handles the response to the Update request. The method always

@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,6 +43,18 @@ const (
 	Reject IPAction = original.Reject
 )
 
+type IdentityType = original.IdentityType
+
+const (
+	SystemAssigned IdentityType = original.SystemAssigned
+)
+
+type KeySource = original.KeySource
+
+const (
+	MicrosoftKeyVault KeySource = original.MicrosoftKeyVault
+)
+
 type NetworkRuleIPAction = original.NetworkRuleIPAction
 
 const (
@@ -63,6 +75,8 @@ const (
 	SkuTierStandard SkuTier = original.SkuTierStandard
 )
 
+type AvailableCluster = original.AvailableCluster
+type AvailableClustersList = original.AvailableClustersList
 type BaseClient = original.BaseClient
 type Cluster = original.Cluster
 type ClusterListResult = original.ClusterListResult
@@ -72,19 +86,26 @@ type ClusterProperties = original.ClusterProperties
 type ClusterQuotaConfigurationProperties = original.ClusterQuotaConfigurationProperties
 type ClusterSku = original.ClusterSku
 type ClustersClient = original.ClustersClient
+type ClustersDeleteFuture = original.ClustersDeleteFuture
 type ClustersPatchFuture = original.ClustersPatchFuture
+type ClustersPutFuture = original.ClustersPutFuture
 type ConfigurationClient = original.ConfigurationClient
 type EHNamespace = original.EHNamespace
+type EHNamespaceIDContainer = original.EHNamespaceIDContainer
+type EHNamespaceIDListResult = original.EHNamespaceIDListResult
 type EHNamespaceListResult = original.EHNamespaceListResult
 type EHNamespaceListResultIterator = original.EHNamespaceListResultIterator
 type EHNamespaceListResultPage = original.EHNamespaceListResultPage
 type EHNamespaceProperties = original.EHNamespaceProperties
+type Encryption = original.Encryption
 type ErrorResponse = original.ErrorResponse
 type IPFilterRule = original.IPFilterRule
 type IPFilterRuleListResult = original.IPFilterRuleListResult
 type IPFilterRuleListResultIterator = original.IPFilterRuleListResultIterator
 type IPFilterRuleListResultPage = original.IPFilterRuleListResultPage
 type IPFilterRuleProperties = original.IPFilterRuleProperties
+type Identity = original.Identity
+type KeyVaultProperties = original.KeyVaultProperties
 type NWRuleSetIPRules = original.NWRuleSetIPRules
 type NWRuleSetVirtualNetworkRules = original.NWRuleSetVirtualNetworkRules
 type NamespacesClient = original.NamespacesClient
@@ -173,6 +194,12 @@ func PossibleDefaultActionValues() []DefaultAction {
 }
 func PossibleIPActionValues() []IPAction {
 	return original.PossibleIPActionValues()
+}
+func PossibleIdentityTypeValues() []IdentityType {
+	return original.PossibleIdentityTypeValues()
+}
+func PossibleKeySourceValues() []KeySource {
+	return original.PossibleKeySourceValues()
 }
 func PossibleNetworkRuleIPActionValues() []NetworkRuleIPAction {
 	return original.PossibleNetworkRuleIPActionValues()

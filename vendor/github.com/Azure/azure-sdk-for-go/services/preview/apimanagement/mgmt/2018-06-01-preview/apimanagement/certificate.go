@@ -68,7 +68,7 @@ func (client CertificateClient) CreateOrUpdate(ctx context.Context, resourceGrou
 		{TargetValue: certificateID,
 			Constraints: []validation.Constraint{{Target: "certificateID", Name: validation.MaxLength, Rule: 80, Chain: nil},
 				{Target: "certificateID", Name: validation.MinLength, Rule: 1, Chain: nil},
-				{Target: "certificateID", Name: validation.Pattern, Rule: `(^[\w]+$)|(^[\w][\w\-]+[\w]$)`, Chain: nil}}},
+				{Target: "certificateID", Name: validation.Pattern, Rule: `^[^*#&+:<>?]+$`, Chain: nil}}},
 		{TargetValue: parameters,
 			Constraints: []validation.Constraint{{Target: "parameters.CertificateCreateOrUpdateProperties", Name: validation.Null, Rule: false,
 				Chain: []validation.Constraint{{Target: "parameters.CertificateCreateOrUpdateProperties.Data", Name: validation.Null, Rule: true, Chain: nil},
@@ -129,8 +129,8 @@ func (client CertificateClient) CreateOrUpdatePreparer(ctx context.Context, reso
 // CreateOrUpdateSender sends the CreateOrUpdate request. The method will close the
 // http.Response Body if it receives an error.
 func (client CertificateClient) CreateOrUpdateSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // CreateOrUpdateResponder handles the response to the CreateOrUpdate request. The method always
@@ -173,7 +173,7 @@ func (client CertificateClient) Delete(ctx context.Context, resourceGroupName st
 		{TargetValue: certificateID,
 			Constraints: []validation.Constraint{{Target: "certificateID", Name: validation.MaxLength, Rule: 80, Chain: nil},
 				{Target: "certificateID", Name: validation.MinLength, Rule: 1, Chain: nil},
-				{Target: "certificateID", Name: validation.Pattern, Rule: `(^[\w]+$)|(^[\w][\w\-]+[\w]$)`, Chain: nil}}}}); err != nil {
+				{Target: "certificateID", Name: validation.Pattern, Rule: `^[^*#&+:<>?]+$`, Chain: nil}}}}); err != nil {
 		return result, validation.NewError("apimanagement.CertificateClient", "Delete", err.Error())
 	}
 
@@ -224,8 +224,8 @@ func (client CertificateClient) DeletePreparer(ctx context.Context, resourceGrou
 // DeleteSender sends the Delete request. The method will close the
 // http.Response Body if it receives an error.
 func (client CertificateClient) DeleteSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // DeleteResponder handles the response to the Delete request. The method always
@@ -265,7 +265,7 @@ func (client CertificateClient) Get(ctx context.Context, resourceGroupName strin
 		{TargetValue: certificateID,
 			Constraints: []validation.Constraint{{Target: "certificateID", Name: validation.MaxLength, Rule: 80, Chain: nil},
 				{Target: "certificateID", Name: validation.MinLength, Rule: 1, Chain: nil},
-				{Target: "certificateID", Name: validation.Pattern, Rule: `(^[\w]+$)|(^[\w][\w\-]+[\w]$)`, Chain: nil}}}}); err != nil {
+				{Target: "certificateID", Name: validation.Pattern, Rule: `^[^*#&+:<>?]+$`, Chain: nil}}}}); err != nil {
 		return result, validation.NewError("apimanagement.CertificateClient", "Get", err.Error())
 	}
 
@@ -315,8 +315,8 @@ func (client CertificateClient) GetPreparer(ctx context.Context, resourceGroupNa
 // GetSender sends the Get request. The method will close the
 // http.Response Body if it receives an error.
 func (client CertificateClient) GetSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetResponder handles the response to the Get request. The method always
@@ -357,7 +357,7 @@ func (client CertificateClient) GetEntityTag(ctx context.Context, resourceGroupN
 		{TargetValue: certificateID,
 			Constraints: []validation.Constraint{{Target: "certificateID", Name: validation.MaxLength, Rule: 80, Chain: nil},
 				{Target: "certificateID", Name: validation.MinLength, Rule: 1, Chain: nil},
-				{Target: "certificateID", Name: validation.Pattern, Rule: `(^[\w]+$)|(^[\w][\w\-]+[\w]$)`, Chain: nil}}}}); err != nil {
+				{Target: "certificateID", Name: validation.Pattern, Rule: `^[^*#&+:<>?]+$`, Chain: nil}}}}); err != nil {
 		return result, validation.NewError("apimanagement.CertificateClient", "GetEntityTag", err.Error())
 	}
 
@@ -407,8 +407,8 @@ func (client CertificateClient) GetEntityTagPreparer(ctx context.Context, resour
 // GetEntityTagSender sends the GetEntityTag request. The method will close the
 // http.Response Body if it receives an error.
 func (client CertificateClient) GetEntityTagSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetEntityTagResponder handles the response to the GetEntityTag request. The method always
@@ -427,12 +427,13 @@ func (client CertificateClient) GetEntityTagResponder(resp *http.Response) (resu
 // Parameters:
 // resourceGroupName - the name of the resource group.
 // serviceName - the name of the API Management service.
-// filter - | Field          | Supported operators    | Supported functions                         |
-// |----------------|------------------------|---------------------------------------------|
-// | id             | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
-// | subject        | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
-// | thumbprint     | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |
-// | expirationDate | ge, le, eq, ne, gt, lt | N/A                                         |
+// filter - | Field       | Supported operators    | Supported functions               |
+// |-------------|------------------------|-----------------------------------|
+//
+// |name | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith|
+// |subject | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith|
+// |thumbprint | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith|
+// |expirationDate | ge, le, eq, ne, gt, lt |    |
 // top - number of records to return.
 // skip - number of records to skip.
 func (client CertificateClient) ListByService(ctx context.Context, resourceGroupName string, serviceName string, filter string, top *int32, skip *int32) (result CertificateCollectionPage, err error) {
@@ -515,8 +516,8 @@ func (client CertificateClient) ListByServicePreparer(ctx context.Context, resou
 // ListByServiceSender sends the ListByService request. The method will close the
 // http.Response Body if it receives an error.
 func (client CertificateClient) ListByServiceSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListByServiceResponder handles the response to the ListByService request. The method always

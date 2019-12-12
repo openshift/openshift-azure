@@ -32,14 +32,14 @@ type SoftwareUpdateConfigurationsClient struct {
 }
 
 // NewSoftwareUpdateConfigurationsClient creates an instance of the SoftwareUpdateConfigurationsClient client.
-func NewSoftwareUpdateConfigurationsClient(subscriptionID string, countType1 CountType) SoftwareUpdateConfigurationsClient {
-	return NewSoftwareUpdateConfigurationsClientWithBaseURI(DefaultBaseURI, subscriptionID, countType1)
+func NewSoftwareUpdateConfigurationsClient(subscriptionID string) SoftwareUpdateConfigurationsClient {
+	return NewSoftwareUpdateConfigurationsClientWithBaseURI(DefaultBaseURI, subscriptionID)
 }
 
 // NewSoftwareUpdateConfigurationsClientWithBaseURI creates an instance of the SoftwareUpdateConfigurationsClient
 // client.
-func NewSoftwareUpdateConfigurationsClientWithBaseURI(baseURI string, subscriptionID string, countType1 CountType) SoftwareUpdateConfigurationsClient {
-	return SoftwareUpdateConfigurationsClient{NewWithBaseURI(baseURI, subscriptionID, countType1)}
+func NewSoftwareUpdateConfigurationsClientWithBaseURI(baseURI string, subscriptionID string) SoftwareUpdateConfigurationsClient {
+	return SoftwareUpdateConfigurationsClient{NewWithBaseURI(baseURI, subscriptionID)}
 }
 
 // Create create a new software update configuration with the name given in the URI.
@@ -108,6 +108,9 @@ func (client SoftwareUpdateConfigurationsClient) CreatePreparer(ctx context.Cont
 		"api-version": APIVersion,
 	}
 
+	parameters.Name = nil
+	parameters.ID = nil
+	parameters.Type = nil
 	preparer := autorest.CreatePreparer(
 		autorest.AsContentType("application/json; charset=utf-8"),
 		autorest.AsPut(),
@@ -125,8 +128,8 @@ func (client SoftwareUpdateConfigurationsClient) CreatePreparer(ctx context.Cont
 // CreateSender sends the Create request. The method will close the
 // http.Response Body if it receives an error.
 func (client SoftwareUpdateConfigurationsClient) CreateSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // CreateResponder handles the response to the Create request. The method always
@@ -217,8 +220,8 @@ func (client SoftwareUpdateConfigurationsClient) DeletePreparer(ctx context.Cont
 // DeleteSender sends the Delete request. The method will close the
 // http.Response Body if it receives an error.
 func (client SoftwareUpdateConfigurationsClient) DeleteSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // DeleteResponder handles the response to the Delete request. The method always
@@ -308,8 +311,8 @@ func (client SoftwareUpdateConfigurationsClient) GetByNamePreparer(ctx context.C
 // GetByNameSender sends the GetByName request. The method will close the
 // http.Response Body if it receives an error.
 func (client SoftwareUpdateConfigurationsClient) GetByNameSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetByNameResponder handles the response to the GetByName request. The method always
@@ -402,8 +405,8 @@ func (client SoftwareUpdateConfigurationsClient) ListPreparer(ctx context.Contex
 // ListSender sends the List request. The method will close the
 // http.Response Body if it receives an error.
 func (client SoftwareUpdateConfigurationsClient) ListSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListResponder handles the response to the List request. The method always

@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ type IntegrationAccountBatchConfigurationsClientAPI = original.IntegrationAccoun
 type IntegrationAccountsClientAPI = original.IntegrationAccountsClientAPI
 type MapsClientAPI = original.MapsClientAPI
 type PartnersClientAPI = original.PartnersClientAPI
+type RosettaNetProcessConfigurationsClientAPI = original.RosettaNetProcessConfigurationsClientAPI
 type SchemasClientAPI = original.SchemasClientAPI
 type SessionsClientAPI = original.SessionsClientAPI
 type WorkflowRunActionRepetitionsClientAPI = original.WorkflowRunActionRepetitionsClientAPI

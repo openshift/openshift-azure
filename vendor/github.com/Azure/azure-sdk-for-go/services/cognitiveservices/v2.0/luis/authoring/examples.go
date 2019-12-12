@@ -37,11 +37,11 @@ func NewExamplesClient(endpoint string) ExamplesClient {
 	return ExamplesClient{New(endpoint)}
 }
 
-// Add adds a labeled example to the application.
+// Add adds a labeled example utterance in a version of the application.
 // Parameters:
 // appID - the application ID.
 // versionID - the version ID.
-// exampleLabelObject - an example label with the expected intent and entities.
+// exampleLabelObject - a labeled example utterance with the expected intent and entities.
 func (client ExamplesClient) Add(ctx context.Context, appID uuid.UUID, versionID string, exampleLabelObject ExampleLabelObject) (result LabelExampleResponse, err error) {
 	if tracing.IsEnabled() {
 		ctx = tracing.StartSpan(ctx, fqdn+"/ExamplesClient.Add")
@@ -97,8 +97,8 @@ func (client ExamplesClient) AddPreparer(ctx context.Context, appID uuid.UUID, v
 // AddSender sends the Add request. The method will close the
 // http.Response Body if it receives an error.
 func (client ExamplesClient) AddSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // AddResponder handles the response to the Add request. The method always
@@ -114,11 +114,11 @@ func (client ExamplesClient) AddResponder(resp *http.Response) (result LabelExam
 	return
 }
 
-// Batch adds a batch of labeled examples to the application.
+// Batch adds a batch of labeled example utterances to a version of the application.
 // Parameters:
 // appID - the application ID.
 // versionID - the version ID.
-// exampleLabelObjectArray - array of examples.
+// exampleLabelObjectArray - array of example utterances.
 func (client ExamplesClient) Batch(ctx context.Context, appID uuid.UUID, versionID string, exampleLabelObjectArray []ExampleLabelObject) (result ListBatchLabelExample, err error) {
 	if tracing.IsEnabled() {
 		ctx = tracing.StartSpan(ctx, fqdn+"/ExamplesClient.Batch")
@@ -180,8 +180,8 @@ func (client ExamplesClient) BatchPreparer(ctx context.Context, appID uuid.UUID,
 // BatchSender sends the Batch request. The method will close the
 // http.Response Body if it receives an error.
 func (client ExamplesClient) BatchSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // BatchResponder handles the response to the Batch request. The method always
@@ -197,7 +197,7 @@ func (client ExamplesClient) BatchResponder(resp *http.Response) (result ListBat
 	return
 }
 
-// Delete deletes the labeled example with the specified ID.
+// Delete deletes the labeled example utterances with the specified ID from a version of the application.
 // Parameters:
 // appID - the application ID.
 // versionID - the version ID.
@@ -256,8 +256,8 @@ func (client ExamplesClient) DeletePreparer(ctx context.Context, appID uuid.UUID
 // DeleteSender sends the Delete request. The method will close the
 // http.Response Body if it receives an error.
 func (client ExamplesClient) DeleteSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // DeleteResponder handles the response to the Delete request. The method always
@@ -273,7 +273,7 @@ func (client ExamplesClient) DeleteResponder(resp *http.Response) (result Operat
 	return
 }
 
-// List returns examples to be reviewed.
+// List returns example utterances to be reviewed from a version of the application.
 // Parameters:
 // appID - the application ID.
 // versionID - the version ID.
@@ -357,8 +357,8 @@ func (client ExamplesClient) ListPreparer(ctx context.Context, appID uuid.UUID, 
 // ListSender sends the List request. The method will close the
 // http.Response Body if it receives an error.
 func (client ExamplesClient) ListSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	sd := autorest.GetSendDecorators(req.Context(), autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListResponder handles the response to the List request. The method always

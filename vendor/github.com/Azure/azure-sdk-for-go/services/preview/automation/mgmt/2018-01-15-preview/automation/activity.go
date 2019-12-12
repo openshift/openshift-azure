@@ -32,13 +32,13 @@ type ActivityClient struct {
 }
 
 // NewActivityClient creates an instance of the ActivityClient client.
-func NewActivityClient(subscriptionID string, countType1 CountType) ActivityClient {
-	return NewActivityClientWithBaseURI(DefaultBaseURI, subscriptionID, countType1)
+func NewActivityClient(subscriptionID string) ActivityClient {
+	return NewActivityClientWithBaseURI(DefaultBaseURI, subscriptionID)
 }
 
 // NewActivityClientWithBaseURI creates an instance of the ActivityClient client.
-func NewActivityClientWithBaseURI(baseURI string, subscriptionID string, countType1 CountType) ActivityClient {
-	return ActivityClient{NewWithBaseURI(baseURI, subscriptionID, countType1)}
+func NewActivityClientWithBaseURI(baseURI string, subscriptionID string) ActivityClient {
+	return ActivityClient{NewWithBaseURI(baseURI, subscriptionID)}
 }
 
 // Get retrieve the activity in the module identified by module name and activity name.
@@ -113,8 +113,8 @@ func (client ActivityClient) GetPreparer(ctx context.Context, resourceGroupName 
 // GetSender sends the Get request. The method will close the
 // http.Response Body if it receives an error.
 func (client ActivityClient) GetSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetResponder handles the response to the Get request. The method always
@@ -201,8 +201,8 @@ func (client ActivityClient) ListByModulePreparer(ctx context.Context, resourceG
 // ListByModuleSender sends the ListByModule request. The method will close the
 // http.Response Body if it receives an error.
 func (client ActivityClient) ListByModuleSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListByModuleResponder handles the response to the ListByModule request. The method always

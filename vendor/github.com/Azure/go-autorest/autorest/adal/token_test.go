@@ -26,6 +26,7 @@ import (
 	"math/big"
 	"net/http"
 	"net/url"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -99,6 +100,24 @@ func TestServicePrincipalTokenSetAutoRefresh(t *testing.T) {
 	}
 }
 
+func TestServicePrincipalTokenSetCustomRefreshFunc(t *testing.T) {
+	spt := newServicePrincipalToken()
+
+	var refreshFunc TokenRefresh = func(context context.Context, resource string) (*Token, error) {
+		return nil, nil
+	}
+
+	if spt.customRefreshFunc != nil {
+		t.Fatalf("adal: ServicePrincipalToken#SetCustomRefreshFunc had a default custom refresh func when it shouldn't")
+	}
+
+	spt.SetCustomRefreshFunc(refreshFunc)
+
+	if spt.customRefreshFunc == nil {
+		t.Fatalf("adal: ServicePrincipalToken#SetCustomRefreshFunc didn't have a refresh func")
+	}
+}
+
 func TestServicePrincipalTokenSetRefreshWithin(t *testing.T) {
 	spt := newServicePrincipalToken()
 
@@ -119,6 +138,26 @@ func TestServicePrincipalTokenSetSender(t *testing.T) {
 	spt.SetSender(c)
 	if !reflect.DeepEqual(c, spt.sender) {
 		t.Fatal("adal: ServicePrincipalToken#SetSender did not set the sender")
+	}
+}
+
+func TestServicePrincipalTokenRefreshUsesCustomRefreshFunc(t *testing.T) {
+	spt := newServicePrincipalToken()
+
+	called := false
+	var refreshFunc TokenRefresh = func(context context.Context, resource string) (*Token, error) {
+		called = true
+		return &Token{}, nil
+	}
+	spt.SetCustomRefreshFunc(refreshFunc)
+	if called {
+		t.Fatalf("adal: ServicePrincipalToken#refreshInternal called the refresh function prior to refreshing")
+	}
+
+	spt.refreshInternal(context.Background(), "https://example.com")
+
+	if !called {
+		t.Fatalf("adal: ServicePrincipalToken#refreshInternal didn't call the refresh function")
 	}
 }
 
@@ -544,12 +583,29 @@ func TestServicePrincipalTokenEnsureFreshRefreshes(t *testing.T) {
 	}
 }
 
-func TestServicePrincipalTokenEnsureFreshFails(t *testing.T) {
+func TestServicePrincipalTokenEnsureFreshFails1(t *testing.T) {
 	spt := newServicePrincipalToken()
 	expireToken(&spt.inner.Token)
 
 	c := mocks.NewSender()
 	c.SetError(fmt.Errorf("some failure"))
+
+	spt.SetSender(c)
+	err := spt.EnsureFresh()
+	if err == nil {
+		t.Fatal("adal: ServicePrincipalToken#EnsureFresh didn't return an error")
+	}
+	if _, ok := err.(TokenRefreshError); ok {
+		t.Fatal("adal: ServicePrincipalToken#EnsureFresh unexpected TokenRefreshError")
+	}
+}
+
+func TestServicePrincipalTokenEnsureFreshFails2(t *testing.T) {
+	spt := newServicePrincipalToken()
+	expireToken(&spt.inner.Token)
+
+	c := mocks.NewSender()
+	c.AppendResponse(mocks.NewResponseWithStatus("bad request", http.StatusBadRequest))
 
 	spt.SetSender(c)
 	err := spt.EnsureFresh()
@@ -722,6 +778,77 @@ func TestGetVMEndpoint(t *testing.T) {
 	}
 }
 
+func TestGetAppServiceEndpoint(t *testing.T) {
+	const testEndpoint = "http://172.16.1.2:8081/msi/token"
+	if err := os.Setenv(asMSIEndpointEnv, testEndpoint); err != nil {
+		t.Fatalf("os.Setenv: %v", err)
+	}
+
+	endpoint, err := GetMSIAppServiceEndpoint()
+	if err != nil {
+		t.Fatal("Coudn't get App Service endpoint")
+	}
+
+	if endpoint != testEndpoint {
+		t.Fatal("Didn't get correct endpoint")
+	}
+
+	if err := os.Unsetenv(asMSIEndpointEnv); err != nil {
+		t.Fatalf("os.Unsetenv: %v", err)
+	}
+}
+
+func TestGetMSIEndpoint(t *testing.T) {
+	const (
+		testEndpoint = "http://172.16.1.2:8081/msi/token"
+		testSecret   = "DEADBEEF-BBBB-AAAA-DDDD-DDD000000DDD"
+	)
+
+	// Test VM well-known endpoint is returned
+	if err := os.Unsetenv(asMSIEndpointEnv); err != nil {
+		t.Fatalf("os.Unsetenv: %v", err)
+	}
+
+	if err := os.Unsetenv(asMSISecretEnv); err != nil {
+		t.Fatalf("os.Unsetenv: %v", err)
+	}
+
+	vmEndpoint, err := GetMSIEndpoint()
+	if err != nil {
+		t.Fatal("Coudn't get VM endpoint")
+	}
+
+	if vmEndpoint != msiEndpoint {
+		t.Fatal("Didn't get correct endpoint")
+	}
+
+	// Test App Service endpoint is returned
+	if err := os.Setenv(asMSIEndpointEnv, testEndpoint); err != nil {
+		t.Fatalf("os.Setenv: %v", err)
+	}
+
+	if err := os.Setenv(asMSISecretEnv, testSecret); err != nil {
+		t.Fatalf("os.Setenv: %v", err)
+	}
+
+	asEndpoint, err := GetMSIEndpoint()
+	if err != nil {
+		t.Fatal("Coudn't get App Service endpoint")
+	}
+
+	if asEndpoint != testEndpoint {
+		t.Fatal("Didn't get correct endpoint")
+	}
+
+	if err := os.Unsetenv(asMSIEndpointEnv); err != nil {
+		t.Fatalf("os.Unsetenv: %v", err)
+	}
+
+	if err := os.Unsetenv(asMSISecretEnv); err != nil {
+		t.Fatalf("os.Unsetenv: %v", err)
+	}
+}
+
 func TestMarshalServicePrincipalNoSecret(t *testing.T) {
 	spt := newServicePrincipalTokenManual()
 	b, err := json.Marshal(spt)
@@ -842,6 +969,22 @@ func TestMarshalInnerToken(t *testing.T) {
 
 	if !reflect.DeepEqual(t1, testToken) {
 		t.Fatalf("tokens don't match: %s, %s", t1, testToken)
+	}
+}
+
+func TestNewMultiTenantServicePrincipalToken(t *testing.T) {
+	cfg, err := NewMultiTenantOAuthConfig(TestActiveDirectoryEndpoint, TestTenantID, TestAuxTenantIDs, OAuthOptions{})
+	if err != nil {
+		t.Fatalf("autorest/adal: unexpected error while creating multitenant config: %v", err)
+	}
+	mt, err := NewMultiTenantServicePrincipalToken(cfg, "clientID", "superSecret", "resource")
+	if !strings.Contains(mt.PrimaryToken.inner.OauthConfig.AuthorizeEndpoint.String(), TestTenantID) {
+		t.Fatal("didn't find primary tenant ID in primary SPT")
+	}
+	for i := range mt.AuxiliaryTokens {
+		if ep := mt.AuxiliaryTokens[i].inner.OauthConfig.AuthorizeEndpoint.String(); !strings.Contains(ep, fmt.Sprintf("%s%d", TestAuxTenantPrefix, i)) {
+			t.Fatalf("didn't find auxiliary tenant ID in token %s", ep)
+		}
 	}
 }
 

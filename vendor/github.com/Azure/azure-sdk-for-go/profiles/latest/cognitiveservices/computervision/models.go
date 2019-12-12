@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,13 +19,20 @@
 
 package computervision
 
-import original "github.com/Azure/azure-sdk-for-go/services/cognitiveservices/v2.0/computervision"
+import original "github.com/Azure/azure-sdk-for-go/services/cognitiveservices/v2.1/computervision"
+
+type DescriptionExclude = original.DescriptionExclude
+
+const (
+	Celebrities DescriptionExclude = original.Celebrities
+	Landmarks   DescriptionExclude = original.Landmarks
+)
 
 type Details = original.Details
 
 const (
-	Celebrities Details = original.Celebrities
-	Landmarks   Details = original.Landmarks
+	DetailsCelebrities Details = original.DetailsCelebrities
+	DetailsLandmarks   Details = original.DetailsLandmarks
 )
 
 type Gender = original.Gender
@@ -83,10 +90,25 @@ const (
 	Printed     TextRecognitionMode = original.Printed
 )
 
+type TextRecognitionResultConfidenceClass = original.TextRecognitionResultConfidenceClass
+
+const (
+	High TextRecognitionResultConfidenceClass = original.High
+	Low  TextRecognitionResultConfidenceClass = original.Low
+)
+
+type TextRecognitionResultDimensionUnit = original.TextRecognitionResultDimensionUnit
+
+const (
+	Inch  TextRecognitionResultDimensionUnit = original.Inch
+	Pixel TextRecognitionResultDimensionUnit = original.Pixel
+)
+
 type VisualFeatureTypes = original.VisualFeatureTypes
 
 const (
 	VisualFeatureTypesAdult       VisualFeatureTypes = original.VisualFeatureTypesAdult
+	VisualFeatureTypesBrands      VisualFeatureTypes = original.VisualFeatureTypesBrands
 	VisualFeatureTypesCategories  VisualFeatureTypes = original.VisualFeatureTypesCategories
 	VisualFeatureTypesColor       VisualFeatureTypes = original.VisualFeatureTypesColor
 	VisualFeatureTypesDescription VisualFeatureTypes = original.VisualFeatureTypesDescription
@@ -106,6 +128,7 @@ type CelebritiesModel = original.CelebritiesModel
 type CelebrityResults = original.CelebrityResults
 type ColorInfo = original.ColorInfo
 type DetectResult = original.DetectResult
+type DetectedBrand = original.DetectedBrand
 type DetectedObject = original.DetectedObject
 type DomainModelResults = original.DomainModelResults
 type Error = original.Error
@@ -130,9 +153,10 @@ type OcrRegion = original.OcrRegion
 type OcrResult = original.OcrResult
 type OcrWord = original.OcrWord
 type ReadCloser = original.ReadCloser
-type RecognitionResult = original.RecognitionResult
+type ReadOperationResult = original.ReadOperationResult
 type TagResult = original.TagResult
 type TextOperationResult = original.TextOperationResult
+type TextRecognitionResult = original.TextRecognitionResult
 type Word = original.Word
 
 func New(endpoint string) BaseClient {
@@ -140,6 +164,9 @@ func New(endpoint string) BaseClient {
 }
 func NewWithoutDefaults(endpoint string) BaseClient {
 	return original.NewWithoutDefaults(endpoint)
+}
+func PossibleDescriptionExcludeValues() []DescriptionExclude {
+	return original.PossibleDescriptionExcludeValues()
 }
 func PossibleDetailsValues() []Details {
 	return original.PossibleDetailsValues()
@@ -155,6 +182,12 @@ func PossibleTextOperationStatusCodesValues() []TextOperationStatusCodes {
 }
 func PossibleTextRecognitionModeValues() []TextRecognitionMode {
 	return original.PossibleTextRecognitionModeValues()
+}
+func PossibleTextRecognitionResultConfidenceClassValues() []TextRecognitionResultConfidenceClass {
+	return original.PossibleTextRecognitionResultConfidenceClassValues()
+}
+func PossibleTextRecognitionResultDimensionUnitValues() []TextRecognitionResultDimensionUnit {
+	return original.PossibleTextRecognitionResultDimensionUnitValues()
 }
 func PossibleVisualFeatureTypesValues() []VisualFeatureTypes {
 	return original.PossibleVisualFeatureTypesValues()

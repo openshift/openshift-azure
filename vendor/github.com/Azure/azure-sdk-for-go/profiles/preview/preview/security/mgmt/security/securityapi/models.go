@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,22 +19,34 @@
 
 package securityapi
 
-import original "github.com/Azure/azure-sdk-for-go/services/preview/security/mgmt/2017-08-01-preview/security/securityapi"
+import original "github.com/Azure/azure-sdk-for-go/services/preview/security/mgmt/v3.0/security/securityapi"
 
+type AdaptiveApplicationControlsClientAPI = original.AdaptiveApplicationControlsClientAPI
 type AdvancedThreatProtectionClientAPI = original.AdvancedThreatProtectionClientAPI
 type AlertsClientAPI = original.AlertsClientAPI
 type AllowedConnectionsClientAPI = original.AllowedConnectionsClientAPI
 type AutoProvisioningSettingsClientAPI = original.AutoProvisioningSettingsClientAPI
+type ComplianceResultsClientAPI = original.ComplianceResultsClientAPI
 type CompliancesClientAPI = original.CompliancesClientAPI
 type ContactsClientAPI = original.ContactsClientAPI
+type DeviceSecurityGroupsClientAPI = original.DeviceSecurityGroupsClientAPI
 type DiscoveredSecuritySolutionsClientAPI = original.DiscoveredSecuritySolutionsClientAPI
 type ExternalSecuritySolutionsClientAPI = original.ExternalSecuritySolutionsClientAPI
 type InformationProtectionPoliciesClientAPI = original.InformationProtectionPoliciesClientAPI
+type IotSecuritySolutionAnalyticsClientAPI = original.IotSecuritySolutionAnalyticsClientAPI
+type IotSecuritySolutionClientAPI = original.IotSecuritySolutionClientAPI
+type IotSecuritySolutionsAnalyticsAggregatedAlertClientAPI = original.IotSecuritySolutionsAnalyticsAggregatedAlertClientAPI
+type IotSecuritySolutionsAnalyticsRecommendationClientAPI = original.IotSecuritySolutionsAnalyticsRecommendationClientAPI
 type JitNetworkAccessPoliciesClientAPI = original.JitNetworkAccessPoliciesClientAPI
 type LocationsClientAPI = original.LocationsClientAPI
 type OperationsClientAPI = original.OperationsClientAPI
 type PricingsClientAPI = original.PricingsClientAPI
+type RegulatoryComplianceAssessmentsClientAPI = original.RegulatoryComplianceAssessmentsClientAPI
+type RegulatoryComplianceControlsClientAPI = original.RegulatoryComplianceControlsClientAPI
+type RegulatoryComplianceStandardsClientAPI = original.RegulatoryComplianceStandardsClientAPI
+type ServerVulnerabilityAssessmentClientAPI = original.ServerVulnerabilityAssessmentClientAPI
 type SettingsClientAPI = original.SettingsClientAPI
+type SubAssessmentsClientAPI = original.SubAssessmentsClientAPI
 type TasksClientAPI = original.TasksClientAPI
 type TopologyClientAPI = original.TopologyClientAPI
 type WorkspaceSettingsClientAPI = original.WorkspaceSettingsClientAPI

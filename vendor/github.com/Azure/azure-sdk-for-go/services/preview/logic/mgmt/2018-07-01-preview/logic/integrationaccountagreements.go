@@ -97,20 +97,20 @@ func (client IntegrationAccountAgreementsClient) CreateOrUpdate(ctx context.Cont
 													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.AcknowledgementConnectionSettings.UnfoldHTTPHeaders", Name: validation.Null, Rule: true, Chain: nil},
 												}},
 											{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.MdnSettings", Name: validation.Null, Rule: true,
-												Chain: []validation.Constraint{{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.MdnSettings.NeedMdn", Name: validation.Null, Rule: true, Chain: nil},
-													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.MdnSettings.SignMdn", Name: validation.Null, Rule: true, Chain: nil},
-													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.MdnSettings.SendMdnAsynchronously", Name: validation.Null, Rule: true, Chain: nil},
-													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.MdnSettings.SignOutboundMdnIfOptional", Name: validation.Null, Rule: true, Chain: nil},
-													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.MdnSettings.SendInboundMdnToMessageBox", Name: validation.Null, Rule: true, Chain: nil},
+												Chain: []validation.Constraint{{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.MdnSettings.NeedMDN", Name: validation.Null, Rule: true, Chain: nil},
+													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.MdnSettings.SignMDN", Name: validation.Null, Rule: true, Chain: nil},
+													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.MdnSettings.SendMDNAsynchronously", Name: validation.Null, Rule: true, Chain: nil},
+													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.MdnSettings.SignOutboundMDNIfOptional", Name: validation.Null, Rule: true, Chain: nil},
+													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.MdnSettings.SendInboundMDNToMessageBox", Name: validation.Null, Rule: true, Chain: nil},
 												}},
 											{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.SecuritySettings", Name: validation.Null, Rule: true,
 												Chain: []validation.Constraint{{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.SecuritySettings.OverrideGroupSigningCertificate", Name: validation.Null, Rule: true, Chain: nil},
-													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.SecuritySettings.EnableNrrForInboundEncodedMessages", Name: validation.Null, Rule: true, Chain: nil},
-													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.SecuritySettings.EnableNrrForInboundDecodedMessages", Name: validation.Null, Rule: true, Chain: nil},
-													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.SecuritySettings.EnableNrrForOutboundMdn", Name: validation.Null, Rule: true, Chain: nil},
-													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.SecuritySettings.EnableNrrForOutboundEncodedMessages", Name: validation.Null, Rule: true, Chain: nil},
-													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.SecuritySettings.EnableNrrForOutboundDecodedMessages", Name: validation.Null, Rule: true, Chain: nil},
-													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.SecuritySettings.EnableNrrForInboundMdn", Name: validation.Null, Rule: true, Chain: nil},
+													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.SecuritySettings.EnableNRRForInboundEncodedMessages", Name: validation.Null, Rule: true, Chain: nil},
+													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.SecuritySettings.EnableNRRForInboundDecodedMessages", Name: validation.Null, Rule: true, Chain: nil},
+													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.SecuritySettings.EnableNRRForOutboundMDN", Name: validation.Null, Rule: true, Chain: nil},
+													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.SecuritySettings.EnableNRRForOutboundEncodedMessages", Name: validation.Null, Rule: true, Chain: nil},
+													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.SecuritySettings.EnableNRRForOutboundDecodedMessages", Name: validation.Null, Rule: true, Chain: nil},
+													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.SecuritySettings.EnableNRRForInboundMDN", Name: validation.Null, Rule: true, Chain: nil},
 												}},
 											{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.ValidationSettings", Name: validation.Null, Rule: true,
 												Chain: []validation.Constraint{{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.ValidationSettings.OverrideMessageProperties", Name: validation.Null, Rule: true, Chain: nil},
@@ -131,7 +131,7 @@ func (client IntegrationAccountAgreementsClient) CreateOrUpdate(ctx context.Cont
 												}},
 											{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.ErrorSettings", Name: validation.Null, Rule: true,
 												Chain: []validation.Constraint{{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.ErrorSettings.SuspendDuplicateMessage", Name: validation.Null, Rule: true, Chain: nil},
-													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.ErrorSettings.ResendIfMdnNotReceived", Name: validation.Null, Rule: true, Chain: nil},
+													{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.ReceiveAgreement.ProtocolSettings.ErrorSettings.ResendIfMDNNotReceived", Name: validation.Null, Rule: true, Chain: nil},
 												}},
 										}},
 								}},
@@ -158,20 +158,20 @@ func (client IntegrationAccountAgreementsClient) CreateOrUpdate(ctx context.Cont
 														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.AcknowledgementConnectionSettings.UnfoldHTTPHeaders", Name: validation.Null, Rule: true, Chain: nil},
 													}},
 												{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.MdnSettings", Name: validation.Null, Rule: true,
-													Chain: []validation.Constraint{{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.MdnSettings.NeedMdn", Name: validation.Null, Rule: true, Chain: nil},
-														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.MdnSettings.SignMdn", Name: validation.Null, Rule: true, Chain: nil},
-														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.MdnSettings.SendMdnAsynchronously", Name: validation.Null, Rule: true, Chain: nil},
-														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.MdnSettings.SignOutboundMdnIfOptional", Name: validation.Null, Rule: true, Chain: nil},
-														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.MdnSettings.SendInboundMdnToMessageBox", Name: validation.Null, Rule: true, Chain: nil},
+													Chain: []validation.Constraint{{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.MdnSettings.NeedMDN", Name: validation.Null, Rule: true, Chain: nil},
+														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.MdnSettings.SignMDN", Name: validation.Null, Rule: true, Chain: nil},
+														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.MdnSettings.SendMDNAsynchronously", Name: validation.Null, Rule: true, Chain: nil},
+														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.MdnSettings.SignOutboundMDNIfOptional", Name: validation.Null, Rule: true, Chain: nil},
+														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.MdnSettings.SendInboundMDNToMessageBox", Name: validation.Null, Rule: true, Chain: nil},
 													}},
 												{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.SecuritySettings", Name: validation.Null, Rule: true,
 													Chain: []validation.Constraint{{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.SecuritySettings.OverrideGroupSigningCertificate", Name: validation.Null, Rule: true, Chain: nil},
-														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.SecuritySettings.EnableNrrForInboundEncodedMessages", Name: validation.Null, Rule: true, Chain: nil},
-														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.SecuritySettings.EnableNrrForInboundDecodedMessages", Name: validation.Null, Rule: true, Chain: nil},
-														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.SecuritySettings.EnableNrrForOutboundMdn", Name: validation.Null, Rule: true, Chain: nil},
-														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.SecuritySettings.EnableNrrForOutboundEncodedMessages", Name: validation.Null, Rule: true, Chain: nil},
-														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.SecuritySettings.EnableNrrForOutboundDecodedMessages", Name: validation.Null, Rule: true, Chain: nil},
-														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.SecuritySettings.EnableNrrForInboundMdn", Name: validation.Null, Rule: true, Chain: nil},
+														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.SecuritySettings.EnableNRRForInboundEncodedMessages", Name: validation.Null, Rule: true, Chain: nil},
+														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.SecuritySettings.EnableNRRForInboundDecodedMessages", Name: validation.Null, Rule: true, Chain: nil},
+														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.SecuritySettings.EnableNRRForOutboundMDN", Name: validation.Null, Rule: true, Chain: nil},
+														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.SecuritySettings.EnableNRRForOutboundEncodedMessages", Name: validation.Null, Rule: true, Chain: nil},
+														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.SecuritySettings.EnableNRRForOutboundDecodedMessages", Name: validation.Null, Rule: true, Chain: nil},
+														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.SecuritySettings.EnableNRRForInboundMDN", Name: validation.Null, Rule: true, Chain: nil},
 													}},
 												{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.ValidationSettings", Name: validation.Null, Rule: true,
 													Chain: []validation.Constraint{{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.ValidationSettings.OverrideMessageProperties", Name: validation.Null, Rule: true, Chain: nil},
@@ -192,7 +192,7 @@ func (client IntegrationAccountAgreementsClient) CreateOrUpdate(ctx context.Cont
 													}},
 												{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.ErrorSettings", Name: validation.Null, Rule: true,
 													Chain: []validation.Constraint{{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.ErrorSettings.SuspendDuplicateMessage", Name: validation.Null, Rule: true, Chain: nil},
-														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.ErrorSettings.ResendIfMdnNotReceived", Name: validation.Null, Rule: true, Chain: nil},
+														{Target: "agreement.IntegrationAccountAgreementProperties.Content.AS2.SendAgreement.ProtocolSettings.ErrorSettings.ResendIfMDNNotReceived", Name: validation.Null, Rule: true, Chain: nil},
 													}},
 											}},
 									}},
@@ -542,8 +542,8 @@ func (client IntegrationAccountAgreementsClient) CreateOrUpdatePreparer(ctx cont
 // CreateOrUpdateSender sends the CreateOrUpdate request. The method will close the
 // http.Response Body if it receives an error.
 func (client IntegrationAccountAgreementsClient) CreateOrUpdateSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // CreateOrUpdateResponder handles the response to the CreateOrUpdate request. The method always
@@ -621,8 +621,8 @@ func (client IntegrationAccountAgreementsClient) DeletePreparer(ctx context.Cont
 // DeleteSender sends the Delete request. The method will close the
 // http.Response Body if it receives an error.
 func (client IntegrationAccountAgreementsClient) DeleteSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // DeleteResponder handles the response to the Delete request. The method always
@@ -699,8 +699,8 @@ func (client IntegrationAccountAgreementsClient) GetPreparer(ctx context.Context
 // GetSender sends the Get request. The method will close the
 // http.Response Body if it receives an error.
 func (client IntegrationAccountAgreementsClient) GetSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetResponder handles the response to the Get request. The method always
@@ -785,8 +785,8 @@ func (client IntegrationAccountAgreementsClient) ListPreparer(ctx context.Contex
 // ListSender sends the List request. The method will close the
 // http.Response Body if it receives an error.
 func (client IntegrationAccountAgreementsClient) ListSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListResponder handles the response to the List request. The method always
@@ -903,8 +903,8 @@ func (client IntegrationAccountAgreementsClient) ListContentCallbackURLPreparer(
 // ListContentCallbackURLSender sends the ListContentCallbackURL request. The method will close the
 // http.Response Body if it receives an error.
 func (client IntegrationAccountAgreementsClient) ListContentCallbackURLSender(req *http.Request) (*http.Response, error) {
-	return autorest.SendWithSender(client, req,
-		azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListContentCallbackURLResponder handles the response to the ListContentCallbackURL request. The method always

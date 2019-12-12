@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,6 +39,8 @@ const (
 type BaseClient = original.BaseClient
 type ErrorDefinition = original.ErrorDefinition
 type ErrorResponse = original.ErrorResponse
+type ExpressionEvaluationDetails = original.ExpressionEvaluationDetails
+type IfNotExistsEvaluationDetails = original.IfNotExistsEvaluationDetails
 type Operation = original.Operation
 type OperationDisplay = original.OperationDisplay
 type OperationsClient = original.OperationsClient
@@ -46,6 +48,7 @@ type OperationsListResults = original.OperationsListResults
 type PolicyAssignmentSummary = original.PolicyAssignmentSummary
 type PolicyDefinitionSummary = original.PolicyDefinitionSummary
 type PolicyDetails = original.PolicyDetails
+type PolicyEvaluationDetails = original.PolicyEvaluationDetails
 type PolicyEvent = original.PolicyEvent
 type PolicyEventsClient = original.PolicyEventsClient
 type PolicyEventsQueryResults = original.PolicyEventsQueryResults

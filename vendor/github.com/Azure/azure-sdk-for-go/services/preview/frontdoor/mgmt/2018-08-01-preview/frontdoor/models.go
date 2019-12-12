@@ -569,12 +569,11 @@ type Backend struct {
 
 // BackendPool a backend pool is a collection of backends that can be routed to.
 type BackendPool struct {
-	autorest.Response `json:"-"`
 	// BackendPoolProperties - Properties of the Front Door Backend Pool
 	*BackendPoolProperties `json:"properties,omitempty"`
 	// Name - Resource name.
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type.
+	// Type - READ-ONLY; Resource type.
 	Type *string `json:"type,omitempty"`
 	// ID - Resource ID.
 	ID *string `json:"id,omitempty"`
@@ -588,9 +587,6 @@ func (bp BackendPool) MarshalJSON() ([]byte, error) {
 	}
 	if bp.Name != nil {
 		objectMap["name"] = bp.Name
-	}
-	if bp.Type != nil {
-		objectMap["type"] = bp.Type
 	}
 	if bp.ID != nil {
 		objectMap["id"] = bp.ID
@@ -652,148 +648,10 @@ func (bp *BackendPool) UnmarshalJSON(body []byte) error {
 // BackendPoolListResult result of the request to list Backend Pools. It contains a list of Backend Pools
 // objects and a URL link to get the next set of results.
 type BackendPoolListResult struct {
-	autorest.Response `json:"-"`
-	// Value - List of Backend Pools within a Front Door.
+	// Value - READ-ONLY; List of Backend Pools within a Front Door.
 	Value *[]BackendPool `json:"value,omitempty"`
 	// NextLink - URL to get the next set of BackendPool objects if there are any.
 	NextLink *string `json:"nextLink,omitempty"`
-}
-
-// BackendPoolListResultIterator provides access to a complete listing of BackendPool values.
-type BackendPoolListResultIterator struct {
-	i    int
-	page BackendPoolListResultPage
-}
-
-// NextWithContext advances to the next value.  If there was an error making
-// the request the iterator does not advance and the error is returned.
-func (iter *BackendPoolListResultIterator) NextWithContext(ctx context.Context) (err error) {
-	if tracing.IsEnabled() {
-		ctx = tracing.StartSpan(ctx, fqdn+"/BackendPoolListResultIterator.NextWithContext")
-		defer func() {
-			sc := -1
-			if iter.Response().Response.Response != nil {
-				sc = iter.Response().Response.Response.StatusCode
-			}
-			tracing.EndSpan(ctx, sc, err)
-		}()
-	}
-	iter.i++
-	if iter.i < len(iter.page.Values()) {
-		return nil
-	}
-	err = iter.page.NextWithContext(ctx)
-	if err != nil {
-		iter.i--
-		return err
-	}
-	iter.i = 0
-	return nil
-}
-
-// Next advances to the next value.  If there was an error making
-// the request the iterator does not advance and the error is returned.
-// Deprecated: Use NextWithContext() instead.
-func (iter *BackendPoolListResultIterator) Next() error {
-	return iter.NextWithContext(context.Background())
-}
-
-// NotDone returns true if the enumeration should be started or is not yet complete.
-func (iter BackendPoolListResultIterator) NotDone() bool {
-	return iter.page.NotDone() && iter.i < len(iter.page.Values())
-}
-
-// Response returns the raw server response from the last page request.
-func (iter BackendPoolListResultIterator) Response() BackendPoolListResult {
-	return iter.page.Response()
-}
-
-// Value returns the current value or a zero-initialized value if the
-// iterator has advanced beyond the end of the collection.
-func (iter BackendPoolListResultIterator) Value() BackendPool {
-	if !iter.page.NotDone() {
-		return BackendPool{}
-	}
-	return iter.page.Values()[iter.i]
-}
-
-// Creates a new instance of the BackendPoolListResultIterator type.
-func NewBackendPoolListResultIterator(page BackendPoolListResultPage) BackendPoolListResultIterator {
-	return BackendPoolListResultIterator{page: page}
-}
-
-// IsEmpty returns true if the ListResult contains no values.
-func (bplr BackendPoolListResult) IsEmpty() bool {
-	return bplr.Value == nil || len(*bplr.Value) == 0
-}
-
-// backendPoolListResultPreparer prepares a request to retrieve the next set of results.
-// It returns nil if no more results exist.
-func (bplr BackendPoolListResult) backendPoolListResultPreparer(ctx context.Context) (*http.Request, error) {
-	if bplr.NextLink == nil || len(to.String(bplr.NextLink)) < 1 {
-		return nil, nil
-	}
-	return autorest.Prepare((&http.Request{}).WithContext(ctx),
-		autorest.AsJSON(),
-		autorest.AsGet(),
-		autorest.WithBaseURL(to.String(bplr.NextLink)))
-}
-
-// BackendPoolListResultPage contains a page of BackendPool values.
-type BackendPoolListResultPage struct {
-	fn   func(context.Context, BackendPoolListResult) (BackendPoolListResult, error)
-	bplr BackendPoolListResult
-}
-
-// NextWithContext advances to the next page of values.  If there was an error making
-// the request the page does not advance and the error is returned.
-func (page *BackendPoolListResultPage) NextWithContext(ctx context.Context) (err error) {
-	if tracing.IsEnabled() {
-		ctx = tracing.StartSpan(ctx, fqdn+"/BackendPoolListResultPage.NextWithContext")
-		defer func() {
-			sc := -1
-			if page.Response().Response.Response != nil {
-				sc = page.Response().Response.Response.StatusCode
-			}
-			tracing.EndSpan(ctx, sc, err)
-		}()
-	}
-	next, err := page.fn(ctx, page.bplr)
-	if err != nil {
-		return err
-	}
-	page.bplr = next
-	return nil
-}
-
-// Next advances to the next page of values.  If there was an error making
-// the request the page does not advance and the error is returned.
-// Deprecated: Use NextWithContext() instead.
-func (page *BackendPoolListResultPage) Next() error {
-	return page.NextWithContext(context.Background())
-}
-
-// NotDone returns true if the page enumeration should be started or is not yet complete.
-func (page BackendPoolListResultPage) NotDone() bool {
-	return !page.bplr.IsEmpty()
-}
-
-// Response returns the raw server response from the last page request.
-func (page BackendPoolListResultPage) Response() BackendPoolListResult {
-	return page.bplr
-}
-
-// Values returns the slice of values for the current page or nil if there are no values.
-func (page BackendPoolListResultPage) Values() []BackendPool {
-	if page.bplr.IsEmpty() {
-		return nil
-	}
-	return *page.bplr.Value
-}
-
-// Creates a new instance of the BackendPoolListResultPage type.
-func NewBackendPoolListResultPage(getNextPage func(context.Context, BackendPoolListResult) (BackendPoolListResult, error)) BackendPoolListResultPage {
-	return BackendPoolListResultPage{fn: getNextPage}
 }
 
 // BackendPoolProperties the JSON object that contains the properties required to create a routing rule.
@@ -806,58 +664,6 @@ type BackendPoolProperties struct {
 	LoadBalancingSettings *SubResource `json:"loadBalancingSettings,omitempty"`
 	// HealthProbeSettings - L7 health probe settings for a backend pool
 	HealthProbeSettings *SubResource `json:"healthProbeSettings,omitempty"`
-}
-
-// BackendPoolsCreateOrUpdateFuture an abstraction for monitoring and retrieving the results of a
-// long-running operation.
-type BackendPoolsCreateOrUpdateFuture struct {
-	azure.Future
-}
-
-// Result returns the result of the asynchronous operation.
-// If the operation has not completed it will return an error.
-func (future *BackendPoolsCreateOrUpdateFuture) Result(client BackendPoolsClient) (bp BackendPool, err error) {
-	var done bool
-	done, err = future.Done(client)
-	if err != nil {
-		err = autorest.NewErrorWithError(err, "frontdoor.BackendPoolsCreateOrUpdateFuture", "Result", future.Response(), "Polling failure")
-		return
-	}
-	if !done {
-		err = azure.NewAsyncOpIncompleteError("frontdoor.BackendPoolsCreateOrUpdateFuture")
-		return
-	}
-	sender := autorest.DecorateSender(client, autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
-	if bp.Response.Response, err = future.GetResult(sender); err == nil && bp.Response.Response.StatusCode != http.StatusNoContent {
-		bp, err = client.CreateOrUpdateResponder(bp.Response.Response)
-		if err != nil {
-			err = autorest.NewErrorWithError(err, "frontdoor.BackendPoolsCreateOrUpdateFuture", "Result", bp.Response.Response, "Failure responding to request")
-		}
-	}
-	return
-}
-
-// BackendPoolsDeleteFuture an abstraction for monitoring and retrieving the results of a long-running
-// operation.
-type BackendPoolsDeleteFuture struct {
-	azure.Future
-}
-
-// Result returns the result of the asynchronous operation.
-// If the operation has not completed it will return an error.
-func (future *BackendPoolsDeleteFuture) Result(client BackendPoolsClient) (ar autorest.Response, err error) {
-	var done bool
-	done, err = future.Done(client)
-	if err != nil {
-		err = autorest.NewErrorWithError(err, "frontdoor.BackendPoolsDeleteFuture", "Result", future.Response(), "Polling failure")
-		return
-	}
-	if !done {
-		err = azure.NewAsyncOpIncompleteError("frontdoor.BackendPoolsDeleteFuture")
-		return
-	}
-	ar.Response = future.Response()
-	return
 }
 
 // BackendPoolUpdateParameters a collection of backends that can be routed to.
@@ -896,11 +702,11 @@ type CheckNameAvailabilityInput struct {
 // CheckNameAvailabilityOutput output of check name availability API.
 type CheckNameAvailabilityOutput struct {
 	autorest.Response `json:"-"`
-	// NameAvailability - Indicates whether the name is available. Possible values include: 'Available', 'Unavailable'
+	// NameAvailability - READ-ONLY; Indicates whether the name is available. Possible values include: 'Available', 'Unavailable'
 	NameAvailability Availability `json:"nameAvailability,omitempty"`
-	// Reason - The reason why the name is not available.
+	// Reason - READ-ONLY; The reason why the name is not available.
 	Reason *string `json:"reason,omitempty"`
-	// Message - The detailed error message describing why the name is not available.
+	// Message - READ-ONLY; The detailed error message describing why the name is not available.
 	Message *string `json:"message,omitempty"`
 }
 
@@ -989,7 +795,7 @@ func (chc *CustomHTTPSConfiguration) UnmarshalJSON(body []byte) error {
 type CustomRule struct {
 	// Name - Gets name of the resource that is unique within a policy. This name can be used to access the resource.
 	Name *string `json:"name,omitempty"`
-	// Etag - Gets a unique read-only string that changes whenever the resource is updated.
+	// Etag - READ-ONLY; Gets a unique read-only string that changes whenever the resource is updated.
 	Etag *string `json:"etag,omitempty"`
 	// Priority - Describes priority of the rule. Rules with a lower value will be evaluated before rules with a higher value
 	Priority *int32 `json:"priority,omitempty"`
@@ -1023,7 +829,7 @@ type EndpointsPurgeContentFuture struct {
 // If the operation has not completed it will return an error.
 func (future *EndpointsPurgeContentFuture) Result(client EndpointsClient) (ar autorest.Response, err error) {
 	var done bool
-	done, err = future.Done(client)
+	done, err = future.DoneWithContext(context.Background(), client)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "frontdoor.EndpointsPurgeContentFuture", "Result", future.Response(), "Polling failure")
 		return
@@ -1055,9 +861,9 @@ type ErrorDetails struct {
 // ErrorResponse error response indicates Front Door service is not able to process the incoming request.
 // The reason is provided in the error message.
 type ErrorResponse struct {
-	// Code - Error code.
+	// Code - READ-ONLY; Error code.
 	Code *string `json:"code,omitempty"`
-	// Message - Error message indicating why the operation failed.
+	// Message - READ-ONLY; Error message indicating why the operation failed.
 	Message *string `json:"message,omitempty"`
 }
 
@@ -1067,11 +873,11 @@ type FrontDoor struct {
 	autorest.Response `json:"-"`
 	// Properties - Properties of the Front Door Load Balancer
 	*Properties `json:"properties,omitempty"`
-	// ID - Resource ID.
+	// ID - READ-ONLY; Resource ID.
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name.
+	// Name - READ-ONLY; Resource name.
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type.
+	// Type - READ-ONLY; Resource type.
 	Type *string `json:"type,omitempty"`
 	// Location - Resource location.
 	Location *string `json:"location,omitempty"`
@@ -1084,15 +890,6 @@ func (fd FrontDoor) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if fd.Properties != nil {
 		objectMap["properties"] = fd.Properties
-	}
-	if fd.ID != nil {
-		objectMap["id"] = fd.ID
-	}
-	if fd.Name != nil {
-		objectMap["name"] = fd.Name
-	}
-	if fd.Type != nil {
-		objectMap["type"] = fd.Type
 	}
 	if fd.Location != nil {
 		objectMap["location"] = fd.Location
@@ -1182,7 +979,7 @@ type FrontDoorsCreateOrUpdateFutureType struct {
 // If the operation has not completed it will return an error.
 func (future *FrontDoorsCreateOrUpdateFutureType) Result(client FrontDoorsClient) (fd FrontDoor, err error) {
 	var done bool
-	done, err = future.Done(client)
+	done, err = future.DoneWithContext(context.Background(), client)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "frontdoor.FrontDoorsCreateOrUpdateFutureType", "Result", future.Response(), "Polling failure")
 		return
@@ -1211,7 +1008,7 @@ type FrontDoorsDeleteFutureType struct {
 // If the operation has not completed it will return an error.
 func (future *FrontDoorsDeleteFutureType) Result(client FrontDoorsClient) (ar autorest.Response, err error) {
 	var done bool
-	done, err = future.Done(client)
+	done, err = future.DoneWithContext(context.Background(), client)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "frontdoor.FrontDoorsDeleteFutureType", "Result", future.Response(), "Polling failure")
 		return
@@ -1231,7 +1028,7 @@ type FrontendEndpoint struct {
 	*FrontendEndpointProperties `json:"properties,omitempty"`
 	// Name - Resource name.
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type.
+	// Type - READ-ONLY; Resource type.
 	Type *string `json:"type,omitempty"`
 	// ID - Resource ID.
 	ID *string `json:"id,omitempty"`
@@ -1245,9 +1042,6 @@ func (fe FrontendEndpoint) MarshalJSON() ([]byte, error) {
 	}
 	if fe.Name != nil {
 		objectMap["name"] = fe.Name
-	}
-	if fe.Type != nil {
-		objectMap["type"] = fe.Type
 	}
 	if fe.ID != nil {
 		objectMap["id"] = fe.ID
@@ -1311,11 +1105,11 @@ func (fe *FrontendEndpoint) UnmarshalJSON(body []byte) error {
 type FrontendEndpointProperties struct {
 	// ResourceState - Resource status. Possible values include: 'ResourceStateCreating', 'ResourceStateEnabling', 'ResourceStateEnabled', 'ResourceStateDisabling', 'ResourceStateDisabled', 'ResourceStateDeleting'
 	ResourceState ResourceState `json:"resourceState,omitempty"`
-	// CustomHTTPSProvisioningState - Provisioning status of Custom Https of the frontendEndpoint. Possible values include: 'Enabling', 'Enabled', 'Disabling', 'Disabled', 'Failed'
+	// CustomHTTPSProvisioningState - READ-ONLY; Provisioning status of Custom Https of the frontendEndpoint. Possible values include: 'Enabling', 'Enabled', 'Disabling', 'Disabled', 'Failed'
 	CustomHTTPSProvisioningState CustomHTTPSProvisioningState `json:"customHttpsProvisioningState,omitempty"`
-	// CustomHTTPSProvisioningSubstate - Provisioning substate shows the progress of custom HTTPS enabling/disabling process step by step. Possible values include: 'SubmittingDomainControlValidationRequest', 'PendingDomainControlValidationREquestApproval', 'DomainControlValidationRequestApproved', 'DomainControlValidationRequestRejected', 'DomainControlValidationRequestTimedOut', 'IssuingCertificate', 'DeployingCertificate', 'CertificateDeployed', 'DeletingCertificate', 'CertificateDeleted'
+	// CustomHTTPSProvisioningSubstate - READ-ONLY; Provisioning substate shows the progress of custom HTTPS enabling/disabling process step by step. Possible values include: 'SubmittingDomainControlValidationRequest', 'PendingDomainControlValidationREquestApproval', 'DomainControlValidationRequestApproved', 'DomainControlValidationRequestRejected', 'DomainControlValidationRequestTimedOut', 'IssuingCertificate', 'DeployingCertificate', 'CertificateDeployed', 'DeletingCertificate', 'CertificateDeleted'
 	CustomHTTPSProvisioningSubstate CustomHTTPSProvisioningSubstate `json:"customHttpsProvisioningSubstate,omitempty"`
-	// CustomHTTPSConfiguration - The configuration specifying how to enable HTTPS
+	// CustomHTTPSConfiguration - READ-ONLY; The configuration specifying how to enable HTTPS
 	CustomHTTPSConfiguration *CustomHTTPSConfiguration `json:"customHttpsConfiguration,omitempty"`
 	// HostName - The host name of the frontendEndpoint. Must be a domain name.
 	HostName *string `json:"hostName,omitempty"`
@@ -1325,58 +1119,6 @@ type FrontendEndpointProperties struct {
 	SessionAffinityTTLSeconds *int32 `json:"sessionAffinityTtlSeconds,omitempty"`
 	// WebApplicationFirewallPolicyLink - Defines the Web Application Firewall policy for each host (if applicable)
 	WebApplicationFirewallPolicyLink *FrontendEndpointUpdateParametersWebApplicationFirewallPolicyLink `json:"webApplicationFirewallPolicyLink,omitempty"`
-}
-
-// FrontendEndpointsCreateOrUpdateFuture an abstraction for monitoring and retrieving the results of a
-// long-running operation.
-type FrontendEndpointsCreateOrUpdateFuture struct {
-	azure.Future
-}
-
-// Result returns the result of the asynchronous operation.
-// If the operation has not completed it will return an error.
-func (future *FrontendEndpointsCreateOrUpdateFuture) Result(client FrontendEndpointsClient) (fe FrontendEndpoint, err error) {
-	var done bool
-	done, err = future.Done(client)
-	if err != nil {
-		err = autorest.NewErrorWithError(err, "frontdoor.FrontendEndpointsCreateOrUpdateFuture", "Result", future.Response(), "Polling failure")
-		return
-	}
-	if !done {
-		err = azure.NewAsyncOpIncompleteError("frontdoor.FrontendEndpointsCreateOrUpdateFuture")
-		return
-	}
-	sender := autorest.DecorateSender(client, autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
-	if fe.Response.Response, err = future.GetResult(sender); err == nil && fe.Response.Response.StatusCode != http.StatusNoContent {
-		fe, err = client.CreateOrUpdateResponder(fe.Response.Response)
-		if err != nil {
-			err = autorest.NewErrorWithError(err, "frontdoor.FrontendEndpointsCreateOrUpdateFuture", "Result", fe.Response.Response, "Failure responding to request")
-		}
-	}
-	return
-}
-
-// FrontendEndpointsDeleteFuture an abstraction for monitoring and retrieving the results of a long-running
-// operation.
-type FrontendEndpointsDeleteFuture struct {
-	azure.Future
-}
-
-// Result returns the result of the asynchronous operation.
-// If the operation has not completed it will return an error.
-func (future *FrontendEndpointsDeleteFuture) Result(client FrontendEndpointsClient) (ar autorest.Response, err error) {
-	var done bool
-	done, err = future.Done(client)
-	if err != nil {
-		err = autorest.NewErrorWithError(err, "frontdoor.FrontendEndpointsDeleteFuture", "Result", future.Response(), "Polling failure")
-		return
-	}
-	if !done {
-		err = azure.NewAsyncOpIncompleteError("frontdoor.FrontendEndpointsDeleteFuture")
-		return
-	}
-	ar.Response = future.Response()
-	return
 }
 
 // FrontendEndpointsDisableHTTPSFuture an abstraction for monitoring and retrieving the results of a
@@ -1389,7 +1131,7 @@ type FrontendEndpointsDisableHTTPSFuture struct {
 // If the operation has not completed it will return an error.
 func (future *FrontendEndpointsDisableHTTPSFuture) Result(client FrontendEndpointsClient) (ar autorest.Response, err error) {
 	var done bool
-	done, err = future.Done(client)
+	done, err = future.DoneWithContext(context.Background(), client)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "frontdoor.FrontendEndpointsDisableHTTPSFuture", "Result", future.Response(), "Polling failure")
 		return
@@ -1412,7 +1154,7 @@ type FrontendEndpointsEnableHTTPSFuture struct {
 // If the operation has not completed it will return an error.
 func (future *FrontendEndpointsEnableHTTPSFuture) Result(client FrontendEndpointsClient) (ar autorest.Response, err error) {
 	var done bool
-	done, err = future.Done(client)
+	done, err = future.DoneWithContext(context.Background(), client)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "frontdoor.FrontendEndpointsEnableHTTPSFuture", "Result", future.Response(), "Polling failure")
 		return
@@ -1429,7 +1171,7 @@ func (future *FrontendEndpointsEnableHTTPSFuture) Result(client FrontendEndpoint
 // Frontend endpoint objects and a URL link to get the next set of results.
 type FrontendEndpointsListResult struct {
 	autorest.Response `json:"-"`
-	// Value - List of Frontend endpoints within a Front Door.
+	// Value - READ-ONLY; List of Frontend endpoints within a Front Door.
 	Value *[]FrontendEndpoint `json:"value,omitempty"`
 	// NextLink - URL to get the next set of frontend endpoints if there are any.
 	NextLink *string `json:"nextLink,omitempty"`
@@ -1591,214 +1333,22 @@ type FrontendEndpointUpdateParametersWebApplicationFirewallPolicyLink struct {
 	ID *string `json:"id,omitempty"`
 }
 
-// HealthProbeSettingsCreateOrUpdateFuture an abstraction for monitoring and retrieving the results of a
-// long-running operation.
-type HealthProbeSettingsCreateOrUpdateFuture struct {
-	azure.Future
-}
-
-// Result returns the result of the asynchronous operation.
-// If the operation has not completed it will return an error.
-func (future *HealthProbeSettingsCreateOrUpdateFuture) Result(client HealthProbeSettingsClient) (hpsm HealthProbeSettingsModel, err error) {
-	var done bool
-	done, err = future.Done(client)
-	if err != nil {
-		err = autorest.NewErrorWithError(err, "frontdoor.HealthProbeSettingsCreateOrUpdateFuture", "Result", future.Response(), "Polling failure")
-		return
-	}
-	if !done {
-		err = azure.NewAsyncOpIncompleteError("frontdoor.HealthProbeSettingsCreateOrUpdateFuture")
-		return
-	}
-	sender := autorest.DecorateSender(client, autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
-	if hpsm.Response.Response, err = future.GetResult(sender); err == nil && hpsm.Response.Response.StatusCode != http.StatusNoContent {
-		hpsm, err = client.CreateOrUpdateResponder(hpsm.Response.Response)
-		if err != nil {
-			err = autorest.NewErrorWithError(err, "frontdoor.HealthProbeSettingsCreateOrUpdateFuture", "Result", hpsm.Response.Response, "Failure responding to request")
-		}
-	}
-	return
-}
-
-// HealthProbeSettingsDeleteFuture an abstraction for monitoring and retrieving the results of a
-// long-running operation.
-type HealthProbeSettingsDeleteFuture struct {
-	azure.Future
-}
-
-// Result returns the result of the asynchronous operation.
-// If the operation has not completed it will return an error.
-func (future *HealthProbeSettingsDeleteFuture) Result(client HealthProbeSettingsClient) (ar autorest.Response, err error) {
-	var done bool
-	done, err = future.Done(client)
-	if err != nil {
-		err = autorest.NewErrorWithError(err, "frontdoor.HealthProbeSettingsDeleteFuture", "Result", future.Response(), "Polling failure")
-		return
-	}
-	if !done {
-		err = azure.NewAsyncOpIncompleteError("frontdoor.HealthProbeSettingsDeleteFuture")
-		return
-	}
-	ar.Response = future.Response()
-	return
-}
-
 // HealthProbeSettingsListResult result of the request to list HealthProbeSettings. It contains a list of
 // HealthProbeSettings objects and a URL link to get the next set of results.
 type HealthProbeSettingsListResult struct {
-	autorest.Response `json:"-"`
-	// Value - List of HealthProbeSettings within a Front Door.
+	// Value - READ-ONLY; List of HealthProbeSettings within a Front Door.
 	Value *[]HealthProbeSettingsModel `json:"value,omitempty"`
 	// NextLink - URL to get the next set of HealthProbeSettings objects if there are any.
 	NextLink *string `json:"nextLink,omitempty"`
 }
 
-// HealthProbeSettingsListResultIterator provides access to a complete listing of HealthProbeSettingsModel
-// values.
-type HealthProbeSettingsListResultIterator struct {
-	i    int
-	page HealthProbeSettingsListResultPage
-}
-
-// NextWithContext advances to the next value.  If there was an error making
-// the request the iterator does not advance and the error is returned.
-func (iter *HealthProbeSettingsListResultIterator) NextWithContext(ctx context.Context) (err error) {
-	if tracing.IsEnabled() {
-		ctx = tracing.StartSpan(ctx, fqdn+"/HealthProbeSettingsListResultIterator.NextWithContext")
-		defer func() {
-			sc := -1
-			if iter.Response().Response.Response != nil {
-				sc = iter.Response().Response.Response.StatusCode
-			}
-			tracing.EndSpan(ctx, sc, err)
-		}()
-	}
-	iter.i++
-	if iter.i < len(iter.page.Values()) {
-		return nil
-	}
-	err = iter.page.NextWithContext(ctx)
-	if err != nil {
-		iter.i--
-		return err
-	}
-	iter.i = 0
-	return nil
-}
-
-// Next advances to the next value.  If there was an error making
-// the request the iterator does not advance and the error is returned.
-// Deprecated: Use NextWithContext() instead.
-func (iter *HealthProbeSettingsListResultIterator) Next() error {
-	return iter.NextWithContext(context.Background())
-}
-
-// NotDone returns true if the enumeration should be started or is not yet complete.
-func (iter HealthProbeSettingsListResultIterator) NotDone() bool {
-	return iter.page.NotDone() && iter.i < len(iter.page.Values())
-}
-
-// Response returns the raw server response from the last page request.
-func (iter HealthProbeSettingsListResultIterator) Response() HealthProbeSettingsListResult {
-	return iter.page.Response()
-}
-
-// Value returns the current value or a zero-initialized value if the
-// iterator has advanced beyond the end of the collection.
-func (iter HealthProbeSettingsListResultIterator) Value() HealthProbeSettingsModel {
-	if !iter.page.NotDone() {
-		return HealthProbeSettingsModel{}
-	}
-	return iter.page.Values()[iter.i]
-}
-
-// Creates a new instance of the HealthProbeSettingsListResultIterator type.
-func NewHealthProbeSettingsListResultIterator(page HealthProbeSettingsListResultPage) HealthProbeSettingsListResultIterator {
-	return HealthProbeSettingsListResultIterator{page: page}
-}
-
-// IsEmpty returns true if the ListResult contains no values.
-func (hpslr HealthProbeSettingsListResult) IsEmpty() bool {
-	return hpslr.Value == nil || len(*hpslr.Value) == 0
-}
-
-// healthProbeSettingsListResultPreparer prepares a request to retrieve the next set of results.
-// It returns nil if no more results exist.
-func (hpslr HealthProbeSettingsListResult) healthProbeSettingsListResultPreparer(ctx context.Context) (*http.Request, error) {
-	if hpslr.NextLink == nil || len(to.String(hpslr.NextLink)) < 1 {
-		return nil, nil
-	}
-	return autorest.Prepare((&http.Request{}).WithContext(ctx),
-		autorest.AsJSON(),
-		autorest.AsGet(),
-		autorest.WithBaseURL(to.String(hpslr.NextLink)))
-}
-
-// HealthProbeSettingsListResultPage contains a page of HealthProbeSettingsModel values.
-type HealthProbeSettingsListResultPage struct {
-	fn    func(context.Context, HealthProbeSettingsListResult) (HealthProbeSettingsListResult, error)
-	hpslr HealthProbeSettingsListResult
-}
-
-// NextWithContext advances to the next page of values.  If there was an error making
-// the request the page does not advance and the error is returned.
-func (page *HealthProbeSettingsListResultPage) NextWithContext(ctx context.Context) (err error) {
-	if tracing.IsEnabled() {
-		ctx = tracing.StartSpan(ctx, fqdn+"/HealthProbeSettingsListResultPage.NextWithContext")
-		defer func() {
-			sc := -1
-			if page.Response().Response.Response != nil {
-				sc = page.Response().Response.Response.StatusCode
-			}
-			tracing.EndSpan(ctx, sc, err)
-		}()
-	}
-	next, err := page.fn(ctx, page.hpslr)
-	if err != nil {
-		return err
-	}
-	page.hpslr = next
-	return nil
-}
-
-// Next advances to the next page of values.  If there was an error making
-// the request the page does not advance and the error is returned.
-// Deprecated: Use NextWithContext() instead.
-func (page *HealthProbeSettingsListResultPage) Next() error {
-	return page.NextWithContext(context.Background())
-}
-
-// NotDone returns true if the page enumeration should be started or is not yet complete.
-func (page HealthProbeSettingsListResultPage) NotDone() bool {
-	return !page.hpslr.IsEmpty()
-}
-
-// Response returns the raw server response from the last page request.
-func (page HealthProbeSettingsListResultPage) Response() HealthProbeSettingsListResult {
-	return page.hpslr
-}
-
-// Values returns the slice of values for the current page or nil if there are no values.
-func (page HealthProbeSettingsListResultPage) Values() []HealthProbeSettingsModel {
-	if page.hpslr.IsEmpty() {
-		return nil
-	}
-	return *page.hpslr.Value
-}
-
-// Creates a new instance of the HealthProbeSettingsListResultPage type.
-func NewHealthProbeSettingsListResultPage(getNextPage func(context.Context, HealthProbeSettingsListResult) (HealthProbeSettingsListResult, error)) HealthProbeSettingsListResultPage {
-	return HealthProbeSettingsListResultPage{fn: getNextPage}
-}
-
 // HealthProbeSettingsModel load balancing settings for a backend pool
 type HealthProbeSettingsModel struct {
-	autorest.Response `json:"-"`
 	// HealthProbeSettingsProperties - Properties of the health probe settings
 	*HealthProbeSettingsProperties `json:"properties,omitempty"`
 	// Name - Resource name.
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type.
+	// Type - READ-ONLY; Resource type.
 	Type *string `json:"type,omitempty"`
 	// ID - Resource ID.
 	ID *string `json:"id,omitempty"`
@@ -1812,9 +1362,6 @@ func (hpsm HealthProbeSettingsModel) MarshalJSON() ([]byte, error) {
 	}
 	if hpsm.Name != nil {
 		objectMap["name"] = hpsm.Name
-	}
-	if hpsm.Type != nil {
-		objectMap["type"] = hpsm.Type
 	}
 	if hpsm.ID != nil {
 		objectMap["id"] = hpsm.ID
@@ -1916,7 +1463,7 @@ type KeyVaultCertificateSourceParametersVault struct {
 // link to get the next set of results.
 type ListResult struct {
 	autorest.Response `json:"-"`
-	// Value - List of Front Doors within a resource group.
+	// Value - READ-ONLY; List of Front Doors within a resource group.
 	Value *[]FrontDoor `json:"value,omitempty"`
 	// NextLink - URL to get the next set of Front Door objects if there are any.
 	NextLink *string `json:"nextLink,omitempty"`
@@ -2059,214 +1606,22 @@ func NewListResultPage(getNextPage func(context.Context, ListResult) (ListResult
 	return ListResultPage{fn: getNextPage}
 }
 
-// LoadBalancingSettingsCreateOrUpdateFuture an abstraction for monitoring and retrieving the results of a
-// long-running operation.
-type LoadBalancingSettingsCreateOrUpdateFuture struct {
-	azure.Future
-}
-
-// Result returns the result of the asynchronous operation.
-// If the operation has not completed it will return an error.
-func (future *LoadBalancingSettingsCreateOrUpdateFuture) Result(client LoadBalancingSettingsClient) (lbsm LoadBalancingSettingsModel, err error) {
-	var done bool
-	done, err = future.Done(client)
-	if err != nil {
-		err = autorest.NewErrorWithError(err, "frontdoor.LoadBalancingSettingsCreateOrUpdateFuture", "Result", future.Response(), "Polling failure")
-		return
-	}
-	if !done {
-		err = azure.NewAsyncOpIncompleteError("frontdoor.LoadBalancingSettingsCreateOrUpdateFuture")
-		return
-	}
-	sender := autorest.DecorateSender(client, autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
-	if lbsm.Response.Response, err = future.GetResult(sender); err == nil && lbsm.Response.Response.StatusCode != http.StatusNoContent {
-		lbsm, err = client.CreateOrUpdateResponder(lbsm.Response.Response)
-		if err != nil {
-			err = autorest.NewErrorWithError(err, "frontdoor.LoadBalancingSettingsCreateOrUpdateFuture", "Result", lbsm.Response.Response, "Failure responding to request")
-		}
-	}
-	return
-}
-
-// LoadBalancingSettingsDeleteFuture an abstraction for monitoring and retrieving the results of a
-// long-running operation.
-type LoadBalancingSettingsDeleteFuture struct {
-	azure.Future
-}
-
-// Result returns the result of the asynchronous operation.
-// If the operation has not completed it will return an error.
-func (future *LoadBalancingSettingsDeleteFuture) Result(client LoadBalancingSettingsClient) (ar autorest.Response, err error) {
-	var done bool
-	done, err = future.Done(client)
-	if err != nil {
-		err = autorest.NewErrorWithError(err, "frontdoor.LoadBalancingSettingsDeleteFuture", "Result", future.Response(), "Polling failure")
-		return
-	}
-	if !done {
-		err = azure.NewAsyncOpIncompleteError("frontdoor.LoadBalancingSettingsDeleteFuture")
-		return
-	}
-	ar.Response = future.Response()
-	return
-}
-
 // LoadBalancingSettingsListResult result of the request to list load balancing settings. It contains a
 // list of load balancing settings objects and a URL link to get the next set of results.
 type LoadBalancingSettingsListResult struct {
-	autorest.Response `json:"-"`
-	// Value - List of Backend Pools within a Front Door.
+	// Value - READ-ONLY; List of Backend Pools within a Front Door.
 	Value *[]LoadBalancingSettingsModel `json:"value,omitempty"`
 	// NextLink - URL to get the next set of LoadBalancingSettings objects if there are any.
 	NextLink *string `json:"nextLink,omitempty"`
 }
 
-// LoadBalancingSettingsListResultIterator provides access to a complete listing of
-// LoadBalancingSettingsModel values.
-type LoadBalancingSettingsListResultIterator struct {
-	i    int
-	page LoadBalancingSettingsListResultPage
-}
-
-// NextWithContext advances to the next value.  If there was an error making
-// the request the iterator does not advance and the error is returned.
-func (iter *LoadBalancingSettingsListResultIterator) NextWithContext(ctx context.Context) (err error) {
-	if tracing.IsEnabled() {
-		ctx = tracing.StartSpan(ctx, fqdn+"/LoadBalancingSettingsListResultIterator.NextWithContext")
-		defer func() {
-			sc := -1
-			if iter.Response().Response.Response != nil {
-				sc = iter.Response().Response.Response.StatusCode
-			}
-			tracing.EndSpan(ctx, sc, err)
-		}()
-	}
-	iter.i++
-	if iter.i < len(iter.page.Values()) {
-		return nil
-	}
-	err = iter.page.NextWithContext(ctx)
-	if err != nil {
-		iter.i--
-		return err
-	}
-	iter.i = 0
-	return nil
-}
-
-// Next advances to the next value.  If there was an error making
-// the request the iterator does not advance and the error is returned.
-// Deprecated: Use NextWithContext() instead.
-func (iter *LoadBalancingSettingsListResultIterator) Next() error {
-	return iter.NextWithContext(context.Background())
-}
-
-// NotDone returns true if the enumeration should be started or is not yet complete.
-func (iter LoadBalancingSettingsListResultIterator) NotDone() bool {
-	return iter.page.NotDone() && iter.i < len(iter.page.Values())
-}
-
-// Response returns the raw server response from the last page request.
-func (iter LoadBalancingSettingsListResultIterator) Response() LoadBalancingSettingsListResult {
-	return iter.page.Response()
-}
-
-// Value returns the current value or a zero-initialized value if the
-// iterator has advanced beyond the end of the collection.
-func (iter LoadBalancingSettingsListResultIterator) Value() LoadBalancingSettingsModel {
-	if !iter.page.NotDone() {
-		return LoadBalancingSettingsModel{}
-	}
-	return iter.page.Values()[iter.i]
-}
-
-// Creates a new instance of the LoadBalancingSettingsListResultIterator type.
-func NewLoadBalancingSettingsListResultIterator(page LoadBalancingSettingsListResultPage) LoadBalancingSettingsListResultIterator {
-	return LoadBalancingSettingsListResultIterator{page: page}
-}
-
-// IsEmpty returns true if the ListResult contains no values.
-func (lbslr LoadBalancingSettingsListResult) IsEmpty() bool {
-	return lbslr.Value == nil || len(*lbslr.Value) == 0
-}
-
-// loadBalancingSettingsListResultPreparer prepares a request to retrieve the next set of results.
-// It returns nil if no more results exist.
-func (lbslr LoadBalancingSettingsListResult) loadBalancingSettingsListResultPreparer(ctx context.Context) (*http.Request, error) {
-	if lbslr.NextLink == nil || len(to.String(lbslr.NextLink)) < 1 {
-		return nil, nil
-	}
-	return autorest.Prepare((&http.Request{}).WithContext(ctx),
-		autorest.AsJSON(),
-		autorest.AsGet(),
-		autorest.WithBaseURL(to.String(lbslr.NextLink)))
-}
-
-// LoadBalancingSettingsListResultPage contains a page of LoadBalancingSettingsModel values.
-type LoadBalancingSettingsListResultPage struct {
-	fn    func(context.Context, LoadBalancingSettingsListResult) (LoadBalancingSettingsListResult, error)
-	lbslr LoadBalancingSettingsListResult
-}
-
-// NextWithContext advances to the next page of values.  If there was an error making
-// the request the page does not advance and the error is returned.
-func (page *LoadBalancingSettingsListResultPage) NextWithContext(ctx context.Context) (err error) {
-	if tracing.IsEnabled() {
-		ctx = tracing.StartSpan(ctx, fqdn+"/LoadBalancingSettingsListResultPage.NextWithContext")
-		defer func() {
-			sc := -1
-			if page.Response().Response.Response != nil {
-				sc = page.Response().Response.Response.StatusCode
-			}
-			tracing.EndSpan(ctx, sc, err)
-		}()
-	}
-	next, err := page.fn(ctx, page.lbslr)
-	if err != nil {
-		return err
-	}
-	page.lbslr = next
-	return nil
-}
-
-// Next advances to the next page of values.  If there was an error making
-// the request the page does not advance and the error is returned.
-// Deprecated: Use NextWithContext() instead.
-func (page *LoadBalancingSettingsListResultPage) Next() error {
-	return page.NextWithContext(context.Background())
-}
-
-// NotDone returns true if the page enumeration should be started or is not yet complete.
-func (page LoadBalancingSettingsListResultPage) NotDone() bool {
-	return !page.lbslr.IsEmpty()
-}
-
-// Response returns the raw server response from the last page request.
-func (page LoadBalancingSettingsListResultPage) Response() LoadBalancingSettingsListResult {
-	return page.lbslr
-}
-
-// Values returns the slice of values for the current page or nil if there are no values.
-func (page LoadBalancingSettingsListResultPage) Values() []LoadBalancingSettingsModel {
-	if page.lbslr.IsEmpty() {
-		return nil
-	}
-	return *page.lbslr.Value
-}
-
-// Creates a new instance of the LoadBalancingSettingsListResultPage type.
-func NewLoadBalancingSettingsListResultPage(getNextPage func(context.Context, LoadBalancingSettingsListResult) (LoadBalancingSettingsListResult, error)) LoadBalancingSettingsListResultPage {
-	return LoadBalancingSettingsListResultPage{fn: getNextPage}
-}
-
 // LoadBalancingSettingsModel load balancing settings for a backend pool
 type LoadBalancingSettingsModel struct {
-	autorest.Response `json:"-"`
 	// LoadBalancingSettingsProperties - Properties of the load balancing settings
 	*LoadBalancingSettingsProperties `json:"properties,omitempty"`
 	// Name - Resource name.
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type.
+	// Type - READ-ONLY; Resource type.
 	Type *string `json:"type,omitempty"`
 	// ID - Resource ID.
 	ID *string `json:"id,omitempty"`
@@ -2280,9 +1635,6 @@ func (lbsm LoadBalancingSettingsModel) MarshalJSON() ([]byte, error) {
 	}
 	if lbsm.Name != nil {
 		objectMap["name"] = lbsm.Name
-	}
-	if lbsm.Type != nil {
-		objectMap["type"] = lbsm.Type
 	}
 	if lbsm.ID != nil {
 		objectMap["id"] = lbsm.ID
@@ -2501,7 +1853,7 @@ type PoliciesDeleteFuture struct {
 // If the operation has not completed it will return an error.
 func (future *PoliciesDeleteFuture) Result(client PoliciesClient) (ar autorest.Response, err error) {
 	var done bool
-	done, err = future.Done(client)
+	done, err = future.DoneWithContext(context.Background(), client)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "frontdoor.PoliciesDeleteFuture", "Result", future.Response(), "Polling failure")
 		return
@@ -2526,9 +1878,9 @@ type PolicySettings struct {
 type Properties struct {
 	// ResourceState - Resource status of the Front Door. Possible values include: 'ResourceStateCreating', 'ResourceStateEnabling', 'ResourceStateEnabled', 'ResourceStateDisabling', 'ResourceStateDisabled', 'ResourceStateDeleting'
 	ResourceState ResourceState `json:"resourceState,omitempty"`
-	// ProvisioningState - Provisioning state of the Front Door.
+	// ProvisioningState - READ-ONLY; Provisioning state of the Front Door.
 	ProvisioningState *string `json:"provisioningState,omitempty"`
-	// Cname - The host that each frontendEndpoint must CNAME to.
+	// Cname - READ-ONLY; The host that each frontendEndpoint must CNAME to.
 	Cname *string `json:"cname,omitempty"`
 	// FriendlyName - A friendly name for the frontDoor
 	FriendlyName *string `json:"friendlyName,omitempty"`
@@ -2554,11 +1906,11 @@ type PurgeParameters struct {
 
 // Resource common resource representation.
 type Resource struct {
-	// ID - Resource ID.
+	// ID - READ-ONLY; Resource ID.
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name.
+	// Name - READ-ONLY; Resource name.
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type.
+	// Type - READ-ONLY; Resource type.
 	Type *string `json:"type,omitempty"`
 	// Location - Resource location.
 	Location *string `json:"location,omitempty"`
@@ -2569,15 +1921,6 @@ type Resource struct {
 // MarshalJSON is the custom marshaler for Resource.
 func (r Resource) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
-	if r.ID != nil {
-		objectMap["id"] = r.ID
-	}
-	if r.Name != nil {
-		objectMap["name"] = r.Name
-	}
-	if r.Type != nil {
-		objectMap["type"] = r.Type
-	}
 	if r.Location != nil {
 		objectMap["location"] = r.Location
 	}
@@ -2590,12 +1933,11 @@ func (r Resource) MarshalJSON() ([]byte, error) {
 // RoutingRule a routing rule represents a specification for traffic to treat and where to send it, along
 // with health probe information.
 type RoutingRule struct {
-	autorest.Response `json:"-"`
 	// RoutingRuleProperties - Properties of the Front Door Routing Rule
 	*RoutingRuleProperties `json:"properties,omitempty"`
 	// Name - Resource name.
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type.
+	// Type - READ-ONLY; Resource type.
 	Type *string `json:"type,omitempty"`
 	// ID - Resource ID.
 	ID *string `json:"id,omitempty"`
@@ -2609,9 +1951,6 @@ func (rr RoutingRule) MarshalJSON() ([]byte, error) {
 	}
 	if rr.Name != nil {
 		objectMap["name"] = rr.Name
-	}
-	if rr.Type != nil {
-		objectMap["type"] = rr.Type
 	}
 	if rr.ID != nil {
 		objectMap["id"] = rr.ID
@@ -2673,148 +2012,10 @@ func (rr *RoutingRule) UnmarshalJSON(body []byte) error {
 // RoutingRuleListResult result of the request to list Routing Rules. It contains a list of Routing Rule
 // objects and a URL link to get the next set of results.
 type RoutingRuleListResult struct {
-	autorest.Response `json:"-"`
-	// Value - List of Routing Rules within a Front Door.
+	// Value - READ-ONLY; List of Routing Rules within a Front Door.
 	Value *[]RoutingRule `json:"value,omitempty"`
 	// NextLink - URL to get the next set of RoutingRule objects if there are any.
 	NextLink *string `json:"nextLink,omitempty"`
-}
-
-// RoutingRuleListResultIterator provides access to a complete listing of RoutingRule values.
-type RoutingRuleListResultIterator struct {
-	i    int
-	page RoutingRuleListResultPage
-}
-
-// NextWithContext advances to the next value.  If there was an error making
-// the request the iterator does not advance and the error is returned.
-func (iter *RoutingRuleListResultIterator) NextWithContext(ctx context.Context) (err error) {
-	if tracing.IsEnabled() {
-		ctx = tracing.StartSpan(ctx, fqdn+"/RoutingRuleListResultIterator.NextWithContext")
-		defer func() {
-			sc := -1
-			if iter.Response().Response.Response != nil {
-				sc = iter.Response().Response.Response.StatusCode
-			}
-			tracing.EndSpan(ctx, sc, err)
-		}()
-	}
-	iter.i++
-	if iter.i < len(iter.page.Values()) {
-		return nil
-	}
-	err = iter.page.NextWithContext(ctx)
-	if err != nil {
-		iter.i--
-		return err
-	}
-	iter.i = 0
-	return nil
-}
-
-// Next advances to the next value.  If there was an error making
-// the request the iterator does not advance and the error is returned.
-// Deprecated: Use NextWithContext() instead.
-func (iter *RoutingRuleListResultIterator) Next() error {
-	return iter.NextWithContext(context.Background())
-}
-
-// NotDone returns true if the enumeration should be started or is not yet complete.
-func (iter RoutingRuleListResultIterator) NotDone() bool {
-	return iter.page.NotDone() && iter.i < len(iter.page.Values())
-}
-
-// Response returns the raw server response from the last page request.
-func (iter RoutingRuleListResultIterator) Response() RoutingRuleListResult {
-	return iter.page.Response()
-}
-
-// Value returns the current value or a zero-initialized value if the
-// iterator has advanced beyond the end of the collection.
-func (iter RoutingRuleListResultIterator) Value() RoutingRule {
-	if !iter.page.NotDone() {
-		return RoutingRule{}
-	}
-	return iter.page.Values()[iter.i]
-}
-
-// Creates a new instance of the RoutingRuleListResultIterator type.
-func NewRoutingRuleListResultIterator(page RoutingRuleListResultPage) RoutingRuleListResultIterator {
-	return RoutingRuleListResultIterator{page: page}
-}
-
-// IsEmpty returns true if the ListResult contains no values.
-func (rrlr RoutingRuleListResult) IsEmpty() bool {
-	return rrlr.Value == nil || len(*rrlr.Value) == 0
-}
-
-// routingRuleListResultPreparer prepares a request to retrieve the next set of results.
-// It returns nil if no more results exist.
-func (rrlr RoutingRuleListResult) routingRuleListResultPreparer(ctx context.Context) (*http.Request, error) {
-	if rrlr.NextLink == nil || len(to.String(rrlr.NextLink)) < 1 {
-		return nil, nil
-	}
-	return autorest.Prepare((&http.Request{}).WithContext(ctx),
-		autorest.AsJSON(),
-		autorest.AsGet(),
-		autorest.WithBaseURL(to.String(rrlr.NextLink)))
-}
-
-// RoutingRuleListResultPage contains a page of RoutingRule values.
-type RoutingRuleListResultPage struct {
-	fn   func(context.Context, RoutingRuleListResult) (RoutingRuleListResult, error)
-	rrlr RoutingRuleListResult
-}
-
-// NextWithContext advances to the next page of values.  If there was an error making
-// the request the page does not advance and the error is returned.
-func (page *RoutingRuleListResultPage) NextWithContext(ctx context.Context) (err error) {
-	if tracing.IsEnabled() {
-		ctx = tracing.StartSpan(ctx, fqdn+"/RoutingRuleListResultPage.NextWithContext")
-		defer func() {
-			sc := -1
-			if page.Response().Response.Response != nil {
-				sc = page.Response().Response.Response.StatusCode
-			}
-			tracing.EndSpan(ctx, sc, err)
-		}()
-	}
-	next, err := page.fn(ctx, page.rrlr)
-	if err != nil {
-		return err
-	}
-	page.rrlr = next
-	return nil
-}
-
-// Next advances to the next page of values.  If there was an error making
-// the request the page does not advance and the error is returned.
-// Deprecated: Use NextWithContext() instead.
-func (page *RoutingRuleListResultPage) Next() error {
-	return page.NextWithContext(context.Background())
-}
-
-// NotDone returns true if the page enumeration should be started or is not yet complete.
-func (page RoutingRuleListResultPage) NotDone() bool {
-	return !page.rrlr.IsEmpty()
-}
-
-// Response returns the raw server response from the last page request.
-func (page RoutingRuleListResultPage) Response() RoutingRuleListResult {
-	return page.rrlr
-}
-
-// Values returns the slice of values for the current page or nil if there are no values.
-func (page RoutingRuleListResultPage) Values() []RoutingRule {
-	if page.rrlr.IsEmpty() {
-		return nil
-	}
-	return *page.rrlr.Value
-}
-
-// Creates a new instance of the RoutingRuleListResultPage type.
-func NewRoutingRuleListResultPage(getNextPage func(context.Context, RoutingRuleListResult) (RoutingRuleListResult, error)) RoutingRuleListResultPage {
-	return RoutingRuleListResultPage{fn: getNextPage}
 }
 
 // RoutingRuleProperties the JSON object that contains the properties required to create a routing rule.
@@ -2837,58 +2038,6 @@ type RoutingRuleProperties struct {
 	BackendPool *SubResource `json:"backendPool,omitempty"`
 	// EnabledState - Whether to enable use of this rule. Permitted values are 'Enabled' or 'Disabled'. Possible values include: 'EnabledStateEnumEnabled', 'EnabledStateEnumDisabled'
 	EnabledState EnabledStateEnum `json:"enabledState,omitempty"`
-}
-
-// RoutingRulesCreateOrUpdateFuture an abstraction for monitoring and retrieving the results of a
-// long-running operation.
-type RoutingRulesCreateOrUpdateFuture struct {
-	azure.Future
-}
-
-// Result returns the result of the asynchronous operation.
-// If the operation has not completed it will return an error.
-func (future *RoutingRulesCreateOrUpdateFuture) Result(client RoutingRulesClient) (rr RoutingRule, err error) {
-	var done bool
-	done, err = future.Done(client)
-	if err != nil {
-		err = autorest.NewErrorWithError(err, "frontdoor.RoutingRulesCreateOrUpdateFuture", "Result", future.Response(), "Polling failure")
-		return
-	}
-	if !done {
-		err = azure.NewAsyncOpIncompleteError("frontdoor.RoutingRulesCreateOrUpdateFuture")
-		return
-	}
-	sender := autorest.DecorateSender(client, autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
-	if rr.Response.Response, err = future.GetResult(sender); err == nil && rr.Response.Response.StatusCode != http.StatusNoContent {
-		rr, err = client.CreateOrUpdateResponder(rr.Response.Response)
-		if err != nil {
-			err = autorest.NewErrorWithError(err, "frontdoor.RoutingRulesCreateOrUpdateFuture", "Result", rr.Response.Response, "Failure responding to request")
-		}
-	}
-	return
-}
-
-// RoutingRulesDeleteFuture an abstraction for monitoring and retrieving the results of a long-running
-// operation.
-type RoutingRulesDeleteFuture struct {
-	azure.Future
-}
-
-// Result returns the result of the asynchronous operation.
-// If the operation has not completed it will return an error.
-func (future *RoutingRulesDeleteFuture) Result(client RoutingRulesClient) (ar autorest.Response, err error) {
-	var done bool
-	done, err = future.Done(client)
-	if err != nil {
-		err = autorest.NewErrorWithError(err, "frontdoor.RoutingRulesDeleteFuture", "Result", future.Response(), "Polling failure")
-		return
-	}
-	if !done {
-		err = azure.NewAsyncOpIncompleteError("frontdoor.RoutingRulesDeleteFuture")
-		return
-	}
-	ar.Response = future.Response()
-	return
 }
 
 // RoutingRuleUpdateParameters routing rules to apply to an endpoint
@@ -2959,11 +2108,11 @@ type ValidateCustomDomainInput struct {
 // ValidateCustomDomainOutput output of custom domain validation.
 type ValidateCustomDomainOutput struct {
 	autorest.Response `json:"-"`
-	// CustomDomainValidated - Indicates whether the custom domain is valid or not.
+	// CustomDomainValidated - READ-ONLY; Indicates whether the custom domain is valid or not.
 	CustomDomainValidated *bool `json:"customDomainValidated,omitempty"`
-	// Reason - The reason why the custom domain is not valid.
+	// Reason - READ-ONLY; The reason why the custom domain is not valid.
 	Reason *string `json:"reason,omitempty"`
-	// Message - Error message describing why the custom domain is not valid.
+	// Message - READ-ONLY; Error message describing why the custom domain is not valid.
 	Message *string `json:"message,omitempty"`
 }
 
@@ -2974,11 +2123,11 @@ type WebApplicationFirewallPolicy1 struct {
 	*WebApplicationFirewallPolicyPropertiesFormat `json:"properties,omitempty"`
 	// Etag - Gets a unique read-only string that changes whenever the resource is updated.
 	Etag *string `json:"etag,omitempty"`
-	// ID - Resource ID.
+	// ID - READ-ONLY; Resource ID.
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name.
+	// Name - READ-ONLY; Resource name.
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type.
+	// Type - READ-ONLY; Resource type.
 	Type *string `json:"type,omitempty"`
 	// Location - Resource location.
 	Location *string `json:"location,omitempty"`
@@ -2994,15 +2143,6 @@ func (wafp1 WebApplicationFirewallPolicy1) MarshalJSON() ([]byte, error) {
 	}
 	if wafp1.Etag != nil {
 		objectMap["etag"] = wafp1.Etag
-	}
-	if wafp1.ID != nil {
-		objectMap["id"] = wafp1.ID
-	}
-	if wafp1.Name != nil {
-		objectMap["name"] = wafp1.Name
-	}
-	if wafp1.Type != nil {
-		objectMap["type"] = wafp1.Type
 	}
 	if wafp1.Location != nil {
 		objectMap["location"] = wafp1.Location
@@ -3095,7 +2235,7 @@ func (wafp1 *WebApplicationFirewallPolicy1) UnmarshalJSON(body []byte) error {
 // contains a list of WebApplicationFirewallPolicy objects and a URL link to get the next set of results.
 type WebApplicationFirewallPolicyListResult struct {
 	autorest.Response `json:"-"`
-	// Value - List of WebApplicationFirewallPolicies within a resource group.
+	// Value - READ-ONLY; List of WebApplicationFirewallPolicies within a resource group.
 	Value *[]WebApplicationFirewallPolicy1 `json:"value,omitempty"`
 	// NextLink - URL to get the next set of WebApplicationFirewallPolicy objects if there are any.
 	NextLink *string `json:"nextLink,omitempty"`
@@ -3247,8 +2387,8 @@ type WebApplicationFirewallPolicyPropertiesFormat struct {
 	CustomRules *CustomRules `json:"customRules,omitempty"`
 	// ManagedRules - Describes managed rules inside the policy
 	ManagedRules *ManagedRuleSets `json:"managedRules,omitempty"`
-	// ProvisioningState - Provisioning state of the WebApplicationFirewallPolicy.
+	// ProvisioningState - READ-ONLY; Provisioning state of the WebApplicationFirewallPolicy.
 	ProvisioningState *string `json:"provisioningState,omitempty"`
-	// ResourceState - Possible values include: 'WebApplicationFirewallPolicyCreating', 'WebApplicationFirewallPolicyEnabling', 'WebApplicationFirewallPolicyEnabled', 'WebApplicationFirewallPolicyDisabling', 'WebApplicationFirewallPolicyDisabled', 'WebApplicationFirewallPolicyDeleting'
+	// ResourceState - READ-ONLY; Possible values include: 'WebApplicationFirewallPolicyCreating', 'WebApplicationFirewallPolicyEnabling', 'WebApplicationFirewallPolicyEnabled', 'WebApplicationFirewallPolicyDisabling', 'WebApplicationFirewallPolicyDisabled', 'WebApplicationFirewallPolicyDeleting'
 	ResourceState WebApplicationFirewallPolicy `json:"resourceState,omitempty"`
 }

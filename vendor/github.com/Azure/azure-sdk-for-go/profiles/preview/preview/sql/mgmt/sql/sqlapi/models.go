@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,20 +19,17 @@
 
 package sqlapi
 
-import original "github.com/Azure/azure-sdk-for-go/services/preview/sql/mgmt/2017-10-01-preview/sql/sqlapi"
+import original "github.com/Azure/azure-sdk-for-go/services/preview/sql/mgmt/2018-06-01-preview/sql/sqlapi"
 
-type BackupShortTermRetentionPoliciesClientAPI = original.BackupShortTermRetentionPoliciesClientAPI
-type CapabilitiesClientAPI = original.CapabilitiesClientAPI
-type DatabaseOperationsClientAPI = original.DatabaseOperationsClientAPI
-type DatabaseVulnerabilityAssessmentScansClientAPI = original.DatabaseVulnerabilityAssessmentScansClientAPI
+type DatabaseSecurityAlertPoliciesClientAPI = original.DatabaseSecurityAlertPoliciesClientAPI
 type DatabasesClientAPI = original.DatabasesClientAPI
-type ElasticPoolOperationsClientAPI = original.ElasticPoolOperationsClientAPI
 type ElasticPoolsClientAPI = original.ElasticPoolsClientAPI
-type InstanceFailoverGroupsClientAPI = original.InstanceFailoverGroupsClientAPI
-type ManagedDatabaseVulnerabilityAssessmentRuleBaselinesClientAPI = original.ManagedDatabaseVulnerabilityAssessmentRuleBaselinesClientAPI
-type ManagedDatabaseVulnerabilityAssessmentScansClientAPI = original.ManagedDatabaseVulnerabilityAssessmentScansClientAPI
-type ManagedDatabaseVulnerabilityAssessmentsClientAPI = original.ManagedDatabaseVulnerabilityAssessmentsClientAPI
-type ManagedInstanceEncryptionProtectorsClientAPI = original.ManagedInstanceEncryptionProtectorsClientAPI
-type ManagedInstanceKeysClientAPI = original.ManagedInstanceKeysClientAPI
-type ManagedInstanceTdeCertificatesClientAPI = original.ManagedInstanceTdeCertificatesClientAPI
-type TdeCertificatesClientAPI = original.TdeCertificatesClientAPI
+type InstancePoolsClientAPI = original.InstancePoolsClientAPI
+type ManagedDatabaseRestoreDetailsClientAPI = original.ManagedDatabaseRestoreDetailsClientAPI
+type ManagedDatabaseSensitivityLabelsClientAPI = original.ManagedDatabaseSensitivityLabelsClientAPI
+type ManagedDatabasesClientAPI = original.ManagedDatabasesClientAPI
+type ManagedInstanceVulnerabilityAssessmentsClientAPI = original.ManagedInstanceVulnerabilityAssessmentsClientAPI
+type ManagedInstancesClientAPI = original.ManagedInstancesClientAPI
+type PrivateEndpointConnectionsClientAPI = original.PrivateEndpointConnectionsClientAPI
+type ServerVulnerabilityAssessmentsClientAPI = original.ServerVulnerabilityAssessmentsClientAPI
+type UsagesClientAPI = original.UsagesClientAPI

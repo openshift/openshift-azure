@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ type ApplicationsClientAPI = original.ApplicationsClientAPI
 type DeletedApplicationsClientAPI = original.DeletedApplicationsClientAPI
 type DomainsClientAPI = original.DomainsClientAPI
 type GroupsClientAPI = original.GroupsClientAPI
-type OAuth2ClientAPI = original.OAuth2ClientAPI
+type OAuth2PermissionGrantClientAPI = original.OAuth2PermissionGrantClientAPI
 type ObjectsClientAPI = original.ObjectsClientAPI
 type ServicePrincipalsClientAPI = original.ServicePrincipalsClientAPI
 type SignedInUserClientAPI = original.SignedInUserClientAPI

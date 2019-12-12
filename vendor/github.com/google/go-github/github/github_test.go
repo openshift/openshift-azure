@@ -6,9 +6,9 @@
 package github
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -135,31 +135,28 @@ func testBody(t *testing.T, r *http.Request, want string) {
 	}
 }
 
-// Helper function to test that a value is marshalled to JSON as expected.
+// Test whether the marshaling of v produces JSON that corresponds
+// to the want string.
 func testJSONMarshal(t *testing.T, v interface{}, want string) {
-	j, err := json.Marshal(v)
-	if err != nil {
-		t.Errorf("Unable to marshal JSON for %v", v)
-	}
-
-	w := new(bytes.Buffer)
-	err = json.Compact(w, []byte(want))
-	if err != nil {
-		t.Errorf("String is not valid json: %s", want)
-	}
-
-	if w.String() != string(j) {
-		t.Errorf("json.Marshal(%q) returned %s, want %s", v, j, w)
-	}
-
-	// now go the other direction and make sure things unmarshal as expected
-	u := reflect.ValueOf(v).Interface()
-	if err := json.Unmarshal([]byte(want), u); err != nil {
+	// Unmarshal the wanted JSON, to verify its correctness, and marshal it back
+	// to sort the keys.
+	u := reflect.New(reflect.TypeOf(v)).Interface()
+	if err := json.Unmarshal([]byte(want), &u); err != nil {
 		t.Errorf("Unable to unmarshal JSON for %v: %v", want, err)
 	}
+	w, err := json.Marshal(u)
+	if err != nil {
+		t.Errorf("Unable to marshal JSON for %#v", u)
+	}
 
-	if !reflect.DeepEqual(v, u) {
-		t.Errorf("json.Unmarshal(%q) returned %s, want %s", want, u, v)
+	// Marshal the target value.
+	j, err := json.Marshal(v)
+	if err != nil {
+		t.Errorf("Unable to marshal JSON for %#v", v)
+	}
+
+	if string(w) != string(j) {
+		t.Errorf("json.Marshal(%q) returned %s, want %s", v, j, w)
 	}
 }
 
@@ -180,8 +177,8 @@ func TestNewClient(t *testing.T) {
 }
 
 func TestNewEnterpriseClient(t *testing.T) {
-	baseURL := "https://custom-url/"
-	uploadURL := "https://custom-upload-url/"
+	baseURL := "https://custom-url/api/v3/"
+	uploadURL := "https://custom-upload-url/api/v3/"
 	c, err := NewEnterpriseClient(baseURL, uploadURL, nil)
 	if err != nil {
 		t.Fatalf("NewEnterpriseClient returned unexpected error: %v", err)
@@ -196,10 +193,48 @@ func TestNewEnterpriseClient(t *testing.T) {
 }
 
 func TestNewEnterpriseClient_addsTrailingSlashToURLs(t *testing.T) {
-	baseURL := "https://custom-url"
-	uploadURL := "https://custom-upload-url"
+	baseURL := "https://custom-url/api/v3"
+	uploadURL := "https://custom-upload-url/api/v3"
 	formattedBaseURL := baseURL + "/"
 	formattedUploadURL := uploadURL + "/"
+
+	c, err := NewEnterpriseClient(baseURL, uploadURL, nil)
+	if err != nil {
+		t.Fatalf("NewEnterpriseClient returned unexpected error: %v", err)
+	}
+
+	if got, want := c.BaseURL.String(), formattedBaseURL; got != want {
+		t.Errorf("NewClient BaseURL is %v, want %v", got, want)
+	}
+	if got, want := c.UploadURL.String(), formattedUploadURL; got != want {
+		t.Errorf("NewClient UploadURL is %v, want %v", got, want)
+	}
+}
+
+func TestNewEnterpriseClient_addsEnterpriseSuffixToURLs(t *testing.T) {
+	baseURL := "https://custom-url/"
+	uploadURL := "https://custom-upload-url/"
+	formattedBaseURL := baseURL + "api/v3/"
+	formattedUploadURL := uploadURL + "api/v3/"
+
+	c, err := NewEnterpriseClient(baseURL, uploadURL, nil)
+	if err != nil {
+		t.Fatalf("NewEnterpriseClient returned unexpected error: %v", err)
+	}
+
+	if got, want := c.BaseURL.String(), formattedBaseURL; got != want {
+		t.Errorf("NewClient BaseURL is %v, want %v", got, want)
+	}
+	if got, want := c.UploadURL.String(), formattedUploadURL; got != want {
+		t.Errorf("NewClient UploadURL is %v, want %v", got, want)
+	}
+}
+
+func TestNewEnterpriseClient_addsEnterpriseSuffixAndTrailingSlashToURLs(t *testing.T) {
+	baseURL := "https://custom-url"
+	uploadURL := "https://custom-upload-url"
+	formattedBaseURL := baseURL + "/api/v3/"
+	formattedUploadURL := uploadURL + "/api/v3/"
 
 	c, err := NewEnterpriseClient(baseURL, uploadURL, nil)
 	if err != nil {
@@ -440,6 +475,18 @@ func TestDo(t *testing.T) {
 	want := &foo{"a"}
 	if !reflect.DeepEqual(body, want) {
 		t.Errorf("Response body = %v, want %v", body, want)
+	}
+}
+
+func TestDo_nilContext(t *testing.T) {
+	client, _, _, teardown := setup()
+	defer teardown()
+
+	req, _ := client.NewRequest("GET", ".", nil)
+	_, err := client.Do(nil, req, nil)
+
+	if !reflect.DeepEqual(err, errors.New("context must be non-nil")) {
+		t.Errorf("Expected context must be non-nil error")
 	}
 }
 
@@ -818,6 +865,56 @@ func TestCheckResponse(t *testing.T) {
 			Reason:    "dmca",
 			CreatedAt: &Timestamp{time.Date(2016, time.March, 17, 15, 39, 46, 0, time.UTC)},
 		},
+	}
+	if !reflect.DeepEqual(err, want) {
+		t.Errorf("Error = %#v, want %#v", err, want)
+	}
+}
+
+func TestCheckResponse_RateLimit(t *testing.T) {
+	res := &http.Response{
+		Request:    &http.Request{},
+		StatusCode: http.StatusForbidden,
+		Header:     http.Header{},
+		Body: ioutil.NopCloser(strings.NewReader(`{"message":"m",
+			"documentation_url": "url"}`)),
+	}
+	res.Header.Set(headerRateLimit, "60")
+	res.Header.Set(headerRateRemaining, "0")
+	res.Header.Set(headerRateReset, "243424")
+
+	err := CheckResponse(res).(*RateLimitError)
+
+	if err == nil {
+		t.Errorf("Expected error response.")
+	}
+
+	want := &RateLimitError{
+		Rate:     parseRate(res),
+		Response: res,
+		Message:  "m",
+	}
+	if !reflect.DeepEqual(err, want) {
+		t.Errorf("Error = %#v, want %#v", err, want)
+	}
+}
+
+func TestCheckResponse_AbuseRateLimit(t *testing.T) {
+	res := &http.Response{
+		Request:    &http.Request{},
+		StatusCode: http.StatusForbidden,
+		Body: ioutil.NopCloser(strings.NewReader(`{"message":"m",
+			"documentation_url": "developer.github.com/v3/#abuse-rate-limits"}`)),
+	}
+	err := CheckResponse(res).(*AbuseRateLimitError)
+
+	if err == nil {
+		t.Errorf("Expected error response.")
+	}
+
+	want := &AbuseRateLimitError{
+		Response: res,
+		Message:  "m",
 	}
 	if !reflect.DeepEqual(err, want) {
 		t.Errorf("Error = %#v, want %#v", err, want)

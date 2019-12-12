@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package managementgroups
 import (
 	"context"
 
-	original "github.com/Azure/azure-sdk-for-go/services/preview/resources/mgmt/2018-03-01-preview/managementgroups"
+	original "github.com/Azure/azure-sdk-for-go/services/preview/resources/mgmt/2019-11-01/managementgroups"
 )
 
 const (
@@ -56,12 +56,6 @@ const (
 	Permissions1View     Permissions1 = original.Permissions1View
 )
 
-type ProvisioningState = original.ProvisioningState
-
-const (
-	Updating ProvisioningState = original.Updating
-)
-
 type Reason = original.Reason
 
 const (
@@ -83,21 +77,21 @@ const (
 type Type = original.Type
 
 const (
-	ProvidersMicrosoftManagementmanagementGroups Type = original.ProvidersMicrosoftManagementmanagementGroups
+	MicrosoftManagementmanagementGroups Type = original.MicrosoftManagementmanagementGroups
 )
 
 type Type1 = original.Type1
 
 const (
-	Type1ProvidersMicrosoftManagementmanagementGroups Type1 = original.Type1ProvidersMicrosoftManagementmanagementGroups
-	Type1Subscriptions                                Type1 = original.Type1Subscriptions
+	Type1MicrosoftManagementmanagementGroups Type1 = original.Type1MicrosoftManagementmanagementGroups
+	Type1Subscriptions                       Type1 = original.Type1Subscriptions
 )
 
 type Type2 = original.Type2
 
 const (
-	Type2ProvidersMicrosoftManagementmanagementGroups Type2 = original.Type2ProvidersMicrosoftManagementmanagementGroups
-	Type2Subscriptions                                Type2 = original.Type2Subscriptions
+	Type2MicrosoftManagementmanagementGroups Type2 = original.Type2MicrosoftManagementmanagementGroups
+	Type2Subscriptions                       Type2 = original.Type2Subscriptions
 )
 
 type BaseClient = original.BaseClient
@@ -112,6 +106,12 @@ type CreateManagementGroupRequest = original.CreateManagementGroupRequest
 type CreateOrUpdateFuture = original.CreateOrUpdateFuture
 type CreateParentGroupInfo = original.CreateParentGroupInfo
 type DeleteFuture = original.DeleteFuture
+type DescendantInfo = original.DescendantInfo
+type DescendantInfoProperties = original.DescendantInfoProperties
+type DescendantListResult = original.DescendantListResult
+type DescendantListResultIterator = original.DescendantListResultIterator
+type DescendantListResultPage = original.DescendantListResultPage
+type DescendantParentGroupInfo = original.DescendantParentGroupInfo
 type Details = original.Details
 type EntitiesClient = original.EntitiesClient
 type EntityHierarchyItem = original.EntityHierarchyItem
@@ -136,10 +136,10 @@ type OperationListResult = original.OperationListResult
 type OperationListResultIterator = original.OperationListResultIterator
 type OperationListResultPage = original.OperationListResultPage
 type OperationResults = original.OperationResults
-type OperationResultsProperties = original.OperationResultsProperties
 type OperationsClient = original.OperationsClient
 type ParentGroupInfo = original.ParentGroupInfo
 type PatchManagementGroupRequest = original.PatchManagementGroupRequest
+type PathElement = original.PathElement
 type Properties = original.Properties
 type SetObject = original.SetObject
 type SubscriptionsClient = original.SubscriptionsClient
@@ -153,6 +153,12 @@ func NewClient() Client {
 }
 func NewClientWithBaseURI(baseURI string) Client {
 	return original.NewClientWithBaseURI(baseURI)
+}
+func NewDescendantListResultIterator(page DescendantListResultPage) DescendantListResultIterator {
+	return original.NewDescendantListResultIterator(page)
+}
+func NewDescendantListResultPage(getNextPage func(context.Context, DescendantListResult) (DescendantListResult, error)) DescendantListResultPage {
+	return original.NewDescendantListResultPage(getNextPage)
 }
 func NewEntitiesClient() EntitiesClient {
 	return original.NewEntitiesClient()
@@ -201,9 +207,6 @@ func PossiblePermissions1Values() []Permissions1 {
 }
 func PossiblePermissionsValues() []Permissions {
 	return original.PossiblePermissionsValues()
-}
-func PossibleProvisioningStateValues() []ProvisioningState {
-	return original.PossibleProvisioningStateValues()
 }
 func PossibleReasonValues() []Reason {
 	return original.PossibleReasonValues()

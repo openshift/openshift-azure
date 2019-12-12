@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,10 +19,28 @@
 
 package servicefabric
 
-import original "github.com/Azure/azure-sdk-for-go/services/servicefabric/mgmt/2018-02-01/servicefabric"
+import (
+	"context"
+
+	original "github.com/Azure/azure-sdk-for-go/services/servicefabric/mgmt/2019-03-01/servicefabric"
+)
 
 const (
 	DefaultBaseURI = original.DefaultBaseURI
+)
+
+type ArmServicePackageActivationMode = original.ArmServicePackageActivationMode
+
+const (
+	ExclusiveProcess ArmServicePackageActivationMode = original.ExclusiveProcess
+	SharedProcess    ArmServicePackageActivationMode = original.SharedProcess
+)
+
+type ArmUpgradeFailureAction = original.ArmUpgradeFailureAction
+
+const (
+	Manual   ArmUpgradeFailureAction = original.Manual
+	Rollback ArmUpgradeFailureAction = original.Rollback
 )
 
 type ClusterState = original.ClusterState
@@ -173,8 +191,8 @@ const (
 type UpgradeMode = original.UpgradeMode
 
 const (
-	Automatic UpgradeMode = original.Automatic
-	Manual    UpgradeMode = original.Manual
+	UpgradeModeAutomatic UpgradeMode = original.UpgradeModeAutomatic
+	UpgradeModeManual    UpgradeMode = original.UpgradeModeManual
 )
 
 type UpgradeMode1 = original.UpgradeMode1
@@ -225,15 +243,18 @@ type ApplicationTypeVersionResource = original.ApplicationTypeVersionResource
 type ApplicationTypeVersionResourceList = original.ApplicationTypeVersionResourceList
 type ApplicationTypeVersionResourceProperties = original.ApplicationTypeVersionResourceProperties
 type ApplicationTypeVersionsClient = original.ApplicationTypeVersionsClient
-type ApplicationTypeVersionsCreateFuture = original.ApplicationTypeVersionsCreateFuture
+type ApplicationTypeVersionsCreateOrUpdateFuture = original.ApplicationTypeVersionsCreateOrUpdateFuture
 type ApplicationTypeVersionsDeleteFuture = original.ApplicationTypeVersionsDeleteFuture
 type ApplicationTypesClient = original.ApplicationTypesClient
 type ApplicationTypesDeleteFuture = original.ApplicationTypesDeleteFuture
 type ApplicationUpgradePolicy = original.ApplicationUpgradePolicy
 type ApplicationsClient = original.ApplicationsClient
-type ApplicationsCreateFuture = original.ApplicationsCreateFuture
+type ApplicationsCreateOrUpdateFuture = original.ApplicationsCreateOrUpdateFuture
 type ApplicationsDeleteFuture = original.ApplicationsDeleteFuture
 type ApplicationsUpdateFuture = original.ApplicationsUpdateFuture
+type ArmApplicationHealthPolicy = original.ArmApplicationHealthPolicy
+type ArmRollingUpgradeMonitoringPolicy = original.ArmRollingUpgradeMonitoringPolicy
+type ArmServiceTypeHealthPolicy = original.ArmServiceTypeHealthPolicy
 type AvailableOperationDisplay = original.AvailableOperationDisplay
 type AzureActiveDirectory = original.AzureActiveDirectory
 type BaseClient = original.BaseClient
@@ -257,7 +278,7 @@ type ClusterUpgradePolicy = original.ClusterUpgradePolicy
 type ClusterVersionDetails = original.ClusterVersionDetails
 type ClusterVersionsClient = original.ClusterVersionsClient
 type ClustersClient = original.ClustersClient
-type ClustersCreateFuture = original.ClustersCreateFuture
+type ClustersCreateOrUpdateFuture = original.ClustersCreateOrUpdateFuture
 type ClustersUpdateFuture = original.ClustersUpdateFuture
 type DiagnosticsStorageAccountConfig = original.DiagnosticsStorageAccountConfig
 type EndpointRangeDescription = original.EndpointRangeDescription
@@ -273,7 +294,6 @@ type OperationsClient = original.OperationsClient
 type PartitionSchemeDescription = original.PartitionSchemeDescription
 type ProxyResource = original.ProxyResource
 type Resource = original.Resource
-type RollingUpgradeMonitoringPolicy = original.RollingUpgradeMonitoringPolicy
 type ServerCertificateCommonName = original.ServerCertificateCommonName
 type ServerCertificateCommonNames = original.ServerCertificateCommonNames
 type ServiceCorrelationDescription = original.ServiceCorrelationDescription
@@ -288,7 +308,7 @@ type ServiceResourceUpdateProperties = original.ServiceResourceUpdateProperties
 type ServiceTypeDeltaHealthPolicy = original.ServiceTypeDeltaHealthPolicy
 type ServiceTypeHealthPolicy = original.ServiceTypeHealthPolicy
 type ServicesClient = original.ServicesClient
-type ServicesCreateFuture = original.ServicesCreateFuture
+type ServicesCreateOrUpdateFuture = original.ServicesCreateOrUpdateFuture
 type ServicesDeleteFuture = original.ServicesDeleteFuture
 type ServicesUpdateFuture = original.ServicesUpdateFuture
 type SettingsParameterDescription = original.SettingsParameterDescription
@@ -333,6 +353,12 @@ func NewClustersClient(subscriptionID string) ClustersClient {
 func NewClustersClientWithBaseURI(baseURI string, subscriptionID string) ClustersClient {
 	return original.NewClustersClientWithBaseURI(baseURI, subscriptionID)
 }
+func NewOperationListResultIterator(page OperationListResultPage) OperationListResultIterator {
+	return original.NewOperationListResultIterator(page)
+}
+func NewOperationListResultPage(getNextPage func(context.Context, OperationListResult) (OperationListResult, error)) OperationListResultPage {
+	return original.NewOperationListResultPage(getNextPage)
+}
 func NewOperationsClient(subscriptionID string) OperationsClient {
 	return original.NewOperationsClient(subscriptionID)
 }
@@ -347,6 +373,12 @@ func NewServicesClientWithBaseURI(baseURI string, subscriptionID string) Service
 }
 func NewWithBaseURI(baseURI string, subscriptionID string) BaseClient {
 	return original.NewWithBaseURI(baseURI, subscriptionID)
+}
+func PossibleArmServicePackageActivationModeValues() []ArmServicePackageActivationMode {
+	return original.PossibleArmServicePackageActivationModeValues()
+}
+func PossibleArmUpgradeFailureActionValues() []ArmUpgradeFailureAction {
+	return original.PossibleArmUpgradeFailureActionValues()
 }
 func PossibleClusterStateValues() []ClusterState {
 	return original.PossibleClusterStateValues()

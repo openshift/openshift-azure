@@ -230,6 +230,8 @@ type SkuName string
 const (
 	// L1 ...
 	L1 SkuName = "L1"
+	// P1 ...
+	P1 SkuName = "P1"
 	// S1 ...
 	S1 SkuName = "S1"
 	// S2 ...
@@ -238,7 +240,7 @@ const (
 
 // PossibleSkuNameValues returns an array of possible values for the SkuName const type.
 func PossibleSkuNameValues() []SkuName {
-	return []SkuName{L1, S1, S2}
+	return []SkuName{L1, P1, S1, S2}
 }
 
 // StorageLimitExceededBehavior enumerates the values for storage limit exceeded behavior.
@@ -254,6 +256,23 @@ const (
 // PossibleStorageLimitExceededBehaviorValues returns an array of possible values for the StorageLimitExceededBehavior const type.
 func PossibleStorageLimitExceededBehaviorValues() []StorageLimitExceededBehavior {
 	return []StorageLimitExceededBehavior{PauseIngress, PurgeOldData}
+}
+
+// WarmStoragePropertiesState enumerates the values for warm storage properties state.
+type WarmStoragePropertiesState string
+
+const (
+	// WarmStoragePropertiesStateError ...
+	WarmStoragePropertiesStateError WarmStoragePropertiesState = "Error"
+	// WarmStoragePropertiesStateOk ...
+	WarmStoragePropertiesStateOk WarmStoragePropertiesState = "Ok"
+	// WarmStoragePropertiesStateUnknown ...
+	WarmStoragePropertiesStateUnknown WarmStoragePropertiesState = "Unknown"
+)
+
+// PossibleWarmStoragePropertiesStateValues returns an array of possible values for the WarmStoragePropertiesState const type.
+func PossibleWarmStoragePropertiesStateValues() []WarmStoragePropertiesState {
+	return []WarmStoragePropertiesState{WarmStoragePropertiesStateError, WarmStoragePropertiesStateOk, WarmStoragePropertiesStateUnknown}
 }
 
 // AccessPolicyCreateOrUpdateParameters ...
@@ -316,11 +335,11 @@ type AccessPolicyMutableProperties struct {
 type AccessPolicyResource struct {
 	autorest.Response               `json:"-"`
 	*AccessPolicyResourceProperties `json:"properties,omitempty"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -329,15 +348,6 @@ func (apr AccessPolicyResource) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if apr.AccessPolicyResourceProperties != nil {
 		objectMap["properties"] = apr.AccessPolicyResourceProperties
-	}
-	if apr.ID != nil {
-		objectMap["id"] = apr.ID
-	}
-	if apr.Name != nil {
-		objectMap["name"] = apr.Name
-	}
-	if apr.Type != nil {
-		objectMap["type"] = apr.Type
 	}
 	return json.Marshal(objectMap)
 }
@@ -450,7 +460,7 @@ type AzureEventSourceProperties struct {
 	TimestampPropertyName *string `json:"timestampPropertyName,omitempty"`
 	// ProvisioningState - Provisioning state of the resource. Possible values include: 'Accepted', 'Creating', 'Updating', 'Succeeded', 'Failed', 'Deleting'
 	ProvisioningState ProvisioningState `json:"provisioningState,omitempty"`
-	// CreationTime - The time the resource was created.
+	// CreationTime - READ-ONLY; The time the resource was created.
 	CreationTime *date.Time `json:"creationTime,omitempty"`
 }
 
@@ -642,11 +652,11 @@ type EnvironmentResource struct {
 	Location *string `json:"location,omitempty"`
 	// Tags - Resource tags
 	Tags map[string]*string `json:"tags"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -707,15 +717,6 @@ func (er EnvironmentResource) MarshalJSON() ([]byte, error) {
 	if er.Tags != nil {
 		objectMap["tags"] = er.Tags
 	}
-	if er.ID != nil {
-		objectMap["id"] = er.ID
-	}
-	if er.Name != nil {
-		objectMap["name"] = er.Name
-	}
-	if er.Type != nil {
-		objectMap["type"] = er.Type
-	}
 	return json.Marshal(objectMap)
 }
 
@@ -758,15 +759,15 @@ func (erm *EnvironmentResourceModel) UnmarshalJSON(body []byte) error {
 
 // EnvironmentResourceProperties properties of the environment.
 type EnvironmentResourceProperties struct {
-	// DataAccessID - An id used to access the environment data, e.g. to query the environment's events or upload reference data for the environment.
+	// DataAccessID - READ-ONLY; An id used to access the environment data, e.g. to query the environment's events or upload reference data for the environment.
 	DataAccessID *uuid.UUID `json:"dataAccessId,omitempty"`
-	// DataAccessFqdn - The fully qualified domain name used to access the environment data, e.g. to query the environment's events or upload reference data for the environment.
+	// DataAccessFqdn - READ-ONLY; The fully qualified domain name used to access the environment data, e.g. to query the environment's events or upload reference data for the environment.
 	DataAccessFqdn *string `json:"dataAccessFqdn,omitempty"`
 	// Status - An object that represents the status of the environment, and its internal state in the Time Series Insights service.
 	Status *EnvironmentStatus `json:"status,omitempty"`
 	// ProvisioningState - Provisioning state of the resource. Possible values include: 'Accepted', 'Creating', 'Updating', 'Succeeded', 'Failed', 'Deleting'
 	ProvisioningState ProvisioningState `json:"provisioningState,omitempty"`
-	// CreationTime - The time the resource was created.
+	// CreationTime - READ-ONLY; The time the resource was created.
 	CreationTime *date.Time `json:"creationTime,omitempty"`
 }
 
@@ -780,7 +781,7 @@ type EnvironmentsCreateOrUpdateFuture struct {
 // If the operation has not completed it will return an error.
 func (future *EnvironmentsCreateOrUpdateFuture) Result(client EnvironmentsClient) (erm EnvironmentResourceModel, err error) {
 	var done bool
-	done, err = future.Done(client)
+	done, err = future.DoneWithContext(context.Background(), client)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "timeseriesinsights.EnvironmentsCreateOrUpdateFuture", "Result", future.Response(), "Polling failure")
 		return
@@ -812,6 +813,8 @@ type EnvironmentStateDetails struct {
 type EnvironmentStatus struct {
 	// Ingress - An object that represents the status of ingress on an environment.
 	Ingress *IngressEnvironmentStatus `json:"ingress,omitempty"`
+	// WarmStorage - An object that represents the status of warm storage on an environment.
+	WarmStorage *WarmStorageEnvironmentStatus `json:"warmStorage,omitempty"`
 }
 
 // EnvironmentsUpdateFuture an abstraction for monitoring and retrieving the results of a long-running
@@ -824,7 +827,7 @@ type EnvironmentsUpdateFuture struct {
 // If the operation has not completed it will return an error.
 func (future *EnvironmentsUpdateFuture) Result(client EnvironmentsClient) (erm EnvironmentResourceModel, err error) {
 	var done bool
-	done, err = future.Done(client)
+	done, err = future.DoneWithContext(context.Background(), client)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "timeseriesinsights.EnvironmentsUpdateFuture", "Result", future.Response(), "Polling failure")
 		return
@@ -874,7 +877,7 @@ type EventHubEventSourceCommonProperties struct {
 	TimestampPropertyName *string `json:"timestampPropertyName,omitempty"`
 	// ProvisioningState - Provisioning state of the resource. Possible values include: 'Accepted', 'Creating', 'Updating', 'Succeeded', 'Failed', 'Deleting'
 	ProvisioningState ProvisioningState `json:"provisioningState,omitempty"`
-	// CreationTime - The time the resource was created.
+	// CreationTime - READ-ONLY; The time the resource was created.
 	CreationTime *date.Time `json:"creationTime,omitempty"`
 }
 
@@ -999,7 +1002,7 @@ type EventHubEventSourceCreationProperties struct {
 	TimestampPropertyName *string `json:"timestampPropertyName,omitempty"`
 	// ProvisioningState - Provisioning state of the resource. Possible values include: 'Accepted', 'Creating', 'Updating', 'Succeeded', 'Failed', 'Deleting'
 	ProvisioningState ProvisioningState `json:"provisioningState,omitempty"`
-	// CreationTime - The time the resource was created.
+	// CreationTime - READ-ONLY; The time the resource was created.
 	CreationTime *date.Time `json:"creationTime,omitempty"`
 }
 
@@ -1021,11 +1024,11 @@ type EventHubEventSourceResource struct {
 	Location *string `json:"location,omitempty"`
 	// Tags - Resource tags
 	Tags map[string]*string `json:"tags"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 	// Kind - Possible values include: 'KindBasicEventSourceResourceKindEventSourceResource', 'KindBasicEventSourceResourceKindMicrosoftEventHub', 'KindBasicEventSourceResourceKindMicrosoftIotHub'
 	Kind KindBasicEventSourceResource `json:"kind,omitempty"`
@@ -1046,15 +1049,6 @@ func (ehesr EventHubEventSourceResource) MarshalJSON() ([]byte, error) {
 	}
 	if ehesr.Tags != nil {
 		objectMap["tags"] = ehesr.Tags
-	}
-	if ehesr.ID != nil {
-		objectMap["id"] = ehesr.ID
-	}
-	if ehesr.Name != nil {
-		objectMap["name"] = ehesr.Name
-	}
-	if ehesr.Type != nil {
-		objectMap["type"] = ehesr.Type
 	}
 	return json.Marshal(objectMap)
 }
@@ -1173,7 +1167,7 @@ type EventHubEventSourceResourceProperties struct {
 	TimestampPropertyName *string `json:"timestampPropertyName,omitempty"`
 	// ProvisioningState - Provisioning state of the resource. Possible values include: 'Accepted', 'Creating', 'Updating', 'Succeeded', 'Failed', 'Deleting'
 	ProvisioningState ProvisioningState `json:"provisioningState,omitempty"`
-	// CreationTime - The time the resource was created.
+	// CreationTime - READ-ONLY; The time the resource was created.
 	CreationTime *date.Time `json:"creationTime,omitempty"`
 }
 
@@ -1237,7 +1231,7 @@ type EventSourceCommonProperties struct {
 	TimestampPropertyName *string `json:"timestampPropertyName,omitempty"`
 	// ProvisioningState - Provisioning state of the resource. Possible values include: 'Accepted', 'Creating', 'Updating', 'Succeeded', 'Failed', 'Deleting'
 	ProvisioningState ProvisioningState `json:"provisioningState,omitempty"`
-	// CreationTime - The time the resource was created.
+	// CreationTime - READ-ONLY; The time the resource was created.
 	CreationTime *date.Time `json:"creationTime,omitempty"`
 }
 
@@ -1394,11 +1388,11 @@ type EventSourceResource struct {
 	Location *string `json:"location,omitempty"`
 	// Tags - Resource tags
 	Tags map[string]*string `json:"tags"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -1455,15 +1449,6 @@ func (esr EventSourceResource) MarshalJSON() ([]byte, error) {
 	}
 	if esr.Tags != nil {
 		objectMap["tags"] = esr.Tags
-	}
-	if esr.ID != nil {
-		objectMap["id"] = esr.ID
-	}
-	if esr.Name != nil {
-		objectMap["name"] = esr.Name
-	}
-	if esr.Type != nil {
-		objectMap["type"] = esr.Type
 	}
 	return json.Marshal(objectMap)
 }
@@ -1542,7 +1527,7 @@ type IoTHubEventSourceCommonProperties struct {
 	TimestampPropertyName *string `json:"timestampPropertyName,omitempty"`
 	// ProvisioningState - Provisioning state of the resource. Possible values include: 'Accepted', 'Creating', 'Updating', 'Succeeded', 'Failed', 'Deleting'
 	ProvisioningState ProvisioningState `json:"provisioningState,omitempty"`
-	// CreationTime - The time the resource was created.
+	// CreationTime - READ-ONLY; The time the resource was created.
 	CreationTime *date.Time `json:"creationTime,omitempty"`
 }
 
@@ -1665,7 +1650,7 @@ type IoTHubEventSourceCreationProperties struct {
 	TimestampPropertyName *string `json:"timestampPropertyName,omitempty"`
 	// ProvisioningState - Provisioning state of the resource. Possible values include: 'Accepted', 'Creating', 'Updating', 'Succeeded', 'Failed', 'Deleting'
 	ProvisioningState ProvisioningState `json:"provisioningState,omitempty"`
-	// CreationTime - The time the resource was created.
+	// CreationTime - READ-ONLY; The time the resource was created.
 	CreationTime *date.Time `json:"creationTime,omitempty"`
 }
 
@@ -1689,11 +1674,11 @@ type IoTHubEventSourceResource struct {
 	Location *string `json:"location,omitempty"`
 	// Tags - Resource tags
 	Tags map[string]*string `json:"tags"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -1712,15 +1697,6 @@ func (ithesr IoTHubEventSourceResource) MarshalJSON() ([]byte, error) {
 	}
 	if ithesr.Tags != nil {
 		objectMap["tags"] = ithesr.Tags
-	}
-	if ithesr.ID != nil {
-		objectMap["id"] = ithesr.ID
-	}
-	if ithesr.Name != nil {
-		objectMap["name"] = ithesr.Name
-	}
-	if ithesr.Type != nil {
-		objectMap["type"] = ithesr.Type
 	}
 	return json.Marshal(objectMap)
 }
@@ -1837,7 +1813,7 @@ type IoTHubEventSourceResourceProperties struct {
 	TimestampPropertyName *string `json:"timestampPropertyName,omitempty"`
 	// ProvisioningState - Provisioning state of the resource. Possible values include: 'Accepted', 'Creating', 'Updating', 'Succeeded', 'Failed', 'Deleting'
 	ProvisioningState ProvisioningState `json:"provisioningState,omitempty"`
-	// CreationTime - The time the resource was created.
+	// CreationTime - READ-ONLY; The time the resource was created.
 	CreationTime *date.Time `json:"creationTime,omitempty"`
 }
 
@@ -2035,6 +2011,65 @@ type LongTermEnvironmentCreationProperties struct {
 	TimeSeriesIDProperties *[]TimeSeriesIDProperty `json:"timeSeriesIdProperties,omitempty"`
 	// StorageConfiguration - The storage configuration provides the connection details that allows the Time Series Insights service to connect to the customer storage account that is used to store the environment's data.
 	StorageConfiguration *LongTermStorageConfigurationInput `json:"storageConfiguration,omitempty"`
+	// WarmStoreConfigurationProperties - The warm store configuration provides the details to create a warm store cache that will retain a copy of the environment's data available for faster query.
+	*WarmStoreConfigurationProperties `json:"warmStoreConfiguration,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for LongTermEnvironmentCreationProperties.
+func (ltecp LongTermEnvironmentCreationProperties) MarshalJSON() ([]byte, error) {
+	objectMap := make(map[string]interface{})
+	if ltecp.TimeSeriesIDProperties != nil {
+		objectMap["timeSeriesIdProperties"] = ltecp.TimeSeriesIDProperties
+	}
+	if ltecp.StorageConfiguration != nil {
+		objectMap["storageConfiguration"] = ltecp.StorageConfiguration
+	}
+	if ltecp.WarmStoreConfigurationProperties != nil {
+		objectMap["warmStoreConfiguration"] = ltecp.WarmStoreConfigurationProperties
+	}
+	return json.Marshal(objectMap)
+}
+
+// UnmarshalJSON is the custom unmarshaler for LongTermEnvironmentCreationProperties struct.
+func (ltecp *LongTermEnvironmentCreationProperties) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "timeSeriesIdProperties":
+			if v != nil {
+				var timeSeriesIDProperties []TimeSeriesIDProperty
+				err = json.Unmarshal(*v, &timeSeriesIDProperties)
+				if err != nil {
+					return err
+				}
+				ltecp.TimeSeriesIDProperties = &timeSeriesIDProperties
+			}
+		case "storageConfiguration":
+			if v != nil {
+				var storageConfiguration LongTermStorageConfigurationInput
+				err = json.Unmarshal(*v, &storageConfiguration)
+				if err != nil {
+					return err
+				}
+				ltecp.StorageConfiguration = &storageConfiguration
+			}
+		case "warmStoreConfiguration":
+			if v != nil {
+				var warmStoreConfigurationProperties WarmStoreConfigurationProperties
+				err = json.Unmarshal(*v, &warmStoreConfigurationProperties)
+				if err != nil {
+					return err
+				}
+				ltecp.WarmStoreConfigurationProperties = &warmStoreConfigurationProperties
+			}
+		}
+	}
+
+	return nil
 }
 
 // LongTermEnvironmentMutableProperties an object that represents a set of mutable long-term environment
@@ -2042,8 +2077,53 @@ type LongTermEnvironmentCreationProperties struct {
 type LongTermEnvironmentMutableProperties struct {
 	// StorageConfiguration - The storage configuration provides the connection details that allows the Time Series Insights service to connect to the customer storage account that is used to store the environment's data.
 	StorageConfiguration *LongTermStorageConfigurationMutableProperties `json:"storageConfiguration,omitempty"`
-	// TimeSeriesIDProperties - The list of event properties which will be used to partition data in the environment.
-	TimeSeriesIDProperties *[]TimeSeriesIDProperty `json:"timeSeriesIdProperties,omitempty"`
+	// WarmStoreConfigurationProperties - The warm store configuration provides the details to create a warm store cache that will retain a copy of the environment's data available for faster query.
+	*WarmStoreConfigurationProperties `json:"warmStoreConfiguration,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for LongTermEnvironmentMutableProperties.
+func (ltemp LongTermEnvironmentMutableProperties) MarshalJSON() ([]byte, error) {
+	objectMap := make(map[string]interface{})
+	if ltemp.StorageConfiguration != nil {
+		objectMap["storageConfiguration"] = ltemp.StorageConfiguration
+	}
+	if ltemp.WarmStoreConfigurationProperties != nil {
+		objectMap["warmStoreConfiguration"] = ltemp.WarmStoreConfigurationProperties
+	}
+	return json.Marshal(objectMap)
+}
+
+// UnmarshalJSON is the custom unmarshaler for LongTermEnvironmentMutableProperties struct.
+func (ltemp *LongTermEnvironmentMutableProperties) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "storageConfiguration":
+			if v != nil {
+				var storageConfiguration LongTermStorageConfigurationMutableProperties
+				err = json.Unmarshal(*v, &storageConfiguration)
+				if err != nil {
+					return err
+				}
+				ltemp.StorageConfiguration = &storageConfiguration
+			}
+		case "warmStoreConfiguration":
+			if v != nil {
+				var warmStoreConfigurationProperties WarmStoreConfigurationProperties
+				err = json.Unmarshal(*v, &warmStoreConfigurationProperties)
+				if err != nil {
+					return err
+				}
+				ltemp.WarmStoreConfigurationProperties = &warmStoreConfigurationProperties
+			}
+		}
+	}
+
+	return nil
 }
 
 // LongTermEnvironmentResource an environment is a set of time-series data available for query, and is the
@@ -2059,11 +2139,11 @@ type LongTermEnvironmentResource struct {
 	Location *string `json:"location,omitempty"`
 	// Tags - Resource tags
 	Tags map[string]*string `json:"tags"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -2085,15 +2165,6 @@ func (lter LongTermEnvironmentResource) MarshalJSON() ([]byte, error) {
 	}
 	if lter.Tags != nil {
 		objectMap["tags"] = lter.Tags
-	}
-	if lter.ID != nil {
-		objectMap["id"] = lter.ID
-	}
-	if lter.Name != nil {
-		objectMap["name"] = lter.Name
-	}
-	if lter.Type != nil {
-		objectMap["type"] = lter.Type
 	}
 	return json.Marshal(objectMap)
 }
@@ -2207,20 +2278,130 @@ func (lter *LongTermEnvironmentResource) UnmarshalJSON(body []byte) error {
 
 // LongTermEnvironmentResourceProperties properties of the long-term environment.
 type LongTermEnvironmentResourceProperties struct {
-	// DataAccessID - An id used to access the environment data, e.g. to query the environment's events or upload reference data for the environment.
+	// DataAccessID - READ-ONLY; An id used to access the environment data, e.g. to query the environment's events or upload reference data for the environment.
 	DataAccessID *uuid.UUID `json:"dataAccessId,omitempty"`
-	// DataAccessFqdn - The fully qualified domain name used to access the environment data, e.g. to query the environment's events or upload reference data for the environment.
+	// DataAccessFqdn - READ-ONLY; The fully qualified domain name used to access the environment data, e.g. to query the environment's events or upload reference data for the environment.
 	DataAccessFqdn *string `json:"dataAccessFqdn,omitempty"`
 	// Status - An object that represents the status of the environment, and its internal state in the Time Series Insights service.
 	Status *EnvironmentStatus `json:"status,omitempty"`
 	// ProvisioningState - Provisioning state of the resource. Possible values include: 'Accepted', 'Creating', 'Updating', 'Succeeded', 'Failed', 'Deleting'
 	ProvisioningState ProvisioningState `json:"provisioningState,omitempty"`
-	// CreationTime - The time the resource was created.
+	// CreationTime - READ-ONLY; The time the resource was created.
 	CreationTime *date.Time `json:"creationTime,omitempty"`
 	// TimeSeriesIDProperties - The list of event properties which will be used to define the environment's time series id.
 	TimeSeriesIDProperties *[]TimeSeriesIDProperty `json:"timeSeriesIdProperties,omitempty"`
 	// StorageConfiguration - The storage configuration provides the connection details that allows the Time Series Insights service to connect to the customer storage account that is used to store the environment's data.
 	StorageConfiguration *LongTermStorageConfigurationOutput `json:"storageConfiguration,omitempty"`
+	// WarmStoreConfigurationProperties - The warm store configuration provides the details to create a warm store cache that will retain a copy of the environment's data available for faster query.
+	*WarmStoreConfigurationProperties `json:"warmStoreConfiguration,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for LongTermEnvironmentResourceProperties.
+func (lterp LongTermEnvironmentResourceProperties) MarshalJSON() ([]byte, error) {
+	objectMap := make(map[string]interface{})
+	if lterp.Status != nil {
+		objectMap["status"] = lterp.Status
+	}
+	if lterp.ProvisioningState != "" {
+		objectMap["provisioningState"] = lterp.ProvisioningState
+	}
+	if lterp.TimeSeriesIDProperties != nil {
+		objectMap["timeSeriesIdProperties"] = lterp.TimeSeriesIDProperties
+	}
+	if lterp.StorageConfiguration != nil {
+		objectMap["storageConfiguration"] = lterp.StorageConfiguration
+	}
+	if lterp.WarmStoreConfigurationProperties != nil {
+		objectMap["warmStoreConfiguration"] = lterp.WarmStoreConfigurationProperties
+	}
+	return json.Marshal(objectMap)
+}
+
+// UnmarshalJSON is the custom unmarshaler for LongTermEnvironmentResourceProperties struct.
+func (lterp *LongTermEnvironmentResourceProperties) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "dataAccessId":
+			if v != nil {
+				var dataAccessID uuid.UUID
+				err = json.Unmarshal(*v, &dataAccessID)
+				if err != nil {
+					return err
+				}
+				lterp.DataAccessID = &dataAccessID
+			}
+		case "dataAccessFqdn":
+			if v != nil {
+				var dataAccessFqdn string
+				err = json.Unmarshal(*v, &dataAccessFqdn)
+				if err != nil {
+					return err
+				}
+				lterp.DataAccessFqdn = &dataAccessFqdn
+			}
+		case "status":
+			if v != nil {
+				var status EnvironmentStatus
+				err = json.Unmarshal(*v, &status)
+				if err != nil {
+					return err
+				}
+				lterp.Status = &status
+			}
+		case "provisioningState":
+			if v != nil {
+				var provisioningState ProvisioningState
+				err = json.Unmarshal(*v, &provisioningState)
+				if err != nil {
+					return err
+				}
+				lterp.ProvisioningState = provisioningState
+			}
+		case "creationTime":
+			if v != nil {
+				var creationTime date.Time
+				err = json.Unmarshal(*v, &creationTime)
+				if err != nil {
+					return err
+				}
+				lterp.CreationTime = &creationTime
+			}
+		case "timeSeriesIdProperties":
+			if v != nil {
+				var timeSeriesIDProperties []TimeSeriesIDProperty
+				err = json.Unmarshal(*v, &timeSeriesIDProperties)
+				if err != nil {
+					return err
+				}
+				lterp.TimeSeriesIDProperties = &timeSeriesIDProperties
+			}
+		case "storageConfiguration":
+			if v != nil {
+				var storageConfiguration LongTermStorageConfigurationOutput
+				err = json.Unmarshal(*v, &storageConfiguration)
+				if err != nil {
+					return err
+				}
+				lterp.StorageConfiguration = &storageConfiguration
+			}
+		case "warmStoreConfiguration":
+			if v != nil {
+				var warmStoreConfigurationProperties WarmStoreConfigurationProperties
+				err = json.Unmarshal(*v, &warmStoreConfigurationProperties)
+				if err != nil {
+					return err
+				}
+				lterp.WarmStoreConfigurationProperties = &warmStoreConfigurationProperties
+			}
+		}
+	}
+
+	return nil
 }
 
 // LongTermEnvironmentUpdateParameters parameters supplied to the Update Environment operation to update a
@@ -2304,21 +2485,21 @@ type LongTermStorageConfigurationOutput struct {
 
 // Operation a Time Series Insights REST API operation
 type Operation struct {
-	// Name - The name of the operation being performed on this particular object.
+	// Name - READ-ONLY; The name of the operation being performed on this particular object.
 	Name *string `json:"name,omitempty"`
-	// Display - Contains the localized display information for this particular operation / action.
+	// Display - READ-ONLY; Contains the localized display information for this particular operation / action.
 	Display *OperationDisplay `json:"display,omitempty"`
 }
 
 // OperationDisplay contains the localized display information for this particular operation / action.
 type OperationDisplay struct {
-	// Provider - The localized friendly form of the resource provider name.
+	// Provider - READ-ONLY; The localized friendly form of the resource provider name.
 	Provider *string `json:"provider,omitempty"`
-	// Resource - The localized friendly form of the resource type related to this action/operation.
+	// Resource - READ-ONLY; The localized friendly form of the resource type related to this action/operation.
 	Resource *string `json:"resource,omitempty"`
-	// Operation - The localized friendly name for the operation.
+	// Operation - READ-ONLY; The localized friendly name for the operation.
 	Operation *string `json:"operation,omitempty"`
-	// Description - The localized friendly description for the operation.
+	// Description - READ-ONLY; The localized friendly description for the operation.
 	Description *string `json:"description,omitempty"`
 }
 
@@ -2326,9 +2507,9 @@ type OperationDisplay struct {
 // operations and a URL link to get the next set of results.
 type OperationListResult struct {
 	autorest.Response `json:"-"`
-	// Value - List of Time Series Insights operations supported by the Microsoft.TimeSeriesInsights resource provider.
+	// Value - READ-ONLY; List of Time Series Insights operations supported by the Microsoft.TimeSeriesInsights resource provider.
 	Value *[]Operation `json:"value,omitempty"`
-	// NextLink - URL to get the next set of operation list results if there are any.
+	// NextLink - READ-ONLY; URL to get the next set of operation list results if there are any.
 	NextLink *string `json:"nextLink,omitempty"`
 }
 
@@ -2570,11 +2751,11 @@ type ReferenceDataSetResource struct {
 	Location *string `json:"location,omitempty"`
 	// Tags - Resource tags
 	Tags map[string]*string `json:"tags"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -2589,15 +2770,6 @@ func (rdsr ReferenceDataSetResource) MarshalJSON() ([]byte, error) {
 	}
 	if rdsr.Tags != nil {
 		objectMap["tags"] = rdsr.Tags
-	}
-	if rdsr.ID != nil {
-		objectMap["id"] = rdsr.ID
-	}
-	if rdsr.Name != nil {
-		objectMap["name"] = rdsr.Name
-	}
-	if rdsr.Type != nil {
-		objectMap["type"] = rdsr.Type
 	}
 	return json.Marshal(objectMap)
 }
@@ -2679,7 +2851,7 @@ type ReferenceDataSetResourceProperties struct {
 	DataStringComparisonBehavior DataStringComparisonBehavior `json:"dataStringComparisonBehavior,omitempty"`
 	// ProvisioningState - Provisioning state of the resource. Possible values include: 'Accepted', 'Creating', 'Updating', 'Succeeded', 'Failed', 'Deleting'
 	ProvisioningState ProvisioningState `json:"provisioningState,omitempty"`
-	// CreationTime - The time the resource was created.
+	// CreationTime - READ-ONLY; The time the resource was created.
 	CreationTime *date.Time `json:"creationTime,omitempty"`
 }
 
@@ -2700,11 +2872,11 @@ func (rdsup ReferenceDataSetUpdateParameters) MarshalJSON() ([]byte, error) {
 
 // Resource time Series Insights resource
 type Resource struct {
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -2712,7 +2884,7 @@ type Resource struct {
 type ResourceProperties struct {
 	// ProvisioningState - Provisioning state of the resource. Possible values include: 'Accepted', 'Creating', 'Updating', 'Succeeded', 'Failed', 'Deleting'
 	ProvisioningState ProvisioningState `json:"provisioningState,omitempty"`
-	// CreationTime - The time the resource was created.
+	// CreationTime - READ-ONLY; The time the resource was created.
 	CreationTime *date.Time `json:"creationTime,omitempty"`
 }
 
@@ -2720,7 +2892,7 @@ type ResourceProperties struct {
 // standard environments the sku determines the capacity of the environment, the ingress rate, and the
 // billing rate.
 type Sku struct {
-	// Name - The name of this SKU. Possible values include: 'S1', 'S2', 'L1'
+	// Name - The name of this SKU. Possible values include: 'S1', 'S2', 'P1', 'L1'
 	Name SkuName `json:"name,omitempty"`
 	// Capacity - The capacity of the sku. For standard environments, this value can be changed to support scale out of environments after they have been created.
 	Capacity *int32 `json:"capacity,omitempty"`
@@ -2875,11 +3047,11 @@ type StandardEnvironmentResource struct {
 	Location *string `json:"location,omitempty"`
 	// Tags - Resource tags
 	Tags map[string]*string `json:"tags"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -2901,15 +3073,6 @@ func (ser StandardEnvironmentResource) MarshalJSON() ([]byte, error) {
 	}
 	if ser.Tags != nil {
 		objectMap["tags"] = ser.Tags
-	}
-	if ser.ID != nil {
-		objectMap["id"] = ser.ID
-	}
-	if ser.Name != nil {
-		objectMap["name"] = ser.Name
-	}
-	if ser.Type != nil {
-		objectMap["type"] = ser.Type
 	}
 	return json.Marshal(objectMap)
 }
@@ -3029,15 +3192,15 @@ type StandardEnvironmentResourceProperties struct {
 	StorageLimitExceededBehavior StorageLimitExceededBehavior `json:"storageLimitExceededBehavior,omitempty"`
 	// PartitionKeyProperties - The list of event properties which will be used to partition data in the environment.
 	PartitionKeyProperties *[]TimeSeriesIDProperty `json:"partitionKeyProperties,omitempty"`
-	// DataAccessID - An id used to access the environment data, e.g. to query the environment's events or upload reference data for the environment.
+	// DataAccessID - READ-ONLY; An id used to access the environment data, e.g. to query the environment's events or upload reference data for the environment.
 	DataAccessID *uuid.UUID `json:"dataAccessId,omitempty"`
-	// DataAccessFqdn - The fully qualified domain name used to access the environment data, e.g. to query the environment's events or upload reference data for the environment.
+	// DataAccessFqdn - READ-ONLY; The fully qualified domain name used to access the environment data, e.g. to query the environment's events or upload reference data for the environment.
 	DataAccessFqdn *string `json:"dataAccessFqdn,omitempty"`
 	// Status - An object that represents the status of the environment, and its internal state in the Time Series Insights service.
 	Status *EnvironmentStatus `json:"status,omitempty"`
 	// ProvisioningState - Provisioning state of the resource. Possible values include: 'Accepted', 'Creating', 'Updating', 'Succeeded', 'Failed', 'Deleting'
 	ProvisioningState ProvisioningState `json:"provisioningState,omitempty"`
-	// CreationTime - The time the resource was created.
+	// CreationTime - READ-ONLY; The time the resource was created.
 	CreationTime *date.Time `json:"creationTime,omitempty"`
 }
 
@@ -3124,11 +3287,11 @@ type TrackedResource struct {
 	Location *string `json:"location,omitempty"`
 	// Tags - Resource tags
 	Tags map[string]*string `json:"tags"`
-	// ID - Resource Id
+	// ID - READ-ONLY; Resource Id
 	ID *string `json:"id,omitempty"`
-	// Name - Resource name
+	// Name - READ-ONLY; Resource name
 	Name *string `json:"name,omitempty"`
-	// Type - Resource type
+	// Type - READ-ONLY; Resource type
 	Type *string `json:"type,omitempty"`
 }
 
@@ -3141,14 +3304,113 @@ func (tr TrackedResource) MarshalJSON() ([]byte, error) {
 	if tr.Tags != nil {
 		objectMap["tags"] = tr.Tags
 	}
-	if tr.ID != nil {
-		objectMap["id"] = tr.ID
-	}
-	if tr.Name != nil {
-		objectMap["name"] = tr.Name
-	}
-	if tr.Type != nil {
-		objectMap["type"] = tr.Type
+	return json.Marshal(objectMap)
+}
+
+// WarmStorageEnvironmentStatus an object that represents the status of warm storage on an environment.
+type WarmStorageEnvironmentStatus struct {
+	// WarmStoragePropertiesUsage - An object that contains the status of warm storage properties usage.
+	*WarmStoragePropertiesUsage `json:"propertiesUsage,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for WarmStorageEnvironmentStatus.
+func (wses WarmStorageEnvironmentStatus) MarshalJSON() ([]byte, error) {
+	objectMap := make(map[string]interface{})
+	if wses.WarmStoragePropertiesUsage != nil {
+		objectMap["propertiesUsage"] = wses.WarmStoragePropertiesUsage
 	}
 	return json.Marshal(objectMap)
+}
+
+// UnmarshalJSON is the custom unmarshaler for WarmStorageEnvironmentStatus struct.
+func (wses *WarmStorageEnvironmentStatus) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "propertiesUsage":
+			if v != nil {
+				var warmStoragePropertiesUsage WarmStoragePropertiesUsage
+				err = json.Unmarshal(*v, &warmStoragePropertiesUsage)
+				if err != nil {
+					return err
+				}
+				wses.WarmStoragePropertiesUsage = &warmStoragePropertiesUsage
+			}
+		}
+	}
+
+	return nil
+}
+
+// WarmStoragePropertiesUsage an object that contains the status of warm storage properties usage.
+type WarmStoragePropertiesUsage struct {
+	// State - This string represents the state of warm storage properties usage. It can be "Ok", "Error", "Unknown". Possible values include: 'WarmStoragePropertiesStateOk', 'WarmStoragePropertiesStateError', 'WarmStoragePropertiesStateUnknown'
+	State WarmStoragePropertiesState `json:"state,omitempty"`
+	// WarmStoragePropertiesUsageStateDetails - An object that contains the details about warm storage properties usage state.
+	*WarmStoragePropertiesUsageStateDetails `json:"stateDetails,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for WarmStoragePropertiesUsage.
+func (wspu WarmStoragePropertiesUsage) MarshalJSON() ([]byte, error) {
+	objectMap := make(map[string]interface{})
+	if wspu.State != "" {
+		objectMap["state"] = wspu.State
+	}
+	if wspu.WarmStoragePropertiesUsageStateDetails != nil {
+		objectMap["stateDetails"] = wspu.WarmStoragePropertiesUsageStateDetails
+	}
+	return json.Marshal(objectMap)
+}
+
+// UnmarshalJSON is the custom unmarshaler for WarmStoragePropertiesUsage struct.
+func (wspu *WarmStoragePropertiesUsage) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "state":
+			if v != nil {
+				var state WarmStoragePropertiesState
+				err = json.Unmarshal(*v, &state)
+				if err != nil {
+					return err
+				}
+				wspu.State = state
+			}
+		case "stateDetails":
+			if v != nil {
+				var warmStoragePropertiesUsageStateDetails WarmStoragePropertiesUsageStateDetails
+				err = json.Unmarshal(*v, &warmStoragePropertiesUsageStateDetails)
+				if err != nil {
+					return err
+				}
+				wspu.WarmStoragePropertiesUsageStateDetails = &warmStoragePropertiesUsageStateDetails
+			}
+		}
+	}
+
+	return nil
+}
+
+// WarmStoragePropertiesUsageStateDetails an object that contains the details about warm storage properties
+// usage state.
+type WarmStoragePropertiesUsageStateDetails struct {
+	// CurrentCount - A value that represents the number of properties used by the environment for S1/S2 SKU and number of properties used by Warm Store for PAYG SKU
+	CurrentCount *int32 `json:"currentCount,omitempty"`
+	// MaxCount - A value that represents the maximum number of properties used allowed by the environment for S1/S2 SKU and maximum number of properties allowed by Warm Store for PAYG SKU.
+	MaxCount *int32 `json:"maxCount,omitempty"`
+}
+
+// WarmStoreConfigurationProperties the warm store configuration provides the details to create a warm
+// store cache that will retain a copy of the environment's data available for faster query.
+type WarmStoreConfigurationProperties struct {
+	// DataRetention - ISO8601 timespan specifying the number of days the environment's events will be available for query from the warm store.
+	DataRetention *string `json:"dataRetention,omitempty"`
 }

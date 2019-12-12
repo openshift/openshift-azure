@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,69 +22,23 @@ package costmanagement
 import (
 	"context"
 
-	original "github.com/Azure/azure-sdk-for-go/services/preview/costmanagement/mgmt/2018-08-01-preview/costmanagement"
+	original "github.com/Azure/azure-sdk-for-go/services/preview/costmanagement/mgmt/2019-10-01/costmanagement"
 )
 
 const (
 	DefaultBaseURI = original.DefaultBaseURI
 )
 
-type AlertCategory = original.AlertCategory
-
-const (
-	Billing AlertCategory = original.Billing
-	Cost    AlertCategory = original.Cost
-	Usage   AlertCategory = original.Usage
-)
-
-type AlertCriteria = original.AlertCriteria
-
-const (
-	CostThresholdExceeded  AlertCriteria = original.CostThresholdExceeded
-	CreditThresholdReached AlertCriteria = original.CreditThresholdReached
-	UsageThresholdExceeded AlertCriteria = original.UsageThresholdExceeded
-)
-
-type AlertSource = original.AlertSource
-
-const (
-	Preset AlertSource = original.Preset
-	User   AlertSource = original.User
-)
-
-type AlertStatus = original.AlertStatus
-
-const (
-	Active     AlertStatus = original.Active
-	Dismissed  AlertStatus = original.Dismissed
-	Overridden AlertStatus = original.Overridden
-	Resolved   AlertStatus = original.Resolved
-)
-
-type AlertType = original.AlertType
-
-const (
-	Budget  AlertType = original.Budget
-	Credit  AlertType = original.Credit
-	Invoice AlertType = original.Invoice
-)
-
-type ConnectorStatus = original.ConnectorStatus
-
-const (
-	ConnectorStatusActive    ConnectorStatus = original.ConnectorStatusActive
-	ConnectorStatusError     ConnectorStatus = original.ConnectorStatusError
-	ConnectorStatusSuspended ConnectorStatus = original.ConnectorStatusSuspended
-)
-
 type ExecutionStatus = original.ExecutionStatus
 
 const (
-	Completed  ExecutionStatus = original.Completed
-	Failed     ExecutionStatus = original.Failed
-	InProgress ExecutionStatus = original.InProgress
-	Queud      ExecutionStatus = original.Queud
-	Timeout    ExecutionStatus = original.Timeout
+	Completed           ExecutionStatus = original.Completed
+	DataNotAvailable    ExecutionStatus = original.DataNotAvailable
+	Failed              ExecutionStatus = original.Failed
+	InProgress          ExecutionStatus = original.InProgress
+	NewDataNotAvailable ExecutionStatus = original.NewDataNotAvailable
+	Queued              ExecutionStatus = original.Queued
+	Timeout             ExecutionStatus = original.Timeout
 )
 
 type ExecutionType = original.ExecutionType
@@ -103,7 +57,15 @@ const (
 type GranularityType = original.GranularityType
 
 const (
-	Daily GranularityType = original.Daily
+	Daily  GranularityType = original.Daily
+	Hourly GranularityType = original.Hourly
+)
+
+type QueryColumnType = original.QueryColumnType
+
+const (
+	QueryColumnTypeDimension QueryColumnType = original.QueryColumnTypeDimension
+	QueryColumnTypeTag       QueryColumnType = original.QueryColumnTypeTag
 )
 
 type RecurrenceType = original.RecurrenceType
@@ -115,109 +77,86 @@ const (
 	RecurrenceTypeWeekly   RecurrenceType = original.RecurrenceTypeWeekly
 )
 
-type ReportColumnType = original.ReportColumnType
+type SortDirection = original.SortDirection
 
 const (
-	ReportColumnTypeDimension ReportColumnType = original.ReportColumnTypeDimension
-	ReportColumnTypeTag       ReportColumnType = original.ReportColumnTypeTag
+	Ascending  SortDirection = original.Ascending
+	Descending SortDirection = original.Descending
 )
 
 type StatusType = original.StatusType
 
 const (
-	StatusTypeActive   StatusType = original.StatusTypeActive
-	StatusTypeInactive StatusType = original.StatusTypeInactive
+	Active   StatusType = original.Active
+	Inactive StatusType = original.Inactive
 )
 
 type TimeframeType = original.TimeframeType
 
 const (
-	Custom      TimeframeType = original.Custom
-	MonthToDate TimeframeType = original.MonthToDate
-	WeekToDate  TimeframeType = original.WeekToDate
+	Custom       TimeframeType = original.Custom
+	MonthToDate  TimeframeType = original.MonthToDate
+	TheLastMonth TimeframeType = original.TheLastMonth
+	TheLastWeek  TimeframeType = original.TheLastWeek
+	TheLastYear  TimeframeType = original.TheLastYear
+	WeekToDate   TimeframeType = original.WeekToDate
+	YearToDate   TimeframeType = original.YearToDate
 )
 
-type Alert = original.Alert
-type AlertDefinition = original.AlertDefinition
-type AlertListResult = original.AlertListResult
-type AlertListResultIterator = original.AlertListResultIterator
-type AlertListResultPage = original.AlertListResultPage
-type AlertProperties = original.AlertProperties
-type AlertsClient = original.AlertsClient
 type BaseClient = original.BaseClient
-type BillingAccountDimensionsClient = original.BillingAccountDimensionsClient
-type CommonReportProperties = original.CommonReportProperties
-type ConnectorClient = original.ConnectorClient
-type ConnectorCollectionErrorInfo = original.ConnectorCollectionErrorInfo
-type ConnectorCollectionInfo = original.ConnectorCollectionInfo
-type ConnectorDefinition = original.ConnectorDefinition
-type ConnectorDefinitionListResult = original.ConnectorDefinitionListResult
-type ConnectorProperties = original.ConnectorProperties
+type CommonExportProperties = original.CommonExportProperties
 type Dimension = original.Dimension
 type DimensionProperties = original.DimensionProperties
+type DimensionsClient = original.DimensionsClient
 type DimensionsListResult = original.DimensionsListResult
-type ErrorBase = original.ErrorBase
 type ErrorDetails = original.ErrorDetails
 type ErrorResponse = original.ErrorResponse
+type Export = original.Export
+type ExportDeliveryDestination = original.ExportDeliveryDestination
+type ExportDeliveryInfo = original.ExportDeliveryInfo
+type ExportExecution = original.ExportExecution
+type ExportExecutionListResult = original.ExportExecutionListResult
+type ExportExecutionProperties = original.ExportExecutionProperties
+type ExportListResult = original.ExportListResult
+type ExportProperties = original.ExportProperties
+type ExportRecurrencePeriod = original.ExportRecurrencePeriod
+type ExportSchedule = original.ExportSchedule
+type ExportsClient = original.ExportsClient
 type Operation = original.Operation
 type OperationDisplay = original.OperationDisplay
 type OperationListResult = original.OperationListResult
 type OperationListResultIterator = original.OperationListResultIterator
 type OperationListResultPage = original.OperationListResultPage
 type OperationsClient = original.OperationsClient
-type Query = original.Query
+type QueryAggregation = original.QueryAggregation
+type QueryClient = original.QueryClient
 type QueryColumn = original.QueryColumn
+type QueryComparisonExpression = original.QueryComparisonExpression
+type QueryDataset = original.QueryDataset
+type QueryDatasetConfiguration = original.QueryDatasetConfiguration
+type QueryDefinition = original.QueryDefinition
+type QueryFilter = original.QueryFilter
+type QueryGrouping = original.QueryGrouping
 type QueryProperties = original.QueryProperties
 type QueryResult = original.QueryResult
-type Report = original.Report
-type ReportAggregation = original.ReportAggregation
-type ReportComparisonExpression = original.ReportComparisonExpression
-type ReportDataset = original.ReportDataset
-type ReportDatasetConfiguration = original.ReportDatasetConfiguration
-type ReportDefinition = original.ReportDefinition
-type ReportDeliveryDestination = original.ReportDeliveryDestination
-type ReportDeliveryInfo = original.ReportDeliveryInfo
-type ReportExecution = original.ReportExecution
-type ReportExecutionListResult = original.ReportExecutionListResult
-type ReportExecutionProperties = original.ReportExecutionProperties
-type ReportFilter = original.ReportFilter
-type ReportGrouping = original.ReportGrouping
-type ReportListResult = original.ReportListResult
-type ReportProperties = original.ReportProperties
-type ReportRecurrencePeriod = original.ReportRecurrencePeriod
-type ReportSchedule = original.ReportSchedule
-type ReportTimePeriod = original.ReportTimePeriod
-type ReportsClient = original.ReportsClient
+type QuerySortingConfiguration = original.QuerySortingConfiguration
+type QueryTimePeriod = original.QueryTimePeriod
 type Resource = original.Resource
-type ResourceGroupDimensionsClient = original.ResourceGroupDimensionsClient
-type SubscriptionDimensionsClient = original.SubscriptionDimensionsClient
 
 func New(subscriptionID string) BaseClient {
 	return original.New(subscriptionID)
 }
-func NewAlertListResultIterator(page AlertListResultPage) AlertListResultIterator {
-	return original.NewAlertListResultIterator(page)
+func NewDimensionsClient(subscriptionID string) DimensionsClient {
+	return original.NewDimensionsClient(subscriptionID)
 }
-func NewAlertListResultPage(getNextPage func(context.Context, AlertListResult) (AlertListResult, error)) AlertListResultPage {
-	return original.NewAlertListResultPage(getNextPage)
+func NewDimensionsClientWithBaseURI(baseURI string, subscriptionID string) DimensionsClient {
+	return original.NewDimensionsClientWithBaseURI(baseURI, subscriptionID)
 }
-func NewAlertsClient(subscriptionID string) AlertsClient {
-	return original.NewAlertsClient(subscriptionID)
+func NewExportsClient(subscriptionID string) ExportsClient {
+	return original.NewExportsClient(subscriptionID)
 }
-func NewAlertsClientWithBaseURI(baseURI string, subscriptionID string) AlertsClient {
-	return original.NewAlertsClientWithBaseURI(baseURI, subscriptionID)
-}
-func NewBillingAccountDimensionsClient(subscriptionID string) BillingAccountDimensionsClient {
-	return original.NewBillingAccountDimensionsClient(subscriptionID)
-}
-func NewBillingAccountDimensionsClientWithBaseURI(baseURI string, subscriptionID string) BillingAccountDimensionsClient {
-	return original.NewBillingAccountDimensionsClientWithBaseURI(baseURI, subscriptionID)
-}
-func NewConnectorClient(subscriptionID string) ConnectorClient {
-	return original.NewConnectorClient(subscriptionID)
-}
-func NewConnectorClientWithBaseURI(baseURI string, subscriptionID string) ConnectorClient {
-	return original.NewConnectorClientWithBaseURI(baseURI, subscriptionID)
+func NewExportsClientWithBaseURI(baseURI string, subscriptionID string) ExportsClient {
+	return original.NewExportsClientWithBaseURI(baseURI, subscriptionID)
 }
 func NewOperationListResultIterator(page OperationListResultPage) OperationListResultIterator {
 	return original.NewOperationListResultIterator(page)
@@ -231,44 +170,14 @@ func NewOperationsClient(subscriptionID string) OperationsClient {
 func NewOperationsClientWithBaseURI(baseURI string, subscriptionID string) OperationsClient {
 	return original.NewOperationsClientWithBaseURI(baseURI, subscriptionID)
 }
-func NewReportsClient(subscriptionID string) ReportsClient {
-	return original.NewReportsClient(subscriptionID)
+func NewQueryClient(subscriptionID string) QueryClient {
+	return original.NewQueryClient(subscriptionID)
 }
-func NewReportsClientWithBaseURI(baseURI string, subscriptionID string) ReportsClient {
-	return original.NewReportsClientWithBaseURI(baseURI, subscriptionID)
-}
-func NewResourceGroupDimensionsClient(subscriptionID string) ResourceGroupDimensionsClient {
-	return original.NewResourceGroupDimensionsClient(subscriptionID)
-}
-func NewResourceGroupDimensionsClientWithBaseURI(baseURI string, subscriptionID string) ResourceGroupDimensionsClient {
-	return original.NewResourceGroupDimensionsClientWithBaseURI(baseURI, subscriptionID)
-}
-func NewSubscriptionDimensionsClient(subscriptionID string) SubscriptionDimensionsClient {
-	return original.NewSubscriptionDimensionsClient(subscriptionID)
-}
-func NewSubscriptionDimensionsClientWithBaseURI(baseURI string, subscriptionID string) SubscriptionDimensionsClient {
-	return original.NewSubscriptionDimensionsClientWithBaseURI(baseURI, subscriptionID)
+func NewQueryClientWithBaseURI(baseURI string, subscriptionID string) QueryClient {
+	return original.NewQueryClientWithBaseURI(baseURI, subscriptionID)
 }
 func NewWithBaseURI(baseURI string, subscriptionID string) BaseClient {
 	return original.NewWithBaseURI(baseURI, subscriptionID)
-}
-func PossibleAlertCategoryValues() []AlertCategory {
-	return original.PossibleAlertCategoryValues()
-}
-func PossibleAlertCriteriaValues() []AlertCriteria {
-	return original.PossibleAlertCriteriaValues()
-}
-func PossibleAlertSourceValues() []AlertSource {
-	return original.PossibleAlertSourceValues()
-}
-func PossibleAlertStatusValues() []AlertStatus {
-	return original.PossibleAlertStatusValues()
-}
-func PossibleAlertTypeValues() []AlertType {
-	return original.PossibleAlertTypeValues()
-}
-func PossibleConnectorStatusValues() []ConnectorStatus {
-	return original.PossibleConnectorStatusValues()
 }
 func PossibleExecutionStatusValues() []ExecutionStatus {
 	return original.PossibleExecutionStatusValues()
@@ -282,11 +191,14 @@ func PossibleFormatTypeValues() []FormatType {
 func PossibleGranularityTypeValues() []GranularityType {
 	return original.PossibleGranularityTypeValues()
 }
+func PossibleQueryColumnTypeValues() []QueryColumnType {
+	return original.PossibleQueryColumnTypeValues()
+}
 func PossibleRecurrenceTypeValues() []RecurrenceType {
 	return original.PossibleRecurrenceTypeValues()
 }
-func PossibleReportColumnTypeValues() []ReportColumnType {
-	return original.PossibleReportColumnTypeValues()
+func PossibleSortDirectionValues() []SortDirection {
+	return original.PossibleSortDirectionValues()
 }
 func PossibleStatusTypeValues() []StatusType {
 	return original.PossibleStatusTypeValues()
