@@ -460,14 +460,14 @@ versions:
       genevaStatsd: osarpint.azurecr.io/acs/mdm:git-a909a2e76
       genevaTDAgent: osarpint.azurecr.io/acs/td-agent:master.20190228.1
       logAnalyticsAgent: mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod11012019
-      azureControllers: osarpint.azurecr.io/openshift-on-azure/azure:v13.0
-      aroAdmissionController: osarpint.azurecr.io/openshift-on-azure/azure:v13.0
-      canary: osarpint.azurecr.io/openshift-on-azure/azure:v13.0
-      etcdBackup: osarpint.azurecr.io/openshift-on-azure/azure:v13.0
-      metricsBridge: osarpint.azurecr.io/openshift-on-azure/azure:v13.0
-      startup: osarpint.azurecr.io/openshift-on-azure/azure:v13.0
-      sync: osarpint.azurecr.io/openshift-on-azure/azure:v13.0
-      tlsProxy: osarpint.azurecr.io/openshift-on-azure/azure:v13.0
+      azureControllers: osarpint.azurecr.io/openshift-on-azure/azure:v13.1
+      aroAdmissionController: osarpint.azurecr.io/openshift-on-azure/azure:v13.1
+      canary: osarpint.azurecr.io/openshift-on-azure/azure:v13.1
+      etcdBackup: osarpint.azurecr.io/openshift-on-azure/azure:v13.1
+      metricsBridge: osarpint.azurecr.io/openshift-on-azure/azure:v13.1
+      startup: osarpint.azurecr.io/openshift-on-azure/azure:v13.1
+      sync: osarpint.azurecr.io/openshift-on-azure/azure:v13.1
+      tlsProxy: osarpint.azurecr.io/openshift-on-azure/azure:v13.1
 ## certificates, used to authenticate to external systems
 ## Red Hat CDN client certificates
 #packageRepository:
