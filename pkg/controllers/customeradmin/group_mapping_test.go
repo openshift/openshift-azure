@@ -29,6 +29,12 @@ func TestFromMSGraphGroup(t *testing.T) {
 				Name: "live.com#user@guest.com",
 			},
 		},
+		// case 2.b
+		&v1.User{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "live.com#hhi_admin@guest.com",
+			},
+		},
 		// case 3
 		&v1.User{
 			ObjectMeta: metav1.ObjectMeta{
@@ -203,6 +209,32 @@ func TestFromMSGraphGroup(t *testing.T) {
 					Name: osaCustomerAdmins,
 				},
 				Users: []string{"live.com#user@guest.com"},
+			},
+		},
+		{
+			name:          "guest user with prefix (case 2.b)",
+			kubeGroupName: osaCustomerAdmins,
+			want1:         false,
+			kubeGroup: &v1.Group{
+				ObjectMeta: meta_v1.ObjectMeta{
+					Name: osaCustomerAdmins,
+				},
+				Users: []string{"live.com#hhi_admin@guest.com"},
+			},
+			msGroupMembers: []graphrbac.User{
+				{
+					Mail:              nil,
+					UserType:          graphrbac.Guest,
+					GivenName:         nil,
+					MailNickname:      to.StringPtr("hhi_admin_guest.com#EXT#"),
+					UserPrincipalName: to.StringPtr("hhi_admin_guest.com#EXT#@home2.onmicrosoft.com"),
+				},
+			},
+			want: &v1.Group{
+				ObjectMeta: meta_v1.ObjectMeta{
+					Name: osaCustomerAdmins,
+				},
+				Users: []string{"live.com#hhi_admin@guest.com"},
 			},
 		},
 		{
