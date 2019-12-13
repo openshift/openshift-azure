@@ -76,6 +76,7 @@ func tryOverride(mail string, ocpUserList []v1.User) string {
 // This code is trying to solve 4 usecases for guest accounts:
 // 1. Member owner account - Mail = nil, GiveName = owner@home.com, MailNickname is partial email with owner_home.com#EXT#
 // 2. Guest user with prefix live.com#user@guest.com in OCP users but not in AAD
+// 2.b Guest user with prefix live.com#user@guest.com in OCP users but not in AAD and Mail is nil
 // 3. Guest user with no prefix user@trustedGuest.com
 // 4. Normal user/ other usecases - Default: Mail
 // To check structure:
@@ -102,15 +103,21 @@ func reconcileUsers(log *logrus.Entry, ocpUserList []v1.User, AADUser graphrbac.
 			}
 		}
 	}
-	// This is optimistic code, trying to catch use-case 2
-	if AADUser.MailNickname != nil &&
-		AADUser.Mail != nil &&
-		strings.Contains(*AADUser.MailNickname, "#EXT#") {
+	// This is optimistic code, trying to catch use-case 2 and 2.b
+	if AADUser.MailNickname != nil && strings.Contains(*AADUser.MailNickname, "#EXT#") {
+		var email string
+		if AADUser.Mail != nil {
+			email = *AADUser.Mail
+		} else {
+			s := strings.Replace(*AADUser.MailNickname, "#EXT#", "", 1)
+			idx := strings.LastIndex(s, "_")
+			email = s[:idx] + "@" + s[idx+1:]
+		}
 		for _, usr := range ocpUserList {
 			// if OpenShift user contains # - we need to drop it for checking.
 			if strings.Contains(usr.Name, "#") {
 				loginEmail := strings.SplitN(usr.Name, "#", 2)[1]
-				if mailEqual(loginEmail, *AADUser.Mail) {
+				if mailEqual(loginEmail, email) {
 					return usr.Name
 				}
 			}
