@@ -589,7 +589,7 @@ var translations = map[string][]struct {
 			Template: "{{ String .Config.Images.ImagePullSecret }}",
 		},
 	},
-	"Secret/openshift-azure-logging/log-analytics": {
+	"Secret/openshift-azure-logging/omsagent-secret": {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'WSID'"),
 			Template: "{{ .ContainerService.Properties.MonitorProfile.WorkspaceID }}",
