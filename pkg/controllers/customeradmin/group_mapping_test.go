@@ -47,6 +47,12 @@ func TestFromMSGraphGroup(t *testing.T) {
 				Name: "user@home.com",
 			},
 		},
+		// case 4b
+		&v1.User{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "123@home.com",
+			},
+		},
 		&v1.User{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "bob_owner@home.com",
@@ -293,6 +299,31 @@ func TestFromMSGraphGroup(t *testing.T) {
 					Name: osaCustomerAdmins,
 				},
 				Users: []string{"user@home.com"},
+			},
+		},
+		{
+			name:          "non-guest user with Mail field matching (case 4b)",
+			kubeGroupName: osaCustomerAdmins,
+			want1:         true,
+			kubeGroup: &v1.Group{
+				ObjectMeta: meta_v1.ObjectMeta{
+					Name: osaCustomerAdmins,
+				},
+				Users: []string{"bob@home.com"},
+			},
+			msGroupMembers: []graphrbac.User{
+				{
+					Mail:              to.StringPtr("bob@home.com"),
+					GivenName:         to.StringPtr("User"),
+					MailNickname:      to.StringPtr("USER123"),
+					UserPrincipalName: to.StringPtr("123@home.com"),
+				},
+			},
+			want: &v1.Group{
+				ObjectMeta: meta_v1.ObjectMeta{
+					Name: osaCustomerAdmins,
+				},
+				Users: []string{"123@home.com"},
 			},
 		},
 		{
