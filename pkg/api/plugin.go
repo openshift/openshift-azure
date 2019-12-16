@@ -67,6 +67,8 @@ const (
 	CommandRestartNetworkManager = "RestartNetworkManager"
 	CommandRestartKubelet        = "RestartKubelet"
 	CommandRestartDocker         = "RestartDocker"
+	CommandLiveNetStatus         = "GetLiveNetStatus"
+	CommandOCGetAll              = "OCGetAll"
 )
 
 // PluginError error returned by CreateOrUpdate to specify the step that failed.

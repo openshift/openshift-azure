@@ -1,0 +1,17 @@
+#!/bin/bash
+set -x
+
+# Get the current network config
+time ip a
+
+# Get the current netstat output
+time netstat -Wpant
+
+# Get the iptables output
+time iptables -L
+
+# Print the routing table
+time route -n
+
+# Print the DNS resolve config
+time cat /etc/resolv.conf
