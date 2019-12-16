@@ -30,7 +30,7 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (
 		return v10.New(log, cs, initClients)
 	case "v12.0", "v12.1", "v12.2":
 		return v12.New(log, cs, initClients)
-	case "v13.0":
+	case "v13.0", "v13.1":
 		return v13.New(log, cs, initClients)
 	case "v14.0":
 		return v14.New(log, cs, initClients)
@@ -45,7 +45,7 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (
 
 func AssetNames(cs *api.OpenShiftManagedCluster) ([]string, error) {
 	switch cs.Config.PluginVersion {
-	case "v13.0":
+	case "v13.0", "v13.1":
 		return v13.AssetNames(), nil
 	case "v14.0":
 		return v14.AssetNames(), nil
@@ -56,6 +56,8 @@ func AssetNames(cs *api.OpenShiftManagedCluster) ([]string, error) {
 
 func Asset(cs *api.OpenShiftManagedCluster, name string) ([]byte, error) {
 	switch cs.Config.PluginVersion {
+	case "v13.0", "v13.1":
+		return v13.Asset(name)
 	case "v14.0":
 		return v14.Asset(name)
 	}
