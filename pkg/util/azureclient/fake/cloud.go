@@ -6,6 +6,7 @@ import (
 	azstorage "github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
 	"github.com/sirupsen/logrus"
 
+	"github.com/openshift/openshift-azure/pkg/arm/constants"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/compute"
 	fakecompute "github.com/openshift/openshift-azure/pkg/util/azureclient/fake/compute"
 	fakekeyvault "github.com/openshift/openshift-azure/pkg/util/azureclient/fake/keyvault"
@@ -22,6 +23,7 @@ type AzureCloud struct {
 	fakecompute.ComputeRP
 	fakestorage.StorageRP
 	fakekeyvault.VaultRP
+	fakenetwork.NetworkRP
 
 	AccountsClient                  storage.AccountsClient
 	StorageClient                   storage.Client
@@ -51,6 +53,9 @@ func NewFakeAzureCloud(log *logrus.Entry, secrets []azkeyvault.SecretBundle) *Az
 			Accts: []azstorage.Account{},
 			Blobs: map[string]map[string][]byte{},
 		},
+		NetworkRP: fakenetwork.NetworkRP{
+			Nameservers: &[]string{constants.AzureNameserver},
+		},
 	}
 	az.AccountsClient = fakestorage.NewFakeAccountsClient(&az.StorageRP)
 	az.StorageClient = fakestorage.NewFakeStorageClient(&az.StorageRP)
@@ -58,6 +63,6 @@ func NewFakeAzureCloud(log *logrus.Entry, secrets []azkeyvault.SecretBundle) *Az
 	az.VirtualMachineScaleSetVMsClient = fakecompute.NewFakeVirtualMachineScaleSetVMsClient(&az.ComputeRP)
 	az.VirtualMachineScaleSetsClient = fakecompute.NewFakeVirtualMachineScaleSetsClient(&az.ComputeRP)
 	az.DeploymentsClient = fakeresources.NewFakeDeploymentsClient(az.VirtualMachineScaleSetsClient, &az.StorageRP)
-	az.VirtualNetworksClient = fakenetwork.NewFakeVirtualNetworksClient()
+	az.VirtualNetworksClient = fakenetwork.NewFakeVirtualNetworksClient(&az.NetworkRP)
 	return az
 }

@@ -57,6 +57,17 @@ func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedClu
 	validator := validate.NewAPIValidator(p.testConfig.RunningUnderTest, p.roleLister)
 	errs = validator.Validate(new, old, externalOnly)
 
+	var isUpdate bool
+	switch new.Properties.ProvisioningState {
+	case api.Creating:
+		isUpdate = false
+	case api.Updating, api.Upgrading, api.AdminUpdating:
+		isUpdate = true
+	default:
+		// if ProvisioningState == "" or other
+		isUpdate = old != nil
+	}
+
 	// if this is an update and not an upgrade, check if we can service it, and
 	// if not, fail early.  Validation runs on the front end before RP cascades
 	// ClusterVersion "latest" to PluginVersion "latest", *and* on the back end
@@ -68,7 +79,7 @@ func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedClu
 	// run Validate() - test can fire on cs.Config.PluginVersion
 	// run GenerateConfig()
 	// run CreateOrUpdate()
-	if old != nil && new.Properties.ClusterVersion != "latest" && new.Config.PluginVersion != "latest" {
+	if isUpdate && new.Properties.ClusterVersion != "latest" && new.Config.PluginVersion != "latest" {
 		_, err := p.configInterfaceFactory(new)
 		if err != nil {
 			errs = append(errs, fmt.Errorf(`cluster with version %q cannot be updated by resource provider with version %q`, new.Config.PluginVersion, p.pluginConfig.PluginVersion))
@@ -78,7 +89,7 @@ func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedClu
 		// don't call checkIfClusterWillRefresh() if we already have errors.
 		return
 	}
-	if !externalOnly && old != nil {
+	if !externalOnly && isUpdate {
 		if err := p.checkIfClusterWillRefresh(ctx, new); err != nil {
 			errs = append(errs, err)
 		}

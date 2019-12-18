@@ -700,6 +700,30 @@ func TestHowActionsCauseRotations(t *testing.T) {
 		expectCalls    []string
 	}{
 		{
+			name:           "scale up, with dns change",
+			expectRotation: map[rotationType]bool{rotationMaster: true, rotationInfra: true, rotationSync: false, rotationCompute: true},
+			expectNodes:    map[rotationType]int{rotationCompute: 6, rotationInfra: 3, rotationMaster: 3},
+			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
+				oldCs := cs.DeepCopy()
+				for i, p := range cs.Properties.AgentPoolProfiles {
+					if p.Role == api.AgentPoolProfileRoleCompute {
+						cs.Properties.AgentPoolProfiles[i].Count = 6
+					}
+				}
+				*az.NetworkRP.Nameservers = append(*az.NetworkRP.Nameservers, "8.8.8.8")
+				cs.Properties.RefreshCluster = to.BoolPtr(true)
+				errs := p.Validate(ctx, cs, oldCs, false)
+				if errs != nil {
+					return kerrors.NewAggregate(errs)
+				}
+				perr := p.CreateOrUpdate(ctx, cs, true, getFakeDeployer(log, cs, az))
+				if perr != nil {
+					return perr
+				}
+				return nil
+			},
+		},
+		{
 			name:           "scale up",
 			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
 			expectNodes:    map[rotationType]int{rotationCompute: 6, rotationInfra: 3, rotationMaster: 3},
