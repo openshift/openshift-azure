@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/ghodss/yaml"
+	authorizationv1 "github.com/openshift/client-go/authorization/clientset/versioned/typed/authorization/v1"
 	"github.com/sirupsen/logrus"
 	kapiextensions "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -545,6 +546,7 @@ type sync struct {
 	cli        *discovery.DiscoveryClient
 	dyn        dynamic.ClientPool
 	grs        []*restmapper.APIGroupResources
+	auth       authorizationv1.ClusterRoleBindingsGetter
 
 	managedSharedResources bool
 }
@@ -587,6 +589,11 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (
 		}
 
 		s.cli, err = discovery.NewDiscoveryClientForConfig(s.restconfig)
+		if err != nil {
+			return nil, err
+		}
+
+		s.auth, err = authorizationv1.NewForConfig(s.restconfig)
 		if err != nil {
 			return nil, err
 		}

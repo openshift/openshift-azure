@@ -277,6 +277,26 @@ func (s *sync) isReconcileProtected(existing, o *unstructured.Unstructured) bool
 		return true
 	}
 
+	if o.GetName() == "self-provisioners" &&
+		(o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "rbac.authorization.k8s.io", Kind: "ClusterRoleBinding"}) {
+		if strings.ToLower(existing.GetAnnotations()[reconcileProtectAnnotationKey]) == "true" {
+			return true
+		}
+
+		// it turns out that not all annotations are synced from
+		// ClusterRoleBinding{,.authorization.openshift.io} (which is what most
+		// users modify) to ClusterRoleBinding.rbac.authorization.k8s.io (which
+		// is what we work with here).  So, check to see if there is a
+		// openshift.io/reconcile-protect: true annotation on the
+		// ClusterRoleBinding{,.authorization.openshift.io}.  If so, interpret
+		// it as being valid for the
+		// ClusterRoleBinding.rbac.authorization.k8s.io.
+		crb, err := s.auth.ClusterRoleBindings().Get(o.GetName(), metav1.GetOptions{})
+		if err == nil && strings.ToLower(crb.Annotations[reconcileProtectAnnotationKey]) == "true" {
+			return true
+		}
+	}
+
 	if strings.ToLower(existing.GetAnnotations()[reconcileProtectAnnotationKey]) == "true" {
 		// openshift namespace for shared-resources
 		if (o.GetName() == "openshift" &&
@@ -287,10 +307,6 @@ func (s *sync) isReconcileProtected(existing, o *unstructured.Unstructured) bool
 		if o.GetNamespace() == "openshift" &&
 			(o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "image.openshift.io", Kind: "ImageStream"} ||
 				o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "template.openshift.io", Kind: "Template"}) {
-			return true
-		}
-		if o.GetName() == "self-provisioners" &&
-			(o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "rbac.authorization.k8s.io", Kind: "ClusterRoleBinding"}) {
 			return true
 		}
 		// log analytics agent data collection configuration
