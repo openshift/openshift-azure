@@ -36,13 +36,20 @@ func createOrUpdateContainerInsights(ctx context.Context, log *logrus.Entry, cs 
 		return err
 	}
 
-	b, err := utiltemplate.Template("azuremonitor-containerSolution.json", string(tmpl), nil, map[string]interface{}{
-		"Location":            cs.Location,
-		"SubscriptionID":      cs.Properties.AzProfile.SubscriptionID,
-		"ResourceGroup":       rg,
-		"WorkspaceResourceID": cs.Properties.MonitorProfile.WorkspaceResourceID,
-		"WorkspaceName":       workspaceName,
-	})
+	b, err := utiltemplate.Template("azuremonitor-containerSolution.json", string(tmpl), nil,
+		struct {
+			Location            string
+			SubscriptionID      string
+			ResourceGroup       string
+			WorkspaceResourceID string
+			WorkspaceName       string
+		}{
+			Location:            cs.Location,
+			SubscriptionID:      cs.Properties.AzProfile.SubscriptionID,
+			ResourceGroup:       rg,
+			WorkspaceResourceID: cs.Properties.MonitorProfile.WorkspaceResourceID,
+			WorkspaceName:       workspaceName,
+		})
 	if err != nil {
 		return err
 	}

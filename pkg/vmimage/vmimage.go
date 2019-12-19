@@ -55,21 +55,32 @@ func (builder *Builder) generateTemplate() (map[string]interface{}, error) {
 	var script []byte
 	var err error
 	if !builder.Validate {
-		script, err = template.Template("script.sh", string(MustAsset("script.sh")), nil, map[string]interface{}{
-			"Archive":      MustAsset("archive.tgz"),
-			"Builder":      builder,
-			"ClientID":     os.Getenv("AZURE_CLIENT_ID"),
-			"ClientSecret": os.Getenv("AZURE_CLIENT_SECRET"),
-			"TenantID":     os.Getenv("AZURE_TENANT_ID"),
-		})
+		script, err = template.Template("script.sh", string(MustAsset("script.sh")), nil,
+			struct {
+				Archive      []byte
+				Builder      *Builder
+				ClientID     string
+				ClientSecret string
+				TenantID     string
+			}{
+				Archive:      MustAsset("archive.tgz"),
+				Builder:      builder,
+				ClientID:     os.Getenv("AZURE_CLIENT_ID"),
+				ClientSecret: os.Getenv("AZURE_CLIENT_SECRET"),
+				TenantID:     os.Getenv("AZURE_TENANT_ID"),
+			})
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		script, err = template.Template("validate.sh", string(MustAsset("validate.sh")), nil, map[string]interface{}{
-			"Archive": MustAsset("archive.tgz"),
-			"Builder": builder,
-		})
+		script, err = template.Template("validate.sh", string(MustAsset("validate.sh")), nil,
+			struct {
+				Archive []byte
+				Builder *Builder
+			}{
+				Archive: MustAsset("archive.tgz"),
+				Builder: builder,
+			})
 		if err != nil {
 			return nil, err
 		}
