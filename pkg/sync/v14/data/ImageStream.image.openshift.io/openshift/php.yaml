@@ -27,6 +27,23 @@ spec:
     referencePolicy:
       type: Local
   - annotations:
+      description: Build and run PHP 7.3 applications on RHEL 7. For more information
+        about using this builder image, including OpenShift considerations, see https://github.com/sclorg/s2i-php-container/blob/master/7.3/README.md.
+      iconClass: icon-php
+      openshift.io/display-name: PHP 7.3
+      openshift.io/provider-display-name: Red Hat, Inc.
+      sampleRepo: https://github.com/sclorg/cakephp-ex.git
+      supports: php:7.3,php
+      tags: builder,php
+      version: "7.3"
+    from:
+      kind: DockerImage
+      name: registry.redhat.io/rhscl/php-73-rhel7:latest
+    importPolicy: {}
+    name: "7.3"
+    referencePolicy:
+      type: Local
+  - annotations:
       description: |-
         Build and run PHP applications on RHEL 7. For more information about using this builder image, including OpenShift considerations, see https://github.com/sclorg/s2i-php-container/blob/master/7.2/README.md.
 
@@ -39,7 +56,7 @@ spec:
       tags: builder,php
     from:
       kind: ImageStreamTag
-      name: "7.2"
+      name: "7.3"
     importPolicy: {}
     name: latest
     referencePolicy:
