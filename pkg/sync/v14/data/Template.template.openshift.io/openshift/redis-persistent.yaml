@@ -8,16 +8,16 @@ message: |-
          Password: ${REDIS_PASSWORD}
    Connection URL: redis://${DATABASE_SERVICE_NAME}:6379/
 
-  For more information about using this template, including OpenShift considerations, see https://github.com/sclorg/redis-container/blob/master/3.2.
+  For more information about using this template, including OpenShift considerations, see https://github.com/sclorg/redis-container/blob/master/5.
 metadata:
   annotations:
     description: |-
-      Redis in-memory data structure store, with persistent storage. For more information about using this template, including OpenShift considerations, see https://github.com/sclorg/redis-container/blob/master/3.2.
+      Redis in-memory data structure store, with persistent storage. For more information about using this template, including OpenShift considerations, see https://github.com/sclorg/redis-container/blob/master/5.
 
       NOTE: You must have persistent volumes available in your cluster to use this template.
     iconClass: icon-redis
     openshift.io/display-name: Redis
-    openshift.io/documentation-url: https://github.com/sclorg/redis-container/tree/master/3.2
+    openshift.io/documentation-url: https://github.com/sclorg/redis-container/tree/master/5
     openshift.io/long-description: This template provides a standalone Redis server.  The
       data is stored on persistent storage.
     openshift.io/provider-display-name: Red Hat, Inc.
@@ -163,8 +163,8 @@ parameters:
   name: VOLUME_CAPACITY
   required: true
   value: 1Gi
-- description: Version of Redis image to be used (3.2 or latest).
+- description: Version of Redis image to be used (5 or latest).
   displayName: Version of Redis Image
   name: REDIS_VERSION
   required: true
-  value: "3.2"
+  value: "5"
