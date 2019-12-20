@@ -6,24 +6,27 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-06-01/network"
 	"github.com/Azure/go-autorest/autorest"
-
-	"github.com/openshift/openshift-azure/pkg/arm/constants"
 )
+
+type NetworkRP struct {
+	Nameservers *[]string
+}
 
 // FakeVirtualNetworksClient is a Fake of NetworkClient interface
 type FakeVirtualNetworksClient struct {
+	NetworkRP
 }
 
 // NewFakeVirtualNetworksClient creates a new Fake instance
-func NewFakeVirtualNetworksClient() *FakeVirtualNetworksClient {
-	return &FakeVirtualNetworksClient{}
+func NewFakeVirtualNetworksClient(rp *NetworkRP) *FakeVirtualNetworksClient {
+	return &FakeVirtualNetworksClient{NetworkRP: *rp}
 }
 
 func (vn *FakeVirtualNetworksClient) Get(ctx context.Context, resourceGroupName string, virtualNetworkName string, expand string) (network.VirtualNetwork, error) {
 	return network.VirtualNetwork{
 		VirtualNetworkPropertiesFormat: &network.VirtualNetworkPropertiesFormat{
 			DhcpOptions: &network.DhcpOptions{
-				DNSServers: &[]string{constants.AzureNameserver},
+				DNSServers: vn.Nameservers,
 			},
 		},
 	}, nil

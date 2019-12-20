@@ -71,6 +71,16 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	} else {
 		apiVersion = keys[0]
 	}
+	// the real RP is responsible for ProvisoningState; this is our fake equivalent
+	var newState internalapi.ProvisioningState
+	switch {
+	case isAdmin && oldCs != nil:
+		newState = internalapi.AdminUpdating
+	case oldCs != nil:
+		newState = internalapi.Updating
+	default:
+		newState = internalapi.Creating
+	}
 
 	// convert the external API manifest into the internal API representation
 	s.log.Info("read request and convert to internal")
@@ -80,7 +90,7 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 		s.log.Info("admin request")
 		cs, err = s.readAdminRequest(req.Body, oldCs)
 		if err == nil {
-			cs.Properties.ProvisioningState = internalapi.AdminUpdating
+			cs.Properties.ProvisioningState = newState
 			s.store.Put(cs)
 		}
 	} else {
@@ -88,19 +98,19 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 		case "2019-10-27-preview":
 			cs, err = s.read20191027Request(req.Body, oldCs)
 			if err == nil {
-				cs.Properties.ProvisioningState = internalapi.Updating
+				cs.Properties.ProvisioningState = newState
 				s.store.Put(cs)
 			}
 		case "2019-04-30":
 			cs, err = s.read20190430Request(req.Body, oldCs)
 			if err == nil {
-				cs.Properties.ProvisioningState = internalapi.Updating
+				cs.Properties.ProvisioningState = newState
 				s.store.Put(cs)
 			}
 		case "2019-09-30-preview":
 			cs, err = s.read20190930Request(req.Body, oldCs)
 			if err == nil {
-				cs.Properties.ProvisioningState = internalapi.Updating
+				cs.Properties.ProvisioningState = newState
 				s.store.Put(cs)
 			}
 		default:
