@@ -41,3 +41,12 @@ rules:
   - delete
   - patch
   - update
+- apiGroups:
+  - image.openshift.io
+  resources:
+  - imagestreams
+  - imagestreams/layers
+  verbs:
+  - get
+  - list
+  - watch
