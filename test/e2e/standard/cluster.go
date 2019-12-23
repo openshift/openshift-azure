@@ -458,10 +458,6 @@ func (sc *SanityChecker) checkEnforcesEmptyDirQuotas(ctx context.Context) error 
 	if err != nil {
 		return err
 	}
-	By("Verifying that plugin version is over v6 otherwise skip")
-	if major < 6 {
-		return nil
-	}
 
 	namespace, err := sc.CreateProject(ctx)
 	if err != nil {
