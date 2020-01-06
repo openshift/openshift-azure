@@ -47,6 +47,9 @@ type Properties struct {
 	// FQDN (out): Auto-allocated internal FQDN for OpenShift API server.
 	FQDN *string `json:"fqdn,omitempty"`
 
+	// PrivateAPIServer: Specifies if API server is public or private
+	PrivateAPIServer bool `json:"privateApiServer,omitempty"`
+
 	// NetworkProfile (in): Configuration for OpenShift networking.
 	NetworkProfile *NetworkProfile `json:"networkProfile,omitempty"`
 
