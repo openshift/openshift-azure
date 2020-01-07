@@ -321,6 +321,10 @@ func TestRoundTrip(t *testing.T) {
 		t.Error(err)
 	}
 	end := FromInternal(internal)
+
+	// Read-only: ignore in comparison
+	start.Properties.PrivateAPIServer = false
+
 	if !reflect.DeepEqual(start, end) {
 		t.Errorf("unexpected diff %s", cmp.Diff(start, end))
 	}

@@ -34,6 +34,7 @@ func FromInternal(cs *api.OpenShiftManagedCluster) *OpenShiftManagedCluster {
 		ClusterVersion:    &cs.Properties.ClusterVersion,
 		PublicHostname:    &cs.Properties.PublicHostname,
 		FQDN:              &cs.Properties.FQDN,
+		PrivateAPIServer:  cs.Properties.PrivateAPIServer,
 	}
 	// This is intentionally reversed as far as pointers go.
 	if cs.Properties.RefreshCluster != nil {

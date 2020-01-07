@@ -30,6 +30,7 @@ var marshalled = []byte(`{
 		"clusterVersion": "Properties.ClusterVersion",
 		"publicHostname": "Properties.PublicHostname",
 		"fqdn": "Properties.FQDN",
+		"privateApiServer": true,
 		"networkProfile": {
 			"vnetCidr": "Properties.NetworkProfile.VnetCIDR",
 			"managementSubnetCidr": "Properties.NetworkProfile.ManagementSubnetCIDR",
@@ -362,7 +363,6 @@ func TestAPIParity(t *testing.T) {
 		regexp.MustCompile(`^\.Properties\.NetworkProfile\.InternalLoadBalancerFrontendIPID$`),
 		regexp.MustCompile(`^\.Properties\.NetworkProfile\.Nameservers$`),
 		regexp.MustCompile(`^\.Properties\.MonitorProfile\.Workspace(ID|Key)`),
-		regexp.MustCompile(`^\.Properties\.PrivateAPIServer`),
 		regexp.MustCompile(`^\.Properties\.AzProfile\.`),
 		regexp.MustCompile(`^\.Properties\.(Master|Worker)ServicePrincipalProfile\.`),
 		regexp.MustCompile(`^\.Properties\.APICertProfile\.`),
