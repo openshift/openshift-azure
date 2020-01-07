@@ -19,5 +19,5 @@ data:
     /opt/main.sh
 kind: ConfigMap
 metadata:
-  name: log-analytics-agent-entrypoint
+  name: omsagent-entrypoint
   namespace: openshift-azure-logging

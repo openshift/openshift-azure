@@ -82,10 +82,10 @@ spec:
           name: settings-vol-config
           readOnly: true
         - mountPath: /opt/main-wrapper.sh
-          name: log-analytics-agent-entrypoint
+          name: omsagent-entrypoint
           subPath: main-wrapper.sh
         - mountPath: /etc/rsyslog.d/95-omsagent.conf
-          name: log-analytics-rsyslog-config
+          name: omsagent-rsyslog-config
           subPath: rsyslog.conf
       nodeSelector:
         beta.kubernetes.io/os: linux
@@ -121,11 +121,11 @@ spec:
         name: settings-vol-config
       - configMap:
           defaultMode: 509
-          name: log-analytics-agent-entrypoint
-        name: log-analytics-agent-entrypoint
+          name: omsagent-entrypoint
+        name: omsagent-entrypoint
       - configMap:
-          name: log-analytics-rsyslog-config
-        name: log-analytics-rsyslog-config
+          name: omsagent-rsyslog-config
+        name: omsagent-rsyslog-config
       - name: omsagent-secret
         secret:
           defaultMode: 288
