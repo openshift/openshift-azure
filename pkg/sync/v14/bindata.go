@@ -428,7 +428,7 @@
 // data/Role.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml
 // data/Role.rbac.authorization.k8s.io/openshift/shared-resource-editor.yaml
 // data/Role.rbac.authorization.k8s.io/openshift/shared-resource-viewer.yaml
-// data/Role.rbac.authorization.k8s.io/openshift-azure-logging/customer-admin-log-analytics-agent.yaml
+// data/Role.rbac.authorization.k8s.io/openshift-azure-logging/customer-admin-omsagent.yaml
 // data/Role.rbac.authorization.k8s.io/openshift-infra/prometheus-k8s.yaml
 // data/Role.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/kube-public/system-controller-bootstrap-signer.yaml
@@ -444,7 +444,7 @@
 // data/RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/openshift/shared-resource-editors.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/openshift/shared-resource-viewers.yaml
-// data/RoleBinding.rbac.authorization.k8s.io/openshift-azure-logging/customer-admin-log-analytics-agent.yaml
+// data/RoleBinding.rbac.authorization.k8s.io/openshift-azure-logging/customer-admin-omsagent.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/openshift-azure-monitoring/etcd-metrics-viewer.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/openshift-infra/prometheus-k8s.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml
@@ -9364,22 +9364,22 @@ func roleRbacAuthorizationK8sIoOpenshiftSharedResourceViewerYaml() (*asset, erro
 	return a, nil
 }
 
-var _roleRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminLogAnalyticsAgentYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x6c\x8f\xb1\x6e\xc3\x30\x0c\x44\x77\x7d\x05\x91\x5d\x29\xba\x15\xfa\x81\x6e\x1d\x3a\x74\x67\x64\x5a\x26\x62\x91\x02\x45\x05\xa8\xbf\xbe\xb0\x63\xa0\x1d\x3a\x49\x3c\xdc\xdd\x23\xb1\xf1\x17\x59\x67\x95\x04\x76\xc3\x7c\xc5\xe1\x8b\x1a\x6f\xe8\xac\x72\xbd\xbf\xf5\x2b\xeb\xcb\xe3\x35\xdc\x59\xa6\x04\x9f\xba\x52\xa8\xe4\x38\xa1\x63\x0a\x00\x28\xa2\x7e\x78\xfb\x3e\xc2\xbf\x25\xe3\x46\x26\xe4\x74\x74\xe1\x70\x1d\x6d\x42\xa7\x04\x17\xb7\x41\x97\x00\x20\x58\x29\x41\x1e\xdd\xb5\x92\x45\x9c\x2a\x4b\x5c\xb5\x44\x14\x5c\xbf\x9d\x73\x8f\x58\x48\xfc\xb4\xf6\x86\x99\x12\x68\x23\xe9\x0b\xcf\x1e\x71\x1b\x46\x7b\xa0\xb0\x94\x60\x63\xa5\x9e\x42\x04\x6c\xfc\x6e\x3a\xda\xb1\x5b\x84\xcb\x8e\x32\xea\x3a\x2c\xd3\xc7\xde\xf3\xd4\xb3\x8a\x23\xcb\x0e\xde\x6a\xac\x27\x2b\xab\xcc\x5c\xfe\x24\x7e\xdd\x33\x97\x8a\xad\x07\x80\x07\xd9\xed\xd4\x0b\xf9\xf1\x36\xf4\xbc\x1c\xbf\xe7\x99\xe1\x27\x00\x00\xff\xff\x34\x3d\xe3\xbd\x64\x01\x00\x00")
+var _roleRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminOmsagentYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x6c\x8f\x31\x6e\x34\x31\x08\x85\x7b\x9f\x02\x6d\xef\xfd\xf5\x77\x91\x2f\x90\x2e\x45\x8a\xf4\xac\x87\xf1\xa0\x1d\x83\x85\xf1\x16\x73\xfa\x68\xbc\x2b\x25\x45\x2a\x9b\xc7\xe3\x7b\x80\x8d\xbf\xc8\x3a\xab\x24\xb0\x1b\xe6\x2b\x0e\xdf\xd4\xf8\x40\x67\x95\xeb\xfd\xad\x5f\x59\xff\x3d\xfe\x87\x3b\xcb\x92\xe0\x53\x77\x0a\x95\x1c\x17\x74\x4c\x01\x00\x45\xd4\xa7\xb7\x9f\x25\xfc\x09\x19\x37\x32\x21\xa7\xc9\xc2\xe1\x3a\xda\x82\x4e\x09\x2e\x6e\x83\x2e\x01\x40\xb0\x52\x82\x3c\xba\x6b\x25\x8b\xb8\x54\x96\xa8\xb5\x63\x21\xf1\x57\xbf\x37\xcc\x94\x40\x1b\x49\xdf\x78\xf5\x88\xc7\x30\x8a\xbb\x96\xc2\x52\x82\x8d\x9d\x7a\x0a\x11\xb0\xf1\xbb\xe9\x68\x73\xa1\x08\x97\x93\x6f\xd4\x75\x58\xa6\x8f\x93\xf3\xd4\xb3\x8a\x23\xcb\x99\x76\xd4\x58\x7b\x9c\x59\x59\x65\xe5\xf2\x6b\xe2\xc7\xbd\x72\xa9\xd8\x7a\x00\x78\x90\xdd\x5e\x7a\x21\x9f\x6f\x43\xcf\xdb\xfc\x3d\x6f\x0b\xdf\x01\x00\x00\xff\xff\xb4\x41\x58\xd2\x59\x01\x00\x00")
 
-func roleRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminLogAnalyticsAgentYamlBytes() ([]byte, error) {
+func roleRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminOmsagentYamlBytes() ([]byte, error) {
 	return bindataRead(
-		_roleRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminLogAnalyticsAgentYaml,
-		"Role.rbac.authorization.k8s.io/openshift-azure-logging/customer-admin-log-analytics-agent.yaml",
+		_roleRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminOmsagentYaml,
+		"Role.rbac.authorization.k8s.io/openshift-azure-logging/customer-admin-omsagent.yaml",
 	)
 }
 
-func roleRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminLogAnalyticsAgentYaml() (*asset, error) {
-	bytes, err := roleRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminLogAnalyticsAgentYamlBytes()
+func roleRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminOmsagentYaml() (*asset, error) {
+	bytes, err := roleRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminOmsagentYamlBytes()
 	if err != nil {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/openshift-azure-logging/customer-admin-log-analytics-agent.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/openshift-azure-logging/customer-admin-omsagent.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -9684,22 +9684,22 @@ func rolebindingRbacAuthorizationK8sIoOpenshiftSharedResourceViewersYaml() (*ass
 	return a, nil
 }
 
-var _rolebindingRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminLogAnalyticsAgentYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x94\x8f\x31\x4b\x04\x41\x0c\x85\xfb\xf9\x15\xe1\xfa\x39\xb1\x93\x29\x6d\xec\xaf\xb0\xcf\xce\xe4\xf6\xe2\xed\x26\xc3\x24\x11\xbc\x5f\x2f\xbb\x88\x22\x88\x70\x65\x20\xef\x7d\xdf\xc3\xce\xaf\x34\x8c\x55\x0a\x8c\x09\xeb\x11\xc3\x2f\x3a\xf8\x86\xce\x2a\xc7\xeb\x93\x1d\x59\x1f\xde\x1f\xd3\x95\xa5\x15\x38\xe9\x42\xcf\x2c\x8d\x65\x4e\x2b\x39\x36\x74\x2c\x09\x00\x45\xd4\xf7\x88\x6d\x27\xfc\xd9\x15\x13\x0d\x21\xa7\xbd\x12\xc3\x35\x7a\x43\xa7\x02\x07\x1f\x41\x87\x04\x20\xb8\x52\x81\x1a\xe6\xba\xd2\xc8\xd8\x56\x96\xbc\xe8\x9c\x51\x70\xf9\x70\xae\x96\x71\x26\xf1\xaf\x57\xeb\x58\xa9\x80\x76\x12\xbb\xf0\xd9\x33\xde\x62\xd0\x16\x98\x37\xc1\xa1\x0b\x9d\xe8\xbc\xfb\x75\x7e\x19\x1a\xfd\x9f\x91\x09\xe0\x67\xe3\x3d\x2e\x16\xd3\x1b\x55\xb7\x92\xf2\x5d\x9c\xfd\xf1\x1b\xa4\x86\xf9\x37\xcc\xd2\x67\x00\x00\x00\xff\xff\x28\xcc\xe3\xe7\x9d\x01\x00\x00")
+var _rolebindingRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminOmsagentYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x94\x8f\xb1\x4e\x03\x31\x0c\x86\xf7\x3c\x85\xd5\x3d\x87\xd8\x50\x46\x16\xf6\x0e\xec\xbe\x8b\x7b\x35\xbd\xd8\x51\x6c\x33\xf4\xe9\x51\x4f\x08\x84\x84\x40\x1d\x2d\xdb\xdf\xff\xfd\xd8\xf9\x95\x86\xb1\x4a\x81\x31\xe3\x32\x61\xf8\x59\x07\x5f\xd1\x59\x65\xba\x3c\xd9\xc4\xfa\xf0\xfe\x98\x2e\x2c\xb5\xc0\x51\x37\x7a\x66\xa9\x2c\x6b\x6a\xe4\x58\xd1\xb1\x24\x00\x14\x51\xdf\x5f\xec\x36\xc2\xaf\xac\x98\x69\x08\x39\xed\x48\x0c\xd7\xe8\x15\x9d\x0a\x1c\x7c\x04\x1d\x12\x80\x60\xa3\x02\x4b\x98\x6b\xa3\x91\xb1\x36\x96\xac\xcd\x70\x25\xf1\xcf\xbd\x75\x5c\xa8\x80\x76\x12\x3b\xf3\xc9\x33\x5e\x63\x50\xde\x74\x5d\x6f\x56\x43\x37\x3a\xd2\x69\x97\xea\xfc\x32\x34\xfa\x1f\xcd\x12\xc0\x77\xb1\x7f\x05\x2c\xe6\x37\x5a\xdc\x4a\xca\x77\xc1\xf7\xc3\x2f\xba\x1a\xe6\x9f\x09\x96\x3e\x02\x00\x00\xff\xff\xc9\x8c\xca\x46\x87\x01\x00\x00")
 
-func rolebindingRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminLogAnalyticsAgentYamlBytes() ([]byte, error) {
+func rolebindingRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminOmsagentYamlBytes() ([]byte, error) {
 	return bindataRead(
-		_rolebindingRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminLogAnalyticsAgentYaml,
-		"RoleBinding.rbac.authorization.k8s.io/openshift-azure-logging/customer-admin-log-analytics-agent.yaml",
+		_rolebindingRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminOmsagentYaml,
+		"RoleBinding.rbac.authorization.k8s.io/openshift-azure-logging/customer-admin-omsagent.yaml",
 	)
 }
 
-func rolebindingRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminLogAnalyticsAgentYaml() (*asset, error) {
-	bytes, err := rolebindingRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminLogAnalyticsAgentYamlBytes()
+func rolebindingRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminOmsagentYaml() (*asset, error) {
+	bytes, err := rolebindingRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminOmsagentYamlBytes()
 	if err != nil {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/openshift-azure-logging/customer-admin-log-analytics-agent.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/openshift-azure-logging/customer-admin-omsagent.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -15844,7 +15844,7 @@ var _bindata = map[string]func() (*asset, error){
 	"Role.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml":                                                    roleRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml,
 	"Role.rbac.authorization.k8s.io/openshift/shared-resource-editor.yaml":                                                               roleRbacAuthorizationK8sIoOpenshiftSharedResourceEditorYaml,
 	"Role.rbac.authorization.k8s.io/openshift/shared-resource-viewer.yaml":                                                               roleRbacAuthorizationK8sIoOpenshiftSharedResourceViewerYaml,
-	"Role.rbac.authorization.k8s.io/openshift-azure-logging/customer-admin-log-analytics-agent.yaml":                                     roleRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminLogAnalyticsAgentYaml,
+	"Role.rbac.authorization.k8s.io/openshift-azure-logging/customer-admin-omsagent.yaml":                                                roleRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminOmsagentYaml,
 	"Role.rbac.authorization.k8s.io/openshift-infra/prometheus-k8s.yaml":                                                                 roleRbacAuthorizationK8sIoOpenshiftInfraPrometheusK8sYaml,
 	"Role.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml":                            roleRbacAuthorizationK8sIoOpenshiftTemplateServiceBrokerTemplateservicebrokerAuthReaderYaml,
 	"RoleBinding.rbac.authorization.k8s.io/kube-public/system-controller-bootstrap-signer.yaml":                                          rolebindingRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYaml,
@@ -15860,7 +15860,7 @@ var _bindata = map[string]func() (*asset, error){
 	"RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml":                                             rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml,
 	"RoleBinding.rbac.authorization.k8s.io/openshift/shared-resource-editors.yaml":                                                       rolebindingRbacAuthorizationK8sIoOpenshiftSharedResourceEditorsYaml,
 	"RoleBinding.rbac.authorization.k8s.io/openshift/shared-resource-viewers.yaml":                                                       rolebindingRbacAuthorizationK8sIoOpenshiftSharedResourceViewersYaml,
-	"RoleBinding.rbac.authorization.k8s.io/openshift-azure-logging/customer-admin-log-analytics-agent.yaml":                              rolebindingRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminLogAnalyticsAgentYaml,
+	"RoleBinding.rbac.authorization.k8s.io/openshift-azure-logging/customer-admin-omsagent.yaml":                                         rolebindingRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminOmsagentYaml,
 	"RoleBinding.rbac.authorization.k8s.io/openshift-azure-monitoring/etcd-metrics-viewer.yaml":                                          rolebindingRbacAuthorizationK8sIoOpenshiftAzureMonitoringEtcdMetricsViewerYaml,
 	"RoleBinding.rbac.authorization.k8s.io/openshift-infra/prometheus-k8s.yaml":                                                          rolebindingRbacAuthorizationK8sIoOpenshiftInfraPrometheusK8sYaml,
 	"RoleBinding.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml":                     rolebindingRbacAuthorizationK8sIoOpenshiftTemplateServiceBrokerTemplateservicebrokerAuthReaderYaml,
@@ -16707,7 +16707,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"shared-resource-viewer.yaml": {roleRbacAuthorizationK8sIoOpenshiftSharedResourceViewerYaml, map[string]*bintree{}},
 		}},
 		"openshift-azure-logging": {nil, map[string]*bintree{
-			"customer-admin-log-analytics-agent.yaml": {roleRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminLogAnalyticsAgentYaml, map[string]*bintree{}},
+			"customer-admin-omsagent.yaml": {roleRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminOmsagentYaml, map[string]*bintree{}},
 		}},
 		"openshift-infra": {nil, map[string]*bintree{
 			"prometheus-k8s.yaml": {roleRbacAuthorizationK8sIoOpenshiftInfraPrometheusK8sYaml, map[string]*bintree{}},
@@ -16739,7 +16739,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"shared-resource-viewers.yaml": {rolebindingRbacAuthorizationK8sIoOpenshiftSharedResourceViewersYaml, map[string]*bintree{}},
 		}},
 		"openshift-azure-logging": {nil, map[string]*bintree{
-			"customer-admin-log-analytics-agent.yaml": {rolebindingRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminLogAnalyticsAgentYaml, map[string]*bintree{}},
+			"customer-admin-omsagent.yaml": {rolebindingRbacAuthorizationK8sIoOpenshiftAzureLoggingCustomerAdminOmsagentYaml, map[string]*bintree{}},
 		}},
 		"openshift-azure-monitoring": {nil, map[string]*bintree{
 			"etcd-metrics-viewer.yaml": {rolebindingRbacAuthorizationK8sIoOpenshiftAzureMonitoringEtcdMetricsViewerYaml, map[string]*bintree{}},
