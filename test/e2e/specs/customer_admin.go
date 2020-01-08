@@ -154,13 +154,13 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Ev
 		Expect(err).NotTo(HaveOccurred())
 
 		// make sure customer-admins cannot access any of the other log analytics agent configmaps
-		_, err = sanity.Checker.Client.CustomerAdmin.CoreV1.ConfigMaps(azureMonitorNamespace).Get("log-analytics-cluster-agent-config", metav1.GetOptions{})
+		_, err = sanity.Checker.Client.CustomerAdmin.CoreV1.ConfigMaps(azureMonitorNamespace).Get("omsagent-rs-config", metav1.GetOptions{})
 		Expect(err).To(HaveOccurred())
 
-		_, err = sanity.Checker.Client.CustomerAdmin.CoreV1.ConfigMaps(azureMonitorNamespace).Get("log-analytics-rsyslog-config", metav1.GetOptions{})
+		_, err = sanity.Checker.Client.CustomerAdmin.CoreV1.ConfigMaps(azureMonitorNamespace).Get("omsagent-rsyslog-config", metav1.GetOptions{})
 		Expect(err).To(HaveOccurred())
 
-		_, err = sanity.Checker.Client.CustomerAdmin.CoreV1.ConfigMaps(azureMonitorNamespace).Get("log-analytics-agent-entrypoint", metav1.GetOptions{})
+		_, err = sanity.Checker.Client.CustomerAdmin.CoreV1.ConfigMaps(azureMonitorNamespace).Get("omsagent-entrypoint", metav1.GetOptions{})
 		Expect(err).To(HaveOccurred())
 	})
 
