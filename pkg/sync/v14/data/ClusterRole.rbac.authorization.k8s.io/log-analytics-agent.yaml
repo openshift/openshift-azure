@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
-  name: omsagent-reader
+  name: log-analytics-agent
 rules:
 - apiGroups:
   - ""
@@ -16,7 +16,7 @@ rules:
   - get
   - watch
 - apiGroups:
-  - apps
+  - extensions
   resources:
   - replicasets
   verbs:

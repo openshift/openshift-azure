@@ -11,7 +11,23 @@ spec:
   tags:
   - annotations:
       description: Build and run Node.js 10 applications on RHEL 7. For more information
-        about using this builder image, including OpenShift considerations, see https://github.com/sclorg/s2i-nodejs-container/blob/master/10/README.md.
+        about using this builder image, including OpenShift considerations, see https://github.com/nodeshift/centos7-s2i-nodejs.
+      iconClass: icon-nodejs
+      openshift.io/display-name: OpenShift Application Runtimes Node.js 10
+      openshift.io/provider-display-name: Red Hat, Inc.
+      sampleRepo: https://github.com/sclorg/nodejs-ex.git
+      tags: builder,nodejs,hidden
+      version: "10"
+    from:
+      kind: DockerImage
+      name: registry.redhat.io/rhoar-nodejs/nodejs-10
+    importPolicy: {}
+    name: "10"
+    referencePolicy:
+      type: Local
+  - annotations:
+      description: Build and run Node.js 10 applications on RHEL 7. For more information
+        about using this builder image, including OpenShift considerations, see https://github.com/nodeshift/centos7-s2i-nodejs.
       iconClass: icon-nodejs
       openshift.io/display-name: Node.js 10
       openshift.io/provider-display-name: Red Hat, Inc.
@@ -20,32 +36,48 @@ spec:
       version: "10"
     from:
       kind: DockerImage
-      name: registry.redhat.io/rhscl/nodejs-10-rhel7:latest
+      name: registry.redhat.io/rhscl/nodejs-10-rhel7
     importPolicy: {}
-    name: "10"
+    name: 10-SCL
     referencePolicy:
       type: Local
   - annotations:
-      description: Build and run Node.js 12 applications on RHEL 7. For more information
-        about using this builder image, including OpenShift considerations, see https://github.com/sclorg/s2i-nodejs-container/blob/master/12/README.md.
+      description: Build and run Node.js 8 applications on RHEL 7. For more information
+        about using this builder image, including OpenShift considerations, see https://github.com/sclorg/s2i-nodejs-container.
       iconClass: icon-nodejs
-      openshift.io/display-name: Node.js 12
+      openshift.io/display-name: Node.js 8
       openshift.io/provider-display-name: Red Hat, Inc.
       sampleRepo: https://github.com/sclorg/nodejs-ex.git
       tags: builder,nodejs
-      version: "12"
+      version: "8"
     from:
       kind: DockerImage
-      name: registry.redhat.io/rhscl/nodejs-12-rhel7:latest
+      name: registry.redhat.io/rhscl/nodejs-8-rhel7:latest
     importPolicy: {}
-    name: "12"
+    name: "8"
+    referencePolicy:
+      type: Local
+  - annotations:
+      description: Build and run Node.js 8 applications on RHEL 7. For more information
+        about using this builder image, including OpenShift considerations, see https://github.com/nodeshift/centos7-s2i-nodejs.
+      iconClass: icon-nodejs
+      openshift.io/display-name: OpenShift Application Runtimes Node.js 8
+      openshift.io/provider-display-name: Red Hat, Inc.
+      sampleRepo: https://github.com/sclorg/nodejs-ex.git
+      tags: builder,nodejs
+      version: "8"
+    from:
+      kind: DockerImage
+      name: registry.redhat.io/rhoar-nodejs/nodejs-8
+    importPolicy: {}
+    name: 8-RHOAR
     referencePolicy:
       type: Local
   - annotations:
       description: |-
-        Build and run Node.js applications on RHEL 7. For more information about using this builder image, including OpenShift considerations, see https://github.com/sclorg/s2i-nodejs-container/blob/master/12/README.md.
+        Build and run Node.js 10 applications on RHEL 7. For more information about using this builder image, including OpenShift considerations, see https://github.com/nodeshift/centos7-s2i-nodejs.
 
-        WARNING: By selecting this tag, your application will automatically update to use the latest version of Node.js available on OpenShift, including major version updates.
+        WARNING: By selecting this tag, your application will automatically update to use the latest version of Node.js available on OpenShift, including major versions updates.
       iconClass: icon-nodejs
       openshift.io/display-name: Node.js (Latest)
       openshift.io/provider-display-name: Red Hat, Inc.
@@ -54,7 +86,7 @@ spec:
       tags: builder,nodejs
     from:
       kind: ImageStreamTag
-      name: "12"
+      name: 10-SCL
     importPolicy: {}
     name: latest
     referencePolicy:

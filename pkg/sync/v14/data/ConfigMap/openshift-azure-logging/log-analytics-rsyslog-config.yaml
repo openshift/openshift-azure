@@ -18,5 +18,5 @@ data:
     local7.debug     @127.0.0.1:25224
 kind: ConfigMap
 metadata:
-  name: omsagent-rsyslog-config
+  name: log-analytics-rsyslog-config
   namespace: openshift-azure-logging
