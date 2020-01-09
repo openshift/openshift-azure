@@ -268,9 +268,9 @@ func validateImageConfig(path, version string, i *pluginapi.ImageConfig) (errs [
 		errs = append(errs, fmt.Errorf("invalid %s.canary %q", path, i.Canary))
 	}
 
-	// TODO: remove when v13 is the oldest deployed plugin
+	// TODO: remove when v14 is the oldest deployed plugin
 	major, _, _ := pluginversion.Parse(version)
-	if major >= 13 && i.AroAdmissionController == "" {
+	if major >= 14 && i.AroAdmissionController == "" {
 		errs = append(errs, fmt.Errorf("invalid %s.aroAdmissionController %q", path, i.Canary))
 	}
 

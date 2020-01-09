@@ -16,7 +16,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	v10 "github.com/openshift/openshift-azure/pkg/arm/v10"
 	v12 "github.com/openshift/openshift-azure/pkg/arm/v12"
-	v13 "github.com/openshift/openshift-azure/pkg/arm/v13"
 	v14 "github.com/openshift/openshift-azure/pkg/arm/v14"
 	v15 "github.com/openshift/openshift-azure/pkg/arm/v15"
 	v71 "github.com/openshift/openshift-azure/pkg/arm/v71"
@@ -36,8 +35,6 @@ func New(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster
 		return v10.New(ctx, log, cs, testConfig), nil
 	case "v12.0", "v12.1", "v12.2":
 		return v12.New(ctx, log, cs, testConfig), nil
-	case "v13.0", "v13.1":
-		return v13.New(ctx, log, cs, testConfig), nil
 	case "v14.0":
 		return v14.New(ctx, log, cs, testConfig), nil
 	case "v15.0":
