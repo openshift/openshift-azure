@@ -1,0 +1,12 @@
+apiVersion: v1
+data:
+  client-ca-file: '*** GENERATED ***'
+  requestheader-allowed-names: '["aggregator-front-proxy"]'
+  requestheader-client-ca-file: '*** GENERATED ***'
+  requestheader-extra-headers-prefix: '["X-Remote-Extra-"]'
+  requestheader-group-headers: '["X-Remote-Group"]'
+  requestheader-username-headers: '["X-Remote-User"]'
+kind: ConfigMap
+metadata:
+  name: extension-apiserver-authentication
+  namespace: kube-system
