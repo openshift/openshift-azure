@@ -79,7 +79,7 @@ testinsights:
 
 unit: generate testinsights
 	go version
-	go test ./... -p=1 -coverprofile=coverage.out -covermode=atomic -json | ./testinsights
+	go test ./... -coverprofile=coverage.out -covermode=atomic -json | ./testinsights
 
 e2e:
 	FOCUS="\[CustomerAdmin\]|\[EndUser\]" TIMEOUT=60m ./hack/e2e.sh
