@@ -1,0 +1,56 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  annotations:
+    description: Red Hat Single Sign-On Continuous Delivery based on Red Hat Universal
+      Base Image 8 Minimal
+    openshift.io/display-name: Red Hat Single Sign-On Continuous Delivery based on
+      Red Hat Universal Base Image 8 Minimal
+    openshift.io/provider-display-name: Red Hat, Inc.
+    version: "7"
+  name: redhat-sso-cd-openshift-rhel8
+  namespace: openshift
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+  - annotations:
+      description: Red Hat Single Sign-On Continuous Delivery 7 Tech Preview image
+        based on Red Hat Universal Base Image 8 Minimal
+      iconClass: icon-sso
+      openshift.io/display-name: Red Hat Single Sign-On 7 Continuous Delivery based
+        on Red Hat Universal Base Image 8 Minimal (Tech Preview)
+      supports: sso-cd:7,sso:7
+      tags: sso,keycloak,redhat,hidden
+      version: "7"
+    from:
+      kind: DockerImage
+      name: registry.redhat.io/redhat-sso-cd-tech-preview/sso-cd-openshift-rhel8:7
+    importPolicy: {}
+    name: "7"
+    referencePolicy:
+      type: Local
+  - annotations: null
+    from:
+      kind: ImageStreamTag
+      name: "7"
+    importPolicy: {}
+    name: "7.0"
+    referencePolicy:
+      type: Local
+  - annotations:
+      description: Latest build of Red Hat Single Sign-On Continuous Delivery Tech
+        Preview image based on Red Hat Universal Base Image 8 Minimal
+      iconClass: icon-sso
+      openshift.io/display-name: Red Hat Single Sign-On Continuous Delivery based
+        on Red Hat Universal Base Image 8 Minimal (Tech Preview)
+      supports: sso:7
+      tags: sso,keycloak,redhat,hidden
+      version: latest
+    from:
+      kind: DockerImage
+      name: registry.redhat.io/redhat-sso-cd-tech-preview/sso-cd-openshift-rhel8:latest
+    importPolicy: {}
+    name: latest
+    referencePolicy:
+      type: Local
