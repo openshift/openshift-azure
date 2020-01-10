@@ -249,7 +249,7 @@ func TestHashSyncPodStability(t *testing.T) {
 		},
 		"v14.0": {
 			// this value should not change
-			expectedHash: "4dd641611a5f33ecdae8be029f1911827636999c11997d20db3f935badeb1129",
+			expectedHash: "6eec62c0a5e275c4d38e61ba5b9ac4c0f90f065d01d0d466fcafca4150f361e5",
 		},
 	}
 
