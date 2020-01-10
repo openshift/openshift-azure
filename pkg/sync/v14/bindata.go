@@ -28,7 +28,9 @@
 // data/ClusterRole.rbac.authorization.k8s.io/service-catalog-controller.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/servicecatalog-serviceclass-viewer.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/storage-admin.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/strimzi-admin.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/strimzi-aggregate-to-admin.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/strimzi-aggregate-to-edit.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/strimzi-aggregate-to-view.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/strimzi-cluster-operator-global.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/strimzi-cluster-operator-namespaced.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/strimzi-entity-operator.yaml
@@ -196,7 +198,6 @@
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/strimzi-cluster-operator-topic-operator-delegation.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/system-auth-delegator-binding.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/system-aws-cloud-provider.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-basic-user-strimzi-binding.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/system-basic-user.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/system-build-strategy-docker-binding.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/system-build-strategy-jenkinspipeline-binding.yaml
@@ -1365,22 +1366,62 @@ func clusterroleRbacAuthorizationK8sIoStorageAdminYaml() (*asset, error) {
 	return a, nil
 }
 
-var _clusterroleRbacAuthorizationK8sIoStrimziAdminYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x6c\x8e\x3d\x4e\x04\x31\x0c\x85\xfb\x9c\xc2\x17\xd8\x41\x4b\x85\xa6\xa5\xa0\xa7\xa0\xf7\x24\x66\xd7\xca\x8f\x23\xdb\x59\xa4\x3d\x3d\x9a\x61\xb4\x0c\x12\x55\xbe\xf7\xbd\x17\xc9\xd8\xf9\x83\xd4\x58\xda\x0c\xba\x60\x9c\x70\xf8\x55\x94\xef\xe8\x2c\x6d\xca\x2f\x36\xb1\x3c\xdd\xce\x0b\x39\x9e\x43\xe6\x96\x66\x78\x2d\xc3\x9c\xf4\x5d\x0a\x85\x4a\x8e\x09\x1d\xe7\x00\x50\x70\xa1\x62\x2b\x01\x60\xef\x33\x98\x2b\xd7\x3b\x07\x80\x86\x95\x1e\xf9\x84\xa9\x72\x0b\x3a\x0a\xd9\x1c\x4e\x80\x9d\xdf\x54\x46\xdf\xbe\x9e\x20\xe3\x67\xc6\x69\xdf\x4e\x2c\x01\x40\xc9\x64\x68\xa4\xe3\xc2\x7e\x31\x4a\x6b\x14\xfd\x1f\xf3\xcc\x07\x59\x59\x55\xb4\x62\x26\x3d\xd8\x61\x7f\xa2\x4b\xe7\x78\xc8\x8b\x72\xba\xd0\x2a\x6e\xa4\xcb\x7e\xc0\x85\x7c\x7b\x0b\xdb\x0f\x7c\xa1\xc7\xeb\x46\x51\x09\x9d\x36\x4c\x54\x68\xc7\xfe\xe8\x47\x4f\x6b\xff\x1d\x00\x00\xff\xff\x4a\x5e\xa5\x00\x78\x01\x00\x00")
+var _clusterroleRbacAuthorizationK8sIoStrimziAggregateToAdminYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x74\x8e\xb1\x4e\xc4\x30\x0c\x86\xf7\x3c\x85\x75\x7b\x8b\x60\x42\x59\x19\xd8\x19\xd8\xdd\xc4\xf4\xac\x26\x71\xe4\x38\x87\x74\x4f\x8f\x5a\xaa\xa3\x08\x6e\xca\xe7\xcf\xce\xaf\x1f\x2b\xbf\x93\x36\x96\xe2\x41\x27\x0c\x23\x76\x3b\x8b\xf2\x15\x8d\xa5\x8c\xcb\x73\x1b\x59\x1e\x2e\x8f\x6e\xe1\x12\x3d\xbc\xa4\xde\x8c\xf4\x4d\x12\xb9\x4c\x86\x11\x0d\xbd\x03\x48\x38\x51\x6a\x2b\x01\x60\xad\x1e\x9a\x29\xe7\x2b\x6f\xe2\x7e\x2e\xce\xb3\xd2\x8c\x46\x83\xc9\x80\x31\x73\xf1\x70\x32\xed\x74\x72\x00\x05\x33\xdd\x82\x86\xbf\xa7\x4e\x7b\xa2\xe6\xdd\x00\x58\xf9\x55\xa5\xd7\xad\xc0\x00\x0b\x7e\x2c\x38\xee\x1f\x47\x16\x07\xa0\xd4\xa4\x6b\xa0\xe3\x45\xfb\xc1\x20\xa5\x50\xb0\x7f\xcc\x13\x1f\x64\x66\x55\xd1\x8c\x0b\xe9\xc1\xf6\xf6\x6b\x34\xa9\x1c\x0e\xf3\xa4\x1c\x67\x5a\xc5\x85\x74\xda\x0b\xcc\x64\xdb\x9b\xb8\x7d\xc3\x27\x5a\x38\x6f\x14\x94\xd0\x68\xc3\x48\x89\x76\xac\xb7\x7d\xaf\x71\xdd\x7f\x05\x00\x00\xff\xff\x96\x99\x7c\xc2\xb9\x01\x00\x00")
 
-func clusterroleRbacAuthorizationK8sIoStrimziAdminYamlBytes() ([]byte, error) {
+func clusterroleRbacAuthorizationK8sIoStrimziAggregateToAdminYamlBytes() ([]byte, error) {
 	return bindataRead(
-		_clusterroleRbacAuthorizationK8sIoStrimziAdminYaml,
-		"ClusterRole.rbac.authorization.k8s.io/strimzi-admin.yaml",
+		_clusterroleRbacAuthorizationK8sIoStrimziAggregateToAdminYaml,
+		"ClusterRole.rbac.authorization.k8s.io/strimzi-aggregate-to-admin.yaml",
 	)
 }
 
-func clusterroleRbacAuthorizationK8sIoStrimziAdminYaml() (*asset, error) {
-	bytes, err := clusterroleRbacAuthorizationK8sIoStrimziAdminYamlBytes()
+func clusterroleRbacAuthorizationK8sIoStrimziAggregateToAdminYaml() (*asset, error) {
+	bytes, err := clusterroleRbacAuthorizationK8sIoStrimziAggregateToAdminYamlBytes()
 	if err != nil {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/strimzi-admin.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/strimzi-aggregate-to-admin.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _clusterroleRbacAuthorizationK8sIoStrimziAggregateToEditYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x74\x8e\xb1\x4e\xc4\x30\x0c\x86\xf7\x3c\x85\x75\x7b\x8b\x60\x42\x59\x19\xd8\x19\xd8\xdd\xc4\xf4\xac\xa6\x71\xe4\x38\x87\x74\x4f\x8f\x1a\xaa\xa3\x08\x6e\xca\xe7\xcf\x7f\xfe\x04\x0b\xbf\x93\x56\x96\xec\x41\x27\x0c\x23\x36\x3b\x8b\xf2\x15\x8d\x25\x8f\xcb\x73\x1d\x59\x1e\x2e\x8f\x6e\xe1\x1c\x3d\xbc\xa4\x56\x8d\xf4\x4d\x12\xb9\x95\x0c\x23\x1a\x7a\x07\x90\x70\xa2\x54\x37\x02\xc0\x52\x3c\x54\x53\x5e\xaf\xdc\xc5\xfd\x5e\x9c\x67\xa5\x19\x8d\x06\x93\x81\x22\x9b\x87\x93\x69\xa3\x93\x03\xc8\xb8\xd2\xad\x67\xf8\x93\x74\xda\x12\x55\xef\x06\xc0\xc2\xaf\x2a\xad\xf4\xe7\x07\x58\xf0\x63\xc1\x71\xbf\x37\xb2\x38\x00\xa5\x2a\x4d\x03\x1d\x13\xf5\x07\x83\xe4\x4c\xc1\xfe\x31\x4f\x7c\x90\x2b\xab\x8a\xae\xb8\x90\x1e\x6c\xab\xbf\x46\x93\xc2\xe1\x30\x4f\xca\x71\xa6\x4d\x5c\x48\xa7\xfd\x03\x33\x59\x3f\x13\xd7\x6f\xf8\x44\x0b\xe7\x4e\x41\x09\x8d\x3a\x46\x4a\xb4\x63\xb9\xed\x5b\x89\xdb\xfe\x2b\x00\x00\xff\xff\xd9\x90\x53\x40\xb7\x01\x00\x00")
+
+func clusterroleRbacAuthorizationK8sIoStrimziAggregateToEditYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_clusterroleRbacAuthorizationK8sIoStrimziAggregateToEditYaml,
+		"ClusterRole.rbac.authorization.k8s.io/strimzi-aggregate-to-edit.yaml",
+	)
+}
+
+func clusterroleRbacAuthorizationK8sIoStrimziAggregateToEditYaml() (*asset, error) {
+	bytes, err := clusterroleRbacAuthorizationK8sIoStrimziAggregateToEditYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/strimzi-aggregate-to-edit.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _clusterroleRbacAuthorizationK8sIoStrimziAggregateToViewYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x74\x8e\xb1\x4e\xf4\x40\x0c\x84\xfb\x7d\x0a\xeb\xfa\xe4\xd7\x4f\x85\xb6\xa5\xa0\xa7\xa0\x77\x36\x26\x67\x65\x77\xbd\xb2\xbd\x39\xe9\x9e\x1e\x5d\x38\x41\x10\x50\x79\xe6\xd3\x78\x6c\x6c\xfc\x4a\x6a\x2c\x35\x82\x4e\x98\x46\xec\x7e\x16\xe5\x2b\x3a\x4b\x1d\xd7\x47\x1b\x59\xfe\x6d\xff\xc3\xca\x75\x8e\xf0\x94\xbb\x39\xe9\x8b\x64\x0a\x85\x1c\x67\x74\x8c\x01\x20\xe3\x44\xd9\x6e\x0a\x00\x5b\x8b\x60\xae\x5c\xae\xbc\x83\xbf\x7b\x71\x59\x94\x16\x74\x1a\x5c\x86\x8d\xe9\x12\xe1\xe4\xda\xe9\x14\x00\x2a\x16\xfa\xec\x19\x7e\x24\x83\xf6\x4c\x16\xc3\x00\xd8\xf8\x59\xa5\xb7\xfd\xfc\x00\x2b\xbe\xad\x38\xde\xf7\x46\x96\x00\xa0\x64\xd2\x35\xd1\x31\x61\x5f\x32\x49\xad\x94\xfc\x17\xf2\xc0\x07\x58\x58\x55\xb4\xe0\x4a\x7a\xa0\xdd\xbe\x59\x97\xc6\xe9\xe0\x27\xe5\x79\xa1\x1b\xd8\x48\xa7\xfb\x03\x0b\xf9\x3e\x33\xdb\x87\xb8\xa0\xa7\x73\x78\x0f\x00\x00\xff\xff\x75\x1e\x48\x45\x8c\x01\x00\x00")
+
+func clusterroleRbacAuthorizationK8sIoStrimziAggregateToViewYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_clusterroleRbacAuthorizationK8sIoStrimziAggregateToViewYaml,
+		"ClusterRole.rbac.authorization.k8s.io/strimzi-aggregate-to-view.yaml",
+	)
+}
+
+func clusterroleRbacAuthorizationK8sIoStrimziAggregateToViewYaml() (*asset, error) {
+	bytes, err := clusterroleRbacAuthorizationK8sIoStrimziAggregateToViewYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/strimzi-aggregate-to-view.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4721,26 +4762,6 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemAwsCloudProviderYaml() (*asse
 	}
 
 	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-aws-cloud-provider.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserStrimziBindingYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x94\x8f\xb1\x6a\xc3\x30\x10\x86\x77\x3d\x85\x5e\x40\x2e\xdd\x8a\xc6\x76\xe8\xee\xa1\xfb\x49\xba\x26\x17\x5b\x27\x73\x77\x0a\xc4\x4f\x1f\x1c\x0c\x81\x04\x02\xd9\xff\xef\xfb\xf8\x61\xa1\x3f\x14\xa5\xc6\xd1\x4b\x82\x3c\x40\xb7\x63\x13\x5a\xc1\xa8\xf1\x30\x7d\xe9\x40\xed\xe3\xfc\xe9\x26\xe2\x12\xfd\xcf\xdc\xd5\x50\xc6\x36\xe3\x37\x71\x21\x3e\xb8\x8a\x06\x05\x0c\xa2\xf3\x9e\xa1\x62\xf4\x7a\x51\xc3\x1a\x12\x28\xe5\xd0\x15\x25\xa8\x09\xd5\x95\x42\xda\x19\x69\x33\x8e\xf8\xbf\x21\xb0\xd0\xaf\xb4\xbe\xbc\xc8\x3b\xef\x9f\xea\xf7\xd8\xae\x86\x52\x89\x9d\xf6\x74\xc2\x6c\x1a\x5d\x78\xcb\x7c\x1b\x3e\x1c\x88\x1b\x81\x6c\x94\xc1\xb0\xb8\x6b\x00\x00\x00\xff\xff\x05\x9c\x34\xfc\x2a\x01\x00\x00")
-
-func clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserStrimziBindingYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserStrimziBindingYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system-basic-user-strimzi-binding.yaml",
-	)
-}
-
-func clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserStrimziBindingYaml() (*asset, error) {
-	bytes, err := clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserStrimziBindingYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-basic-user-strimzi-binding.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -15465,7 +15486,9 @@ var _bindata = map[string]func() (*asset, error){
 	"ClusterRole.rbac.authorization.k8s.io/service-catalog-controller.yaml":                                                      clusterroleRbacAuthorizationK8sIoServiceCatalogControllerYaml,
 	"ClusterRole.rbac.authorization.k8s.io/servicecatalog-serviceclass-viewer.yaml":                                              clusterroleRbacAuthorizationK8sIoServicecatalogServiceclassViewerYaml,
 	"ClusterRole.rbac.authorization.k8s.io/storage-admin.yaml":                                                                   clusterroleRbacAuthorizationK8sIoStorageAdminYaml,
-	"ClusterRole.rbac.authorization.k8s.io/strimzi-admin.yaml":                                                                   clusterroleRbacAuthorizationK8sIoStrimziAdminYaml,
+	"ClusterRole.rbac.authorization.k8s.io/strimzi-aggregate-to-admin.yaml":                                                      clusterroleRbacAuthorizationK8sIoStrimziAggregateToAdminYaml,
+	"ClusterRole.rbac.authorization.k8s.io/strimzi-aggregate-to-edit.yaml":                                                       clusterroleRbacAuthorizationK8sIoStrimziAggregateToEditYaml,
+	"ClusterRole.rbac.authorization.k8s.io/strimzi-aggregate-to-view.yaml":                                                       clusterroleRbacAuthorizationK8sIoStrimziAggregateToViewYaml,
 	"ClusterRole.rbac.authorization.k8s.io/strimzi-cluster-operator-global.yaml":                                                 clusterroleRbacAuthorizationK8sIoStrimziClusterOperatorGlobalYaml,
 	"ClusterRole.rbac.authorization.k8s.io/strimzi-cluster-operator-namespaced.yaml":                                             clusterroleRbacAuthorizationK8sIoStrimziClusterOperatorNamespacedYaml,
 	"ClusterRole.rbac.authorization.k8s.io/strimzi-entity-operator.yaml":                                                         clusterroleRbacAuthorizationK8sIoStrimziEntityOperatorYaml,
@@ -15633,7 +15656,6 @@ var _bindata = map[string]func() (*asset, error){
 	"ClusterRoleBinding.rbac.authorization.k8s.io/strimzi-cluster-operator-topic-operator-delegation.yaml":                       clusterrolebindingRbacAuthorizationK8sIoStrimziClusterOperatorTopicOperatorDelegationYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/system-auth-delegator-binding.yaml":                                            clusterrolebindingRbacAuthorizationK8sIoSystemAuthDelegatorBindingYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/system-aws-cloud-provider.yaml":                                                clusterrolebindingRbacAuthorizationK8sIoSystemAwsCloudProviderYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system-basic-user-strimzi-binding.yaml":                                        clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserStrimziBindingYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/system-basic-user.yaml":                                                        clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/system-build-strategy-docker-binding.yaml":                                     clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyDockerBindingYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/system-build-strategy-jenkinspipeline-binding.yaml":                            clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyJenkinspipelineBindingYaml,
@@ -16240,7 +16262,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"service-catalog-controller.yaml":            {clusterroleRbacAuthorizationK8sIoServiceCatalogControllerYaml, map[string]*bintree{}},
 		"servicecatalog-serviceclass-viewer.yaml":    {clusterroleRbacAuthorizationK8sIoServicecatalogServiceclassViewerYaml, map[string]*bintree{}},
 		"storage-admin.yaml":                         {clusterroleRbacAuthorizationK8sIoStorageAdminYaml, map[string]*bintree{}},
-		"strimzi-admin.yaml":                         {clusterroleRbacAuthorizationK8sIoStrimziAdminYaml, map[string]*bintree{}},
+		"strimzi-aggregate-to-admin.yaml":            {clusterroleRbacAuthorizationK8sIoStrimziAggregateToAdminYaml, map[string]*bintree{}},
+		"strimzi-aggregate-to-edit.yaml":             {clusterroleRbacAuthorizationK8sIoStrimziAggregateToEditYaml, map[string]*bintree{}},
+		"strimzi-aggregate-to-view.yaml":             {clusterroleRbacAuthorizationK8sIoStrimziAggregateToViewYaml, map[string]*bintree{}},
 		"strimzi-cluster-operator-global.yaml":       {clusterroleRbacAuthorizationK8sIoStrimziClusterOperatorGlobalYaml, map[string]*bintree{}},
 		"strimzi-cluster-operator-namespaced.yaml":   {clusterroleRbacAuthorizationK8sIoStrimziClusterOperatorNamespacedYaml, map[string]*bintree{}},
 		"strimzi-entity-operator.yaml":               {clusterroleRbacAuthorizationK8sIoStrimziEntityOperatorYaml, map[string]*bintree{}},
@@ -16410,7 +16434,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"strimzi-cluster-operator-topic-operator-delegation.yaml":                       {clusterrolebindingRbacAuthorizationK8sIoStrimziClusterOperatorTopicOperatorDelegationYaml, map[string]*bintree{}},
 		"system-auth-delegator-binding.yaml":                                            {clusterrolebindingRbacAuthorizationK8sIoSystemAuthDelegatorBindingYaml, map[string]*bintree{}},
 		"system-aws-cloud-provider.yaml":                                                {clusterrolebindingRbacAuthorizationK8sIoSystemAwsCloudProviderYaml, map[string]*bintree{}},
-		"system-basic-user-strimzi-binding.yaml":                                        {clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserStrimziBindingYaml, map[string]*bintree{}},
 		"system-basic-user.yaml":                                                        {clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserYaml, map[string]*bintree{}},
 		"system-build-strategy-docker-binding.yaml":                                     {clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyDockerBindingYaml, map[string]*bintree{}},
 		"system-build-strategy-jenkinspipeline-binding.yaml":                            {clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyJenkinspipelineBindingYaml, map[string]*bintree{}},
