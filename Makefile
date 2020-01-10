@@ -78,6 +78,7 @@ testinsights:
 	go build -ldflags ${LDFLAGS} ./cmd/$@
 
 unit: generate testinsights
+	go version
 	go test ./... -coverprofile=coverage.out -covermode=atomic -json | ./testinsights
 
 e2e:
