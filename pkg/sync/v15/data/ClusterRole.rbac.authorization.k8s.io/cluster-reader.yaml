@@ -349,6 +349,20 @@ rules:
   verbs:
   - get
 - apiGroups:
+  - kafka.strimzi.io
+  resources:
+  - kafkas
+  - kafkaconnects
+  - kafkaconnects2is
+  - kafkamirrormakers
+  - kafkausers
+  - kafkatopics
+  - kafkabridges
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - ""
   resources:
   - configmaps

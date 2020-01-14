@@ -14,6 +14,20 @@ metadata:
   name: view
 rules:
 - apiGroups:
+  - kafka.strimzi.io
+  resources:
+  - kafkas
+  - kafkaconnects
+  - kafkaconnects2is
+  - kafkamirrormakers
+  - kafkausers
+  - kafkatopics
+  - kafkabridges
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - ""
   resources:
   - configmaps
@@ -252,20 +266,6 @@ rules:
   - serviceplans
   - serviceinstances
   - servicebindings
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - kafka.strimzi.io
-  resources:
-  - kafkas
-  - kafkaconnects
-  - kafkaconnects2is
-  - kafkamirrormakers
-  - kafkausers
-  - kafkatopics
-  - kafkabridges
   verbs:
   - get
   - list
