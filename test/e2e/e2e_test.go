@@ -43,6 +43,22 @@ func TestE2E(t *testing.T) {
 	c := appinsights.NewTelemetryClient(os.Getenv("AZURE_APP_INSIGHTS_KEY"))
 	c.Context().CommonProperties["type"] = "ginkgo"
 	c.Context().CommonProperties["resourcegroup"] = os.Getenv("RESOURCEGROUP")
+	// Consistent with unit test appinsight CustomDimensions.
+	// fields below are populated by PROW env variables
+	// see https://github.com/kubernetes/test-infra/blob/master/prow/jobs.md#job-environment-variables
+	if os.Getenv("JOB_NAME") == "" {
+		// local make unit
+		c.Context().CommonProperties["prowjobname"] = "local-run"
+		c.Context().CommonProperties["prowjobtype"] = ""
+		c.Context().CommonProperties["prowjobbuild"] = ""
+		c.Context().CommonProperties["prowprnumber"] = ""
+	} else {
+		// prow run
+		c.Context().CommonProperties["prowjobname"] = os.Getenv("JOB_NAME")
+		c.Context().CommonProperties["prowjobtype"] = os.Getenv("JOB_TYPE")
+		c.Context().CommonProperties["prowjobbuild"] = os.Getenv("BUILD_ID")
+		c.Context().CommonProperties["prowprnumber"] = os.Getenv("PULL_NUMBER")
+	}
 
 	format.TruncatedDiff = false
 
