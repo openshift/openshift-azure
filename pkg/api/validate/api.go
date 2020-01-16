@@ -42,7 +42,11 @@ func (v *APIValidator) Validate(cs, oldCs *api.OpenShiftManagedCluster, external
 		return
 	}
 
-	errs = append(errs, v.validateAADIdentityProvider(cs)...)
+	// HACK: Plugin unit tests does have access to valid AAD credentials. We skip
+	// this when running under tests
+	if !v.runningUnderTest {
+		errs = append(errs, v.validateAADIdentityProvider(cs)...)
+	}
 
 	return
 }

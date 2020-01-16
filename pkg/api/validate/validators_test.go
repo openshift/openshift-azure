@@ -648,6 +648,7 @@ func TestValidate(t *testing.T) {
 				oc.Properties.AuthProfile.IdentityProviders[0].Provider.(*api.AADIdentityProvider).CustomerAdminGroupID = to.StringPtr("00000000-0000-0000-0000-000000000000")
 			},
 			externalOnly: true,
+			simulateProd: true,
 			expectedErrs: []error{
 				errors.New(`invalid properties.authProfile.identityProviders["Azure AD"]: application does not have Azure Active Directory Graph / Directory.Read.All role granted`),
 			},
