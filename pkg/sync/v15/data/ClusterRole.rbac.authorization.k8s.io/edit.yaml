@@ -20,6 +20,24 @@ rules:
   verbs:
   - create
 - apiGroups:
+  - kafka.strimzi.io
+  resources:
+  - kafkas
+  - kafkaconnects
+  - kafkaconnects2is
+  - kafkamirrormakers
+  - kafkausers
+  - kafkatopics
+  - kafkabridges
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+  - patch
+  - update
+- apiGroups:
   - ""
   resources:
   - pods

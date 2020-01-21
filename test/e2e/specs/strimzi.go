@@ -26,7 +26,7 @@ func validateKafkaCluster(ctx context.Context, namespace string) (err error) {
 
 	return wait.PollImmediate(5*time.Second, 5*time.Minute,
 		func() (bool, error) {
-			ko, err := sanity.Checker.Client.CustomerAdmin.GetKafka(kafkaClusterName, namespace)
+			ko, err := sanity.Checker.Client.EndUser.GetKafka(kafkaClusterName, namespace)
 			if kerrors.IsNotFound(err) {
 				sanity.Checker.Log.Debugf("kafka CR not found")
 				return false, nil
@@ -67,15 +67,15 @@ func createKafkaCluster(ctx context.Context, namespace string) (err error) {
 	parameters["KAFKA_VERSION"] = "2.2.1"
 
 	sanity.Checker.Log.Debugf("creating kafka cluster in %s", namespace)
-	err = sanity.Checker.Client.CustomerAdmin.InstantiateTemplateFromBytes(templdata, namespace, parameters)
+	err = sanity.Checker.Client.EndUser.InstantiateTemplateFromBytes(templdata, namespace, parameters)
 	if err != nil {
 		sanity.Checker.Log.Error(err)
 	}
 	return
 }
 
-var _ = Describe("Openshift on Azure end user e2e tests [CustomerAdmin][EveryPR]", func() {
-	It("should create and validate a strimzi kafka cluster [CustomerAdmin][Strimzi]", func() {
+var _ = Describe("Openshift on Azure end user e2e tests [EndUser][EveryPR]", func() {
+	It("should create and validate a strimzi kafka cluster [EndUser][Strimzi]", func() {
 		sanity.Checker.Log.Debugf("creating openshift project for kafka cluster")
 		ctx := context.Background()
 		namespace, err := sanity.Checker.CreateProject(ctx)
@@ -86,14 +86,14 @@ var _ = Describe("Openshift on Azure end user e2e tests [CustomerAdmin][EveryPR]
 		Expect(err).ToNot(HaveOccurred())
 		defer func() {
 			By("deleting strimzi kafka cluster")
-			_ = sanity.Checker.Client.CustomerAdmin.DeleteKafka(kafkaClusterName, namespace)
+			_ = sanity.Checker.Client.EndUser.DeleteKafka(kafkaClusterName, namespace)
 		}()
 
 		By("validating strimzi kafka cluster")
 		var errs []error
 		if err := validateKafkaCluster(ctx, namespace); err != nil {
 			errs = append(errs, err)
-			if err = sanity.Checker.Client.CustomerAdmin.DumpInfo("strimzi", "validateKafkaCluster"); err != nil {
+			if err = sanity.Checker.Client.EndUser.DumpInfo("strimzi", "validateKafkaCluster"); err != nil {
 				errs = append(errs, err)
 			}
 		}
