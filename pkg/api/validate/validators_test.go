@@ -71,7 +71,8 @@ properties:
   workerServicePrincipalProfile:
     clientID: 00000000-0000-0000-0000-000000000000
     secret: secret
-`)
+  config:
+    etcdMetricsPassword: password`)
 
 func TestValidate(t *testing.T) {
 	tests := map[string]struct {
