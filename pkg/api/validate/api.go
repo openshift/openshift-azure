@@ -92,6 +92,8 @@ func (v *APIValidator) validateUpdateContainerService(cs, oldCs *api.OpenShiftMa
 			csCopy.Properties.AuthProfile.IdentityProviders[0].Provider.(*api.AADIdentityProvider).Secret = "<hidden 1>"
 			old.Properties.AuthProfile.IdentityProviders[0].Provider.(*api.AADIdentityProvider).Secret = "<hidden 2>"
 		}
+		csCopy.Config = api.Config{}
+		old.Config = api.Config{}
 		errs = append(errs, fmt.Errorf("invalid change %s", cmp.Diff(csCopy, old)))
 	}
 
