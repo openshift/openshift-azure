@@ -55,6 +55,16 @@ func TestAPIValidateUpdate(t *testing.T) {
 				oc.Properties.ProvisioningState = api.Creating // the RP is responsible for checking this
 			},
 		},
+		"config structure is not exposed if changed": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Config.EtcdMetricsPassword = "test"
+			},
+			expectedErrs: []*regexp.Regexp{
+				// when config struct changed we should print ONLY error
+				// No diff output should be printed from the struct
+				regexp.MustCompile(`invalid change $`),
+			},
+		},
 	}
 
 	for name, test := range tests {
