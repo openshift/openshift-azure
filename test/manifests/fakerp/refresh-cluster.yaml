@@ -1,0 +1,3 @@
+# MANIFEST=test/manifests/fakerp/refresh-cluster.yaml API_VERSION=2019-10-27-preview hack/upgrade.sh
+properties:
+  refreshCluster: true
