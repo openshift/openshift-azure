@@ -285,11 +285,13 @@ func (c Client) Create(ctx context.Context) (string, error) {
 
 	// If no MANIFEST has been provided and this is a cluster
 	// creation, default to the test manifest.
-	if !shared.IsUpdate() && c.conf.Manifest == "" {
-		c.conf.Manifest = "test/manifests/fakerp/create.yaml"
-	} else {
-		// If this is a cluster upgrade, reuse the existing manifest.
-		c.conf.Manifest = "_data/manifest.yaml"
+	if c.conf.Manifest == "" {
+		if !shared.IsUpdate() {
+			c.conf.Manifest = "test/manifests/fakerp/create.yaml"
+		} else {
+			// If this is a cluster upgrade, reuse the existing manifest.
+			c.conf.Manifest = "_data/manifest.yaml"
+		}
 	}
 
 	var consoleURL string
