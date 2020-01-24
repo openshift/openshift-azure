@@ -20,6 +20,10 @@ if [[ -z "${MANIFEST}${ADMIN_MANIFEST}" ]]; then
     echo ""
 fi
 
+if [[ -n "$API_VERSION" ]]; then
+    API_VERSION="-api-version=$API_VERSION"
+fi
+
 if [[ -n "$TEST_IN_PRODUCTION" ]]; then
     TEST_IN_PRODUCTION="-use-prod=true"
 else
@@ -34,4 +38,4 @@ if [[ -n "$ADMIN_MANIFEST" ]]; then
     ADMIN_MANIFEST="-admin-manifest=$ADMIN_MANIFEST"
 fi
 
-go run cmd/createorupdate/createorupdate.go ${TEST_IN_PRODUCTION:-} ${ADMIN_MANIFEST:-}
+go run cmd/createorupdate/createorupdate.go ${API_VERSION:-} ${TEST_IN_PRODUCTION:-} ${ADMIN_MANIFEST:-}
