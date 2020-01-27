@@ -1,15 +1,15 @@
 package derived
 
 import (
-	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/ghodss/yaml"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	armconst "github.com/openshift/openshift-azure/pkg/arm/constants"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
+	"github.com/openshift/openshift-azure/pkg/util/pluginversion"
 )
 
-func baseCloudProviderConf(cs *api.OpenShiftManagedCluster, disableOutboundSNAT bool) (*cloudprovider.Config, error) {
+func baseCloudProviderConf(cs *api.OpenShiftManagedCluster) (*cloudprovider.Config, error) {
 	cfg := cloudprovider.Config{
 		TenantID:                     cs.Properties.AzProfile.TenantID,
 		SubscriptionID:               cs.Properties.AzProfile.SubscriptionID,
@@ -30,15 +30,17 @@ func baseCloudProviderConf(cs *api.OpenShiftManagedCluster, disableOutboundSNAT 
 		CloudProviderRateLimitQPS:    3.0,
 		CloudProviderRateLimitBucket: 10,
 	}
-	if disableOutboundSNAT {
-		cfg.DisableOutboundSNAT = to.BoolPtr(disableOutboundSNAT)
+	major, _, _ := pluginversion.Parse(cs.Config.PluginVersion)
+	if major >= 15 {
+		cfg.CloudProviderRateLimitQPS = 10.0
+		cfg.CloudProviderRateLimitBucket = 100
 	}
 	return &cfg, nil
 }
 
 // MasterCloudProviderConf returns cloudprovider config for masters
-func MasterCloudProviderConf(cs *api.OpenShiftManagedCluster, disableOutboundSNAT bool) ([]byte, error) {
-	cpc, err := baseCloudProviderConf(cs, disableOutboundSNAT)
+func MasterCloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
+	cpc, err := baseCloudProviderConf(cs)
 	if err != nil {
 		return nil, err
 	}
@@ -48,8 +50,8 @@ func MasterCloudProviderConf(cs *api.OpenShiftManagedCluster, disableOutboundSNA
 }
 
 // WorkerCloudProviderConf returns cloudprovider config for workers
-func WorkerCloudProviderConf(cs *api.OpenShiftManagedCluster, disableOutboundSNAT bool) ([]byte, error) {
-	cpc, err := baseCloudProviderConf(cs, disableOutboundSNAT)
+func WorkerCloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
+	cpc, err := baseCloudProviderConf(cs)
 	if err != nil {
 		return nil, err
 	}

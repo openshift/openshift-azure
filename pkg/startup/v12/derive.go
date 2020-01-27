@@ -64,11 +64,11 @@ func (derivedType) KubeReserved(cs *api.OpenShiftManagedCluster, role api.AgentP
 }
 
 func (derivedType) MasterCloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
-	return derivedpkg.MasterCloudProviderConf(cs, false)
+	return derivedpkg.MasterCloudProviderConf(cs)
 }
 
 func (derivedType) WorkerCloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
-	return derivedpkg.WorkerCloudProviderConf(cs, false)
+	return derivedpkg.WorkerCloudProviderConf(cs)
 }
 
 func (derivedType) CustomerResourceGroup(ID string) (string, error) {
