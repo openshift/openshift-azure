@@ -77,7 +77,7 @@ func (s *Server) reply(w http.ResponseWriter, req *http.Request, cs *api.OpenShi
 }
 
 func writeHelpers(log *logrus.Entry, cs *api.OpenShiftManagedCluster) error {
-	b, err := derived.MasterCloudProviderConf(cs, true)
+	b, err := derived.MasterCloudProviderConf(cs)
 	if err != nil {
 		return err
 	}

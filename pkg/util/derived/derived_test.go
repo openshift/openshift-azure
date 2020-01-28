@@ -51,7 +51,6 @@ cloudProviderBackoffRetries: 6
 cloudProviderRateLimit: true
 cloudProviderRateLimitBucket: 10
 cloudProviderRateLimitQPS: 3
-disableOutboundSNAT: true
 loadBalancerSku: standard
 location: eastus
 resourceGroup: rg
@@ -73,7 +72,6 @@ cloudProviderBackoffRetries: 6
 cloudProviderRateLimit: true
 cloudProviderRateLimitBucket: 10
 cloudProviderRateLimitQPS: 3
-disableOutboundSNAT: true
 loadBalancerSku: standard
 location: eastus
 resourceGroup: rg
@@ -89,7 +87,7 @@ vnetName: vnet
 	}
 
 	for _, tt := range tests {
-		got, err := MasterCloudProviderConf(&tt.cs, true)
+		got, err := MasterCloudProviderConf(&tt.cs)
 		if err != nil {
 			t.Fatal(err)
 			return
@@ -97,7 +95,7 @@ vnetName: vnet
 		if !reflect.DeepEqual(got, tt.wantMaster) {
 			t.Errorf("derived.MasterCloudProviderConf() = \"%v\", want \"%v\"", string(got), string(tt.wantMaster))
 		}
-		got, err = WorkerCloudProviderConf(&tt.cs, true)
+		got, err = WorkerCloudProviderConf(&tt.cs)
 		if err != nil {
 			t.Fatal(err)
 			return
