@@ -46,6 +46,7 @@ func ensureRoleDefinitions(ctx context.Context, log *logrus.Entry) error {
 						"Microsoft.Network/loadBalancers/backendAddressPools/join/action",
 						"Microsoft.Network/networkSecurityGroups/read",
 						"Microsoft.Network/networkSecurityGroups/write",
+						"Microsoft.Network/networkSecurityGroups/join/action",
 						"Microsoft.Network/publicIPAddresses/read",
 						"Microsoft.Network/publicIPAddresses/write",
 						"Microsoft.Network/publicIPAddresses/delete",
