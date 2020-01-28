@@ -40,7 +40,7 @@
 
 /test upgrade-v14.0
 
-/test upgrade-v7.1
+/test upgrade-v14.1
 
 /test vmimage
 

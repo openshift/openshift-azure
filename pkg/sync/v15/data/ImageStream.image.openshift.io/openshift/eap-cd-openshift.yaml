@@ -4,7 +4,7 @@ metadata:
   annotations:
     openshift.io/display-name: JBoss EAP continuous delivery
     openshift.io/provider-display-name: Red Hat, Inc.
-    version: "17.0"
+    version: "18.0"
   name: eap-cd-openshift
   namespace: openshift
 spec:
@@ -188,7 +188,7 @@ spec:
       sampleContextDir: kitchensink
       sampleRef: openshift
       sampleRepo: https://github.com/jboss-developer/jboss-eap-quickstarts.git
-      supports: eap:7.3,javaee:8,java:8
+      supports: eap:7.3,javaee:8,java:11
       tags: builder,eap,javaee,java,jboss,hidden
       version: "17"
     from:
@@ -205,7 +205,7 @@ spec:
       sampleContextDir: kitchensink
       sampleRef: openshift
       sampleRepo: https://github.com/jbossas/eap-quickstarts/openshift
-      supports: eap:7.3,javaee:8,java:8
+      supports: eap:7.3,javaee:8,java:11
       tags: builder,eap,javaee,java,jboss,hidden
       version: "17.0"
     from:
@@ -216,6 +216,40 @@ spec:
     referencePolicy:
       type: Local
   - annotations:
+      description: JBoss EAP continuous delivery Tech Preview version 18.
+      iconClass: icon-eap
+      openshift.io/display-name: JBoss EAP continuous delivery 18 (Tech Preview)
+      sampleContextDir: kitchensink
+      sampleRef: openshift
+      sampleRepo: https://github.com/jboss-developer/jboss-eap-quickstarts.git
+      supports: eap:7.3,javaee:8,java:11
+      tags: builder,eap,javaee,java,jboss,hidden
+      version: "18"
+    from:
+      kind: ImageStreamTag
+      name: "18.0"
+    importPolicy: {}
+    name: "18"
+    referencePolicy:
+      type: Local
+  - annotations:
+      description: JBoss EAP continuous delivery 18 Tech Preview S2I Image
+      iconClass: icon-eap
+      openshift.io/display-name: JBoss EAP continuous delivery 18 (Tech Preview)
+      sampleContextDir: kitchensink
+      sampleRef: openshift
+      sampleRepo: https://github.com/jbossas/eap-quickstarts/openshift
+      supports: eap:7.3,javaee:8,java:11
+      tags: builder,eap,javaee,java,jboss,hidden
+      version: "18.0"
+    from:
+      kind: DockerImage
+      name: registry.redhat.io/jboss-eap-7-tech-preview/eap-cd-openshift-rhel8:18.0
+    importPolicy: {}
+    name: "18.0"
+    referencePolicy:
+      type: Local
+  - annotations:
       description: The latest available build of JBoss EAP continuous delivery Tech
         Preview.
       iconClass: icon-eap
@@ -223,7 +257,7 @@ spec:
       sampleContextDir: kitchensink
       sampleRef: openshift
       sampleRepo: https://github.com/jbossas/eap-quickstarts/openshift
-      supports: eap:7.3,javaee:8,java:8
+      supports: eap:7.3,javaee:8,java:11
       tags: builder,eap,javaee,java,jboss,hidden
       version: latest
     from:
