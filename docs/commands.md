@@ -34,11 +34,15 @@
 
 /test upgrade-private-v14.0
 
+/test upgrade-private-v14.1
+
 /test upgrade-v10.1.1
 
 /test upgrade-v12.2
 
 /test upgrade-v14.0
+
+/test upgrade-v14.1
 
 /test upgrade-v7.1
 
