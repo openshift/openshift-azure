@@ -689,6 +689,44 @@ func TestHowUserConfigChangesCausesRotations(t *testing.T) {
 	}
 }
 
+func TestHowRefreshCausesRotations(t *testing.T) {
+	var expectRotation map[rotationType]bool = map[rotationType]bool{rotationMaster: true, rotationInfra: true, rotationSync: false, rotationCompute: true}
+	log := logrus.NewEntry(logrus.StandardLogger())
+	ctx := context.Background()
+	cs := newTestCs()
+	az := newFakeAzureCloud(log)
+	p, _, err := setupNewCluster(ctx, log, cs, az)
+	if err != nil {
+		t.Fatal(err)
+	}
+	beforeBlob, beforeSyncChecksum, err := getHashes(az, cs)
+	if err != nil {
+		t.Fatal(err)
+	}
+	oldCs := cs.DeepCopy()
+
+	*az.Nameservers = []string{"1.2.3.4", "4.5.6.7"}
+	cs.Properties.RefreshCluster = to.BoolPtr(true)
+
+	errs := p.Validate(ctx, cs, oldCs, false)
+	if errs != nil {
+		t.Fatal(errs)
+	}
+	perr := p.CreateOrUpdate(ctx, cs, true, getFakeDeployer(log, cs, az))
+	if perr != nil {
+		t.Fatal(perr)
+	}
+
+	afterBlob, afterSyncChecksum, err := getHashes(az, cs)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rotations := getRotations(beforeBlob, afterBlob, beforeSyncChecksum, afterSyncChecksum)
+	if !reflect.DeepEqual(expectRotation, rotations) {
+		t.Fatalf("rotation mismatch: expected %v, got %v", expectRotation, rotations)
+	}
+}
+
 func TestHowActionsCauseRotations(t *testing.T) {
 	log := logrus.NewEntry(logrus.StandardLogger())
 	ctx := context.Background()
