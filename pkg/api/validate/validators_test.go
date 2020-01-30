@@ -168,6 +168,17 @@ func TestValidate(t *testing.T) {
 			f:            func(oc *api.OpenShiftManagedCluster) { oc.Name = "cluster name" },
 			expectedErrs: []error{errors.New(`invalid name "cluster name"`)},
 		},
+		"valid compute count": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.AgentPoolProfiles[2].Count = 100
+			},
+		},
+		"invalid compute count": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.AgentPoolProfiles[2].Count = 1000
+			},
+			expectedErrs: []error{errors.New(`invalid properties.agentPoolProfiles["mycompute"].count 1000`)},
+		},
 		"openshift config invalid api fqdn": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Properties.FQDN = ""

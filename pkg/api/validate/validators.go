@@ -305,7 +305,7 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile, np *api.NetworkProfile)
 		if !rxAgentPoolProfileName.MatchString(app.Name) {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
 		}
-		if app.Count < 1 || app.Count > 30 {
+		if app.Count < 1 || app.Count > 100 {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %d", app.Name, app.Count))
 		}
 
