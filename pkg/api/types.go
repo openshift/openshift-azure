@@ -298,3 +298,8 @@ type GenevaActionListEtcdBackups struct {
 	Name         string    `json:"name,omitempty"`
 	LastModified time.Time `json:"lastModified,omitempty"`
 }
+
+//GenevaActionGetClusterLiveInfo returns the VM image version used to build the nodes
+type GenevaActionGetImageVerInfo struct {
+	ImageVer *[]string `json:"version,omitempty"`
+}

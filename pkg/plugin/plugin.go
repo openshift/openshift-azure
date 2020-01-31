@@ -574,6 +574,36 @@ func (p *plugin) ListClusterVMs(ctx context.Context, cs *api.OpenShiftManagedClu
 	return &api.GenevaActionListClusterVMs{VMs: &pods}, nil
 }
 
+func (p *plugin) GetLiveClusterInfo(ctx context.Context, cs *api.OpenShiftManagedCluster) ([]byte, error) {
+	p.log.Info("creating clients")
+	clusterUpgrader, err := p.upgraderFactory(ctx, p.log, cs, true, true, p.testConfig)
+	if err != nil {
+		return nil, &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+	}
+
+	p.log.Infof("querying control plane pods")
+	pods, err := clusterUpgrader.GetLiveClusterInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(pods)
+}
+
+func (p *plugin) GetImageVerInfo(ctx context.Context, cs *api.OpenShiftManagedCluster) (*api.GenevaActionGetClusterLiveInfo, error) {
+	p.log.Info("creating clients")
+	clusterUpgrader, err := p.upgraderFactory(ctx, p.log, cs, true, true, p.testConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	p.log.Infof("listing cluster VM image version")
+	imagever, err := clusterUpgrader.GetImageVerInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &api.GenevaActionGetImageVerInfo{ImageVer: &imagever}, nil
+}
+
 func (p *plugin) Restart(ctx context.Context, cs *api.OpenShiftManagedCluster, hostname string) error {
 	if !validate.IsValidAgentPoolHostname(hostname) {
 		return fmt.Errorf("invalid hostname %q", hostname)

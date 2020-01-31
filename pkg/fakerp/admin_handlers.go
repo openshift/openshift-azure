@@ -35,6 +35,24 @@ func (s *Server) handleListClusterVMs(w http.ResponseWriter, req *http.Request) 
 	s.adminreply(w, err, vms)
 }
 
+// handleGetClusterLiveInfo handles the admin request to list the image version of the VM
+func (s *Server) handleGetClusterLiveInfo(w http.ResponseWriter, req *http.Request) {
+	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
+
+	imagever, err := s.plugin.GetClusterLiveInfo(req.Context(), cs)
+	s.adminreply(w, err, imagever)
+
+}
+
+// handleGetLiveClusterInfo handles the admin request to list the image version of the VM
+func (s *Server) handleGetLiveClusterInfo(w http.ResponseWriter, req *http.Request) {
+	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)
+
+	pods, err := s.plugin.GetLiveClusterInfo(req.Context(), cs)
+	s.adminreply(w, err, pods)
+
+}
+
 // handleRestart handles restarting a vm in the cluster
 func (s *Server) handleRestart(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(contextKeyContainerService).(*api.OpenShiftManagedCluster)

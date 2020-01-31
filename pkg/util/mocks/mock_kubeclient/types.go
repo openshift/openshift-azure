@@ -106,6 +106,21 @@ func (mr *MockInterfaceMockRecorder) GetControlPlanePods(arg0 interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetControlPlanePods", reflect.TypeOf((*MockInterface)(nil).GetControlPlanePods), arg0)
 }
 
+// GetLiveClusterInfo mocks base method
+func (m *MockInterface) GetLiveClusterInfo(arg0 context.Context) ([]v1.Pod, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLiveClusterInfo", arg0)
+	ret0, _ := ret[0].([]v1.Pod)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLiveClusterInfo indicates an expected call of GetLiveClusterInfo
+func (mr *MockInterfaceMockRecorder) GetLiveClusterInfo(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLiveClusterInfo", reflect.TypeOf((*MockInterface)(nil).GetLiveClusterInfo), arg0)
+}
+
 // WaitForReadyMaster mocks base method
 func (m *MockInterface) WaitForReadyMaster(arg0 context.Context, arg1 string) error {
 	m.ctrl.T.Helper()

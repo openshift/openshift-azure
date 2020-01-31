@@ -209,6 +209,21 @@ func (mr *MockUpgraderMockRecorder) GenerateARM(arg0, arg1, arg2, arg3 interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateARM", reflect.TypeOf((*MockUpgrader)(nil).GenerateARM), arg0, arg1, arg2, arg3)
 }
 
+// GetClusterLiveInfo mocks base method
+func (m *MockUpgrader) GetClusterLiveInfo(arg0 context.Context) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetClusterLiveInfo", arg0)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetClusterLiveInfo indicates an expected call of GetClusterLiveInfo
+func (mr *MockUpgraderMockRecorder) GetClusterLiveInfo(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClusterLiveInfo", reflect.TypeOf((*MockUpgrader)(nil).GetClusterLiveInfo), arg0)
+}
+
 // GetControlPlanePods mocks base method
 func (m *MockUpgrader) GetControlPlanePods(arg0 context.Context) ([]v1.Pod, error) {
 	m.ctrl.T.Helper()
@@ -222,6 +237,21 @@ func (m *MockUpgrader) GetControlPlanePods(arg0 context.Context) ([]v1.Pod, erro
 func (mr *MockUpgraderMockRecorder) GetControlPlanePods(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetControlPlanePods", reflect.TypeOf((*MockUpgrader)(nil).GetControlPlanePods), arg0)
+}
+
+// GetLiveClusterInfo mocks base method
+func (m *MockUpgrader) GetLiveClusterInfo(arg0 context.Context) ([]v1.Pod, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLiveClusterInfo", arg0)
+	ret0, _ := ret[0].([]v1.Pod)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLiveClusterInfo indicates an expected call of GetLiveClusterInfo
+func (mr *MockUpgraderMockRecorder) GetLiveClusterInfo(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLiveClusterInfo", reflect.TypeOf((*MockUpgrader)(nil).GetLiveClusterInfo), arg0)
 }
 
 // GetNameserversFromVnet mocks base method

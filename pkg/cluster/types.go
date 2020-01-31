@@ -57,6 +57,7 @@ type Upgrader interface {
 	Restart(ctx context.Context, scaleset, instanceID string) error
 	Reimage(ctx context.Context, scaleset, instanceID string) error
 	ListVMHostnames(ctx context.Context) ([]string, error)
+	GetImageVerInfo(ctx context.Context) ([]string, error)
 	RunCommand(ctx context.Context, scaleset, instanceID, command string) error
 	WriteStartupBlobs() error
 	GenerateARM(ctx context.Context, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error)

@@ -37,6 +37,27 @@ func (u *Upgrade) ListVMHostnames(ctx context.Context) ([]string, error) {
 	return hostnames, nil
 }
 
+func (u *Upgrade) GetImageVerInfo(ctx context.Context) ([]string, error) {
+	scalesets, err := u.Ssc.List(ctx, u.Cs.Properties.AzProfile.ResourceGroup)
+	if err != nil {
+		return nil, err
+	}
+
+	var imagever []string
+	for _, ss := range scalesets {
+		vms, err := u.Vmc.List(ctx, u.Cs.Properties.AzProfile.ResourceGroup, *ss.Name, "", "", "")
+		if err != nil {
+			return nil, err
+		}
+
+		for _, vm := range vms {
+			imagever = append(imagever, strings.ToLower(*vm.VirtualMachineScaleSetVMProperties.StorageProfile.ImageReference.Version))
+		}
+	}
+
+	return imagever, nil
+}
+
 func (u *Upgrade) RunCommand(ctx context.Context, scaleset, instanceID, command string) error {
 	return u.Vmc.RunCommand(ctx, u.Cs.Properties.AzProfile.ResourceGroup, scaleset, instanceID, compute.RunCommandInput{
 		CommandID: to.StringPtr("RunShellScript"),
