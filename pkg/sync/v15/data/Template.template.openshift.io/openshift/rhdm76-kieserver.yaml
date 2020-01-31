@@ -1,35 +1,35 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhdm: "7.5"
-  template: rhdm75-prod-immutable-kieserver
+  rhdm: "7.6"
+  template: rhdm76-kieserver
 message: |-
-  A new immutable Red Hat Decision Manager KIE server has been created in your project.
-  The username/password for accessing the KIE server is
+  A new Decision Manager KIE server application has been created in your project.
+  The user name/password for accessing the KIE server
 
-      Username: ${KIE_SERVER_USER}
+      User name: ${KIE_SERVER_USER}
       Password: ${KIE_SERVER_PWD}
 
-  Please be sure to create the secret named "${KIE_SERVER_HTTPS_SECRET}" containing the ${KIE_SERVER_HTTPS_KEYSTORE} files used for serving secure content.
+  Please be sure to create the secret named "${KIE_SERVER_HTTPS_SECRET}" containing the ${KIE_SERVER_HTTPS_KEYSTORE} file used for serving secure content.
 metadata:
   annotations:
-    description: Application template for an immutable KIE server in a production
-      environment, for Red Hat Decision Manager 7.5 - Deprecated
+    description: Application template for a managed KIE Server, for Red Hat Decision
+      Manager 7.6 - Deprecated
     iconClass: icon-jboss
-    openshift.io/display-name: Red Hat Decision Manager 7.5 immutable production environment
+    openshift.io/display-name: Red Hat Decision Manager 7.6 managed KIE Server
     openshift.io/provider-display-name: Red Hat, Inc.
-    tags: rhdm,decisionserver,jboss,kieserver,immutable,s2i
+    tags: rhdm,decisionserver,jboss,kieserver
     template.openshift.io/bindable: "false"
-    template.openshift.io/documentation-url: https://access.redhat.com/documentation/en-us/red_hat_decision_manager/7.5/html/deploying_a_red_hat_decision_manager_7.5_immutable_server_environment_on_red_hat_openshift_container_platform/
+    template.openshift.io/documentation-url: https://access.redhat.com/documentation/en-us/red_hat_decision_manager/7.6/html/deploying_a_red_hat_decision_manager_7.6_managed_server_environment_on_red_hat_openshift_container_platform/
     template.openshift.io/long-description: This template defines resources needed
-      for an immutable production runtime environment for Red Hat Decision Manager
-      7.5, including a source to image (S2I) build of your services, application deployment
-      configuration, secure and insecure http communication. Deprecated since Red
-      Hat Decision Manager version 7.5; consider using the Red Hat Business Automation
+      to execute Rules on Red Hat Decision Manager KIE server 7.6, including application
+      deployment configuration, secure and insecure http communication. Template for
+      Red Hat OpenShift Container Platform version 3.11. Deprecated since Red Hat
+      Decision Manager version 7.5; consider using the Red Hat Business Automation
       Operator.
     template.openshift.io/support-url: https://access.redhat.com
-    version: "7.5"
-  name: rhdm75-prod-immutable-kieserver
+    version: "7.6"
+  name: rhdm76-kieserver
   namespace: openshift
 objects:
 - apiVersion: v1
@@ -126,58 +126,6 @@ objects:
     to:
       name: ${APPLICATION_NAME}-kieserver
 - apiVersion: v1
-  kind: ImageStream
-  metadata:
-    labels:
-      application: ${APPLICATION_NAME}
-      service: ${APPLICATION_NAME}-kieserver
-    name: ${APPLICATION_NAME}-kieserver
-- apiVersion: v1
-  kind: BuildConfig
-  metadata:
-    annotations:
-      template.alpha.openshift.io/wait-for-ready: "true"
-    labels:
-      application: ${APPLICATION_NAME}
-      service: ${APPLICATION_NAME}-kieserver
-    name: ${APPLICATION_NAME}-kieserver
-  spec:
-    output:
-      to:
-        kind: ImageStreamTag
-        name: ${APPLICATION_NAME}-kieserver:latest
-    source:
-      contextDir: ${CONTEXT_DIR}
-      git:
-        ref: ${SOURCE_REPOSITORY_REF}
-        uri: ${SOURCE_REPOSITORY_URL}
-      type: Git
-    strategy:
-      sourceStrategy:
-        env:
-        - name: KIE_SERVER_CONTAINER_DEPLOYMENT
-          value: ${KIE_SERVER_CONTAINER_DEPLOYMENT}
-        - name: MAVEN_MIRROR_URL
-          value: ${MAVEN_MIRROR_URL}
-        - name: ARTIFACT_DIR
-          value: ${ARTIFACT_DIR}
-        forcePull: true
-        from:
-          kind: ImageStreamTag
-          name: ${KIE_SERVER_IMAGE_STREAM_NAME}:${IMAGE_STREAM_TAG}
-          namespace: ${IMAGE_STREAM_NAMESPACE}
-      type: Source
-    triggers:
-    - github:
-        secret: ${GITHUB_WEBHOOK_SECRET}
-      type: GitHub
-    - generic:
-        secret: ${GENERIC_WEBHOOK_SECRET}
-      type: Generic
-    - imageChange: {}
-      type: ImageChange
-    - type: ConfigChange
-- apiVersion: v1
   kind: DeploymentConfig
   metadata:
     annotations:
@@ -188,7 +136,7 @@ objects:
       services.server.kie.org/kie-server-id: ${APPLICATION_NAME}-kieserver
     name: ${APPLICATION_NAME}-kieserver
   spec:
-    replicas: 2
+    replicas: 1
     revisionHistoryLimit: 10
     selector:
       deploymentConfig: ${APPLICATION_NAME}-kieserver
@@ -215,7 +163,7 @@ objects:
           - name: KIE_ADMIN_PWD
             value: ${KIE_ADMIN_PWD}
           - name: KIE_SERVER_MODE
-            value: DEVELOPMENT
+            value: ${KIE_SERVER_MODE}
           - name: KIE_MBEANS
             value: ${KIE_MBEANS}
           - name: DROOLS_SERVER_FILTER_CLASSES
@@ -260,6 +208,10 @@ objects:
             value: ${MAVEN_REPO_USERNAME}
           - name: EXTERNAL_MAVEN_REPO_PASSWORD
             value: ${MAVEN_REPO_PASSWORD}
+          - name: KIE_SERVER_MGMT_DISABLED
+            value: ${KIE_SERVER_MGMT_DISABLED}
+          - name: KIE_SERVER_STARTUP_STRATEGY
+            value: OpenShiftStartupStrategy
           - name: HTTPS_KEYSTORE_DIR
             value: /etc/kieserver-secret-volume
           - name: HTTPS_KEYSTORE
@@ -268,10 +220,6 @@ objects:
             value: ${KIE_SERVER_HTTPS_NAME}
           - name: HTTPS_PASSWORD
             value: ${KIE_SERVER_HTTPS_PASSWORD}
-          - name: KIE_SERVER_MGMT_DISABLED
-            value: ${KIE_SERVER_MGMT_DISABLED}
-          - name: KIE_SERVER_STARTUP_STRATEGY
-            value: OpenShiftStartupStrategy
           - name: JGROUPS_PING_PROTOCOL
             value: openshift.DNS_PING
           - name: OPENSHIFT_DNS_PING_SERVICE_NAME
@@ -346,7 +294,7 @@ objects:
             value: ${AUTH_ROLE_MAPPER_ROLES_PROPERTIES}
           - name: AUTH_ROLE_MAPPER_REPLACE_ROLE
             value: ${AUTH_ROLE_MAPPER_REPLACE_ROLE}
-          image: ${APPLICATION_NAME}-kieserver
+          image: ${KIE_SERVER_IMAGE_STREAM_NAME}
           imagePullPolicy: Always
           lifecycle:
             postStart:
@@ -410,8 +358,9 @@ objects:
         containerNames:
         - ${APPLICATION_NAME}-kieserver
         from:
-          kind: ImageStream
-          name: ${APPLICATION_NAME}-kieserver
+          kind: ImageStreamTag
+          name: ${KIE_SERVER_IMAGE_STREAM_NAME}:${IMAGE_STREAM_TAG}
+          namespace: ${IMAGE_STREAM_NAMESPACE}
       type: ImageChange
     - type: ConfigChange
 parameters:
@@ -420,7 +369,44 @@ parameters:
   name: APPLICATION_NAME
   required: true
   value: myapp
-- description: KIE administrator username.
+- description: Maven mirror that KIE server must use. If you configure a mirror, this
+    mirror must contain all artifacts that are required for deploying your services.
+  displayName: Maven mirror URL
+  name: MAVEN_MIRROR_URL
+- description: Maven mirror configuration for KIE server.
+  displayName: Maven mirror of
+  name: MAVEN_MIRROR_OF
+  value: external:*
+- description: 'The id to use for the maven repository. If set, it can be excluded
+    from the optionally configured mirror by adding it to MAVEN_MIRROR_OF. For example:
+    external:*,!repo-rhdmcentr,!repo-custom. If MAVEN_MIRROR_URL is set but MAVEN_MIRROR_ID
+    is not set, an id will be generated randomly, but won''t be usable in MAVEN_MIRROR_OF.'
+  displayName: Maven repository ID
+  name: MAVEN_REPO_ID
+  value: repo-custom
+- description: Fully qualified URL to a Maven repository or service.
+  displayName: Maven repository URL
+  name: MAVEN_REPO_URL
+  required: true
+- description: User name for accessing the Maven repository, if required.
+  displayName: Maven repository user name
+  name: MAVEN_REPO_USERNAME
+- description: Password to access the Maven repository, if required.
+  displayName: Maven repository password
+  name: MAVEN_REPO_PASSWORD
+- description: The Service name for the optional Decision Central, where it can be
+    reached, to allow service lookups (for example, maven repo usage), if required.
+  displayName: Name of the Decision Central service
+  name: DECISION_CENTRAL_SERVICE
+- description: User name for accessing the Maven service hosted by Decision Central
+    inside EAP.
+  displayName: User name for the Maven service hosted by Decision Central
+  name: DECISION_CENTRAL_MAVEN_USERNAME
+- description: Password to access the Maven service hosted by Decision Central inside
+    EAP.
+  displayName: Password for the Maven service hosted by Decision Central
+  name: DECISION_CENTRAL_MAVEN_PASSWORD
+- description: KIE administrator user name.
   displayName: KIE Admin User
   name: KIE_ADMIN_USER
   value: adminUser
@@ -429,12 +415,11 @@ parameters:
   from: '[a-zA-Z]{6}[0-9]{1}!'
   generate: expression
   name: KIE_ADMIN_PWD
-- description: KIE server username. (Sets the org.kie.server.user system property)
+- description: KIE server user name. (Sets the org.kie.server.user system property)
   displayName: KIE Server User
   name: KIE_SERVER_USER
   value: executionUser
-- description: KIE server password. If this parameter is not set, the password is
-    automatically generated. (Sets the org.kie.server.pwd system property)
+- description: KIE server password. (Sets the org.kie.server.pwd system property)
   displayName: KIE Server Password
   from: '[a-zA-Z]{6}[0-9]{1}!'
   generate: expression
@@ -452,11 +437,18 @@ parameters:
   name: KIE_SERVER_IMAGE_STREAM_NAME
   required: true
   value: rhdm-kieserver-rhel8
-- description: A named pointer to an image in an image stream. Default is "7.5.1".
+- description: A named pointer to an image in an image stream. Default is "7.6.0".
   displayName: ImageStream Tag
   name: IMAGE_STREAM_TAG
   required: true
-  value: 7.5.1
+  value: 7.6.0
+- description: The KIE Server mode. Valid values are 'DEVELOPMENT' or 'PRODUCTION'.
+    In production mode, you can not deploy SNAPSHOT versions of artifacts on the KIE
+    server and can not change the version of an artifact in an existing container.
+    (Sets the org.kie.server.mode system property).
+  displayName: KIE Server Mode
+  name: KIE_SERVER_MODE
+  value: PRODUCTION
 - description: KIE server mbeans enabled/disabled. (Sets the kie.mbeans and kie.scanner.mbeans
     system properties)
   displayName: KIE MBeans
@@ -501,87 +493,20 @@ parameters:
   displayName: KIE Server Bypass Auth User
   name: KIE_SERVER_BYPASS_AUTH_USER
   value: "false"
-- description: 'KIE Server Container deployment configuration with optional alias.
-    Format: containerId=groupId:artifactId:version|c2(alias2)=g2:a2:v2'
-  displayName: KIE Server Container Deployment
-  name: KIE_SERVER_CONTAINER_DEPLOYMENT
-  required: true
-- description: Git source URI for application.
-  displayName: Git Repository URL
-  name: SOURCE_REPOSITORY_URL
-  required: true
-- description: Git branch/tag reference.
-  displayName: Git Reference
-  name: SOURCE_REPOSITORY_REF
-- description: Path within Git project to build; empty for root project directory.
-  displayName: Context Directory
-  name: CONTEXT_DIR
-- description: GitHub trigger secret.
-  displayName: Github Webhook Secret
-  from: '[a-zA-Z0-9]{8}'
-  generate: expression
-  name: GITHUB_WEBHOOK_SECRET
-  required: true
-- description: Generic build trigger secret.
-  displayName: Generic Webhook Secret
-  from: '[a-zA-Z0-9]{8}'
-  generate: expression
-  name: GENERIC_WEBHOOK_SECRET
-  required: true
-- description: Maven mirror that KIE server must use. If you configure a mirror, this
-    mirror must contain all artifacts that are required for building and deploying
-    your services.
-  displayName: Maven mirror URL
-  name: MAVEN_MIRROR_URL
-- description: Maven mirror configuration for KIE server.
-  displayName: Maven mirror of
-  name: MAVEN_MIRROR_OF
-  value: external:*
-- description: 'The id to use for the maven repository. If set, it can be excluded
-    from the optionally configured mirror by adding it to MAVEN_MIRROR_OF. For example:
-    external:*,!repo-rhdmcentr,!repo-custom. If MAVEN_MIRROR_URL is set but MAVEN_MIRROR_ID
-    is not set, an id will be generated randomly, but won''t be usable in MAVEN_MIRROR_OF.'
-  displayName: Maven repository ID
-  name: MAVEN_REPO_ID
-  value: repo-custom
-- description: Fully qualified URL to a Maven repository.
-  displayName: Maven repository URL
-  name: MAVEN_REPO_URL
-- description: Username to access the Maven repository, if required.
-  displayName: Maven repository username
-  name: MAVEN_REPO_USERNAME
-- description: Password to access the Maven repository, if required.
-  displayName: Maven repository password
-  name: MAVEN_REPO_PASSWORD
-- description: The Service name for the optional Decision Central, where it can be
-    reached, to allow service lookups (for example, maven repo usage), if required.
-  displayName: Name of the Decision Central service
-  name: DECISION_CENTRAL_SERVICE
-- description: Username to access the Maven service hosted by Decision Central inside
-    EAP.
-  displayName: Username for the Maven service hosted by Decision Central
-  name: DECISION_CENTRAL_MAVEN_USERNAME
-- description: Password to access the Maven service hosted by Decision Central inside
-    EAP.
-  displayName: Password for the Maven service hosted by Decision Central
-  name: DECISION_CENTRAL_MAVEN_PASSWORD
-- description: List of directories from which archives will be copied into the deployment
-    folder. If unspecified, all archives in /target will be copied.
-  displayName: List of directories from which archives will be copied into the deployment
-    folder
-  name: ARTIFACT_DIR
 - description: KIE server Container memory limit.
   displayName: KIE Server Container Memory Limit
   name: KIE_SERVER_MEMORY_LIMIT
   value: 1Gi
+- description: 'KIE Server Container deployment configuration with optional alias.
+    Format: containerId=groupId:artifactId:version|c2(alias2)=g2:a2:v2'
+  displayName: KIE Server Container Deployment
+  name: KIE_SERVER_CONTAINER_DEPLOYMENT
 - description: Disable management api and don't allow KIE containers to be deployed/undeployed
     or started/stopped. Sets the property org.kie.server.mgmt.api.disabled to true
     and org.kie.server.startup.strategy to LocalContainersStartupStrategy.
   displayName: Disable KIE Server Management
   name: KIE_SERVER_MGMT_DISABLED
-  required: true
-  value: "true"
-- description: RH-SSO URL
+- description: RH-SSO URL.
   displayName: RH-SSO URL
   name: SSO_URL
 - description: RH-SSO Realm name.
@@ -590,12 +515,12 @@ parameters:
 - description: KIE Server RH-SSO Client name.
   displayName: KIE Server RH-SSO Client name
   name: KIE_SERVER_SSO_CLIENT
-- description: KIE Server RH-SSO Client Secret.
+- description: KIE Server RH-SSO Client Secret
   displayName: KIE Server RH-SSO Client Secret
   name: KIE_SERVER_SSO_SECRET
-- description: RH-SSO Realm Admin Username used to create the Client if it doesn't
+- description: RH-SSO Realm admin user name used to create the Client if it doesn't
     exist.
-  displayName: RH-SSO Realm Admin Username
+  displayName: RH-SSO Realm admin user name
   name: SSO_USERNAME
 - description: RH-SSO Realm Admin Password used to create the Client.
   displayName: RH-SSO Realm Admin Password
@@ -604,7 +529,7 @@ parameters:
   displayName: RH-SSO Disable SSL Certificate Validation
   name: SSO_DISABLE_SSL_CERTIFICATE_VALIDATION
   value: "false"
-- description: RH-SSO Principal Attribute to use as username.
+- description: RH-SSO Principal Attribute to use as user name.
   displayName: RH-SSO Principal Attribute
   name: SSO_PRINCIPAL_ATTRIBUTE
   value: preferred_username
@@ -641,19 +566,19 @@ parameters:
     does not exist, the entry’s DN is used.
   displayName: LDAP DN attribute
   name: AUTH_LDAP_DISTINGUISHED_NAME_ATTRIBUTE
-- description: A flag indicating if the DN is to be parsed for the username. If set
-    to true, the DN is parsed for the username. If set to false the DN is not parsed
-    for the username. This option is used together with usernameBeginString and usernameEndString.
+- description: A flag indicating if the DN is to be parsed for the user name. If set
+    to true, the DN is parsed for the user name. If set to false the DN is not parsed
+    for the user name. This option is used together with usernameBeginString and usernameEndString.
   displayName: LDAP Parse username
   name: AUTH_LDAP_PARSE_USERNAME
 - description: Defines the String which is to be removed from the start of the DN
-    to reveal the username. This option is used together with usernameEndString and
+    to reveal the user name. This option is used together with usernameEndString and
     only taken into account if parseUsername is set to true.
   displayName: LDAP Username begin string
   name: AUTH_LDAP_USERNAME_BEGIN_STRING
 - description: Defines the String which is to be removed from the end of the DN to
-    reveal the username. This option is used together with usernameEndString and only
-    taken into account if parseUsername is set to true.
+    reveal the user name. This option is used together with usernameEndString and
+    only taken into account if parseUsername is set to true.
   displayName: LDAP Username end string
   name: AUTH_LDAP_USERNAME_END_STRING
 - description: Name of the attribute containing the user roles.
@@ -706,7 +631,7 @@ parameters:
   displayName: LDAP Referral user attribute ID
   name: AUTH_LDAP_REFERRAL_USER_ATTRIBUTE_ID_TO_CHECK
 - description: When present, the RoleMapping Login Module will be configured to use
-    the provided file. This parameter defines the fully-qualified file path and name
+    the provided file. This property defines the fully-qualified file path and name
     of a properties file or resource which maps roles to replacement roles. The format
     is original_role=role1,role2,role3
   displayName: RoleMapping rolesProperties file path
