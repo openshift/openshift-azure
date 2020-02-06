@@ -37,3 +37,10 @@ rules:
   - get
   - update
   - patch
+- apiGroups:
+  - ""
+  - authorization.openshift.io
+  resources:
+  - localresourceaccessreviews
+  verbs:
+  - create
