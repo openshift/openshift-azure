@@ -1,39 +1,40 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhdm: "7.5"
-  template: rhdm75-trial-ephemeral
+  rhdm: "7.6"
+  template: rhdm76-trial-ephemeral
 message: |-
   A new Decision Manager trial environment has been created.
-  The username/password for accessing the Decision Central interface is
+  The user name/password for accessing the Decision Central interface is
 
-      Username: ${KIE_ADMIN_USER}
+      User name: ${KIE_ADMIN_USER}
       Password: ${DEFAULT_PASSWORD}
 
   The user name/password for calls to the KIE server is
 
-      Username: ${KIE_SERVER_USER}
+      User name: ${KIE_SERVER_USER}
       Password: ${DEFAULT_PASSWORD}
 
   Please remember that this is an ephemeral environment and any work will be LOST with a simple pod restart.
 metadata:
   annotations:
     description: Application template for an ephemeral authoring and testing environment,
-      for Red Hat Decision Manager 7.5 - Deprecated
+      for Red Hat Decision Manager 7.6 - Deprecated
     iconClass: icon-jboss
-    openshift.io/display-name: Red Hat Decision Manager 7.5 ephemeral trial environment
+    openshift.io/display-name: Red Hat Decision Manager 7.6 ephemeral trial environment
     openshift.io/provider-display-name: Red Hat, Inc.
     tags: rhdm,decisionserver,jboss,trial
     template.openshift.io/bindable: "false"
-    template.openshift.io/documentation-url: https://access.redhat.com/documentation/en-us/red_hat_decision_manager/7.5/html/deploying_a_red_hat_decision_manager_7.5_authoring_environment_on_red_hat_openshift_container_platform/
+    template.openshift.io/documentation-url: https://access.redhat.com/documentation/en-us/red_hat_decision_manager/7.6/html/deploying_a_red_hat_decision_manager_7.6_authoring_environment_on_red_hat_openshift_container_platform/
     template.openshift.io/long-description: This template defines resources needed
       for an ephemeral authoring and testing environment for Red Hat Decision Manager
-      7.5, including application deployment configuration, secure and insecure http
-      communication. Deprecated since Red Hat Decision Manager version 7.5; consider
-      using the Red Hat Business Automation Operator.
+      7.6, including application deployment configuration, secure and insecure http
+      communication. Template for Red Hat OpenShift Container Platform version 3.11.
+      Deprecated since Red Hat Decision Manager version 7.5; consider using the Red
+      Hat Business Automation Operator.
     template.openshift.io/support-url: https://access.redhat.com
-    version: "7.5"
-  name: rhdm75-trial-ephemeral
+    version: "7.6"
+  name: rhdm76-trial-ephemeral
   namespace: openshift
 objects:
 - apiVersion: v1
@@ -94,7 +95,7 @@ objects:
   metadata:
     annotations:
       description: Route for Decision Central's http service.
-      haproxy.router.openshift.io/timeout: 60s
+      haproxy.router.openshift.io/timeout: 1h
     labels:
       application: ${APPLICATION_NAME}
       service: ${APPLICATION_NAME}-rhdmcentr
@@ -528,11 +529,11 @@ parameters:
   name: DEFAULT_PASSWORD
   required: true
   value: RedHat
-- description: KIE administrator username.
+- description: KIE administrator user name.
   displayName: KIE Admin User
   name: KIE_ADMIN_USER
   value: adminUser
-- description: KIE server username. (Sets the org.kie.server.user system property)
+- description: KIE server user name. (Sets the org.kie.server.user system property)
   displayName: KIE Server User
   name: KIE_SERVER_USER
   value: executionUser
@@ -542,7 +543,7 @@ parameters:
   displayName: KIE Server Bypass Auth User
   name: KIE_SERVER_BYPASS_AUTH_USER
   value: "false"
-- description: KIE server controller username. (Sets the org.kie.server.controller.user
+- description: KIE server controller user name. (Sets the org.kie.server.controller.user
     system property)
   displayName: KIE Server Controller User
   name: KIE_SERVER_CONTROLLER_USER
@@ -631,11 +632,11 @@ parameters:
   name: KIE_SERVER_IMAGE_STREAM_NAME
   required: true
   value: rhdm-kieserver-rhel8
-- description: A named pointer to an image in an image stream. Default is "7.5.1".
+- description: A named pointer to an image in an image stream. Default is "7.6.0".
   displayName: ImageStream Tag
   name: IMAGE_STREAM_TAG
   required: true
-  value: 7.5.1
+  value: 7.6.0
 - description: 'KIE Server Container deployment configuration with optional alias.
     Format: containerId=groupId:artifactId:version|c2(alias2)=g2:a2:v2'
   displayName: KIE Server Container Deployment
@@ -648,15 +649,15 @@ parameters:
 - description: Fully qualified URL to a Maven repository or service.
   displayName: Maven repository URL
   name: MAVEN_REPO_URL
-- description: Username to access the Maven repository, if required.
-  displayName: Maven repository username
+- description: User name for accessing the Maven repository, if required.
+  displayName: Maven repository user name
   name: MAVEN_REPO_USERNAME
 - description: Password to access the Maven repository, if required.
   displayName: Maven repository password
   name: MAVEN_REPO_PASSWORD
-- description: Username to access the Maven service hosted by Decision Central inside
-    EAP.
-  displayName: Username for the Maven service hosted by Decision Central
+- description: User name for accessing the Maven service hosted by Decision Central
+    inside EAP.
+  displayName: User name for the Maven service hosted by Decision Central
   name: DECISION_CENTRAL_MAVEN_USERNAME
   required: true
   value: mavenUser
@@ -689,9 +690,9 @@ parameters:
 - description: KIE Server RH-SSO Client Secret.
   displayName: KIE Server RH-SSO Client Secret
   name: KIE_SERVER_SSO_SECRET
-- description: RH-SSO Realm Admin Username used to create the Client if it doesn't
+- description: RH-SSO Realm admin user name used to create the Client if it doesn't
     exist.
-  displayName: RH-SSO Realm Admin Username
+  displayName: RH-SSO Realm admin user name
   name: SSO_USERNAME
 - description: RH-SSO Realm Admin Password used to create the Client.
   displayName: RH-SSO Realm Admin Password
@@ -700,7 +701,7 @@ parameters:
   displayName: RH-SSO Disable SSL Certificate Validation
   name: SSO_DISABLE_SSL_CERTIFICATE_VALIDATION
   value: "false"
-- description: RH-SSO Principal Attribute to use as username.
+- description: RH-SSO Principal Attribute to use as user name.
   displayName: RH-SSO Principal Attribute
   name: SSO_PRINCIPAL_ATTRIBUTE
   value: preferred_username
@@ -737,19 +738,19 @@ parameters:
     does not exist, the entry’s DN is used.
   displayName: LDAP DN attribute
   name: AUTH_LDAP_DISTINGUISHED_NAME_ATTRIBUTE
-- description: A flag indicating if the DN is to be parsed for the username. If set
-    to true, the DN is parsed for the username. If set to false the DN is not parsed
-    for the username. This option is used together with usernameBeginString and usernameEndString.
+- description: A flag indicating if the DN is to be parsed for the user name. If set
+    to true, the DN is parsed for the user name. If set to false the DN is not parsed
+    for the user name. This option is used together with usernameBeginString and usernameEndString.
   displayName: LDAP Parse username
   name: AUTH_LDAP_PARSE_USERNAME
 - description: Defines the String which is to be removed from the start of the DN
-    to reveal the username. This option is used together with usernameEndString and
+    to reveal the user name. This option is used together with usernameEndString and
     only taken into account if parseUsername is set to true.
   displayName: LDAP Username begin string
   name: AUTH_LDAP_USERNAME_BEGIN_STRING
 - description: Defines the String which is to be removed from the end of the DN to
-    reveal the username. This option is used together with usernameEndString and only
-    taken into account if parseUsername is set to true.
+    reveal the user name. This option is used together with usernameEndString and
+    only taken into account if parseUsername is set to true.
   displayName: LDAP Username end string
   name: AUTH_LDAP_USERNAME_END_STRING
 - description: Name of the attribute containing the user roles.
