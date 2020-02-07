@@ -1,18 +1,18 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhpam: "7.5"
-  template: rhpam75-prod
+  rhpam: "7.6"
+  template: rhpam76-prod
 message: |-
   A new environment has been set up for Red Hat Process Automation Manager 7.
-  The username/password for accessing Business Central Monitoring is
+  The user name/password for accessing Business Central Monitoring is
 
-      Username: ${KIE_ADMIN_USER}
+      User name: ${KIE_ADMIN_USER}
       Password: ${KIE_ADMIN_PWD}
 
-  Both sets of KIE servers are configured with the username/password
+  Both sets of KIE servers are configured with the user name/password
 
-      Username: ${KIE_SERVER_USER}
+      User name: ${KIE_SERVER_USER}
       Password: ${KIE_SERVER_PWD}
 
   Please be sure to create the secrets named "${BUSINESS_CENTRAL_HTTPS_SECRET}", "${KIE_SERVER_HTTPS_SECRET}" and
@@ -21,23 +21,23 @@ message: |-
 metadata:
   annotations:
     description: Application template for a managed HA production runtime environment,
-      for Red Hat Process Automation Manager 7.5 - Deprecated
+      for Red Hat Process Automation Manager 7.6 - Deprecated
     iconClass: icon-jboss
-    openshift.io/display-name: Red Hat Process Automation Manager 7.5 production environment
+    openshift.io/display-name: Red Hat Process Automation Manager 7.6 production environment
     openshift.io/provider-display-name: Red Hat, Inc.
     tags: rhpam,processserver,jboss,prod
     template.openshift.io/bindable: "false"
-    template.openshift.io/documentation-url: https://access.redhat.com/documentation/en-us/red_hat_process_automation_manager/7.5/html/deploying_a_red_hat_process_automation_manager_7.5_authoring_environment_on_red_hat_openshift_container_platform/
+    template.openshift.io/documentation-url: https://access.redhat.com/documentation/en-us/red_hat_process_automation_manager/7.6/html/deploying_a_red_hat_process_automation_manager_7.6_authoring_environment_on_red_hat_openshift_container_platform/
     template.openshift.io/long-description: This template defines resources needed
       for a HA production runtime environment for Red Hat Process Automation Manager
-      7.5, including application deployment configuration, secure and insecure http
+      7.6, including application deployment configuration, secure and insecure http
       communication and persistent volume to store data that needs to survive a restart.
       Template for Red Hat OpenShift Container Platform version 3.11. Deprecated since
       Red Hat Process Automation Manager version 7.5; consider using the Red Hat Business
       Automation Operator.
     template.openshift.io/support-url: https://access.redhat.com
-    version: "7.5"
-  name: rhpam75-prod
+    version: "7.6"
+  name: rhpam76-prod
   namespace: openshift
 objects:
 - apiVersion: v1
@@ -240,7 +240,7 @@ objects:
   metadata:
     annotations:
       description: Route for Business Central Monitoring's http service.
-      haproxy.router.openshift.io/timeout: 60s
+      haproxy.router.openshift.io/timeout: 1h
     labels:
       application: ${APPLICATION_NAME}
       service: ${APPLICATION_NAME}-rhpamcentrmon
@@ -257,7 +257,7 @@ objects:
   metadata:
     annotations:
       description: Route for Business Central Monitoring's https service.
-      haproxy.router.openshift.io/timeout: 60s
+      haproxy.router.openshift.io/timeout: 1h
     labels:
       application: ${APPLICATION_NAME}
       service: ${APPLICATION_NAME}-rhpamcentrmon
@@ -386,7 +386,10 @@ objects:
     selector:
       deploymentConfig: ${APPLICATION_NAME}-rhpamcentrmon
     strategy:
-      type: Recreate
+      rollingParams:
+        maxSurge: 100%
+        maxUnavailable: 0
+      type: Rolling
     template:
       metadata:
         labels:
@@ -582,7 +585,10 @@ objects:
     selector:
       deploymentConfig: ${APPLICATION_NAME}-smartrouter
     strategy:
-      type: Recreate
+      rollingParams:
+        maxSurge: 100%
+        maxUnavailable: 0
+      type: Rolling
     template:
       metadata:
         labels:
@@ -915,11 +921,13 @@ objects:
             readOnly: true
         initContainers:
         - command:
-          - sh
+          - /bin/bash
           - -c
-          - until nslookup ${APPLICATION_NAME}-postgresql-1 && nc -vz ${APPLICATION_NAME}-postgresql-1
-            5432; do echo waiting for ${APPLICATION_NAME}-postgresql-1; sleep 2; done;
-          image: busybox
+          - replicas=$(oc get dc ${APPLICATION_NAME}-postgresql-1 -o=jsonpath='{.status.availableReplicas}');
+            until "[" $replicas -gt 0 "]"; do echo waiting for ${APPLICATION_NAME}-postgresql-1;
+            replicas=$(oc get dc ${APPLICATION_NAME}-postgresql-1 -o=jsonpath='{.status.availableReplicas}');
+            sleep 2; done;
+          image: registry.redhat.io/openshift3/ose-cli
           imagePullPolicy: IfNotPresent
           name: ${APPLICATION_NAME}-postgresql-init-1
           terminationMessagePolicy: FallbackToLogsOnError
@@ -1257,11 +1265,13 @@ objects:
             readOnly: true
         initContainers:
         - command:
-          - sh
+          - /bin/bash
           - -c
-          - until nslookup ${APPLICATION_NAME}-postgresql-2 && nc -vz ${APPLICATION_NAME}-postgresql-2
-            5432; do echo waiting for ${APPLICATION_NAME}-postgresql-2; sleep 2; done;
-          image: busybox
+          - replicas=$(oc get dc ${APPLICATION_NAME}-postgresql-2 -o=jsonpath='{.status.availableReplicas}');
+            until "[" $replicas -gt 0 "]"; do echo waiting for ${APPLICATION_NAME}-postgresql-2;
+            replicas=$(oc get dc ${APPLICATION_NAME}-postgresql-2 -o=jsonpath='{.status.availableReplicas}');
+            sleep 2; done;
+          image: registry.redhat.io/openshift3/ose-cli
           imagePullPolicy: IfNotPresent
           name: ${APPLICATION_NAME}-postgresql-init-2
           terminationMessagePolicy: FallbackToLogsOnError
@@ -1430,8 +1440,8 @@ parameters:
   displayName: Maven repository URL
   name: MAVEN_REPO_URL
   required: true
-- description: Username to access the Maven repository, if required.
-  displayName: Maven repository username
+- description: User name for accessing the Maven repository, if required.
+  displayName: Maven repository user name
   name: MAVEN_REPO_USERNAME
 - description: Password to access the Maven repository, if required.
   displayName: Maven repository password
@@ -1440,15 +1450,15 @@ parameters:
     reached, to allow service lookups (for maven repo usage), if required.
   displayName: Name of the Maven service hosted by Business Central
   name: BUSINESS_CENTRAL_MAVEN_SERVICE
-- description: Username to access the Maven service hosted by Business Central inside
-    EAP.
-  displayName: Username for the Maven service hosted by Business Central
+- description: User name for accessing the Maven service hosted by Business Central
+    inside EAP.
+  displayName: User name for the Maven service hosted by Business Central
   name: BUSINESS_CENTRAL_MAVEN_USERNAME
 - description: Password to access the Maven service hosted by Business Central inside
     EAP.
   displayName: Password for the Maven service hosted by Business Central
   name: BUSINESS_CENTRAL_MAVEN_PASSWORD
-- description: KIE administrator username.
+- description: KIE administrator user name.
   displayName: KIE Admin User
   name: KIE_ADMIN_USER
   value: adminUser
@@ -1457,7 +1467,7 @@ parameters:
   from: '[a-zA-Z]{6}[0-9]{1}!'
   generate: expression
   name: KIE_ADMIN_PWD
-- description: KIE server username. (Sets the org.kie.server.user system property)
+- description: KIE server user name. (Sets the org.kie.server.user system property)
   displayName: KIE Server User
   name: KIE_SERVER_USER
   value: executionUser
@@ -1479,11 +1489,11 @@ parameters:
   name: KIE_SERVER_IMAGE_STREAM_NAME
   required: true
   value: rhpam-kieserver-rhel8
-- description: A named pointer to an image in an image stream. Default is "7.5.1".
+- description: A named pointer to an image in an image stream. Default is "7.6.0".
   displayName: ImageStream Tag
   name: IMAGE_STREAM_TAG
   required: true
-  value: 7.5.1
+  value: 7.6.0
 - description: Custom hostname for http service route.  Leave blank for default hostname,
     e.g. <application-name>-smartrouter-<project>.<default-domain-suffix>'
   displayName: Smart Router Custom http Route Hostname
@@ -1512,7 +1522,7 @@ parameters:
   name: KIE_SERVER_ROUTER_NAME
   required: true
   value: KIE Server Router
-- description: KIE server controller username. (Sets the org.kie.server.controller.user
+- description: KIE server controller user name. (Sets the org.kie.server.controller.user
     system property)
   displayName: KIE Server Controller User
   name: KIE_SERVER_CONTROLLER_USER
@@ -1544,7 +1554,7 @@ parameters:
   displayName: PostgreSQL ImageStream Tag
   name: POSTGRESQL_IMAGE_STREAM_TAG
   value: "10"
-- description: KIE server PostgreSQL database username.
+- description: KIE server PostgreSQL database user name.
   displayName: KIE Server PostgreSQL Database User
   name: KIE_SERVER_POSTGRESQL_USER
   value: rhpam
@@ -1743,9 +1753,9 @@ parameters:
 - description: KIE Server 2 RH-SSO Client Secret.
   displayName: KIE Server 2 RH-SSO Client Secret
   name: KIE_SERVER2_SSO_SECRET
-- description: RH-SSO Realm Admin Username used to create the Client if it doesn't
+- description: RH-SSO Realm admin user name for creating the Client if it doesn't
     exist.
-  displayName: RH-SSO Realm Admin Username
+  displayName: RH-SSO Realm admin user name
   name: SSO_USERNAME
 - description: RH-SSO Realm Admin Password used to create the Client.
   displayName: RH-SSO Realm Admin Password
@@ -1754,7 +1764,7 @@ parameters:
   displayName: RH-SSO Disable SSL Certificate Validation
   name: SSO_DISABLE_SSL_CERTIFICATE_VALIDATION
   value: "false"
-- description: RH-SSO Principal Attribute to use as username.
+- description: RH-SSO Principal Attribute to use as user name.
   displayName: RH-SSO Principal Attribute
   name: SSO_PRINCIPAL_ATTRIBUTE
   value: preferred_username
@@ -1791,19 +1801,19 @@ parameters:
     does not exist, the entry’s DN is used.
   displayName: LDAP DN attribute
   name: AUTH_LDAP_DISTINGUISHED_NAME_ATTRIBUTE
-- description: A flag indicating if the DN is to be parsed for the username. If set
-    to true, the DN is parsed for the username. If set to false the DN is not parsed
-    for the username. This option is used together with usernameBeginString and usernameEndString.
+- description: A flag indicating if the DN is to be parsed for the user name. If set
+    to true, the DN is parsed for the user name. If set to false the DN is not parsed
+    for the user name. This option is used together with usernameBeginString and usernameEndString.
   displayName: LDAP Parse username
   name: AUTH_LDAP_PARSE_USERNAME
 - description: Defines the String which is to be removed from the start of the DN
-    to reveal the username. This option is used together with usernameEndString and
+    to reveal the user name. This option is used together with usernameEndString and
     only taken into account if parseUsername is set to true.
   displayName: LDAP Username begin string
   name: AUTH_LDAP_USERNAME_BEGIN_STRING
 - description: Defines the String which is to be removed from the end of the DN to
-    reveal the username. This option is used together with usernameEndString and only
-    taken into account if parseUsername is set to true.
+    reveal the user name. This option is used together with usernameEndString and
+    only taken into account if parseUsername is set to true.
   displayName: LDAP Username end string
   name: AUTH_LDAP_USERNAME_END_STRING
 - description: Name of the attribute containing the user roles.

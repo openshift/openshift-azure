@@ -8,6 +8,8 @@
 
 /test conformance
 
+/test e2e-carotation
+
 /test e2e-changeloglevel
 
 /test e2e-create-20190430
@@ -34,8 +36,6 @@
 
 /test upgrade-private-v14.0
 
-/test upgrade-private-v14.1
-
 /test upgrade-v10.1.1
 
 /test upgrade-v12.2
@@ -43,8 +43,6 @@
 /test upgrade-v14.0
 
 /test upgrade-v14.1
-
-/test upgrade-v7.1
 
 /test vmimage
 
