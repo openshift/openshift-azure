@@ -17,12 +17,15 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/arm/constants"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/keyvault"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/network"
 	"github.com/openshift/openshift-azure/pkg/util/enrich"
 	"github.com/openshift/openshift-azure/pkg/util/template"
 	"github.com/openshift/openshift-azure/pkg/util/writers"
@@ -250,4 +253,54 @@ func (s *startup) writeFiles(role api.AgentPoolProfileRole, w writers.Writer, ho
 	}
 
 	return w.Close()
+}
+
+// WriteSearchDomain queries for the search domain and writes to
+// /etc/dhcp/dhclient-eth0.conf.  This is for private api clusters only
+func (s *startup) WriteSearchDomain(ctx context.Context, log *logrus.Entry) error {
+	spp := &s.cs.Properties.WorkerServicePrincipalProfile
+
+	s.log.Info("creating clients")
+	authorizer, err := azureclient.NewAuthorizer(spp.ClientID, spp.Secret, s.cs.Properties.AzProfile.TenantID, "")
+	if err != nil {
+		return err
+	}
+
+	ncli := network.NewInterfacesClient(ctx, log, s.cs.Properties.AzProfile.SubscriptionID, authorizer)
+	var dnsString string
+	nic, err := ncli.GetVirtualMachineScaleSetNetworkInterface(ctx, s.cs.Properties.AzProfile.ResourceGroup, names.MasterScalesetName, "0", "nic", "")
+	if err != nil {
+		return err
+	}
+	dnsString = to.String(nic.DNSSettings.InternalDomainNameSuffix)
+
+	s.log.Infof("writing custom dns %s", dnsString)
+
+	domainSettings := []string{
+		"interface \"eth0\" {\n",
+		fmt.Sprintf("    supersede domain-name \"%s\";\n", dnsString),
+		fmt.Sprintf("    supersede domain-search \"%s\";\n", dnsString),
+		"}\n",
+	}
+
+	err = writeContentsToFile("/host/etc/dhcp/dhclient-eth0.conf", domainSettings)
+	if err != nil {
+		return err
+	}
+
+	err = writeContentsToFile("/host/etc/dnsmasq.conf", []string{fmt.Sprintf("server=/%s/%s\n", dnsString, constants.AzureNameserver)})
+	return err
+}
+
+func writeContentsToFile(filename string, contents []string) error {
+	fd, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
+	if err != nil {
+		return err
+	}
+	for _, c := range contents {
+		fd.WriteString(c)
+	}
+	defer fd.Close()
+
+	return nil
 }

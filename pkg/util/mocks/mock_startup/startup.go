@@ -9,6 +9,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+	logrus "github.com/sirupsen/logrus"
 
 	api "github.com/openshift/openshift-azure/pkg/api"
 )
@@ -77,4 +78,18 @@ func (m *MockInterface) GetWorkerCs() *api.OpenShiftManagedCluster {
 func (mr *MockInterfaceMockRecorder) GetWorkerCs() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetWorkerCs", reflect.TypeOf((*MockInterface)(nil).GetWorkerCs))
+}
+
+// WriteSearchDomain mocks base method
+func (m *MockInterface) WriteSearchDomain(ctx context.Context, log *logrus.Entry) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WriteSearchDomain", ctx, log)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WriteSearchDomain indicates an expected call of WriteSearchDomain
+func (mr *MockInterfaceMockRecorder) WriteSearchDomain(ctx, log interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteSearchDomain", reflect.TypeOf((*MockInterface)(nil).WriteSearchDomain), ctx, log)
 }
