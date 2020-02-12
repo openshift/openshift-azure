@@ -121,7 +121,7 @@ func TestHashScaleSetStability(t *testing.T) {
 			{
 				role: api.AgentPoolProfileRoleMaster,
 				// this value should not change
-				expectedHash: "752cc90913885e480132837ef71e915933a80fc9933767b7594867fb3848be9a",
+				expectedHash: "8fc0c25d62efb3628a3b72f609547305c96a96f41dc02951508b6f70c2d144a5",
 			},
 			{
 				role: api.AgentPoolProfileRoleInfra,
@@ -138,7 +138,7 @@ func TestHashScaleSetStability(t *testing.T) {
 			{
 				role: api.AgentPoolProfileRoleMaster,
 				// this value should not change
-				expectedHash: "752cc90913885e480132837ef71e915933a80fc9933767b7594867fb3848be9a",
+				expectedHash: "8fc0c25d62efb3628a3b72f609547305c96a96f41dc02951508b6f70c2d144a5",
 			},
 			{
 				role: api.AgentPoolProfileRoleInfra,
