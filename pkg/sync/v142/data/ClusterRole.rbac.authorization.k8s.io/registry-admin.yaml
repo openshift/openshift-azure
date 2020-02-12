@@ -1,0 +1,121 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    authorization.openshift.io/system-only: "true"
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  name: registry-admin
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  - serviceaccounts
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  - image.openshift.io
+  resources:
+  - imagestreamimages
+  - imagestreammappings
+  - imagestreams
+  - imagestreams/secrets
+  - imagestreamtags
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  - image.openshift.io
+  resources:
+  - imagestreamimports
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  - image.openshift.io
+  resources:
+  - imagestreams/layers
+  verbs:
+  - get
+  - update
+- apiGroups:
+  - ""
+  - authorization.openshift.io
+  resources:
+  - rolebindings
+  - roles
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - rolebindings
+  - roles
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  - authorization.openshift.io
+  resources:
+  - localresourceaccessreviews
+  - localsubjectaccessreviews
+  - subjectrulesreviews
+  verbs:
+  - create
+- apiGroups:
+  - authorization.k8s.io
+  resources:
+  - localsubjectaccessreviews
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  - project.openshift.io
+  resources:
+  - projects
+  verbs:
+  - delete
+  - get
+- apiGroups:
+  - ""
+  - authorization.openshift.io
+  resources:
+  - resourceaccessreviews
+  - subjectaccessreviews
+  verbs:
+  - create

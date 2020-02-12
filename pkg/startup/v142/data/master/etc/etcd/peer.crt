@@ -1,0 +1,1 @@
+{{ CertAsBytes .Config.Certificates.EtcdPeer.Cert | String }}

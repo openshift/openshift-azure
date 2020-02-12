@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: metrics-server
+  name: metrics-server
+  namespace: openshift-monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: metrics-server
+  template:
+    metadata:
+      labels:
+        k8s-app: metrics-server
+      name: metrics-server
+    spec:
+      containers:
+      - command:
+        - /usr/bin/metrics-server
+        - --source=kubernetes.summary_api:?useServiceAccount=true&kubeletHttps=true&kubeletPort=10250
+        - --secure-port=8443
+        - --tls-cert-file=/certs/tls.crt
+        - --tls-private-key-file=/certs/tls.key
+        image: '*** GENERATED ***'
+        name: metrics-server
+        resources:
+          limits:
+            cpu: 500m
+            memory: 700Mi
+          requests:
+            cpu: 300m
+            memory: 400Mi
+        volumeMounts:
+        - mountPath: /certs
+          name: metrics-server-certs
+          readOnly: true
+      nodeSelector:
+        node-role.kubernetes.io/infra: "true"
+      serviceAccountName: metrics-server
+      volumes:
+      - name: metrics-server-certs
+        secret:
+          secretName: metrics-server-certs

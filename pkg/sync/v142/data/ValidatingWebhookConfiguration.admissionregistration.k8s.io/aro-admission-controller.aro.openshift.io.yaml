@@ -1,0 +1,86 @@
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: aro-admission-controller.aro.openshift.io
+webhooks:
+- clientConfig:
+    service:
+      name: aro-admission-controller
+      namespace: kube-system
+      path: /podwhitelist
+  failurePolicy: Fail
+  name: aro-admission-controller.aro.openshift.io
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - pods
+    - replicationcontrollers
+  - apiGroups:
+    - apps
+    apiVersions:
+    - v1beta1
+    - v1beta2
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - daemonsets
+    - deployments
+    - replicasets
+    - statefulsets
+  - apiGroups:
+    - batch
+    apiVersions:
+    - v1beta1
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - cronjobs
+    - jobs
+  - apiGroups:
+    - extensions
+    apiVersions:
+    - v1beta1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - daemonsets
+    - deployments
+    - replicasets
+  - apiGroups:
+    - apps.openshift.io
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - deploymentconfigs
+- clientConfig:
+    service:
+      name: aro-admission-controller
+      namespace: kube-system
+      path: /sccs
+  failurePolicy: Fail
+  name: sccs.aro-admission-controller.aro.openshift.io
+  rules:
+  - apiGroups:
+    - security.openshift.io
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    - DELETE
+    resources:
+    - securitycontextconstraints
