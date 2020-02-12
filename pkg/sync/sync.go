@@ -12,6 +12,7 @@ import (
 	v12 "github.com/openshift/openshift-azure/pkg/sync/v12"
 	v13 "github.com/openshift/openshift-azure/pkg/sync/v13"
 	v14 "github.com/openshift/openshift-azure/pkg/sync/v14"
+	v142 "github.com/openshift/openshift-azure/pkg/sync/v142"
 	v71 "github.com/openshift/openshift-azure/pkg/sync/v71"
 )
 
@@ -34,6 +35,8 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (
 		return v13.New(log, cs, initClients)
 	case "v14.0", "v14.1":
 		return v14.New(log, cs, initClients)
+	case "v14.2":
+		return v142.New(log, cs, initClients)
 	}
 
 	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)
@@ -47,7 +50,7 @@ func AssetNames(cs *api.OpenShiftManagedCluster) ([]string, error) {
 	switch cs.Config.PluginVersion {
 	case "v13.0", "v13.1":
 		return v13.AssetNames(), nil
-	case "v14.0", "v14.1":
+	case "v14.0", "v14.1", "v14.2": // NOTE(ehashman): not changing in 14.2
 		return v14.AssetNames(), nil
 	}
 
@@ -58,7 +61,7 @@ func Asset(cs *api.OpenShiftManagedCluster, name string) ([]byte, error) {
 	switch cs.Config.PluginVersion {
 	case "v13.0", "v13.1":
 		return v13.Asset(name)
-	case "v14.0", "v14.1":
+	case "v14.0", "v14.1", "v14.2": // NOTE(ehashman): not changing in 14.2
 		return v14.Asset(name)
 	}
 
