@@ -94,5 +94,8 @@ func start(cfg *cmdConfig) error {
 	default:
 		flag.Usage()
 	}
+
+	log.Print("etcdbackup finished")
+
 	return err
 }
