@@ -390,7 +390,10 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Ev
 			},
 		})
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(Equal(`admission webhook "aro-admission-controller.aro.openshift.io" denied the request: spec.containers[0]: Forbidden: requires privileges but image is not whitelisted on platform`))
+		Expect(err.Error()).To(SatisfyAny(
+			Equal(`admission webhook "aro-admission-controller.aro.openshift.io" denied the request: spec.containers[0]: Forbidden: requires privileges but image is not whitelisted on platform`),
+			Equal(`pods "test" is forbidden: unable to validate against any security context constraint: [spec.containers[0].securityContext.privileged: Invalid value: true: Privileged containers are not allowed]`),
+		))
 
 		_, err = sanity.Checker.Client.EndUser.CoreV1.Pods(namespace).Create(&v1.Pod{
 			ObjectMeta: metav1.ObjectMeta{
