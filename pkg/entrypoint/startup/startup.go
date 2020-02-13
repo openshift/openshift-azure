@@ -17,7 +17,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
-func runStartup(ctx context.Context, log *logrus.Entry) error {
+func readConfig(ctx context.Context, log *logrus.Entry) (*api.OpenShiftManagedCluster, error) {
 	log.Infof("reading config")
 	var cs *api.OpenShiftManagedCluster
 	err := wait.PollImmediateUntil(10*time.Second, func() (bool, error) {
@@ -38,6 +38,36 @@ func runStartup(ctx context.Context, log *logrus.Entry) error {
 		}
 		return true, nil
 	}, ctx.Done())
+	if err != nil {
+		return nil, err
+	}
+
+	return cs, err
+}
+
+func runInitNetwork(ctx context.Context, log *logrus.Entry) error {
+	cs, err := readConfig(ctx, log)
+	if err != nil {
+		return err
+	}
+
+	s, err := startup.New(log, cs, api.TestConfig{})
+	if err != nil {
+		return err
+	}
+
+	if cs.Properties.PrivateAPIServer {
+		err = s.WriteSearchDomain(ctx, log)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func runStartup(ctx context.Context, log *logrus.Entry) error {
+	cs, err := readConfig(ctx, log)
 	if err != nil {
 		return err
 	}
@@ -66,8 +96,14 @@ func start(cfg *cmdConfig) error {
 	log := logrus.NewEntry(logger)
 	log.Info("startup pod starting")
 
-	if err := runStartup(context.Background(), log); err != nil {
-		return err
+	if cfg.initNetwork {
+		if err := runInitNetwork(context.Background(), log); err != nil {
+			return err
+		}
+	} else {
+		if err := runStartup(context.Background(), log); err != nil {
+			return err
+		}
 	}
 
 	log.Info("all done successfully")

@@ -53,10 +53,6 @@ fi
 
 docker pull {{ .Config.Images.Node }} &>/dev/null &
 
-# when starting node waagent and network utilities goes into race condition.
-# if waagent runs before dns is known to the node we end up with empty string
-while [[ $(hostname -d) == "" ]]; do sleep 1; done
-
 logger -t node-startup.sh "pulling {{ .Config.Images.Startup }}"
 for attempt in {1..5}; do
   docker pull {{ .Config.Images.Startup }} && break
@@ -70,6 +66,21 @@ done
 set +x
 export SASURI='{{ .Config.WorkerStartupSASURI }}'
 set -x
+
+# run the startup --init to bootstrap DNS setup
+docker run --privileged --rm --network host -v /:/host:z -e SASURI {{ .Config.Images.Startup }} startup --init-network
+
+# restart network manager to pick up new host settings in the dhclient
+/bin/systemctl restart NetworkManager
+# set the /etc/resolv.conf
+/etc/NetworkManager/dispatcher.d/99-origin-dns.sh
+# restart dnsmasq to get the new settings in /etc/dnsmasq.conf
+/bin/systemctl restart dnsmasq.service
+
+# when starting node waagent and network utilities goes into race condition.
+# if waagent runs before dns is known to the node we end up with empty string
+while [[ $(hostname -d) == "" ]]; do sleep 1; done
+
 docker run --privileged --rm --network host -v /:/host:z -e SASURI {{ .Config.Images.Startup }} startup
 unset SASURI
 

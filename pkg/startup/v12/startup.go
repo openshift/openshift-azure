@@ -244,3 +244,10 @@ func (s *startup) writeFiles(role api.AgentPoolProfileRole, w writers.Writer, ho
 
 	return w.Close()
 }
+
+// WriteSearchDomain queries for the search domain and writes to
+// /etc/dhcp/dhclient-eth0.conf.  This is for private api clusters only
+func (s *startup) WriteSearchDomain(ctx context.Context, log *logrus.Entry) error {
+	log.Info("not supported in this release")
+	return nil
+}
