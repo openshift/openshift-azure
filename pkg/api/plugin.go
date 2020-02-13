@@ -164,6 +164,9 @@ type GenevaActions interface {
 	// RunCommand runs a predefined command on a virtual machine in the cluster
 	RunCommand(ctx context.Context, cs *OpenShiftManagedCluster, hostname string, command Command) error
 
+	// RunCommandRaw runs a provided command on a virtual machine in the cluster
+	RunCommandRaw(ctx context.Context, cs *OpenShiftManagedCluster, hostname string, command string) error
+
 	// GetPluginVersion fetches the RP plugin version
 	GetPluginVersion(ctx context.Context) *GenevaActionPluginVersion
 }

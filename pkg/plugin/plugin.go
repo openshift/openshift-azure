@@ -664,10 +664,6 @@ func (p *plugin) BackupEtcdCluster(ctx context.Context, cs *api.OpenShiftManaged
 }
 
 func (p *plugin) RunCommand(ctx context.Context, cs *api.OpenShiftManagedCluster, hostname string, command api.Command) error {
-	if !validate.IsValidAgentPoolHostname(hostname) {
-		return fmt.Errorf("invalid hostname %q", hostname)
-	}
-
 	var script string
 	switch command {
 	case api.CommandRestartNetworkManager:
@@ -684,6 +680,18 @@ func (p *plugin) RunCommand(ctx context.Context, cs *api.OpenShiftManagedCluster
 		return fmt.Errorf("invalid command %q", command)
 	}
 
+	return p.runCommand(ctx, cs, hostname, script)
+}
+
+func (p *plugin) RunCommandRaw(ctx context.Context, cs *api.OpenShiftManagedCluster, hostname string, command string) error {
+	return p.runCommand(ctx, cs, hostname, command)
+}
+
+func (p *plugin) runCommand(ctx context.Context, cs *api.OpenShiftManagedCluster, hostname string, command string) error {
+	if !validate.IsValidAgentPoolHostname(hostname) {
+		return fmt.Errorf("invalid hostname %q", hostname)
+	}
+
 	scaleset, instanceID, err := names.GetScaleSetNameAndInstanceID(hostname)
 	if err != nil {
 		return err
@@ -696,7 +704,7 @@ func (p *plugin) RunCommand(ctx context.Context, cs *api.OpenShiftManagedCluster
 	}
 
 	p.log.Infof("running %s on %s", command, hostname)
-	return clusterUpgrader.RunCommand(ctx, scaleset, instanceID, script)
+	return clusterUpgrader.RunCommand(ctx, scaleset, instanceID, command)
 }
 
 func (p *plugin) GetPluginVersion(ctx context.Context) *api.GenevaActionPluginVersion {
