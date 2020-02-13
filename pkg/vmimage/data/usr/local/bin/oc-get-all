@@ -7,7 +7,7 @@ then
   exit
 fi
 
-for target in group user deploy service pod route
+for target in node group user daemonset service route deploy cronjob job pod
 do
   set -x
   oc get --all-namespaces $target
