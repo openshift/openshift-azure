@@ -290,7 +290,6 @@ echo 'localpkg_gpgcheck=1' >> /etc/yum.conf
 echo 'kernel.randomize_va_space = 2' >> /etc/sysctl.conf
 
 rpm -qa --qf='%{sourcerpm}\n' | sort -u | sed 's/\.src\.rpm$//' > /var/tmp/installed_packages_list
-docker image ls > /var/tmp/container_images_list
 
 >/var/tmp/kickstart_completed
 %end
@@ -314,7 +313,6 @@ python -c "import pty; pty.spawn([
 virt-cat -a /var/lib/libvirt/images/$IMAGE.raw /var/tmp/kickstart_completed
 
 virt-cat -a /var/lib/libvirt/images/$IMAGE.raw /var/tmp/installed_packages_list > /tmp/$IMAGE-installed-packages.txt
-virt-cat -a /var/lib/libvirt/images/$IMAGE.raw /var/tmp/container_images_list > /tmp/$IMAGE-container-images.txt
 
 
 KERNEL="$(virt-cat -a /var/lib/libvirt/images/$IMAGE.raw /var/tmp/kernel-version)"
@@ -353,7 +351,6 @@ go get github.com/openshift/openshift-azure/cmd/azureblobupload
 set +x
 azureblobupload -account-name '{{ .Builder.ImageStorageAccount }}' -account-key $KEY -container-name '{{ .Builder.ImageContainer }}' -file /var/lib/libvirt/images/$IMAGE.vhd -name $IMAGE.vhd
 az storage blob upload --account-name '{{ .Builder.ImageStorageAccount }}' --account-key $KEY --container-name '{{ .Builder.MetadataContainer }}' --type block --file /tmp/$IMAGE-installed-packages.txt --name $IMAGE-installed-packages.txt
-az storage blob upload --account-name '{{ .Builder.ImageStorageAccount }}' --account-key $KEY --container-name '{{ .Builder.MetadataContainer }}' --type block --file /tmp/$IMAGE-container-images.txt --name $IMAGE-container-images.txt
 set -x
 
 az image create -g '{{ .Builder.ImageResourceGroup }}' -n $IMAGE --source "https://{{ .Builder.ImageStorageAccount }}.blob.core.windows.net/{{ .Builder.ImageContainer }}/$IMAGE.vhd" --os-type Linux --tags "kernel=$KERNEL" "openshift=$OPENSHIFT" 'gitcommit={{ .Builder.GitCommit }}'
