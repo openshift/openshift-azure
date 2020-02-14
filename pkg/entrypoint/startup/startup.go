@@ -56,11 +56,9 @@ func runInitNetwork(ctx context.Context, log *logrus.Entry) error {
 		return err
 	}
 
-	if cs.Properties.PrivateAPIServer {
-		err = s.WriteSearchDomain(ctx, log)
-		if err != nil {
-			return err
-		}
+	err = s.WriteSearchDomain(ctx, log)
+	if err != nil {
+		return err
 	}
 
 	return nil
