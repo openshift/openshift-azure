@@ -93,8 +93,6 @@ docker run --privileged --rm --network host -v /:/host:z -e SASURI {{ .Config.Im
 
 # restart network manager to pick up new host settings in the dhclient
 /bin/systemctl restart NetworkManager
-# set the /etc/resolv.conf
-/etc/NetworkManager/dispatcher.d/99-origin-dns.sh
 # restart dnsmasq to get the new settings in /etc/dnsmasq.conf
 /bin/systemctl restart dnsmasq.service
 
