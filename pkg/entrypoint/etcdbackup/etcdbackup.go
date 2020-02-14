@@ -44,7 +44,7 @@ func start(cfg *cmdConfig) error {
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
 	log := logrus.NewEntry(logrus.StandardLogger())
 
-	log.Print("etcdbackup starting")
+	log.Info("etcdbackup starting")
 
 	cpc, err := cloudprovider.Load("_data/_out/azure.conf")
 	if err != nil {
@@ -94,5 +94,8 @@ func start(cfg *cmdConfig) error {
 	default:
 		flag.Usage()
 	}
+
+	log.Info("etcdbackup finished")
+
 	return err
 }
