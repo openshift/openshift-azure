@@ -8,4 +8,5 @@
 - Hide config from update return errors ([#2191](https://github.com/openshift/openshift-azure/pull/2191), [@mjudeikis](https://github.com/mjudeikis), 22/01/2020)
 - Add client id for use in unit tests which disables roleLister ([#2187](https://github.com/openshift/openshift-azure/pull/2187), [@jim-minter](https://github.com/jim-minter), 22/01/2020)
 - Bugfix: Enable enduser to manage Kafka clusters ([#2129](https://github.com/openshift/openshift-azure/pull/2129), [@olga-mir](https://github.com/olga-mir), 21/01/2020)
+- Bugfix: fix oc binary build regression ([#2170](https://github.com/openshift/openshift-azure/pull/2170), [@pnasrat](https://github.com/pnasrat), 21/01/2020)
 - Rename Log Analytics to omsagent and upgrade omsagent to 12042019 ([#2133](https://github.com/openshift/openshift-azure/pull/2133), [@olga-mir](https://github.com/olga-mir), 08/01/2020)
