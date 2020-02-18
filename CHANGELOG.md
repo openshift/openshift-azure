@@ -1,5 +1,6 @@
 ## v15.0
 
+- Bugfix: fix custom DNS issues ([#2213](https://github.com/openshift/openshift-azure/pull/2213) and [#2230](https://github.com/openshift/openshift-azure/pull/2230), [@kwoodson](https://github.com/kwoodson), 13/02/2020)
 - Allow `osa-customer-admins` group members to run `who-can`, as in `oc adm policy who-can create user` ([#2197](https://github.com/openshift/openshift-azure/pull/2197), [@nilsanderselde](https://github.com/nilsanderselde), 06/02/2020)
 - Intended as a soft launch: support larger cluster creation up to 100 nodes based on previous performance tests now that the timeout issues for cluster creation of this size have been mitigated ([#2204](https://github.com/openshift/openshift-azure/pull/2204), [@mjudeikis](https://github.com/mjudeikis), 30/01/2020)
 - Fix RBAC for ILB ([#2201](https://github.com/openshift/openshift-azure/pull/2201), [@mjudeikis](https://github.com/mjudeikis), 30/01/2020)
