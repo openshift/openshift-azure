@@ -13,8 +13,6 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	v10 "github.com/openshift/openshift-azure/pkg/startup/v10"
-	v12 "github.com/openshift/openshift-azure/pkg/startup/v12"
 	v14 "github.com/openshift/openshift-azure/pkg/startup/v14"
 	v15 "github.com/openshift/openshift-azure/pkg/startup/v15"
 	v16 "github.com/openshift/openshift-azure/pkg/startup/v16"
@@ -34,11 +32,7 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.Test
 	switch cs.Config.PluginVersion {
 	case "v7.1":
 		return v71.New(log, cs, testConfig), nil
-	case "v10.0", "v10.1", "v10.2":
-		return v10.New(log, cs, testConfig), nil
-	case "v12.0", "v12.1", "v12.2":
-		return v12.New(log, cs, testConfig), nil
-	case "v14.0", "v14.1":
+	case "v14.1":
 		return v14.New(log, cs, testConfig), nil
 	case "v15.0":
 		return v15.New(log, cs, testConfig), nil
