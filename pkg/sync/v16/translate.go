@@ -615,12 +615,6 @@ var translations = map[string][]struct {
 			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.GenevaMetrics.Key) }}",
 		},
 	},
-	"Secret/openshift-console/apiserver-cert": {
-		{
-			Path:     jsonpath.MustCompile("$.stringData.'tls.crt'"),
-			Template: "{{ String (CertChainAsBytes .Config.Certificates.OpenShiftConsole.Certs) }}",
-		},
-	},
 	"Secret/openshift-azure-monitoring/etcd-metrics": {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'username'"),

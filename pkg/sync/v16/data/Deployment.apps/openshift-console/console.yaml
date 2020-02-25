@@ -67,9 +67,6 @@ spec:
         - mountPath: /var/oauth-config
           name: oauth-config
           readOnly: true
-        - mountPath: /var/apiserver-cert
-          name: apiserver-cert
-          readOnly: true
         - mountPath: /var/console-config
           name: console-config
       nodeSelector:
@@ -83,10 +80,6 @@ spec:
         secret:
           defaultMode: 288
           secretName: console-oauth-config
-      - name: apiserver-cert
-        secret:
-          defaultMode: 288
-          secretName: apiserver-cert
       - configMap:
           defaultMode: 288
           name: console-config

@@ -6,7 +6,7 @@ data:
       clientID: openshift-console
       clientSecretFile: /var/oauth-config/clientSecret
       logoutRedirect: ''
-      oauthEndpointCAFile: /var/apiserver-cert/tls.crt
+      oauthEndpointCAFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
     clusterInfo:
       consoleBaseAddress: '*** GENERATED ***'
       consoleBasePath: ''
