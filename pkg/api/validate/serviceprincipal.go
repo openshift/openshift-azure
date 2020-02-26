@@ -2,10 +2,13 @@ package validate
 
 import (
 	"fmt"
+	"strings"
+	"time"
 
 	"github.com/Azure/go-autorest/autorest/adal"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/dgrijalva/jwt-go"
+	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 )
@@ -35,7 +38,12 @@ func (SimpleRoleLister) ListAADApplicationRoles(aad *api.AADIdentityProvider) (r
 		return nil, err
 	}
 
-	err = token.EnsureFresh()
+	// get a token, retrying only on AADSTS700016 errors (slow AAD propagation).
+	// see: https://github.com/Azure/ARO-RP/blob/0af036fcd242c116a15bfd3dc2f4ac01b9f64534/pkg/api/validate/openshiftcluster_validatedynamic.go#L95-L108
+	wait.PollImmediate(time.Second, 10*time.Second, func() (bool, error) {
+		err = token.EnsureFresh()
+		return err == nil || !strings.Contains(err.Error(), "AADSTS700016"), nil
+	})
 	if err != nil {
 		return
 	}
