@@ -1,5 +1,0 @@
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: pv-recycler-controller
-  namespace: openshift-infra
