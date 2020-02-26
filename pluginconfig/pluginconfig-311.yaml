@@ -271,37 +271,37 @@ versions:
     imageOffer: osa
     imagePublisher: redhat
     imageSku: osa_311
-    imageVersion: 311.161.20200217
+    imageVersion: 311.170.20200224
     images:
-      alertManager: registry.access.redhat.com/openshift3/prometheus-alertmanager:v3.11.161
-      ansibleServiceBroker: registry.access.redhat.com/openshift3/ose-ansible-service-broker:v3.11.161
-      clusterMonitoringOperator: registry.access.redhat.com/openshift3/ose-cluster-monitoring-operator:v3.11.161
-      configReloader: registry.access.redhat.com/openshift3/ose-configmap-reloader:v3.11.161
-      console: registry.access.redhat.com/openshift3/ose-console:v3.11.161
-      controlPlane: registry.access.redhat.com/openshift3/ose-control-plane:v3.11.161
-      grafana: registry.access.redhat.com/openshift3/grafana:v3.11.161
-      kubeRbacProxy: registry.access.redhat.com/openshift3/ose-kube-rbac-proxy:v3.11.161
-      kubeStateMetrics: registry.access.redhat.com/openshift3/ose-kube-state-metrics:v3.11.161
-      node: registry.access.redhat.com/openshift3/ose-node:v3.11.161
-      nodeExporter: registry.access.redhat.com/openshift3/prometheus-node-exporter:v3.11.161
-      oAuthProxy: registry.access.redhat.com/openshift3/oauth-proxy:v3.11.161
-      prometheus: registry.access.redhat.com/openshift3/prometheus:v3.11.161
-      prometheusConfigReloader: registry.access.redhat.com/openshift3/ose-prometheus-config-reloader:v3.11.161
-      prometheusOperator: registry.access.redhat.com/openshift3/ose-prometheus-operator:v3.11.161
-      registry: registry.access.redhat.com/openshift3/ose-docker-registry:v3.11.161
-      registryConsole: registry.access.redhat.com/openshift3/registry-console:v3.11.161
-      router: registry.access.redhat.com/openshift3/ose-haproxy-router:v3.11.161
-      serviceCatalog: registry.access.redhat.com/openshift3/ose-service-catalog:v3.11.161
-      templateServiceBroker: registry.access.redhat.com/openshift3/ose-template-service-broker:v3.11.161
-      webConsole: registry.access.redhat.com/openshift3/ose-web-console:v3.11.161
-      format: registry.access.redhat.com/openshift3/ose-${component}:v3.11.161
-      httpd: registry.access.redhat.com/rhscl/httpd-24-rhel7:2.4-108
-      masterEtcd: registry.access.redhat.com/rhel7/etcd:3.2.26-22
+      alertManager: registry.access.redhat.com/openshift3/prometheus-alertmanager:v3.11.170
+      ansibleServiceBroker: registry.access.redhat.com/openshift3/ose-ansible-service-broker:v3.11.170
+      clusterMonitoringOperator: registry.access.redhat.com/openshift3/ose-cluster-monitoring-operator:v3.11.170
+      configReloader: registry.access.redhat.com/openshift3/ose-configmap-reloader:v3.11.170
+      console: registry.access.redhat.com/openshift3/ose-console:v3.11.170
+      controlPlane: registry.access.redhat.com/openshift3/ose-control-plane:v3.11.170
+      grafana: registry.access.redhat.com/openshift3/grafana:v3.11.170
+      kubeRbacProxy: registry.access.redhat.com/openshift3/ose-kube-rbac-proxy:v3.11.170
+      kubeStateMetrics: registry.access.redhat.com/openshift3/ose-kube-state-metrics:v3.11.170
+      node: registry.access.redhat.com/openshift3/ose-node:v3.11.170
+      nodeExporter: registry.access.redhat.com/openshift3/prometheus-node-exporter:v3.11.170
+      oAuthProxy: registry.access.redhat.com/openshift3/oauth-proxy:v3.11.170
+      prometheus: registry.access.redhat.com/openshift3/prometheus:v3.11.170
+      prometheusConfigReloader: registry.access.redhat.com/openshift3/ose-prometheus-config-reloader:v3.11.170
+      prometheusOperator: registry.access.redhat.com/openshift3/ose-prometheus-operator:v3.11.170
+      registry: registry.access.redhat.com/openshift3/ose-docker-registry:v3.11.170
+      registryConsole: registry.access.redhat.com/openshift3/registry-console:v3.11.170
+      router: registry.access.redhat.com/openshift3/ose-haproxy-router:v3.11.170
+      serviceCatalog: registry.access.redhat.com/openshift3/ose-service-catalog:v3.11.170
+      templateServiceBroker: registry.access.redhat.com/openshift3/ose-template-service-broker:v3.11.170
+      webConsole: registry.access.redhat.com/openshift3/ose-web-console:v3.11.170
+      format: registry.access.redhat.com/openshift3/ose-${component}:v3.11.170
+      httpd: registry.access.redhat.com/rhscl/httpd-24-rhel7:2.4-109
+      masterEtcd: registry.access.redhat.com/rhel7/etcd:3.2.26-32
       genevaLogging: osarpint.azurecr.io/acs/mdsd:master.20190228.1
       genevaStatsd: osarpint.azurecr.io/acs/mdm:git-a909a2e76
       genevaTDAgent: osarpint.azurecr.io/acs/td-agent:master.20190228.1
       logAnalyticsAgent: mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod12042019
-      metricsServer: registry.access.redhat.com/openshift3/ose-metrics-server:v3.11.161
+      metricsServer: registry.access.redhat.com/openshift3/ose-metrics-server:v3.11.170
       azureControllers: quay.io/openshift-on-azure/ci-azure:latest
       aroAdmissionController: quay.io/openshift-on-azure/ci-azure:latest
       canary: quay.io/openshift-on-azure/ci-azure:latest
