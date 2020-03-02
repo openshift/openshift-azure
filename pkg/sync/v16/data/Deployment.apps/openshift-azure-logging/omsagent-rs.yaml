@@ -4,6 +4,8 @@ metadata:
   labels:
     azure.openshift.io/sync-pod-optionally-apply: '*** GENERATED ***'
     azure.openshift.io/sync-pod-wait-for-readiness: "false"
+    component: oms-agent
+    tier: node
   name: omsagent-rs
   namespace: openshift-azure-logging
 spec:
@@ -15,7 +17,7 @@ spec:
     metadata:
       annotations:
         agentVersion: 1.10.0.1
-        dockerProviderVersion: 8.0.0-1
+        dockerProviderVersion: 8.0.0-3
         schema-versions: v1
       labels:
         rsName: omsagent-rs
@@ -35,6 +37,9 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: status.hostIP
+        # Update this with the user assigned msi client id for omsagent
+        - name: USER_ASSIGNED_IDENTITY_CLIENT_ID
+          value: ""
         image: '*** GENERATED ***'
         livenessProbe:
           exec:
@@ -88,7 +93,19 @@ spec:
       nodeSelector:
         beta.kubernetes.io/os: linux
         node-role.kubernetes.io/compute: "true"
+        kubernetes.io/role: agent
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - labelSelector:
+                matchExpressions:
+                  - key: type
+                    operator: NotIn
+                    values:
+                      - virtual-kubelet
       serviceAccountName: omsagent
+      # The following tolerations are removed for AKS, this is only required for non AKS
       tolerations:
       - effect: NoExecute
         operator: Exists
