@@ -22,6 +22,16 @@ spec:
       labels:
         rsName: omsagent-rs
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - labelSelector: null
+              matchExpressions:
+              - key: type
+                operator: NotIn
+                values:
+                - virtual-kubelet
       containers:
       - command:
         - /opt/main-wrapper.sh
@@ -37,7 +47,6 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: status.hostIP
-        # Update this with the user assigned msi client id for omsagent
         - name: USER_ASSIGNED_IDENTITY_CLIENT_ID
           value: ""
         image: '*** GENERATED ***'
@@ -93,20 +102,7 @@ spec:
       nodeSelector:
         beta.kubernetes.io/os: linux
         node-role.kubernetes.io/compute: "true"
-      # NOTE(ehashman): ARO compute nodes don't have this label
-      # kubernetes.io/role: agent
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - labelSelector:
-                matchExpressions:
-                  - key: type
-                    operator: NotIn
-                    values:
-                      - virtual-kubelet
       serviceAccountName: omsagent
-      # The following tolerations are removed for AKS, this is only required for non AKS
       tolerations:
       - effect: NoExecute
         operator: Exists

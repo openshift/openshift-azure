@@ -9,7 +9,6 @@ data:
       bind 0.0.0.0
       chunk_size_limit 4m
      </source>
-
      #Kubernetes pod inventory
      <source>
       type kubepodinventory
@@ -18,7 +17,6 @@ data:
       log_level debug
       custom_metrics_azure_regions eastus,southcentralus,westcentralus,westus2,southeastasia,northeurope,westeurope,southafricanorth,centralus,northcentralus,eastus2,koreacentral,eastasia,centralindia,uksouth,canadacentral,francecentral,japaneast,australiaeast
      </source>
-
      #Kubernetes events
      <source>
       type kubeevents
@@ -26,7 +24,6 @@ data:
       run_interval 60
       log_level debug
       </source>
-
      #Kubernetes Nodes
      <source>
       type kubenodeinventory
@@ -34,7 +31,6 @@ data:
       run_interval 60
       log_level debug
      </source>
-
      #Kubernetes health
      <source>
       type kubehealth
@@ -42,7 +38,6 @@ data:
       run_interval 60
       log_level debug
      </source>
-
      #cadvisor perf- Windows nodes
      <source>
       type wincadvisorperf
@@ -50,13 +45,11 @@ data:
       run_interval 60
       log_level debug
      </source>
-
      <filter mdm.kubenodeinventory**>
       type filter_inventory2mdm
       custom_metrics_azure_regions eastus,southcentralus,westcentralus,westus2,southeastasia,northeurope,westeurope,southafricanorth,centralus,northcentralus,eastus2,koreacentral,eastasia,centralindia,uksouth,canadacentral,francecentral,japaneast,australiaeast
       log_level info
      </filter>
-
      #custom_metrics_mdm filter plugin for perf data from windows nodes
      <filter mdm.cadvisorperf**>
       type filter_cadvisor2mdm
@@ -64,12 +57,10 @@ data:
       metrics_to_collect cpuUsageNanoCores,memoryWorkingSetBytes
       log_level info
      </filter>
-
      #health model aggregation filter
      <filter kubehealth**>
       type filter_health_model_builder
      </filter>
-
      <match oms.containerinsights.KubePodInventory**>
       type out_oms
       log_level debug
@@ -84,7 +75,6 @@ data:
       retry_wait 5s
       max_retry_wait 5m
      </match>
-
      <match oms.containerinsights.KubeEvents**>
       type out_oms
       log_level debug
@@ -99,7 +89,6 @@ data:
       retry_wait 5s
       max_retry_wait 5m
      </match>
-
      <match oms.containerinsights.KubeServices**>
       type out_oms
       log_level debug
@@ -114,7 +103,6 @@ data:
       retry_wait 5s
       max_retry_wait 5m
      </match>
-
      <match oms.containerinsights.KubeNodeInventory**>
       type out_oms
       log_level debug
@@ -129,7 +117,6 @@ data:
       retry_wait 5s
       max_retry_wait 5m
      </match>
-
      <match oms.containerinsights.ContainerNodeInventory**>
       type out_oms
       log_level debug
@@ -143,8 +130,7 @@ data:
       retry_wait 5s
       max_retry_wait 5m
      </match>
-
-     <match oms.api.KubePerf**>	
+     <match oms.api.KubePerf**>
       type out_oms
       log_level debug
       num_threads 5
@@ -158,7 +144,6 @@ data:
       retry_wait 5s
       max_retry_wait 5m
      </match>
-
      <match mdm.kubepodinventory** mdm.kubenodeinventory** >
       type out_mdm
       log_level debug
@@ -174,7 +159,6 @@ data:
       max_retry_wait 5m
       retry_mdm_post_wait_minutes 30
      </match>
-
      <match oms.api.wincadvisorperf**>
       type out_oms
       log_level debug
@@ -189,7 +173,6 @@ data:
       retry_wait 5s
       max_retry_wait 5m
      </match>
-
      <match mdm.cadvisorperf**>
       type out_mdm
       log_level debug
@@ -205,37 +188,34 @@ data:
       max_retry_wait 5m
       retry_mdm_post_wait_minutes 30
      </match>
-
-    <match kubehealth.Signals**>
-     type out_oms
-     log_level debug
-     num_threads 5
-     buffer_chunk_limit 4m
-     buffer_type file
-     buffer_path %STATE_DIR_WS%/out_oms_kubehealth*.buffer
-     buffer_queue_limit 20
-     buffer_queue_full_action drop_oldest_chunk
-     flush_interval 20s
-     retry_limit 10
-     retry_wait 5s
-     max_retry_wait 5m
-    </match>
-
-    <match oms.api.InsightsMetrics**>
-     type out_oms
-     log_level debug
-     num_threads 5
-     buffer_chunk_limit 4m
-     buffer_type file
-     buffer_path %STATE_DIR_WS%/out_oms_insightsmetrics*.buffer
-     buffer_queue_limit 20
-     buffer_queue_full_action drop_oldest_chunk
-     flush_interval 20s
-     retry_limit 10
-     retry_wait 5s
-     max_retry_wait 5m
-    </match>
-
+     <match kubehealth.Signals**>
+      type out_oms
+      log_level debug
+      num_threads 5
+      buffer_chunk_limit 4m
+      buffer_type file
+      buffer_path %STATE_DIR_WS%/out_oms_kubehealth*.buffer
+      buffer_queue_limit 20
+      buffer_queue_full_action drop_oldest_chunk
+      flush_interval 20s
+      retry_limit 10
+      retry_wait 5s
+      max_retry_wait 5m
+     </match>
+     <match oms.api.InsightsMetrics**>
+      type out_oms
+      log_level debug
+      num_threads 5
+      buffer_chunk_limit 4m
+      buffer_type file
+      buffer_path %STATE_DIR_WS%/out_oms_insightsmetrics*.buffer
+      buffer_queue_limit 20
+      buffer_queue_full_action drop_oldest_chunk
+      flush_interval 20s
+      retry_limit 10
+      retry_wait 5s
+      max_retry_wait 5m
+     </match>
 kind: ConfigMap
 metadata:
   name: omsagent-rs-config
