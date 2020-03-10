@@ -4,21 +4,35 @@ metadata:
   labels:
     azure.openshift.io/sync-pod-optionally-apply: '*** GENERATED ***'
     azure.openshift.io/sync-pod-wait-for-readiness: "false"
+    component: oms-agent
+    tier: node
   name: omsagent
   namespace: openshift-azure-logging
 spec:
   selector:
     matchLabels:
-      dsName: omsagent-ds
+      component: oms-agent
+      tier: node
   template:
     metadata:
       annotations:
         agentVersion: 1.10.0.1
-        dockerProviderVersion: 8.0.0-1
+        dockerProviderVersion: 8.0.0-3
         schema-versions: v1
       labels:
-        dsName: omsagent-ds
+        component: oms-agent
+        tier: node
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - labelSelector: null
+              matchExpressions:
+              - key: type
+                operator: NotIn
+                values:
+                - virtual-kubelet
       containers:
       - command:
         - /opt/main-wrapper.sh
@@ -34,6 +48,8 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: status.hostIP
+        - name: USER_ASSIGNED_IDENTITY_CLIENT_ID
+          value: ""
         - name: REPLICASET_SERVICE_ENDPOINT
           value: healthmodel-replicaset-service.openshift-azure-logging
         image: '*** GENERATED ***'

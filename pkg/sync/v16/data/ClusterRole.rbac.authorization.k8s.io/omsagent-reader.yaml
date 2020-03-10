@@ -9,6 +9,9 @@ rules:
   - pods
   - events
   - nodes
+  - nodes/stats
+  - nodes/metrics
+  - nodes/spec
   - namespaces
   - services
   verbs:
@@ -17,6 +20,7 @@ rules:
   - watch
 - apiGroups:
   - apps
+  - extensions
   resources:
   - replicasets
   verbs:
