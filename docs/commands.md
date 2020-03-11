@@ -44,6 +44,8 @@
 
 /test images
 
+/test images-build01
+
 /test verify
 
 ```
