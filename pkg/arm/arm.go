@@ -17,6 +17,7 @@ import (
 	v14 "github.com/openshift/openshift-azure/pkg/arm/v14"
 	v15 "github.com/openshift/openshift-azure/pkg/arm/v15"
 	v16 "github.com/openshift/openshift-azure/pkg/arm/v16"
+	v17 "github.com/openshift/openshift-azure/pkg/arm/v17"
 	v71 "github.com/openshift/openshift-azure/pkg/arm/v71"
 )
 
@@ -36,6 +37,8 @@ func New(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster
 		return v15.New(ctx, log, cs, testConfig), nil
 	case "v16.0":
 		return v16.New(ctx, log, cs, testConfig), nil
+	case "v17.0":
+		return v17.New(ctx, log, cs, testConfig), nil
 	}
 
 	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)
