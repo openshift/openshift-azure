@@ -62,22 +62,11 @@ Branching model
 # Doing a release with current integration:
 
 0. Build and publish the VM image. For major releases, typically this should
-   happen at the end of the second week of the sprint. See the [VM building
+   happen at the end of the second week of the sprint, and the VM image will
+   not change during the release. See the [VM building
    SOP.](https://github.com/openshift/azure-sop/blob/master/SOP/eng/releng.asciidoc)
 
-1. Container images are built hourly from master. When you are ready to release
-   the container image, [tag
-   it](https://quay.io/repository/openshift-on-azure/azure?tag=latest&tab=tags)
-   with the appropriate version on quay.io. (Note: only members of the
-   `openshift-on-azure` quay.io team have access.)
-
-   Images for production are released to ACR. This can be done by people,
-   who have ACR root secrets. These images can be built by checking out
-   `release-vX` branch and running command `make azure-push`. For this command
-   to publish images to quay.io.
-   Publishing to ACR is a manual process for now.
-
-2. Create a release branch from master and push it.
+1. Create a release branch from master and push it.
 
 ```
 git checkout <required commit>
@@ -95,9 +84,7 @@ git cherry-pick <git commit id>
 
 Command `/cherrypick release-vx` prow command can be used too.
 
-Open a PR into release branch.
-
-3. Configure testing for release branch in `openshift/release` repository. This
+2. Configure testing for release branch in `openshift/release` repository. This
    will make sure that any PR to release branches is gated by tests.
 
 Add new branch config file in `ci-operator/config/openshift/openshift-azure/openshift-openshift-azure-release-vx.yaml`
@@ -111,9 +98,20 @@ docker pull registry.svc.ci.openshift.org/ci/ci-operator-prowgen:latest
 docker run -it -v $(pwd)/ci-operator:/ci-operator:z registry.svc.ci.openshift.org/ci/ci-operator-prowgen:latest --from-dir /ci-operator/config/ --to-dir /ci-operator/jobs
 ```
 
-Merge it to release repository. After this is done, all PR's should run all tests.
+Merge it to release repository. After this is done, all PR's on the release
+branch should run all tests.
 
 Sample PR: https://github.com/openshift/release/pull/4440
+
+3. Container images for production are released to ACR. This can be done by
+   people who have ACR root secrets. Publishing to ACR is a manual process for
+   now.
+
+   These images can be built by checking out `release-vX` branch. Build the
+   container image on the release branch (`make azure-image`), tag it for ACR
+   (`docker tag quay.io/openshift-on-azure/azure:vx.y
+   osarpint.azurecr.io/openshift-on-azure/azure:vx.y`), and push the image to
+   ACR (`docker push osarpint.azurecr.io/openshift-on-azure/azure:vx.y`).
 
 4. Create release PR into `openshift/openshift-azure` repository release branch. This is main step, where we configure/edit release specific configuration.
 
@@ -155,14 +153,9 @@ Note about release numbers to use as commitrange with releasenotes above:
 
 Merge this PR into `release-vx` branch. If step 2 was completed right, this PR now should run all OSA test suites for it to be merged. Test will be using CI infrastructure built images.
 
-**Note:** for major releases, you may need to tag the top commit of the release
-PR with the major release version in order for CI to successfully pass (e.g.
-`scaleupdown-vx.y` job needs the `vx.y` tag to be defined). See instructions in
-the next step.
-
 Sample PR: https://github.com/openshift/openshift-azure/pull/1851
 
-5. Tag release for the release you just merged in step 3.
+5. Tag release on top of the PR you just merged in step 3.
 
 This step requires write access on git repo. You might need to ask somebody
 else to execute these commands.
@@ -174,15 +167,16 @@ git tag -a -s -m "Version vx.y" vx.y
 git push upstream tags/vx.y
 ```
 
-6. Update upgrade tests for published release in `openshift/release`
-
-This step can be done together with step 2, but for first release you are doing we recommend to do it as separate PR.
+6. Add upgrade tests for published release in `openshift/release`
 
 ```
 git checkout -b osa.release.vx.testing
 ```
 
-Add vx.y target to `ci-operator/jobs/openshift/openshift-azure/openshift-openshift-azure-master-presubmits.yaml`
+Add vx.y target to
+`ci-operator/jobs/openshift/openshift-azure/openshift-openshift-azure-master-presubmits.yaml`
+and
+`ci-operator/jobs/openshift/openshift-azure/openshift-openshift-azure-release-vx-presubmits.yaml`:
 
 ```
 - agent: kubernetes
@@ -213,9 +207,9 @@ docker run -it -v $(pwd)/ci-operator:/ci-operator:z registry.svc.ci.openshift.or
 
 Merge the PR. After this test command `/test upgrade-vx.y` should work on PR's.
 
-Sample PR: https://github.com/openshift/release/pull/4730
+Sample PR: https://github.com/openshift/release/pull/7595
 
-7. Start development of v(x+1).0!
+## Start development of the next major version
 
 Prepare a new PR to master which does the following:
 
@@ -260,3 +254,11 @@ ci-operator/jobs/openshift/openshift-azure/openshift-openshift-azure-master-pres
 ```
 
 Github tags/branches and old images inside the registry are left for future reference.
+
+You will also need to clean up code on `openshift/openshift-azure` by following
+the steps in the "Start development for the next major version" section in
+reverse: that is, removing the old plugin version hashes, removing directory
+references, removing old directories, and removing references to that version
+in the pluginconfig.
+
+Sample PR: https://github.com/openshift/openshift-azure/pull/2123
