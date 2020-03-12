@@ -36,13 +36,19 @@
 
 /test upgrade-private-v15.0
 
+/test upgrade-private-v16.0
+
 /test upgrade-v14.1
 
 /test upgrade-v15.0
 
+/test upgrade-v16.0
+
 /test vmimage
 
 /test images
+
+/test images-build01
 
 /test verify
 
