@@ -1,0 +1,22 @@
+apiVersion: v1
+data:
+  rsyslog.conf: |-
+    kern.debug       @127.0.0.1:25224
+    user.debug       @127.0.0.1:25224
+    daemon.debug     @127.0.0.1:25224
+    auth.debug       @127.0.0.1:25224
+    syslog.debug     @127.0.0.1:25224
+    authpriv.debug   @127.0.0.1:25224
+    cron.debug       @127.0.0.1:25224
+    local0.debug     @127.0.0.1:25224
+    local1.debug     @127.0.0.1:25224
+    local2.debug     @127.0.0.1:25224
+    local3.debug     @127.0.0.1:25224
+    local4.debug     @127.0.0.1:25224
+    local5.debug     @127.0.0.1:25224
+    local6.debug     @127.0.0.1:25224
+    local7.debug     @127.0.0.1:25224
+kind: ConfigMap
+metadata:
+  name: omsagent-rsyslog-config
+  namespace: openshift-azure-logging

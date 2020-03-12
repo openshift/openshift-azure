@@ -1,0 +1,23 @@
+apiVersion: v1
+data:
+  main-wrapper.sh: |-
+    #!/bin/bash
+
+    DOCKER_SOCKET=/var/run/host/docker.sock
+    DOCKER_GROUP=docker
+    REGULAR_USER=omsagent
+    if [ -S ${DOCKER_SOCKET} ]; then
+        echo "getting gid for docker.sock"
+        DOCKER_GID=$(stat -c '%g' ${DOCKER_SOCKET})
+        echo "adding omsagent user to docker group ${DOCKER_GID}"
+        cat >>/etc/group <<EOL
+    ${DOCKER_GROUP}:x:${DOCKER_GID}:${REGULAR_USER}
+    EOL
+    fi
+
+    # call the main script
+    /opt/main.sh
+kind: ConfigMap
+metadata:
+  name: omsagent-entrypoint
+  namespace: openshift-azure-logging
