@@ -12,7 +12,6 @@ import (
 	v15 "github.com/openshift/openshift-azure/pkg/sync/v15"
 	v16 "github.com/openshift/openshift-azure/pkg/sync/v16"
 	v17 "github.com/openshift/openshift-azure/pkg/sync/v17"
-	v71 "github.com/openshift/openshift-azure/pkg/sync/v71"
 )
 
 type Interface interface {
@@ -24,8 +23,6 @@ type Interface interface {
 
 func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (Interface, error) {
 	switch cs.Config.PluginVersion {
-	case "v7.1":
-		return v71.New(log, cs, initClients)
 	case "v14.1":
 		return v14.New(log, cs, initClients)
 	case "v15.0":

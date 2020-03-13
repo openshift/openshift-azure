@@ -1168,12 +1168,12 @@ func TestPrioritizeTags(t *testing.T) {
 			expected: []string{"latest", "1.2-rc1", "1.2-beta4", "1.2-beta1", "1.2-alpha1", "1.1-rc1", "1.1-beta2", "1.1-beta1"},
 		},
 		{
-			tags:     []string{"7.1", "v7.1", "7.1.0"},
-			expected: []string{"7.1", "v7.1", "7.1.0"},
+			tags:     []string{"14.1", "v14.1", "14.1.0"},
+			expected: []string{"714.1", "v14.1", "14.1.0"},
 		},
 		{
-			tags:     []string{"7.1.0", "v7.1", "7.1"},
-			expected: []string{"7.1", "v7.1", "7.1.0"},
+			tags:     []string{"14.1.0", "v14.1", "14.1"},
+			expected: []string{"14.1", "v14.1", "14.1.0"},
 		},
 	}
 
