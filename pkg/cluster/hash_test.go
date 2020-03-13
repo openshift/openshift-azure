@@ -32,23 +32,6 @@ func TestHashScaleSetStability(t *testing.T) {
 		role         api.AgentPoolProfileRole
 		expectedHash string
 	}{
-		"v7.1": {
-			{
-				role: api.AgentPoolProfileRoleMaster,
-				// this value should not change
-				expectedHash: "d487b62136a4f5e0d603ec2c0e0074366850fc16b04f1181d7dab9a53707c916",
-			},
-			{
-				role: api.AgentPoolProfileRoleInfra,
-				// this value should not change
-				expectedHash: "e36358c9f1a05cc7d9cd7dd58d1a5ef0145b15c710979817dcfe1c4edd911878",
-			},
-			{
-				role: api.AgentPoolProfileRoleCompute,
-				// this value should not change
-				expectedHash: "b02af291c3fe22fb1e289493959a17d42d5bcd69af1166d1dbb24bf80c69da93",
-			},
-		},
 		"v14.1": {
 			{
 				role: api.AgentPoolProfileRoleMaster,
@@ -150,14 +133,10 @@ func TestHashScaleSetStability(t *testing.T) {
 	populate.DummyCertsAndKeys(cs)
 
 	for version, tests := range tests {
-		switch version {
-		case "v7.1":
-			cs.Config.Images.ImagePullSecret = []byte{}
-			cs.Config.Images.GenevaImagePullSecret = []byte{}
-		default:
-			cs.Config.Images.ImagePullSecret = populate.DummyImagePullSecret("registry.redhat.io")
-			cs.Config.Images.GenevaImagePullSecret = populate.DummyImagePullSecret("osarpint.azurecr.io")
-		}
+
+		cs.Config.Images.ImagePullSecret = populate.DummyImagePullSecret("registry.redhat.io")
+		cs.Config.Images.GenevaImagePullSecret = populate.DummyImagePullSecret("osarpint.azurecr.io")
+
 		for _, tt := range tests {
 			cs.Config.PluginVersion = version
 
@@ -193,10 +172,6 @@ func TestHashSyncPodStability(t *testing.T) {
 	tests := map[string]struct {
 		expectedHash string
 	}{
-		"v7.1": {
-			// this value should not change
-			expectedHash: "13606ac122bf615190ff88d5c358709aaba9228c9e8cab031c058184bd016444",
-		},
 		"v14.1": {
 			// this value should not change
 			expectedHash: "6eec62c0a5e275c4d38e61ba5b9ac4c0f90f065d01d0d466fcafca4150f361e5",
@@ -263,13 +238,8 @@ func TestHashSyncPodStability(t *testing.T) {
 
 	for version, tt := range tests {
 		cs.Config.PluginVersion = version
-		switch cs.Config.PluginVersion {
-		case "v7.1":
-			cs.Config.Images.Console = ""
-		default:
-			// needed by derived.OpenShiftClientVersion()
-			cs.Config.Images.Console = "foo:v1.2.3"
-		}
+		// needed by derived.OpenShiftClientVersion()
+		cs.Config.Images.Console = "foo:v1.2.3"
 
 		s, err := sync.New(nil, cs, false)
 		if err != nil {
