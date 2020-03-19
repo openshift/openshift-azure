@@ -1,43 +1,35 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhdm: "7.6"
-  template: rhdm76-authoring-ha
+  rhdm: "7.7"
+  template: rhdm77-authoring
 message: |-
-  A new persistent HA Decision Manager application has been created in your project.
-  The user name/password for accessing the Decision Central interface is
+  A new persistent Decision Manager application has been created in your project.
+  The username/password needed for accessing the application are stored in "${CREDENTIALS_SECRET}" secret as
+  KIE_ADMIN_USER and KIE_ADMIN_PWD
 
-      User name: ${KIE_ADMIN_USER}
-      Password: ${KIE_ADMIN_PWD}
-
-  The user name/password for calls to the KIE server is
-
-      User name: ${KIE_SERVER_USER}
-      Password: ${KIE_SERVER_PWD}
-
-  Please be sure to create the secrets named "${DECISION_CENTRAL_HTTPS_SECRET}" and "${KIE_SERVER_HTTPS_SECRET}" containing the
-  ${DECISION_CENTRAL_HTTPS_KEYSTORE} and ${KIE_SERVER_HTTPS_KEYSTORE} files used for serving secure content.
+  You must create the secret named "${CREDENTIALS_SECRET}" containing the KIE_ADMIN_USER and KIE_ADMIN_PWD values and the secrets named "${BUSINESS_CENTRAL_HTTPS_SECRET}" and "${KIE_SERVER_HTTPS_SECRET}"
+  containing the ${BUSINESS_CENTRAL_HTTPS_KEYSTORE} and ${KIE_SERVER_HTTPS_KEYSTORE} files used for serving secure content.
 metadata:
   annotations:
-    description: Application template for a HA persistent authoring environment, for
-      Red Hat Decision Manager 7.6 - Deprecated
+    description: Application template for a non-HA persistent authoring environment,
+      for Red Hat Decision Manager 7.7 - Deprecated
     iconClass: icon-jboss
-    openshift.io/display-name: Red Hat Decision Manager 7.6 authoring environment
-      (HA, persistent, with https)
+    openshift.io/display-name: Red Hat Decision Manager 7.7 authoring environment
+      (non-HA, persistent, with https)
     openshift.io/provider-display-name: Red Hat, Inc.
-    tags: rhdm,decisionserver,jboss,authoring,ha
+    tags: rhdm,decisionserver,jboss,authoring
     template.openshift.io/bindable: "false"
-    template.openshift.io/documentation-url: https://access.redhat.com/documentation/en-us/red_hat_decision_manager/7.6/html/deploying_a_red_hat_decision_manager_7.6_authoring_environment_on_red_hat_openshift_container_platform/
+    template.openshift.io/documentation-url: https://access.redhat.com/documentation/en-us/red_hat_decision_manager/7.7/html/deploying_a_red_hat_decision_manager_7.7_authoring_environment_on_red_hat_openshift_container_platform/
     template.openshift.io/long-description: This template defines resources needed
-      to develop and execute Rules on Red Hat Decision Manager 7.6 with High Availability
-      enabled as tech preview, including application deployment configuration, secure
-      and insecure http communication and persistent volumes to store data that needs
-      to survive a restart. Template for Red Hat OpenShift Container Platform version
-      3.11. Deprecated since Red Hat Decision Manager version 7.5; consider using
-      the Red Hat Business Automation Operator.
+      to develop and execute Rules on Red Hat Decision Manager 7.7, including application
+      deployment configuration, secure and insecure http communication and a persistent
+      volume to store data that needs to survive to a restart. Template for Red Hat
+      OpenShift Container Platform version 3.11. Deprecated since Red Hat Decision
+      Manager version 7.5; consider using the Red Hat Business Automation Operator.
     template.openshift.io/support-url: https://access.redhat.com
-    version: "7.6"
-  name: rhdm76-authoring-ha
+    version: "7.7"
+  name: rhdm77-authoring
   namespace: openshift
 objects:
 - apiVersion: v1
@@ -80,57 +72,6 @@ objects:
   kind: Service
   metadata:
     annotations:
-      description: The JGroups ping port for rhdmcentr clustering.
-      service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
-    labels:
-      application: ${APPLICATION_NAME}
-      service: ${APPLICATION_NAME}-rhdmcentr-ping
-    name: ${APPLICATION_NAME}-rhdmcentr-ping
-  spec:
-    clusterIP: None
-    ports:
-    - name: ping
-      port: 8888
-      targetPort: 8888
-    selector:
-      deploymentConfig: ${APPLICATION_NAME}-rhdmcentr
-- apiVersion: v1
-  kind: Service
-  metadata:
-    annotations:
-      description: Provides a ping service for clustered applications.
-      service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
-    labels:
-      application: ${APPLICATION_NAME}
-    name: ${APPLICATION_NAME}-datagrid-ping
-  spec:
-    clusterIP: None
-    ports:
-    - name: ping
-      port: 8888
-      targetPort: 8888
-    selector:
-      deploymentConfig: ${APPLICATION_NAME}-datagrid
-- apiVersion: v1
-  kind: Service
-  metadata:
-    annotations:
-      description: Provides a service for accessing the application over Hot Rod protocol.
-      service.alpha.openshift.io/serving-cert-secret-name: datagrid-service-certs
-    labels:
-      application: ${APPLICATION_NAME}
-    name: ${APPLICATION_NAME}-datagrid
-  spec:
-    ports:
-    - name: hotrod
-      port: 11222
-      targetPort: 11222
-    selector:
-      deploymentConfig: ${APPLICATION_NAME}-datagrid
-- apiVersion: v1
-  kind: Service
-  metadata:
-    annotations:
       description: All the KIE server web server's ports.
     labels:
       application: ${APPLICATION_NAME}
@@ -151,46 +92,11 @@ objects:
       clientIP:
         timeoutSeconds: 3600
 - apiVersion: v1
-  kind: Service
-  metadata:
-    annotations:
-      description: The broker's OpenWire port.
-    labels:
-      application: ${APPLICATION_NAME}
-      service: ${APPLICATION_NAME}-amq-tcp
-    name: ${APPLICATION_NAME}-amq-tcp
-  spec:
-    clusterIP: None
-    ports:
-    - port: 61616
-      targetPort: 61616
-    selector:
-      deploymentConfig: ${APPLICATION_NAME}-amq
-- apiVersion: v1
-  kind: Service
-  metadata:
-    annotations:
-      description: The JGroups ping port for amq clustering.
-      service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
-    labels:
-      application: ${APPLICATION_NAME}
-      service: ping
-    name: ping
-  spec:
-    clusterIP: None
-    ports:
-    - port: 8888
-      protocol: TCP
-      targetPort: 8888
-    selector:
-      deploymentConfig: ${APPLICATION_NAME}-amq
-- apiVersion: v1
   id: insecure-${APPLICATION_NAME}-rhdmcentr-http
   kind: Route
   metadata:
     annotations:
       description: Route for Decision Central's http service.
-      haproxy.router.openshift.io/balance: source
       haproxy.router.openshift.io/timeout: 1h
     labels:
       application: ${APPLICATION_NAME}
@@ -256,106 +162,6 @@ objects:
       termination: passthrough
     to:
       name: ${APPLICATION_NAME}-kieserver
-- apiVersion: apps/v1
-  kind: StatefulSet
-  metadata:
-    labels:
-      application: ${APPLICATION_NAME}
-    name: ${APPLICATION_NAME}-datagrid
-  spec:
-    podManagementPolicy: OrderedReady
-    replicas: 2
-    selector:
-      matchLabels:
-        deploymentConfig: ${APPLICATION_NAME}-datagrid
-    serviceName: ${APPLICATION_NAME}-datagrid
-    template:
-      metadata:
-        labels:
-          application: ${APPLICATION_NAME}
-          deploymentConfig: ${APPLICATION_NAME}-datagrid
-        name: ${APPLICATION_NAME}-datagrid
-      spec:
-        containers:
-        - env:
-          - name: SERVICE_NAME
-            value: ${APPLICATION_NAME}-datagrid
-          - name: SERVICE_PROFILE
-            value: ${APPLICATION_NAME}-datagrid
-          - name: JGROUPS_PING_PROTOCOL
-            value: openshift.DNS_PING
-          - name: OPENSHIFT_DNS_PING_SERVICE_NAME
-            value: ${APPLICATION_NAME}-datagrid-ping
-          - name: INFINISPAN_CONNECTORS
-            value: hotrod
-          image: ${DATAGRID_IMAGE}
-          imagePullPolicy: IfNotPresent
-          livenessProbe:
-            exec:
-              command:
-              - /opt/datagrid/bin/livenessProbe.sh
-            failureThreshold: 5
-            initialDelaySeconds: 15
-            periodSeconds: 20
-            successThreshold: 1
-            timeoutSeconds: 10
-          name: ${APPLICATION_NAME}-datagrid
-          ports:
-          - containerPort: 8888
-            name: ping
-            protocol: TCP
-          - containerPort: 11222
-            name: hotrod
-            protocol: TCP
-          readinessProbe:
-            exec:
-              command:
-              - /opt/datagrid/bin/readinessProbe.sh
-            failureThreshold: 5
-            initialDelaySeconds: 17
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 10
-          resources:
-            limits:
-              cpu: ${DATAGRID_CPU_LIMIT}
-              memory: ${DATAGRID_MEMORY_LIMIT}
-            requests:
-              cpu: ${DATAGRID_CPU_LIMIT}
-              memory: ${DATAGRID_MEMORY_LIMIT}
-          volumeMounts:
-          - mountPath: /opt/datagrid/standalone/data
-            name: srv-data
-          - mountPath: /var/run/secrets/java.io/keystores
-            name: datagrid-keystore-volume
-          - mountPath: /var/run/secrets/openshift.io/serviceaccount
-            name: datagrid-service-certs
-        dnsPolicy: ClusterFirst
-        restartPolicy: Always
-        schedulerName: default-scheduler
-        securityContext: {}
-        terminationGracePeriodSeconds: 60
-        volumes:
-        - empty-dir: {}
-          name: datagrid-keystore-volume
-        - name: datagrid-service-certs
-          secret:
-            secretName: datagrid-service-certs
-    triggers:
-    - type: ConfigChange
-    updateStrategy:
-      rollingUpdate:
-        partition: 0
-      type: RollingUpdate
-    volumeClaimTemplates:
-    - metadata:
-        name: srv-data
-      spec:
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: ${DATAGRID_VOLUME_CAPACITY}
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -366,7 +172,7 @@ objects:
       service: ${APPLICATION_NAME}-rhdmcentr
     name: ${APPLICATION_NAME}-rhdmcentr
   spec:
-    replicas: 2
+    replicas: 1
     selector:
       deploymentConfig: ${APPLICATION_NAME}-rhdmcentr
     strategy:
@@ -376,6 +182,7 @@ objects:
         labels:
           application: ${APPLICATION_NAME}
           deploymentConfig: ${APPLICATION_NAME}-rhdmcentr
+          service: ${APPLICATION_NAME}-rhdmcentr
         name: ${APPLICATION_NAME}-rhdmcentr
       spec:
         containers:
@@ -385,29 +192,27 @@ objects:
           - name: APPLICATION_ROLES_PROPERTIES
             value: /opt/kie/data/configuration/application-roles.properties
           - name: KIE_ADMIN_USER
-            value: ${KIE_ADMIN_USER}
+            valueFrom:
+              secretKeyRef:
+                key: KIE_ADMIN_USER
+                name: ${CREDENTIALS_SECRET}
           - name: KIE_ADMIN_PWD
-            value: ${KIE_ADMIN_PWD}
+            valueFrom:
+              secretKeyRef:
+                key: KIE_ADMIN_PWD
+                name: ${CREDENTIALS_SECRET}
           - name: KIE_MBEANS
             value: ${KIE_MBEANS}
+          - name: KIE_SERVER_CONTROLLER_OPENSHIFT_ENABLED
+            value: "false"
           - name: KIE_SERVER_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED
             value: ${KIE_SERVER_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED}
           - name: KIE_SERVER_CONTROLLER_OPENSHIFT_PREFER_KIESERVER_SERVICE
             value: ${KIE_SERVER_CONTROLLER_OPENSHIFT_PREFER_KIESERVER_SERVICE}
           - name: KIE_SERVER_CONTROLLER_TEMPLATE_CACHE_TTL
             value: ${KIE_SERVER_CONTROLLER_TEMPLATE_CACHE_TTL}
-          - name: KIE_WORKBENCH_CONTROLLER_OPENSHIFT_ENABLED
-            value: "true"
-          - name: KIE_SERVER_CONTROLLER_USER
-            value: ${KIE_SERVER_CONTROLLER_USER}
-          - name: KIE_SERVER_CONTROLLER_PWD
-            value: ${KIE_SERVER_CONTROLLER_PWD}
           - name: KIE_SERVER_CONTROLLER_TOKEN
             value: ${KIE_SERVER_CONTROLLER_TOKEN}
-          - name: KIE_SERVER_USER
-            value: ${KIE_SERVER_USER}
-          - name: KIE_SERVER_PWD
-            value: ${KIE_SERVER_PWD}
           - name: WORKBENCH_ROUTE_NAME
             value: ${APPLICATION_NAME}-rhdmcentr
           - name: MAVEN_MIRROR_URL
@@ -420,10 +225,6 @@ objects:
             value: ${MAVEN_REPO_USERNAME}
           - name: MAVEN_REPO_PASSWORD
             value: ${MAVEN_REPO_PASSWORD}
-          - name: KIE_MAVEN_USER
-            value: ${DECISION_CENTRAL_MAVEN_USERNAME}
-          - name: KIE_MAVEN_PWD
-            value: ${DECISION_CENTRAL_MAVEN_PASSWORD}
           - name: GIT_HOOKS_DIR
             value: ${GIT_HOOKS_DIR}
           - name: HTTPS_KEYSTORE_DIR
@@ -434,26 +235,6 @@ objects:
             value: ${DECISION_CENTRAL_HTTPS_NAME}
           - name: HTTPS_PASSWORD
             value: ${DECISION_CENTRAL_HTTPS_PASSWORD}
-          - name: JGROUPS_PING_PROTOCOL
-            value: openshift.DNS_PING
-          - name: OPENSHIFT_DNS_PING_SERVICE_NAME
-            value: ${APPLICATION_NAME}-rhdmcentr-ping
-          - name: OPENSHIFT_DNS_PING_SERVICE_PORT
-            value: "8888"
-          - name: APPFORMER_INFINISPAN_SERVICE_NAME
-            value: ${APPLICATION_NAME}-datagrid
-          - name: APPFORMER_INFINISPAN_PORT
-            value: "11222"
-          - name: APPFORMER_JMS_BROKER_ADDRESS
-            value: ${APPLICATION_NAME}-amq-tcp
-          - name: APPFORMER_JMS_BROKER_PORT
-            value: "61616"
-          - name: APPFORMER_JMS_BROKER_USER
-            value: ${APPFORMER_JMS_BROKER_USER}
-          - name: APPFORMER_JMS_BROKER_PASSWORD
-            value: ${APPFORMER_JMS_BROKER_PASSWORD}
-          - name: JAVA_MAX_MEM_RATIO
-            value: ${DECISION_CENTRAL_JAVA_MAX_MEM_RATIO}
           - name: SSO_URL
             value: ${SSO_URL}
           - name: SSO_OPENIDCONNECT_DEPLOYMENTS
@@ -522,7 +303,7 @@ objects:
             value: ${AUTH_ROLE_MAPPER_ROLES_PROPERTIES}
           - name: AUTH_ROLE_MAPPER_REPLACE_ROLE
             value: ${AUTH_ROLE_MAPPER_REPLACE_ROLE}
-          image: ${DECISION_CENTRAL_IMAGE_STREAM_NAME}
+          image: rhdm-decisioncentral-rhel8
           imagePullPolicy: Always
           livenessProbe:
             httpGet:
@@ -543,9 +324,6 @@ objects:
           - containerPort: 8443
             name: https
             protocol: TCP
-          - containerPort: 8888
-            name: ping
-            protocol: TCP
           readinessProbe:
             failureThreshold: 36
             httpGet:
@@ -557,10 +335,6 @@ objects:
             timeoutSeconds: 2
           resources:
             limits:
-              cpu: ${DECISION_CENTRAL_CPU_LIMIT}
-              memory: ${DECISION_CENTRAL_MEMORY_LIMIT}
-            requests:
-              cpu: ${DECISION_CENTRAL_CPU_LIMIT}
               memory: ${DECISION_CENTRAL_MEMORY_LIMIT}
           volumeMounts:
           - mountPath: /etc/decisioncentral-secret-volume
@@ -584,7 +358,7 @@ objects:
         - ${APPLICATION_NAME}-rhdmcentr
         from:
           kind: ImageStreamTag
-          name: ${DECISION_CENTRAL_IMAGE_STREAM_NAME}:${IMAGE_STREAM_TAG}
+          name: rhdm-decisioncentral-rhel8:${IMAGE_STREAM_TAG}
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: ImageChange
     - type: ConfigChange
@@ -599,15 +373,12 @@ objects:
       services.server.kie.org/kie-server-id: ${APPLICATION_NAME}-kieserver
     name: ${APPLICATION_NAME}-kieserver
   spec:
-    replicas: 2
+    replicas: 1
     revisionHistoryLimit: 10
     selector:
       deploymentConfig: ${APPLICATION_NAME}-kieserver
     strategy:
-      rollingParams:
-        maxSurge: 100%
-        maxUnavailable: 0
-      type: Rolling
+      type: Recreate
     template:
       metadata:
         labels:
@@ -622,9 +393,15 @@ objects:
           - name: WORKBENCH_SERVICE_NAME
             value: ${APPLICATION_NAME}-rhdmcentr
           - name: KIE_ADMIN_USER
-            value: ${KIE_ADMIN_USER}
+            valueFrom:
+              secretKeyRef:
+                key: KIE_ADMIN_USER
+                name: ${CREDENTIALS_SECRET}
           - name: KIE_ADMIN_PWD
-            value: ${KIE_ADMIN_PWD}
+            valueFrom:
+              secretKeyRef:
+                key: KIE_ADMIN_PWD
+                name: ${CREDENTIALS_SECRET}
           - name: KIE_SERVER_MODE
             value: ${KIE_SERVER_MODE}
           - name: KIE_MBEANS
@@ -635,18 +412,18 @@ objects:
             value: ${PROMETHEUS_SERVER_EXT_DISABLED}
           - name: KIE_SERVER_BYPASS_AUTH_USER
             value: ${KIE_SERVER_BYPASS_AUTH_USER}
+          - name: KIE_SERVER_CONTROLLER_SERVICE
+            value: ${APPLICATION_NAME}-rhdmcentr
+          - name: KIE_SERVER_CONTROLLER_PROTOCOL
+            value: ws
           - name: KIE_SERVER_ID
             valueFrom:
               fieldRef:
                 fieldPath: metadata.labels['services.server.kie.org/kie-server-id']
           - name: KIE_SERVER_ROUTE_NAME
-            value: ${APPLICATION_NAME}-kieserver
+            value: insecure-${APPLICATION_NAME}-kieserver
           - name: KIE_SERVER_STARTUP_STRATEGY
-            value: OpenShiftStartupStrategy
-          - name: KIE_SERVER_PWD
-            value: ${KIE_SERVER_PWD}
-          - name: KIE_SERVER_USER
-            value: ${KIE_SERVER_USER}
+            value: ControllerBasedStartupStrategy
           - name: MAVEN_MIRROR_URL
             value: ${MAVEN_MIRROR_URL}
           - name: MAVEN_MIRROR_OF
@@ -660,9 +437,15 @@ objects:
           - name: RHDMCENTR_MAVEN_REPO_PATH
             value: /maven2/
           - name: RHDMCENTR_MAVEN_REPO_USERNAME
-            value: ${DECISION_CENTRAL_MAVEN_USERNAME}
+            valueFrom:
+              secretKeyRef:
+                key: KIE_ADMIN_USER
+                name: ${CREDENTIALS_SECRET}
           - name: RHDMCENTR_MAVEN_REPO_PASSWORD
-            value: ${DECISION_CENTRAL_MAVEN_PASSWORD}
+            valueFrom:
+              secretKeyRef:
+                key: KIE_ADMIN_PWD
+                name: ${CREDENTIALS_SECRET}
           - name: EXTERNAL_MAVEN_REPO_ID
             value: ${MAVEN_REPO_ID}
           - name: EXTERNAL_MAVEN_REPO_URL
@@ -791,10 +574,6 @@ objects:
             timeoutSeconds: 2
           resources:
             limits:
-              cpu: ${KIE_SERVER_CPU_LIMIT}
-              memory: ${KIE_SERVER_MEMORY_LIMIT}
-            requests:
-              cpu: ${KIE_SERVER_CPU_LIMIT}
               memory: ${KIE_SERVER_MEMORY_LIMIT}
           volumeMounts:
           - mountPath: /etc/kieserver-secret-volume
@@ -817,126 +596,16 @@ objects:
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: ImageChange
     - type: ConfigChange
-- apiVersion: apps/v1
-  kind: StatefulSet
-  metadata:
-    annotations:
-      alpha.image.policy.openshift.io/resolve-names: '*'
-    labels:
-      application: ${APPLICATION_NAME}
-    name: ${APPLICATION_NAME}-amq
-  spec:
-    podManagementPolicy: OrderedReady
-    replicas: ${{AMQ_REPLICAS}}
-    revisionHistoryLimit: 10
-    selector:
-      matchLabels:
-        deploymentConfig: ${APPLICATION_NAME}-amq
-    serviceName: ${APPLICATION_NAME}-amq-tcp
-    template:
-      metadata:
-        labels:
-          application: ${APPLICATION_NAME}
-          deploymentConfig: ${APPLICATION_NAME}-amq
-        name: ${APPLICATION_NAME}-amq
-      spec:
-        containers:
-        - env:
-          - name: AMQ_USER
-            value: ${APPFORMER_JMS_BROKER_USER}
-          - name: AMQ_PASSWORD
-            value: ${APPFORMER_JMS_BROKER_PASSWORD}
-          - name: AMQ_ROLE
-            value: ${AMQ_ROLE}
-          - name: AMQ_NAME
-            value: ${AMQ_NAME}
-          - name: AMQ_TRANSPORTS
-            value: openwire
-          - name: AMQ_GLOBAL_MAX_SIZE
-            value: ${AMQ_GLOBAL_MAX_SIZE}
-          - name: AMQ_REQUIRE_LOGIN
-          - name: AMQ_DATA_DIR
-            value: /opt/amq/data
-          - name: AMQ_DATA_DIR_LOGGING
-            value: "true"
-          - name: AMQ_CLUSTERED
-            value: "true"
-          - name: AMQ_REPLICAS
-            value: ${AMQ_REPLICAS}
-          - name: AMQ_CLUSTER_USER
-            value: ${APPFORMER_JMS_BROKER_USER}
-          - name: AMQ_CLUSTER_PASSWORD
-            value: ${APPFORMER_JMS_BROKER_PASSWORD}
-          - name: AMQ_EXTRA_ARGS
-          - name: AMQ_ANYCAST_PREFIX
-          - name: AMQ_MULTICAST_PREFIX
-          - name: POD_NAMESPACE
-            valueFrom:
-              fieldRef:
-                apiVersion: v1
-                fieldPath: metadata.namespace
-          image: ${AMQ_BROKER_IMAGE}
-          imagePullPolicy: IfNotPresent
-          name: broker-amq
-          ports:
-          - containerPort: 8161
-            name: jolokia
-            protocol: TCP
-          - containerPort: 5672
-            name: amqp
-            protocol: TCP
-          - containerPort: 1883
-            name: mqtt
-            protocol: TCP
-          - containerPort: 61613
-            name: stomp
-            protocol: TCP
-          - containerPort: 61616
-            name: artemis
-            protocol: TCP
-          readinessProbe:
-            exec:
-              command:
-              - /bin/bash
-              - -c
-              - /opt/amq/bin/readinessProbe.sh
-            failureThreshold: 3
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 1
-          resources: {}
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          volumeMounts:
-          - mountPath: /opt/amq/data
-            name: ${APPLICATION_NAME}-amq-pvol
-        dnsPolicy: ClusterFirst
-        restartPolicy: Always
-        schedulerName: default-scheduler
-        securityContext: {}
-        terminationGracePeriodSeconds: 60
-    updateStrategy:
-      rollingUpdate:
-        partition: 0
-      type: RollingUpdate
-    volumeClaimTemplates:
-    - metadata:
-        name: ${APPLICATION_NAME}-amq-pvol
-      spec:
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: ${AMQ_VOLUME_CAPACITY}
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
     labels:
       application: ${APPLICATION_NAME}
+      service: ${APPLICATION_NAME}-rhdmcentr
     name: ${APPLICATION_NAME}-rhdmcentr-claim
   spec:
     accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
     resources:
       requests:
         storage: ${DECISION_CENTRAL_VOLUME_CAPACITY}
@@ -946,39 +615,14 @@ parameters:
   name: APPLICATION_NAME
   required: true
   value: myapp
-- description: KIE administrator user name.
-  displayName: KIE Admin User
-  name: KIE_ADMIN_USER
-  value: adminUser
-- description: KIE administrator password.
-  displayName: KIE Admin Password
-  from: '[a-zA-Z]{6}[0-9]{1}!'
-  generate: expression
-  name: KIE_ADMIN_PWD
-- description: KIE server controller user name. (Sets the org.kie.server.controller.user
-    system property)
-  displayName: KIE Server Controller User
-  name: KIE_SERVER_CONTROLLER_USER
-  value: controllerUser
-- description: KIE server controller password. (Sets the org.kie.server.controller.pwd
-    system property)
-  displayName: KIE Server Controller Password
-  from: '[a-zA-Z]{6}[0-9]{1}!'
-  generate: expression
-  name: KIE_SERVER_CONTROLLER_PWD
+- description: Secret containing the KIE_ADMIN_USER and KIE_ADMIN_PWD values.
+  displayName: Credentials secret
+  name: CREDENTIALS_SECRET
+  required: true
 - description: KIE server controller token for bearer authentication. (Sets the org.kie.server.controller.token
     system property)
   displayName: KIE Server Controller Token
   name: KIE_SERVER_CONTROLLER_TOKEN
-- description: KIE server user name. (Sets the org.kie.server.user system property)
-  displayName: KIE Server User
-  name: KIE_SERVER_USER
-  value: executionUser
-- description: KIE server password. (Sets the org.kie.server.pwd system property)
-  displayName: KIE Server Password
-  from: '[a-zA-Z]{6}[0-9]{1}!'
-  generate: expression
-  name: KIE_SERVER_PWD
 - description: Allows the KIE server to bypass the authenticated user for task-related
     operations, for example, queries. (Sets the org.kie.server.bypass.auth.user system
     property)
@@ -992,12 +636,12 @@ parameters:
   displayName: KIE Server Mode
   name: KIE_SERVER_MODE
   value: DEVELOPMENT
-- description: KIE server mbeans enabled/disabled. (Sets the kie.mbeans and kie.scanner.mbeans
+- description: KIE server mbeans enabled/disabled (Sets the kie.mbeans and kie.scanner.mbeans
     system properties)
   displayName: KIE MBeans
   name: KIE_MBEANS
   value: enabled
-- description: KIE server class filtering. (Sets the org.drools.server.filter.classes
+- description: KIE server class filtering (Sets the org.drools.server.filter.classes
     system property)
   displayName: Drools Server Filter Classes
   name: DROOLS_SERVER_FILTER_CLASSES
@@ -1006,7 +650,7 @@ parameters:
     the org.kie.prometheus.server.ext.disabled system property)
   displayName: Prometheus Server Extension Disabled
   name: PROMETHEUS_SERVER_EXT_DISABLED
-- description: 'Custom hostname for http service route for Decision Central.  Leave
+- description: 'Custom hostname for http service route for Decision Central. Leave
     blank for default hostname, e.g.: insecure-<application-name>-rhdmcentr-<project>.<default-domain-suffix>'
   displayName: Decision Central Custom http Route Hostname
   name: DECISION_CENTRAL_HOSTNAME_HTTP
@@ -1018,7 +662,7 @@ parameters:
     for default hostname, e.g.: insecure-<application-name>-kieserver-<project>.<default-domain-suffix>'
   displayName: KIE Server Custom http Route Hostname
   name: KIE_SERVER_HOSTNAME_HTTP
-- description: 'Custom hostname for https service route for KIE Server. Leave blank
+- description: 'Custom hostname for https service route for KIE Server.  Leave blank
     for default hostname, e.g.: <application-name>-kieserver-<project>.<default-domain-suffix>'
   displayName: KIE Server Custom https Route Hostname
   name: KIE_SERVER_HOSTNAME_HTTPS
@@ -1026,94 +670,34 @@ parameters:
   displayName: Decision Central Server Keystore Secret Name
   name: DECISION_CENTRAL_HTTPS_SECRET
   required: true
-- description: The name of the keystore file within the secret for Decision Central.
+- description: The name of the keystore file within the secret.
   displayName: Decision Central Server Keystore Filename
   name: DECISION_CENTRAL_HTTPS_KEYSTORE
   value: keystore.jks
-- description: The name associated with the server certificate for Decision Central.
+- description: The name associated with the server certificate.
   displayName: Decision Central Server Certificate Name
   name: DECISION_CENTRAL_HTTPS_NAME
   value: jboss
-- description: The password for the keystore and certificate for Decision Central.
+- description: The password for the keystore and certificate.
   displayName: Decision Central Server Keystore Password
   name: DECISION_CENTRAL_HTTPS_PASSWORD
   value: mykeystorepass
-- description: The name of the secret containing the keystore file for KIE Server.
+- description: The name of the secret containing the keystore file.
   displayName: KIE Server Keystore Secret Name
   name: KIE_SERVER_HTTPS_SECRET
   required: true
-- description: The name of the keystore file within the secret for KIE Server.
+- description: The name of the keystore file within the secret.
   displayName: KIE Server Keystore Filename
   name: KIE_SERVER_HTTPS_KEYSTORE
   value: keystore.jks
-- description: The name associated with the server certificate for KIE Server.
+- description: The name associated with the server certificate.
   displayName: KIE Server Certificate Name
   name: KIE_SERVER_HTTPS_NAME
   value: jboss
-- description: The password for the keystore and certificate for KIE Server.
+- description: The password for the keystore and certificate.
   displayName: KIE Server Keystore Password
   name: KIE_SERVER_HTTPS_PASSWORD
   value: mykeystorepass
-- description: The user name to connect to the JMS broker.
-  displayName: AppFormer JMS Broker user name
-  name: APPFORMER_JMS_BROKER_USER
-  required: true
-  value: jmsBrokerUser
-- description: The password to connect to the JMS broker.
-  displayName: AppFormer JMS Broker password
-  from: '[a-zA-Z]{6}[0-9]{1}!'
-  generate: expression
-  name: APPFORMER_JMS_BROKER_PASSWORD
-  required: true
-- description: DataGrid image.
-  displayName: DataGrid Image
-  name: DATAGRID_IMAGE
-  required: true
-  value: registry.redhat.io/jboss-datagrid-7/datagrid73-openshift:1.3
-- description: DataGrid Container cpu limit.
-  displayName: DataGrid Container CPU Limit
-  name: DATAGRID_CPU_LIMIT
-  required: true
-  value: 1000m
-- description: DataGrid Container memory limit.
-  displayName: DataGrid Container Memory Limit
-  name: DATAGRID_MEMORY_LIMIT
-  required: true
-  value: 2Gi
-- description: Size of the persistent storage for DataGrid's runtime data.
-  displayName: DataGrid Volume Capacity
-  name: DATAGRID_VOLUME_CAPACITY
-  required: true
-  value: 1Gi
-- description: AMQ Broker Image
-  displayName: Image
-  name: AMQ_BROKER_IMAGE
-  required: true
-  value: registry.redhat.io/amq7/amq-broker:7.5
-- description: User role for standard broker user.
-  displayName: AMQ Role
-  name: AMQ_ROLE
-  required: true
-  value: admin
-- description: The name of the broker.
-  displayName: AMQ Name
-  name: AMQ_NAME
-  required: true
-  value: broker
-- description: Specifies the maximum amount of memory that message data can consume.
-    If no value is specified, half of the system’s memory is allocated.
-  displayName: AMQ Global Max Size
-  name: AMQ_GLOBAL_MAX_SIZE
-- description: Size of persistent storage for AMQ broker volume.
-  displayName: Broker Volume Capacity
-  name: AMQ_VOLUME_CAPACITY
-  required: true
-  value: 1Gi
-- description: Number of broker replicas for a cluster
-  displayName: Number of Replicas
-  name: AMQ_REPLICAS
-  required: true
-  value: "2"
 - description: If set to true, turns on KIE server global discovery feature (Sets
     the org.kie.server.controller.openshift.global.discovery.enabled system property)
   displayName: Enable KIE server global discovery
@@ -1133,28 +717,22 @@ parameters:
   value: "60000"
 - description: Namespace in which the ImageStreams for Red Hat Decision Manager images
     are installed. These ImageStreams are normally installed in the openshift namespace.
-    You should only need to modify this if you installed the ImageStreams in a different
-    namespace/project.
+    You need to modify this parameter only if you installed the ImageStreams in a
+    different namespace/project.
   displayName: ImageStream Namespace
   name: IMAGE_STREAM_NAMESPACE
   required: true
   value: openshift
-- description: The name of the image stream to use for Decision Central. Default is
-    "rhdm-decisioncentral-rhel8".
-  displayName: Decision Central ImageStream Name
-  name: DECISION_CENTRAL_IMAGE_STREAM_NAME
-  required: true
-  value: rhdm-decisioncentral-rhel8
 - description: The name of the image stream to use for KIE server. Default is "rhdm-kieserver-rhel8".
   displayName: KIE Server ImageStream Name
   name: KIE_SERVER_IMAGE_STREAM_NAME
   required: true
   value: rhdm-kieserver-rhel8
-- description: A named pointer to an image in an image stream. Default is "7.6.0".
+- description: A named pointer to an image in an image stream. Default is "7.7.0".
   displayName: ImageStream Tag
   name: IMAGE_STREAM_TAG
   required: true
-  value: 7.6.0
+  value: 7.7.0
 - description: Maven mirror that Decision Central and KIE server must use. If you
     configure a mirror, this mirror must contain all artifacts that are required for
     building and deploying your services.
@@ -1180,19 +758,6 @@ parameters:
 - description: Password to access the Maven repository, if required.
   displayName: Maven repository password
   name: MAVEN_REPO_PASSWORD
-- description: User name for accessing the Maven service hosted by Decision Central
-    inside EAP.
-  displayName: User name for the Maven service hosted by Decision Central
-  name: DECISION_CENTRAL_MAVEN_USERNAME
-  required: true
-  value: mavenUser
-- description: Password to access the Maven service hosted by Decision Central inside
-    EAP.
-  displayName: Password for the Maven service hosted by Decision Central
-  from: '[a-zA-Z]{6}[0-9]{1}!'
-  generate: expression
-  name: DECISION_CENTRAL_MAVEN_PASSWORD
-  required: true
 - description: The directory to use for git hooks, if required.
   displayName: Git hooks directory
   name: GIT_HOOKS_DIR
@@ -1204,38 +769,18 @@ parameters:
 - description: Decision Central Container memory limit.
   displayName: Decision Central Container Memory Limit
   name: DECISION_CENTRAL_MEMORY_LIMIT
-  required: true
-  value: 8Gi
-- description: Decision Central Container JVM max memory ratio. -Xmx is set to a ratio
-    of the container available memory. The default is 80 which means 80% of the available
-    memory is used as an upper boundary. You can skip this mechanism by setting this
-    value to 0 in which case no -Xmx option is added.
-  displayName: Decision Central Container JVM Max Memory Ratio
-  name: DECISION_CENTRAL_JAVA_MAX_MEM_RATIO
-  required: true
-  value: "80"
-- description: Decision Central Container cpu limit.
-  displayName: Decision Central Container CPU Limit
-  name: DECISION_CENTRAL_CPU_LIMIT
-  required: true
-  value: 2000m
+  value: 2Gi
 - description: KIE server Container memory limit.
   displayName: KIE Server Container Memory Limit
   name: KIE_SERVER_MEMORY_LIMIT
-  required: true
   value: 1Gi
-- description: KIE server Container cpu limit.
-  displayName: KIE Server Container CPU Limit
-  name: KIE_SERVER_CPU_LIMIT
-  required: true
-  value: 1000m
 - description: RH-SSO URL.
   displayName: RH-SSO URL
   name: SSO_URL
 - description: RH-SSO Realm name.
   displayName: RH-SSO Realm name
   name: SSO_REALM
-- description: Decision Central RH-SSO Client name.
+- description: Decision Central RH-SSO Client name
   displayName: Decision Central RH-SSO Client name
   name: DECISION_CENTRAL_SSO_CLIENT
 - description: Decision Central RH-SSO Client Secret.
