@@ -37,6 +37,7 @@ rules:
   resources:
   - rolebindings
   - clusterrolebindings
+  - clusterroles
   verbs:
   - create
   - delete
@@ -50,6 +51,7 @@ rules:
   resources:
   - rolebindings
   - clusterrolebindings
+  - clusterroles
   verbs:
   - create
   - delete
