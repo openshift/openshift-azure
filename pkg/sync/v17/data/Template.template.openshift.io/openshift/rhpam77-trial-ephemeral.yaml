@@ -1,40 +1,36 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhdm: "7.6"
-  template: rhdm76-trial-ephemeral
+  rhpam: "7.7"
+  template: rhpam77-trial-ephemeral
 message: |-
-  A new Decision Manager trial environment has been created.
-  The user name/password for accessing the Decision Central interface is
+  A new Process Automation Manager trial environment has been created.
+  The user name/password for accessing the Business Central interface and calls to the KIE server is
 
       User name: ${KIE_ADMIN_USER}
-      Password: ${DEFAULT_PASSWORD}
-
-  The user name/password for calls to the KIE server is
-
-      User name: ${KIE_SERVER_USER}
       Password: ${DEFAULT_PASSWORD}
 
   Please remember that this is an ephemeral environment and any work will be LOST with a simple pod restart.
 metadata:
   annotations:
     description: Application template for an ephemeral authoring and testing environment,
-      for Red Hat Decision Manager 7.6 - Deprecated
+      for Red Hat Process Automation Manager 7.7 - Deprecated
     iconClass: icon-jboss
-    openshift.io/display-name: Red Hat Decision Manager 7.6 ephemeral trial environment
+    openshift.io/display-name: Red Hat Process Automation Manager 7.7 ephemeral trial
+      environment
     openshift.io/provider-display-name: Red Hat, Inc.
-    tags: rhdm,decisionserver,jboss,trial
+    tags: rhpam,processserver,jboss,trial
     template.openshift.io/bindable: "false"
-    template.openshift.io/documentation-url: https://access.redhat.com/documentation/en-us/red_hat_decision_manager/7.6/html/deploying_a_red_hat_decision_manager_7.6_authoring_environment_on_red_hat_openshift_container_platform/
+    template.openshift.io/documentation-url: https://access.redhat.com/documentation/en-us/red_hat_process_automation_manager/7.7/html/deploying_a_red_hat_process_automation_manager_7.7_authoring_environment_on_red_hat_openshift_container_platform/
     template.openshift.io/long-description: This template defines resources needed
-      for an ephemeral authoring and testing environment for Red Hat Decision Manager
-      7.6, including application deployment configuration, secure and insecure http
-      communication. Template for Red Hat OpenShift Container Platform version 3.11.
-      Deprecated since Red Hat Decision Manager version 7.5; consider using the Red
-      Hat Business Automation Operator.
+      for an ephemeral authoring and testing environment for Red Hat Process Automation
+      Manager 7.7, including application deployment configuration, secure and insecure
+      http communication. Template for Red Hat OpenShift Container Platform version
+      3.11. Deprecated since Red Hat Process Automation Manager version 7.5; consider
+      using the Red Hat Business Automation Operator.
     template.openshift.io/support-url: https://access.redhat.com
-    version: "7.6"
-  name: rhdm76-trial-ephemeral
+    version: "7.7"
+  name: rhpam77-trial-ephemeral
   namespace: openshift
 objects:
 - apiVersion: v1
@@ -42,34 +38,34 @@ objects:
   metadata:
     labels:
       application: ${APPLICATION_NAME}
-    name: ${APPLICATION_NAME}-rhdmsvc
+    name: ${APPLICATION_NAME}-rhpamsvc
 - apiVersion: v1
   kind: RoleBinding
   metadata:
     labels:
       application: ${APPLICATION_NAME}
-    name: ${APPLICATION_NAME}-rhdmsvc-edit
+    name: ${APPLICATION_NAME}-rhpamsvc-edit
   roleRef:
     name: edit
   subjects:
   - kind: ServiceAccount
-    name: ${APPLICATION_NAME}-rhdmsvc
+    name: ${APPLICATION_NAME}-rhpamsvc
 - apiVersion: v1
   kind: Service
   metadata:
     annotations:
-      description: All the Decision Central web server's ports.
+      description: All the Business Central web server's ports.
     labels:
       application: ${APPLICATION_NAME}
-      service: ${APPLICATION_NAME}-rhdmcentr
-    name: ${APPLICATION_NAME}-rhdmcentr
+      service: ${APPLICATION_NAME}-rhpamcentr
+    name: ${APPLICATION_NAME}-rhpamcentr
   spec:
     ports:
     - name: http
       port: 8080
       targetPort: 8080
     selector:
-      deploymentConfig: ${APPLICATION_NAME}-rhdmcentr
+      deploymentConfig: ${APPLICATION_NAME}-rhpamcentr
 - apiVersion: v1
   kind: Service
   metadata:
@@ -90,22 +86,22 @@ objects:
       clientIP:
         timeoutSeconds: 3600
 - apiVersion: v1
-  id: insecure-${APPLICATION_NAME}-rhdmcentr-http
+  id: insecure-${APPLICATION_NAME}-rhpamcentr-http
   kind: Route
   metadata:
     annotations:
-      description: Route for Decision Central's http service.
+      description: Route for Business Central's http service.
       haproxy.router.openshift.io/timeout: 1h
     labels:
       application: ${APPLICATION_NAME}
-      service: ${APPLICATION_NAME}-rhdmcentr
-    name: insecure-${APPLICATION_NAME}-rhdmcentr
+      service: ${APPLICATION_NAME}-rhpamcentr
+    name: insecure-${APPLICATION_NAME}-rhpamcentr
   spec:
-    host: ${DECISION_CENTRAL_HOSTNAME_HTTP}
+    host: ${BUSINESS_CENTRAL_HOSTNAME_HTTP}
     port:
       targetPort: http
     to:
-      name: ${APPLICATION_NAME}-rhdmcentr
+      name: ${APPLICATION_NAME}-rhpamcentr
 - apiVersion: v1
   id: insecure-${APPLICATION_NAME}-kieserver-http
   kind: Route
@@ -128,48 +124,40 @@ objects:
       template.alpha.openshift.io/wait-for-ready: "true"
     labels:
       application: ${APPLICATION_NAME}
-      service: ${APPLICATION_NAME}-rhdmcentr
-    name: ${APPLICATION_NAME}-rhdmcentr
+      service: ${APPLICATION_NAME}-rhpamcentr
+    name: ${APPLICATION_NAME}-rhpamcentr
   spec:
     replicas: 1
     selector:
-      deploymentConfig: ${APPLICATION_NAME}-rhdmcentr
+      deploymentConfig: ${APPLICATION_NAME}-rhpamcentr
     strategy:
       type: Recreate
     template:
       metadata:
         labels:
           application: ${APPLICATION_NAME}
-          deploymentConfig: ${APPLICATION_NAME}-rhdmcentr
-          service: ${APPLICATION_NAME}-rhdmcentr
-        name: ${APPLICATION_NAME}-rhdmcentr
+          deploymentConfig: ${APPLICATION_NAME}-rhpamcentr
+          service: ${APPLICATION_NAME}-rhpamcentr
+        name: ${APPLICATION_NAME}-rhpamcentr
       spec:
         containers:
         - env:
+          - name: WORKBENCH_ROUTE_NAME
+            value: insecure-${APPLICATION_NAME}-rhpamcentr
           - name: KIE_ADMIN_USER
             value: ${KIE_ADMIN_USER}
           - name: KIE_ADMIN_PWD
             value: ${DEFAULT_PASSWORD}
           - name: KIE_MBEANS
             value: ${KIE_MBEANS}
+          - name: KIE_SERVER_CONTROLLER_OPENSHIFT_ENABLED
+            value: "true"
           - name: KIE_SERVER_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED
             value: ${KIE_SERVER_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED}
           - name: KIE_SERVER_CONTROLLER_OPENSHIFT_PREFER_KIESERVER_SERVICE
             value: ${KIE_SERVER_CONTROLLER_OPENSHIFT_PREFER_KIESERVER_SERVICE}
           - name: KIE_SERVER_CONTROLLER_TEMPLATE_CACHE_TTL
             value: ${KIE_SERVER_CONTROLLER_TEMPLATE_CACHE_TTL}
-          - name: KIE_WORKBENCH_CONTROLLER_OPENSHIFT_ENABLED
-            value: "true"
-          - name: KIE_SERVER_CONTROLLER_USER
-            value: ${KIE_SERVER_CONTROLLER_USER}
-          - name: KIE_SERVER_CONTROLLER_PWD
-            value: ${DEFAULT_PASSWORD}
-          - name: KIE_SERVER_USER
-            value: ${KIE_SERVER_USER}
-          - name: KIE_SERVER_PWD
-            value: ${DEFAULT_PASSWORD}
-          - name: WORKBENCH_ROUTE_NAME
-            value: ${APPLICATION_NAME}-rhdmcentr
           - name: MAVEN_REPO_ID
             value: ${MAVEN_REPO_ID}
           - name: MAVEN_REPO_URL
@@ -178,10 +166,6 @@ objects:
             value: ${MAVEN_REPO_USERNAME}
           - name: MAVEN_REPO_PASSWORD
             value: ${MAVEN_REPO_PASSWORD}
-          - name: KIE_MAVEN_USER
-            value: ${DECISION_CENTRAL_MAVEN_USERNAME}
-          - name: KIE_MAVEN_PWD
-            value: ${DEFAULT_PASSWORD}
           - name: GIT_HOOKS_DIR
             value: ${GIT_HOOKS_DIR}
           - name: SSO_URL
@@ -191,9 +175,9 @@ objects:
           - name: SSO_REALM
             value: ${SSO_REALM}
           - name: SSO_SECRET
-            value: ${DECISION_CENTRAL_SSO_SECRET}
+            value: ${BUSINESS_CENTRAL_SSO_SECRET}
           - name: SSO_CLIENT
-            value: ${DECISION_CENTRAL_SSO_CLIENT}
+            value: ${BUSINESS_CENTRAL_SSO_CLIENT}
           - name: SSO_USERNAME
             value: ${SSO_USERNAME}
           - name: SSO_PASSWORD
@@ -203,7 +187,7 @@ objects:
           - name: SSO_PRINCIPAL_ATTRIBUTE
             value: ${SSO_PRINCIPAL_ATTRIBUTE}
           - name: HOSTNAME_HTTP
-            value: ${DECISION_CENTRAL_HOSTNAME_HTTP}
+            value: ${BUSINESS_CENTRAL_HOSTNAME_HTTP}
           - name: AUTH_LDAP_URL
             value: ${AUTH_LDAP_URL}
           - name: AUTH_LDAP_BIND_DN
@@ -250,7 +234,7 @@ objects:
             value: ${AUTH_ROLE_MAPPER_ROLES_PROPERTIES}
           - name: AUTH_ROLE_MAPPER_REPLACE_ROLE
             value: ${AUTH_ROLE_MAPPER_REPLACE_ROLE}
-          image: rhdm-decisioncentral-rhel8
+          image: rhpam-businesscentral-rhel8
           imagePullPolicy: Always
           livenessProbe:
             httpGet:
@@ -260,7 +244,7 @@ objects:
             initialDelaySeconds: 180
             periodSeconds: 15
             timeoutSeconds: 2
-          name: ${APPLICATION_NAME}-rhdmcentr
+          name: ${APPLICATION_NAME}-rhpamcentr
           ports:
           - containerPort: 8778
             name: jolokia
@@ -279,17 +263,17 @@ objects:
             timeoutSeconds: 2
           resources:
             limits:
-              memory: ${DECISION_CENTRAL_MEMORY_LIMIT}
-        serviceAccountName: ${APPLICATION_NAME}-rhdmsvc
+              memory: ${BUSINESS_CENTRAL_MEMORY_LIMIT}
+        serviceAccountName: ${APPLICATION_NAME}-rhpamsvc
         terminationGracePeriodSeconds: 60
     triggers:
     - imageChangeParams:
         automatic: true
         containerNames:
-        - ${APPLICATION_NAME}-rhdmcentr
+        - ${APPLICATION_NAME}-rhpamcentr
         from:
           kind: ImageStreamTag
-          name: rhdm-decisioncentral-rhel8:${IMAGE_STREAM_TAG}
+          name: rhpam-businesscentral-rhel8:${IMAGE_STREAM_TAG}
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: ImageChange
     - type: ConfigChange
@@ -325,7 +309,7 @@ objects:
         containers:
         - env:
           - name: WORKBENCH_SERVICE_NAME
-            value: ${APPLICATION_NAME}-rhdmcentr
+            value: ${APPLICATION_NAME}-rhpamcentr
           - name: KIE_ADMIN_USER
             value: ${KIE_ADMIN_USER}
           - name: KIE_ADMIN_PWD
@@ -348,23 +332,19 @@ objects:
             value: insecure-${APPLICATION_NAME}-kieserver
           - name: KIE_SERVER_STARTUP_STRATEGY
             value: OpenShiftStartupStrategy
-          - name: KIE_SERVER_USER
-            value: ${KIE_SERVER_USER}
-          - name: KIE_SERVER_PWD
-            value: ${DEFAULT_PASSWORD}
           - name: KIE_SERVER_CONTAINER_DEPLOYMENT
             value: ${KIE_SERVER_CONTAINER_DEPLOYMENT}
           - name: MAVEN_REPOS
-            value: RHDMCENTR,EXTERNAL
-          - name: RHDMCENTR_MAVEN_REPO_ID
-            value: repo-rhdmcentr
-          - name: RHDMCENTR_MAVEN_REPO_SERVICE
-            value: ${APPLICATION_NAME}-rhdmcentr
-          - name: RHDMCENTR_MAVEN_REPO_PATH
+            value: RHPAMCENTR,EXTERNAL
+          - name: RHPAMCENTR_MAVEN_REPO_ID
+            value: repo-rhpamcentr
+          - name: RHPAMCENTR_MAVEN_REPO_SERVICE
+            value: ${APPLICATION_NAME}-rhpamcentr
+          - name: RHPAMCENTR_MAVEN_REPO_PATH
             value: /maven2/
-          - name: RHDMCENTR_MAVEN_REPO_USERNAME
-            value: ${DECISION_CENTRAL_MAVEN_USERNAME}
-          - name: RHDMCENTR_MAVEN_REPO_PASSWORD
+          - name: RHPAMCENTR_MAVEN_REPO_USERNAME
+            value: ${KIE_ADMIN_USER}
+          - name: RHPAMCENTR_MAVEN_REPO_PASSWORD
             value: ${DEFAULT_PASSWORD}
           - name: EXTERNAL_MAVEN_REPO_ID
             value: ${MAVEN_REPO_ID}
@@ -504,7 +484,7 @@ objects:
           resources:
             limits:
               memory: ${KIE_SERVER_MEMORY_LIMIT}
-        serviceAccountName: ${APPLICATION_NAME}-rhdmsvc
+        serviceAccountName: ${APPLICATION_NAME}-rhpamsvc
         terminationGracePeriodSeconds: 90
     triggers:
     - imageChangeParams:
@@ -533,21 +513,11 @@ parameters:
   displayName: KIE Admin User
   name: KIE_ADMIN_USER
   value: adminUser
-- description: KIE server user name. (Sets the org.kie.server.user system property)
-  displayName: KIE Server User
-  name: KIE_SERVER_USER
-  value: executionUser
 - description: Allows the KIE server to bypass the authenticated user for task-related
-    operations, for example, queries. (Sets the org.kie.server.bypass.auth.user system
-    property)
+    operations e.g. queries. (Sets the org.kie.server.bypass.auth.user system property)
   displayName: KIE Server Bypass Auth User
   name: KIE_SERVER_BYPASS_AUTH_USER
   value: "false"
-- description: KIE server controller user name. (Sets the org.kie.server.controller.user
-    system property)
-  displayName: KIE Server Controller User
-  name: KIE_SERVER_CONTROLLER_USER
-  value: controllerUser
 - description: The KIE Server mode. Valid values are 'DEVELOPMENT' or 'PRODUCTION'.
     In production mode, you can not deploy SNAPSHOT versions of artifacts on the KIE
     server and can not change the version of an artifact in an existing container.
@@ -598,10 +568,10 @@ parameters:
   displayName: KIE Server Access-Control-Max-Age response header
   name: KIE_SERVER_ACCESS_CONTROL_MAX_AGE
   value: "1"
-- description: 'Custom hostname for http service route.  Leave blank for default hostname,
-    e.g.: insecure-<application-name>-rhdmcentr-<project>.<default-domain-suffix>'
-  displayName: Decision Central Custom http Route Hostname
-  name: DECISION_CENTRAL_HOSTNAME_HTTP
+- description: 'Custom hostname for http service route for Business Central. Leave
+    blank for default hostname, e.g.: insecure-<application-name>-rhpamcentr-<project>.<default-domain-suffix>'
+  displayName: Business Central Custom http Route Hostname
+  name: BUSINESS_CENTRAL_HOSTNAME_HTTP
 - description: If set to true, turns on KIE server global discovery feature (Sets
     the org.kie.server.controller.openshift.global.discovery.enabled system property)
   displayName: Enable KIE server global discovery
@@ -618,25 +588,25 @@ parameters:
     system property)
   displayName: KIE ServerTemplate Cache TTL
   name: KIE_SERVER_CONTROLLER_TEMPLATE_CACHE_TTL
-  value: "60000"
-- description: Namespace in which the ImageStreams for Red Hat Decision Manager images
-    are installed. These ImageStreams are normally installed in the openshift namespace.
-    You should only need to modify this if you installed the ImageStreams in a different
-    namespace/project.
+  value: "5000"
+- description: Namespace in which the ImageStreams for Red Hat Process Automation
+    Manager images are installed. These ImageStreams are normally installed in the
+    openshift namespace. You need to modify this parameter only if you installed the
+    ImageStream in a different namespace/project. Default is "openshift".
   displayName: ImageStream Namespace
   name: IMAGE_STREAM_NAMESPACE
   required: true
   value: openshift
-- description: The name of the image stream to use for KIE server. Default is "rhdm-kieserver-rhel8".
+- description: The name of the image stream to use for KIE server. Default is "rhpam-kieserver-rhel8".
   displayName: KIE Server ImageStream Name
   name: KIE_SERVER_IMAGE_STREAM_NAME
   required: true
-  value: rhdm-kieserver-rhel8
-- description: A named pointer to an image in an image stream. Default is "7.6.0".
+  value: rhpam-kieserver-rhel8
+- description: A named pointer to an image in an image stream. Default is "7.7.0".
   displayName: ImageStream Tag
   name: IMAGE_STREAM_TAG
   required: true
-  value: 7.6.0
+  value: 7.7.0
 - description: 'KIE Server Container deployment configuration with optional alias.
     Format: containerId=groupId:artifactId:version|c2(alias2)=g2:a2:v2'
   displayName: KIE Server Container Deployment
@@ -655,18 +625,12 @@ parameters:
 - description: Password to access the Maven repository, if required.
   displayName: Maven repository password
   name: MAVEN_REPO_PASSWORD
-- description: User name for accessing the Maven service hosted by Decision Central
-    inside EAP.
-  displayName: User name for the Maven service hosted by Decision Central
-  name: DECISION_CENTRAL_MAVEN_USERNAME
-  required: true
-  value: mavenUser
 - description: The directory to use for git hooks, if required.
   displayName: Git hooks directory
   name: GIT_HOOKS_DIR
-- description: Decision Central Container memory limit.
-  displayName: Decision Central Container Memory Limit
-  name: DECISION_CENTRAL_MEMORY_LIMIT
+- description: Business Central Container memory limit.
+  displayName: Business Central Container Memory Limit
+  name: BUSINESS_CENTRAL_MEMORY_LIMIT
   value: 2Gi
 - description: KIE server Container memory limit.
   displayName: KIE Server Container Memory Limit
@@ -678,19 +642,19 @@ parameters:
 - description: RH-SSO Realm name.
   displayName: RH-SSO Realm name
   name: SSO_REALM
-- description: Decision Central RH-SSO Client name.
-  displayName: Decision Central RH-SSO Client name
-  name: DECISION_CENTRAL_SSO_CLIENT
-- description: Decision Central RH-SSO Client Secret.
-  displayName: Decision Central RH-SSO Client Secret
-  name: DECISION_CENTRAL_SSO_SECRET
+- description: Business Central RH-SSO Client name.
+  displayName: Business Central RH-SSO Client name
+  name: BUSINESS_CENTRAL_SSO_CLIENT
+- description: Business Central RH-SSO Client Secret.
+  displayName: Business Central RH-SSO Client Secret
+  name: BUSINESS_CENTRAL_SSO_SECRET
 - description: KIE Server RH-SSO Client name.
   displayName: KIE Server RH-SSO Client name
   name: KIE_SERVER_SSO_CLIENT
 - description: KIE Server RH-SSO Client Secret.
   displayName: KIE Server RH-SSO Client Secret
   name: KIE_SERVER_SSO_SECRET
-- description: RH-SSO Realm admin user name used to create the Client if it doesn't
+- description: RH-SSO Realm admin user name for creating the Client if it doesn't
     exist.
   displayName: RH-SSO Realm admin user name
   name: SSO_USERNAME
