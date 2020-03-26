@@ -18,7 +18,6 @@ import (
 	v15 "github.com/openshift/openshift-azure/pkg/arm/v15"
 	v16 "github.com/openshift/openshift-azure/pkg/arm/v16"
 	v17 "github.com/openshift/openshift-azure/pkg/arm/v17"
-	v71 "github.com/openshift/openshift-azure/pkg/arm/v71"
 )
 
 type Interface interface {
@@ -29,8 +28,6 @@ type Interface interface {
 
 func New(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (Interface, error) {
 	switch cs.Config.PluginVersion {
-	case "v7.1":
-		return v71.New(ctx, log, cs, testConfig), nil
 	case "v14.1":
 		return v14.New(ctx, log, cs, testConfig), nil
 	case "v15.0":
