@@ -204,14 +204,17 @@ func (s *sync) write(o *unstructured.Unstructured) error {
 
 		o.SetResourceVersion(rv)
 		_, err = dc.Resource(res, o.GetNamespace()).Update(o)
-		if err != nil && strings.Contains(err.Error(), "updates to parameters are forbidden") {
-			s.log.Infof("object %s is not updateable, will delete and re-create", o.GetName())
-			err = dc.Resource(res, o.GetNamespace()).Delete(o.GetName(), &metav1.DeleteOptions{})
-			if err != nil {
-				return
+		if err != nil {
+			if strings.Contains(err.Error(), "updates to parameters are forbidden") ||
+				(strings.Contains(err.Error(), "field is immutable") && strings.Contains(o.GetName(), "omsagent")) {
+				s.log.Infof("object %s is not updateable, will delete and re-create", o.GetName())
+				err = dc.Resource(res, o.GetNamespace()).Delete(o.GetName(), &metav1.DeleteOptions{})
+				if err != nil {
+					return
+				}
+				o.SetResourceVersion("")
+				_, err = dc.Resource(res, o.GetNamespace()).Create(o)
 			}
-			o.SetResourceVersion("")
-			_, err = dc.Resource(res, o.GetNamespace()).Create(o)
 		}
 
 		return
