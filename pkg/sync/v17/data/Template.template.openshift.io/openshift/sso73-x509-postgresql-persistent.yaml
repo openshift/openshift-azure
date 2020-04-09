@@ -1,7 +1,7 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhsso: 7.3.2.GA
+  rhsso: 7.3.7.GA
   template: sso73-x509-postgresql-persistent
 message: A new persistent RH-SSO service (using PostgreSQL) has been created in your
   project. The admin username/password for accessing the master realm via the RH-SSO
@@ -25,7 +25,7 @@ metadata:
       for PostgreSQL using persistence, and securing RH-SSO communication using re-encrypt
       TLS.
     template.openshift.io/support-url: https://access.redhat.com
-    version: 7.3.2.GA
+    version: 7.3.7.GA
   name: sso73-x509-postgresql-persistent
   namespace: openshift
 objects:
@@ -139,7 +139,7 @@ objects:
           - name: OPENSHIFT_DNS_PING_SERVICE_PORT
             value: "8888"
           - name: X509_CA_BUNDLE
-            value: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+            value: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
           - name: JGROUPS_CLUSTER_PASSWORD
             value: ${JGROUPS_CLUSTER_PASSWORD}
           - name: SSO_ADMIN_USERNAME
@@ -246,10 +246,12 @@ objects:
           image: postgresql
           imagePullPolicy: Always
           livenessProbe:
-            initialDelaySeconds: 30
+            failureThreshold: 3
+            initialDelaySeconds: 90
+            'successThreshold:': 1
             tcpSocket:
               port: 5432
-            timeoutSeconds: 1
+            timeoutSeconds: 10
           name: ${APPLICATION_NAME}-postgresql
           ports:
           - containerPort: 5432
@@ -262,8 +264,10 @@ objects:
               - -c
               - psql -h 127.0.0.1 -U $POSTGRESQL_USER -q -d $POSTGRESQL_DATABASE -c
                 'SELECT 1'
-            initialDelaySeconds: 5
-            timeoutSeconds: 1
+            failureThreshold: 3
+            initialDelaySeconds: 90
+            'successThreshold:': 1
+            timeoutSeconds: 10
           volumeMounts:
           - mountPath: /var/lib/pgsql/data
             name: ${APPLICATION_NAME}-postgresql-pvol
@@ -388,7 +392,7 @@ parameters:
   displayName: PostgreSQL Image Stream Tag
   name: POSTGRESQL_IMAGE_STREAM_TAG
   required: true
-  value: "9.5"
+  value: "10"
 - description: Container memory limit.
   displayName: Container Memory Limit
   name: MEMORY_LIMIT

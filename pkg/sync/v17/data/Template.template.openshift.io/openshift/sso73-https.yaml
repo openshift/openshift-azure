@@ -1,7 +1,7 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhsso: 7.3.2.GA
+  rhsso: 7.3.7.GA
   template: sso73-https
 message: 'A new RH-SSO service has been created in your project. The admin username/password
   for accessing the master realm via the RH-SSO console is ${SSO_ADMIN_USERNAME}/${SSO_ADMIN_PASSWORD}.
@@ -24,7 +24,7 @@ metadata:
       to develop Red Hat Single Sign-On 7.3 server based deployment, securing RH-SSO
       communication using passthrough TLS.
     template.openshift.io/support-url: https://access.redhat.com
-    version: 7.3.2.GA
+    version: 7.3.7.GA
   name: sso73-https
   namespace: openshift
 objects:

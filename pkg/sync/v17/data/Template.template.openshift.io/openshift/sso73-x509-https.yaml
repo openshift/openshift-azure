@@ -1,7 +1,7 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhsso: 7.3.2.GA
+  rhsso: 7.3.7.GA
   template: sso73-x509-https
 message: A new RH-SSO service has been created in your project. The admin username/password
   for accessing the master realm via the RH-SSO console is ${SSO_ADMIN_USERNAME}/${SSO_ADMIN_PASSWORD}.
@@ -22,7 +22,7 @@ metadata:
       to develop Red Hat Single Sign-On 7.3 server based deployment, securing RH-SSO
       communication using re-encrypt TLS.
     template.openshift.io/support-url: https://access.redhat.com
-    version: 7.3.2.GA
+    version: 7.3.7.GA
   name: sso73-x509-https
   namespace: openshift
 objects:
@@ -108,7 +108,7 @@ objects:
           - name: OPENSHIFT_DNS_PING_SERVICE_PORT
             value: "8888"
           - name: X509_CA_BUNDLE
-            value: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+            value: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
           - name: JGROUPS_CLUSTER_PASSWORD
             value: ${JGROUPS_CLUSTER_PASSWORD}
           - name: SSO_ADMIN_USERNAME
