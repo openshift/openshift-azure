@@ -5,7 +5,7 @@ metadata:
     description: Red Hat Single Sign-On 7.3
     openshift.io/display-name: Red Hat Single Sign-On 7.3
     openshift.io/provider-display-name: Red Hat, Inc.
-    version: 7.3.2.GA
+    version: 7.3.7.GA
   name: redhat-sso73-openshift
   namespace: openshift
 spec:

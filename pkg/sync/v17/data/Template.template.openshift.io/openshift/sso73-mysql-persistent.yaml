@@ -1,7 +1,7 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhsso: 7.3.2.GA
+  rhsso: 7.3.7.GA
   template: sso73-mysql-persistent
 message: 'A new persistent RH-SSO service (using MySQL) has been created in your project.
   The admin username/password for accessing the master realm via the RH-SSO console
@@ -26,7 +26,7 @@ metadata:
       for MySQL using persistence, and securing RH-SSO communication using passthrough
       TLS.
     template.openshift.io/support-url: https://access.redhat.com
-    version: 7.3.2.GA
+    version: 7.3.7.GA
   name: sso73-mysql-persistent
   namespace: openshift
 objects:
@@ -309,10 +309,12 @@ objects:
           image: mysql
           imagePullPolicy: Always
           livenessProbe:
-            initialDelaySeconds: 30
+            failureThreshold: 3
+            initialDelaySeconds: 90
+            'successThreshold:': 1
             tcpSocket:
               port: 3306
-            timeoutSeconds: 1
+            timeoutSeconds: 10
           name: ${APPLICATION_NAME}-mysql
           ports:
           - containerPort: 3306
@@ -325,8 +327,10 @@ objects:
               - -c
               - MYSQL_PWD="$MYSQL_PASSWORD" mysql -h 127.0.0.1 -u $MYSQL_USER -D $MYSQL_DATABASE
                 -e 'SELECT 1'
-            initialDelaySeconds: 5
-            timeoutSeconds: 1
+            failureThreshold: 3
+            initialDelaySeconds: 90
+            'successThreshold:': 1
+            timeoutSeconds: 10
           volumeMounts:
           - mountPath: /var/lib/mysql/data
             name: ${APPLICATION_NAME}-mysql-pvol
