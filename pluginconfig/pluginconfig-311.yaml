@@ -2,7 +2,7 @@
 ## Plugin config template.
 ## This template file is manually curated for the particular OSA version
 ##
-pluginVersion: v16.0
+pluginVersion: v16.1
 ## List of RPM packages that fix security issues
 securityPatchPackages: []
 ## Openshift component logging levels
