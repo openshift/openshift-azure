@@ -36,7 +36,7 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.Test
 		return v14.New(log, cs, testConfig), nil
 	case "v15.0":
 		return v15.New(log, cs, testConfig), nil
-	case "v16.0":
+	case "v16.0", "v16.1":
 		return v16.New(log, cs, testConfig), nil
 	}
 

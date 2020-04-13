@@ -1,3 +1,7 @@
+## v16.1
+
+- Bugfix: Allow recreating omsagent daemonset in sync pod ([#2270](https://github.com/openshift/openshift-azure/pull/2270), [@olga-mir](https://github.com/olga-mir), 09/04/2020)
+
 ## v16.0
 
 - Upgrade omsagent to ciprod03022020 ([#2244](https://github.com/openshift/openshift-azure/pull/2244), [@ehashman](https://github.com/ehashman), 10/03/2020)
