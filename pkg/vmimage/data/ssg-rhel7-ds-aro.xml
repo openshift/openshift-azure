@@ -18,7 +18,6 @@ Red Hat technologies that are based off RHEL7, such as:
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_rpm_verify_permissions" selected="false"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_rpm_verify_ownership" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_rpm_verify_hashes" selected="true"/>
-    <xccdf:select idref="xccdf_org.ssgproject.content_rule_dconf_use_text_backend" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_dconf_gnome_banner_enabled" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_dconf_gnome_login_banner_text" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_banner_etc_issue" selected="false"/>
@@ -152,13 +151,9 @@ Red Hat technologies that are based off RHEL7, such as:
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_audit_rules_privileged_commands_ssh_keysign" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_audit_rules_privileged_commands_crontab" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_audit_rules_privileged_commands_pam_timestamp_check" selected="true"/>
-    <xccdf:select idref="xccdf_org.ssgproject.content_rule_audit_rules_kernel_module_loading_create" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_audit_rules_kernel_module_loading_init" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_audit_rules_kernel_module_loading_finit" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_audit_rules_kernel_module_loading_delete" selected="true"/>
-    <xccdf:select idref="xccdf_org.ssgproject.content_rule_audit_rules_kernel_module_loading_insmod" selected="true"/>
-    <xccdf:select idref="xccdf_org.ssgproject.content_rule_audit_rules_kernel_module_loading_rmmod" selected="true"/>
-    <xccdf:select idref="xccdf_org.ssgproject.content_rule_audit_rules_kernel_module_loading_modprobe" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_audit_rules_usergroup_modification_passwd" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_audit_rules_file_deletion_events_rename" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_audit_rules_file_deletion_events_renameat" selected="true"/>
@@ -334,7 +329,6 @@ Red Hat technologies that are based off RHEL7, such as:
     <xccdf:select idref="xccdf_org.ssgproject.content_group_gnome_media_settings" selected="false"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_group_crypto" selected="false"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_group_mcafee_hbss_software" selected="false"/>
-    <xccdf:select idref="xccdf_org.ssgproject.content_group_sap" selected="false"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_group_poisoning" selected="false"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_group_daemon_umask" selected="false"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_group_coredumps" selected="false"/>
