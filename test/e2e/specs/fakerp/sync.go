@@ -29,7 +29,7 @@ var _ = Describe("sync pod tests [EveryPR]", func() {
 			if len(runs) > 1 {
 				for i, run := range runs {
 					Expect(run).To(Not(ContainSubstring("level=error")))
-					if i == 0 {
+					if i == 0 || i == 1 {
 						By(fmt.Sprintf("ignoring the run %d/%d as it will have updates", i, len(runs)))
 						continue
 					}
