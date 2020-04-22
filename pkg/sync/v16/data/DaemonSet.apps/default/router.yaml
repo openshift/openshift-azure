@@ -52,6 +52,8 @@ spec:
           value: "0"
         - name: EXTENDED_VALIDATION
           value: "true"
+        - name: SSL_MIN_VERSION
+          value: TLSv1.2
         image: '*** GENERATED ***'
         livenessProbe:
           httpGet:
