@@ -208,7 +208,7 @@ versions:
       prometheusOperator: registry.access.redhat.com/openshift3/ose-prometheus-operator:v3.11.170
       registry: registry.access.redhat.com/openshift3/ose-docker-registry:v3.11.170
       registryConsole: registry.access.redhat.com/openshift3/registry-console:v3.11.170
-      router: registry.access.redhat.com/openshift3/ose-haproxy-router:v3.11.170
+      router: registry.access.redhat.com/openshift3/ose-haproxy-router:v3.11.188
       serviceCatalog: registry.access.redhat.com/openshift3/ose-service-catalog:v3.11.170
       templateServiceBroker: registry.access.redhat.com/openshift3/ose-template-service-broker:v3.11.170
       webConsole: registry.access.redhat.com/openshift3/ose-web-console:v3.11.170
@@ -226,7 +226,7 @@ versions:
       etcdBackup: osarpint.azurecr.io/openshift-on-azure/azure:v16.1
       metricsBridge: osarpint.azurecr.io/openshift-on-azure/azure:v16.1
       startup: osarpint.azurecr.io/openshift-on-azure/azure:v16.1
-      sync: osarpint.azurecr.io/openshift-on-azure/azure:v16.1
+      sync: osarpint.azurecr.io/openshift-on-azure/azure:v16.1-tls-hotfix
       tlsProxy: osarpint.azurecr.io/openshift-on-azure/azure:v16.1
 ## certificates, used to authenticate to external systems
 ## Red Hat CDN client certificates
