@@ -8,17 +8,19 @@ message: A Jenkins service (monitored via prometheus) has been created in your p
   contains more information about using this template.
 metadata:
   annotations:
-    description: |-
-      Jenkins service, without persistent storage.
-
-      WARNING: Any data stored will be lost upon pod destruction. Only use this template for testing.
+    description: "Jenkins service, without persistent storage. \n\n To run this template
+      extra RBAC permissions need to be provideed to the use to be able to create
+      the ServiceMonitor Custom Resource managed by the prometheus-operator. \n\nWARNING:
+      Any data stored will be lost upon pod destruction. Only use this template for
+      testing."
     iconClass: icon-jenkins
     openshift.io/display-name: Jenkins (Ephemeral)
     openshift.io/documentation-url: https://docs.okd.io/latest/using_images/other_images/jenkins.html
-    openshift.io/long-description: This template deploys a Jenkins server capable
-      of managing OpenShift Pipeline builds and supporting OpenShift-based oauth login.  The
-      Jenkins configuration is stored in non-persistent storage, so this configuration
-      should be used for experimental purposes only.
+    openshift.io/long-description: 'This template deploys a Jenkins server capable
+      of managing OpenShift Pipeline builds and supporting OpenShift-based oauth login
+      and Prometheus monitoring. DISCLAIMER: User needs to have RBAC Permissions to
+      create the Service Monitor. The Jenkins configuration is stored in non-persistent
+      storage, so this configuration should be used for experimental purposes only.'
     openshift.io/provider-display-name: Red Hat, Inc.
     openshift.io/support-url: https://access.redhat.com
     tags: instant-app,jenkins
@@ -39,6 +41,12 @@ objects:
     to:
       kind: Service
       name: ${JENKINS_SERVICE_NAME}
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    labels:
+      config.openshift.io/inject-trusted-cabundle: "true"
+    name: ${JENKINS_SERVICE_NAME}-trusted-ca-bundle
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -102,6 +110,8 @@ objects:
           volumeMounts:
           - mountPath: /var/lib/jenkins
             name: ${JENKINS_SERVICE_NAME}-data
+          - mountPath: /etc/pki/ca-trust/source/anchors
+            name: ${JENKINS_SERVICE_NAME}-trusted-ca-bundle
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         serviceAccountName: ${JENKINS_SERVICE_NAME}
@@ -109,6 +119,10 @@ objects:
         - emptyDir:
             medium: ""
           name: ${JENKINS_SERVICE_NAME}-data
+        - configMap:
+            name: ${JENKINS_SERVICE_NAME}-trusted-ca-bundle
+            optional: true
+          name: ${JENKINS_SERVICE_NAME}-trusted-ca-bundle
     triggers:
     - imageChangeParams:
         automatic: true

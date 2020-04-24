@@ -32,17 +32,17 @@
 
 /test unit
 
-/test upgrade-private-v14.1
-
 /test upgrade-private-v15.0
 
 /test upgrade-private-v16.0
 
-/test upgrade-v14.1
+/test upgrade-private-v16.1
 
 /test upgrade-v15.0
 
 /test upgrade-v16.0
+
+/test upgrade-v16.1
 
 /test vmimage
 

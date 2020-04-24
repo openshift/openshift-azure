@@ -38,6 +38,12 @@ objects:
       kind: Service
       name: ${JENKINS_SERVICE_NAME}
 - apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    labels:
+      config.openshift.io/inject-trusted-cabundle: "true"
+    name: ${JENKINS_SERVICE_NAME}-trusted-ca-bundle
+- apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
     name: ${JENKINS_SERVICE_NAME}
@@ -112,6 +118,8 @@ objects:
           volumeMounts:
           - mountPath: /var/lib/jenkins
             name: ${JENKINS_SERVICE_NAME}-data
+          - mountPath: /etc/pki/ca-trust/source/anchors
+            name: ${JENKINS_SERVICE_NAME}-trusted-ca-bundle
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         serviceAccountName: ${JENKINS_SERVICE_NAME}
@@ -119,6 +127,10 @@ objects:
         - name: ${JENKINS_SERVICE_NAME}-data
           persistentVolumeClaim:
             claimName: ${JENKINS_SERVICE_NAME}
+        - configMap:
+            name: ${JENKINS_SERVICE_NAME}-trusted-ca-bundle
+            optional: true
+          name: ${JENKINS_SERVICE_NAME}-trusted-ca-bundle
     triggers:
     - imageChangeParams:
         automatic: true
