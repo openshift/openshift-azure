@@ -1,0 +1,49 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    authorization.openshift.io/system-only: "true"
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  name: system:router
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - authentication.k8s.io
+  resources:
+  - tokenreviews
+  verbs:
+  - create
+- apiGroups:
+  - authorization.k8s.io
+  resources:
+  - subjectaccessreviews
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  - route.openshift.io
+  resources:
+  - routes
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  - route.openshift.io
+  resources:
+  - routes/status
+  verbs:
+  - update
