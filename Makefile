@@ -72,7 +72,6 @@ verify:
 	./hack/verify/validate-codecov.sh
 	go run ./hack/validate-imports/validate-imports.go cmd hack pkg test
 	go run ./hack/verify/validate_pluginconfig.go
-	./hack/verify/validate-sec.sh
 
 testinsights:
 	go build -ldflags ${LDFLAGS} ./cmd/$@
