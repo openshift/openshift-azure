@@ -40,7 +40,7 @@ Red Hat technologies that are based off RHEL7, such as:
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_accounts_logon_fail_delay" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_gnome_gdm_disable_automatic_login" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_gnome_gdm_disable_guest_login" selected="true"/>
-    <xccdf:select idref="xccdf_org.ssgproject.content_rule_sshd_do_not_permit_user_env" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_sshd_do_not_permit_user_env" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_disable_host_auth" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_require_singleuser_auth" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_package_rsh-server_removed" selected="true"/>
@@ -181,7 +181,7 @@ Red Hat technologies that are based off RHEL7, such as:
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_sshd_print_last_log" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_sshd_disable_root_login" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_sshd_disable_user_known_hosts" selected="true"/>
-    <xccdf:select idref="xccdf_org.ssgproject.content_rule_sshd_allow_only_protocol2" selected="false"/>
+    <xccdf:select idref="xccdf_org.ssgproject.content_rule_sshd_allow_only_protocol2" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_sshd_use_approved_macs" selected="true"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_file_permissions_sshd_pub_key" selected="false"/>
     <xccdf:select idref="xccdf_org.ssgproject.content_rule_file_permissions_sshd_private_key" selected="false"/>
