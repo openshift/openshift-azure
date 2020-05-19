@@ -5,9 +5,11 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 
@@ -68,6 +70,14 @@ func newAdmissionController(ctx context.Context, log *logrus.Entry, configFile s
 	imageWhitelist, err := loadConfig(log, configFile)
 	if err != nil {
 		return nil, err
+	}
+
+	if cs.Properties.PrivateAPIServer {
+		hostname := os.Getenv("masterNodeName")
+		if hostname == "" {
+			return nil, fmt.Errorf("could not read hostname from env[masterNodeName]")
+		}
+		cs.Config.MasterKubeconfig.Clusters[0].Cluster.Server = "https://" + hostname
 	}
 
 	restconfig, err := managedcluster.RestConfigFromV1Config(cs.Config.MasterKubeconfig)
