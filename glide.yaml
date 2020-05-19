@@ -81,6 +81,8 @@ import:
   version: v3
 - package: google.golang.org/grpc
   version: v1.16.0
+- package: golang.org/x/net
+  version: ab555f366c4508dbe0802550b1b20c46c5c18aa0
 - package: golang.org/x/sys
   version: d69651ed3497faee15a5363a89578e9991f6d5e2
 - package: golang.org/x/tools
