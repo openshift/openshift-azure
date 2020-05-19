@@ -249,7 +249,8 @@ const (
 
 func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, deployFn api.DeployFn) *api.PluginError {
 	if isUpdate {
-		return p.createOrUpdateExt(ctx, cs, updateTypeNormal, deployFn, true)
+		// NOTE(ehashman): disable backups on updates, they regularly fail
+		return p.createOrUpdateExt(ctx, cs, updateTypeNormal, deployFn, false)
 	}
 	return p.createOrUpdateExt(ctx, cs, updateTypeCreate, deployFn, false)
 }
