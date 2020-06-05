@@ -258,8 +258,8 @@ versions:
       templateServiceBroker: registry.access.redhat.com/openshift3/ose-template-service-broker:v3.11.219
       webConsole: registry.access.redhat.com/openshift3/ose-web-console:v3.11.219
       format: registry.access.redhat.com/openshift3/ose-${component}:v3.11.219
-      httpd: registry.access.redhat.com/rhscl/httpd-24-rhel7:2.4-110
-      masterEtcd: registry.access.redhat.com/rhel7/etcd:3.2.26-37
+      httpd: registry.access.redhat.com/rhscl/httpd-24-rhel7:2.4-115
+      masterEtcd: registry.access.redhat.com/rhel7/etcd:3.2.28-8
       genevaLogging: osarpint.azurecr.io/acs/mdsd:master.20190228.1
       genevaStatsd: osarpint.azurecr.io/acs/mdm:git-a909a2e76
       genevaTDAgent: osarpint.azurecr.io/acs/td-agent:master.20190228.1
