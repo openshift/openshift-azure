@@ -14,30 +14,30 @@ import (
 	api "github.com/openshift/openshift-azure/pkg/api"
 )
 
-// MockInterface is a mock of Interface interface
+// MockInterface is a mock of Interface interface.
 type MockInterface struct {
 	ctrl     *gomock.Controller
 	recorder *MockInterfaceMockRecorder
 }
 
-// MockInterfaceMockRecorder is the mock recorder for MockInterface
+// MockInterfaceMockRecorder is the mock recorder for MockInterface.
 type MockInterfaceMockRecorder struct {
 	mock *MockInterface
 }
 
-// NewMockInterface creates a new mock instance
+// NewMockInterface creates a new mock instance.
 func NewMockInterface(ctrl *gomock.Controller) *MockInterface {
 	mock := &MockInterface{ctrl: ctrl}
 	mock.recorder = &MockInterfaceMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockInterface) EXPECT() *MockInterfaceMockRecorder {
 	return m.recorder
 }
 
-// Generate mocks base method
+// Generate mocks base method.
 func (m *MockInterface) Generate(ctx context.Context, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Generate", ctx, backupBlob, isUpdate, suffix)
@@ -46,13 +46,13 @@ func (m *MockInterface) Generate(ctx context.Context, backupBlob string, isUpdat
 	return ret0, ret1
 }
 
-// Generate indicates an expected call of Generate
+// Generate indicates an expected call of Generate.
 func (mr *MockInterfaceMockRecorder) Generate(ctx, backupBlob, isUpdate, suffix interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Generate", reflect.TypeOf((*MockInterface)(nil).Generate), ctx, backupBlob, isUpdate, suffix)
 }
 
-// Vmss mocks base method
+// Vmss mocks base method.
 func (m *MockInterface) Vmss(app *api.AgentPoolProfile, backupBlob, suffix string) (*compute.VirtualMachineScaleSet, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Vmss", app, backupBlob, suffix)
@@ -61,13 +61,13 @@ func (m *MockInterface) Vmss(app *api.AgentPoolProfile, backupBlob, suffix strin
 	return ret0, ret1
 }
 
-// Vmss indicates an expected call of Vmss
+// Vmss indicates an expected call of Vmss.
 func (mr *MockInterfaceMockRecorder) Vmss(app, backupBlob, suffix interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Vmss", reflect.TypeOf((*MockInterface)(nil).Vmss), app, backupBlob, suffix)
 }
 
-// Hash mocks base method
+// Hash mocks base method.
 func (m *MockInterface) Hash(app *api.AgentPoolProfile) ([]byte, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Hash", app)
@@ -76,7 +76,7 @@ func (m *MockInterface) Hash(app *api.AgentPoolProfile) ([]byte, error) {
 	return ret0, ret1
 }
 
-// Hash indicates an expected call of Hash
+// Hash indicates an expected call of Hash.
 func (mr *MockInterfaceMockRecorder) Hash(app interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Hash", reflect.TypeOf((*MockInterface)(nil).Hash), app)

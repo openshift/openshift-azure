@@ -12,30 +12,30 @@ import (
 	updateblob "github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 )
 
-// MockBlobService is a mock of BlobService interface
+// MockBlobService is a mock of BlobService interface.
 type MockBlobService struct {
 	ctrl     *gomock.Controller
 	recorder *MockBlobServiceMockRecorder
 }
 
-// MockBlobServiceMockRecorder is the mock recorder for MockBlobService
+// MockBlobServiceMockRecorder is the mock recorder for MockBlobService.
 type MockBlobServiceMockRecorder struct {
 	mock *MockBlobService
 }
 
-// NewMockBlobService creates a new mock instance
+// NewMockBlobService creates a new mock instance.
 func NewMockBlobService(ctrl *gomock.Controller) *MockBlobService {
 	mock := &MockBlobService{ctrl: ctrl}
 	mock.recorder = &MockBlobServiceMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockBlobService) EXPECT() *MockBlobServiceMockRecorder {
 	return m.recorder
 }
 
-// Read mocks base method
+// Read mocks base method.
 func (m *MockBlobService) Read() (*updateblob.UpdateBlob, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Read")
@@ -44,13 +44,13 @@ func (m *MockBlobService) Read() (*updateblob.UpdateBlob, error) {
 	return ret0, ret1
 }
 
-// Read indicates an expected call of Read
+// Read indicates an expected call of Read.
 func (mr *MockBlobServiceMockRecorder) Read() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Read", reflect.TypeOf((*MockBlobService)(nil).Read))
 }
 
-// Write mocks base method
+// Write mocks base method.
 func (m *MockBlobService) Write(arg0 *updateblob.UpdateBlob) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Write", arg0)
@@ -58,7 +58,7 @@ func (m *MockBlobService) Write(arg0 *updateblob.UpdateBlob) error {
 	return ret0
 }
 
-// Write indicates an expected call of Write
+// Write indicates an expected call of Write.
 func (mr *MockBlobServiceMockRecorder) Write(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Write", reflect.TypeOf((*MockBlobService)(nil).Write), arg0)

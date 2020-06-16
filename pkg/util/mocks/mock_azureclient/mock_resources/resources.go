@@ -13,30 +13,30 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockDeploymentOperationsClient is a mock of DeploymentOperationsClient interface
+// MockDeploymentOperationsClient is a mock of DeploymentOperationsClient interface.
 type MockDeploymentOperationsClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockDeploymentOperationsClientMockRecorder
 }
 
-// MockDeploymentOperationsClientMockRecorder is the mock recorder for MockDeploymentOperationsClient
+// MockDeploymentOperationsClientMockRecorder is the mock recorder for MockDeploymentOperationsClient.
 type MockDeploymentOperationsClientMockRecorder struct {
 	mock *MockDeploymentOperationsClient
 }
 
-// NewMockDeploymentOperationsClient creates a new mock instance
+// NewMockDeploymentOperationsClient creates a new mock instance.
 func NewMockDeploymentOperationsClient(ctrl *gomock.Controller) *MockDeploymentOperationsClient {
 	mock := &MockDeploymentOperationsClient{ctrl: ctrl}
 	mock.recorder = &MockDeploymentOperationsClientMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockDeploymentOperationsClient) EXPECT() *MockDeploymentOperationsClientMockRecorder {
 	return m.recorder
 }
 
-// List mocks base method
+// List mocks base method.
 func (m *MockDeploymentOperationsClient) List(arg0 context.Context, arg1, arg2 string, arg3 *int32) ([]resources.DeploymentOperation, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", arg0, arg1, arg2, arg3)
@@ -45,36 +45,36 @@ func (m *MockDeploymentOperationsClient) List(arg0 context.Context, arg1, arg2 s
 	return ret0, ret1
 }
 
-// List indicates an expected call of List
+// List indicates an expected call of List.
 func (mr *MockDeploymentOperationsClientMockRecorder) List(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockDeploymentOperationsClient)(nil).List), arg0, arg1, arg2, arg3)
 }
 
-// MockDeploymentsClient is a mock of DeploymentsClient interface
+// MockDeploymentsClient is a mock of DeploymentsClient interface.
 type MockDeploymentsClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockDeploymentsClientMockRecorder
 }
 
-// MockDeploymentsClientMockRecorder is the mock recorder for MockDeploymentsClient
+// MockDeploymentsClientMockRecorder is the mock recorder for MockDeploymentsClient.
 type MockDeploymentsClientMockRecorder struct {
 	mock *MockDeploymentsClient
 }
 
-// NewMockDeploymentsClient creates a new mock instance
+// NewMockDeploymentsClient creates a new mock instance.
 func NewMockDeploymentsClient(ctrl *gomock.Controller) *MockDeploymentsClient {
 	mock := &MockDeploymentsClient{ctrl: ctrl}
 	mock.recorder = &MockDeploymentsClientMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockDeploymentsClient) EXPECT() *MockDeploymentsClientMockRecorder {
 	return m.recorder
 }
 
-// Client mocks base method
+// Client mocks base method.
 func (m *MockDeploymentsClient) Client() autorest.Client {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Client")
@@ -82,13 +82,13 @@ func (m *MockDeploymentsClient) Client() autorest.Client {
 	return ret0
 }
 
-// Client indicates an expected call of Client
+// Client indicates an expected call of Client.
 func (mr *MockDeploymentsClientMockRecorder) Client() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Client", reflect.TypeOf((*MockDeploymentsClient)(nil).Client))
 }
 
-// CreateOrUpdate mocks base method
+// CreateOrUpdate mocks base method.
 func (m *MockDeploymentsClient) CreateOrUpdate(arg0 context.Context, arg1, arg2 string, arg3 resources.Deployment) (resources.DeploymentsCreateOrUpdateFuture, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrUpdate", arg0, arg1, arg2, arg3)
@@ -97,13 +97,13 @@ func (m *MockDeploymentsClient) CreateOrUpdate(arg0 context.Context, arg1, arg2 
 	return ret0, ret1
 }
 
-// CreateOrUpdate indicates an expected call of CreateOrUpdate
+// CreateOrUpdate indicates an expected call of CreateOrUpdate.
 func (mr *MockDeploymentsClientMockRecorder) CreateOrUpdate(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrUpdate", reflect.TypeOf((*MockDeploymentsClient)(nil).CreateOrUpdate), arg0, arg1, arg2, arg3)
 }
 
-// CreateOrUpdateAndWait mocks base method
+// CreateOrUpdateAndWait mocks base method.
 func (m *MockDeploymentsClient) CreateOrUpdateAndWait(arg0 context.Context, arg1, arg2 string, arg3 resources.Deployment) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrUpdateAndWait", arg0, arg1, arg2, arg3)
@@ -111,36 +111,36 @@ func (m *MockDeploymentsClient) CreateOrUpdateAndWait(arg0 context.Context, arg1
 	return ret0
 }
 
-// CreateOrUpdateAndWait indicates an expected call of CreateOrUpdateAndWait
+// CreateOrUpdateAndWait indicates an expected call of CreateOrUpdateAndWait.
 func (mr *MockDeploymentsClientMockRecorder) CreateOrUpdateAndWait(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrUpdateAndWait", reflect.TypeOf((*MockDeploymentsClient)(nil).CreateOrUpdateAndWait), arg0, arg1, arg2, arg3)
 }
 
-// MockGroupsClient is a mock of GroupsClient interface
+// MockGroupsClient is a mock of GroupsClient interface.
 type MockGroupsClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockGroupsClientMockRecorder
 }
 
-// MockGroupsClientMockRecorder is the mock recorder for MockGroupsClient
+// MockGroupsClientMockRecorder is the mock recorder for MockGroupsClient.
 type MockGroupsClientMockRecorder struct {
 	mock *MockGroupsClient
 }
 
-// NewMockGroupsClient creates a new mock instance
+// NewMockGroupsClient creates a new mock instance.
 func NewMockGroupsClient(ctrl *gomock.Controller) *MockGroupsClient {
 	mock := &MockGroupsClient{ctrl: ctrl}
 	mock.recorder = &MockGroupsClientMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockGroupsClient) EXPECT() *MockGroupsClientMockRecorder {
 	return m.recorder
 }
 
-// CreateOrUpdate mocks base method
+// CreateOrUpdate mocks base method.
 func (m *MockGroupsClient) CreateOrUpdate(arg0 context.Context, arg1 string, arg2 resources.Group) (resources.Group, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrUpdate", arg0, arg1, arg2)
@@ -149,13 +149,13 @@ func (m *MockGroupsClient) CreateOrUpdate(arg0 context.Context, arg1 string, arg
 	return ret0, ret1
 }
 
-// CreateOrUpdate indicates an expected call of CreateOrUpdate
+// CreateOrUpdate indicates an expected call of CreateOrUpdate.
 func (mr *MockGroupsClientMockRecorder) CreateOrUpdate(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrUpdate", reflect.TypeOf((*MockGroupsClient)(nil).CreateOrUpdate), arg0, arg1, arg2)
 }
 
-// Delete mocks base method
+// Delete mocks base method.
 func (m *MockGroupsClient) Delete(arg0 context.Context, arg1 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0, arg1)
@@ -163,13 +163,13 @@ func (m *MockGroupsClient) Delete(arg0 context.Context, arg1 string) error {
 	return ret0
 }
 
-// Delete indicates an expected call of Delete
+// Delete indicates an expected call of Delete.
 func (mr *MockGroupsClientMockRecorder) Delete(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockGroupsClient)(nil).Delete), arg0, arg1)
 }
 
-// Get mocks base method
+// Get mocks base method.
 func (m *MockGroupsClient) Get(arg0 context.Context, arg1 string) (resources.Group, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", arg0, arg1)
@@ -178,7 +178,7 @@ func (m *MockGroupsClient) Get(arg0 context.Context, arg1 string) (resources.Gro
 	return ret0, ret1
 }
 
-// Get indicates an expected call of Get
+// Get indicates an expected call of Get.
 func (mr *MockGroupsClientMockRecorder) Get(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockGroupsClient)(nil).Get), arg0, arg1)
