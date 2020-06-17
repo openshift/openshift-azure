@@ -18,6 +18,7 @@ clean:
 	rm -f coverage.out azure releasenotes testinsights fakerp
 
 generate:
+	@go-bindata -version
 	@[[ -e /var/run/secrets/kubernetes.io ]] || go generate ./...
 
 test: unit e2e

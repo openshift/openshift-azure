@@ -12,30 +12,30 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockWorkspacesClient is a mock of WorkspacesClient interface
+// MockWorkspacesClient is a mock of WorkspacesClient interface.
 type MockWorkspacesClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockWorkspacesClientMockRecorder
 }
 
-// MockWorkspacesClientMockRecorder is the mock recorder for MockWorkspacesClient
+// MockWorkspacesClientMockRecorder is the mock recorder for MockWorkspacesClient.
 type MockWorkspacesClientMockRecorder struct {
 	mock *MockWorkspacesClient
 }
 
-// NewMockWorkspacesClient creates a new mock instance
+// NewMockWorkspacesClient creates a new mock instance.
 func NewMockWorkspacesClient(ctrl *gomock.Controller) *MockWorkspacesClient {
 	mock := &MockWorkspacesClient{ctrl: ctrl}
 	mock.recorder = &MockWorkspacesClientMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockWorkspacesClient) EXPECT() *MockWorkspacesClientMockRecorder {
 	return m.recorder
 }
 
-// Get mocks base method
+// Get mocks base method.
 func (m *MockWorkspacesClient) Get(arg0 context.Context, arg1, arg2 string) (operationalinsights.Workspace, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", arg0, arg1, arg2)
@@ -44,13 +44,13 @@ func (m *MockWorkspacesClient) Get(arg0 context.Context, arg1, arg2 string) (ope
 	return ret0, ret1
 }
 
-// Get indicates an expected call of Get
+// Get indicates an expected call of Get.
 func (mr *MockWorkspacesClientMockRecorder) Get(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockWorkspacesClient)(nil).Get), arg0, arg1, arg2)
 }
 
-// GetSharedKeys mocks base method
+// GetSharedKeys mocks base method.
 func (m *MockWorkspacesClient) GetSharedKeys(arg0 context.Context, arg1, arg2 string) (operationalinsights.SharedKeys, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSharedKeys", arg0, arg1, arg2)
@@ -59,7 +59,7 @@ func (m *MockWorkspacesClient) GetSharedKeys(arg0 context.Context, arg1, arg2 st
 	return ret0, ret1
 }
 
-// GetSharedKeys indicates an expected call of GetSharedKeys
+// GetSharedKeys indicates an expected call of GetSharedKeys.
 func (mr *MockWorkspacesClientMockRecorder) GetSharedKeys(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSharedKeys", reflect.TypeOf((*MockWorkspacesClient)(nil).GetSharedKeys), arg0, arg1, arg2)
