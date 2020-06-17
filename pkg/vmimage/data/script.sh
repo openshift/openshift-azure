@@ -289,6 +289,9 @@ echo 'localpkg_gpgcheck=1' >> /etc/yum.conf
 #	sysctl_kernel_randomize_va_space
 echo 'kernel.randomize_va_space = 2' >> /etc/sysctl.conf
 
+# sysctl_accept_ra
+echo 'net.ipv6.conf.all.accept_ra = 0' >> /etc/sysctl.conf
+
 rpm -qa --qf='%{sourcerpm}\n' | sort -u | sed 's/\.src\.rpm$//' > /var/tmp/installed_packages_list
 
 >/var/tmp/kickstart_completed
