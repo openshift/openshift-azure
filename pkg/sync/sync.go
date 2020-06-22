@@ -13,6 +13,7 @@ import (
 	v16 "github.com/openshift/openshift-azure/pkg/sync/v16"
 	v17 "github.com/openshift/openshift-azure/pkg/sync/v17"
 	v18 "github.com/openshift/openshift-azure/pkg/sync/v18"
+	v19 "github.com/openshift/openshift-azure/pkg/sync/v19"
 )
 
 type Interface interface {
@@ -34,6 +35,8 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (
 		return v17.New(log, cs, initClients)
 	case "v18.0":
 		return v18.New(log, cs, initClients)
+	case "v19.0":
+		return v19.New(log, cs, initClients)
 	}
 
 	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)
@@ -55,6 +58,8 @@ func AssetNames(cs *api.OpenShiftManagedCluster) ([]string, error) {
 		return v17.AssetNames(), nil
 	case "v18.0":
 		return v18.AssetNames(), nil
+	case "v19.0":
+		return v19.AssetNames(), nil
 	}
 
 	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)
@@ -72,6 +77,8 @@ func Asset(cs *api.OpenShiftManagedCluster, name string) ([]byte, error) {
 		return v17.Asset(name)
 	case "v18.0":
 		return v18.Asset(name)
+	case "v19.0":
+		return v19.Asset(name)
 	}
 
 	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)
