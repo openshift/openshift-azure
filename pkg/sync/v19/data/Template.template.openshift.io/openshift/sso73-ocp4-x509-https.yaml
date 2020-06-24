@@ -1,8 +1,8 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhsso: "7"
-  template: sso-cd-x509-https
+  rhsso: 7.3.8.GA
+  template: sso73-ocp4-x509-https
 message: A new RH-SSO service has been created in your project. The admin username/password
   for accessing the master realm via the RH-SSO console is ${SSO_ADMIN_USERNAME}/${SSO_ADMIN_PASSWORD}.
   The HTTPS keystore used for serving secure content, the JGroups keystore used for
@@ -11,21 +11,30 @@ message: A new RH-SSO service has been created in your project. The admin userna
   secrets.
 metadata:
   annotations:
-    description: An example application based on RH-SSO CD 7 Tech Preview image. For
-      more information about using this template, see https://github.com/jboss-container-images/redhat-sso-7-openshift-image/docs.
+    description: An example application based on RH-SSO 7.3 image. For more information
+      about using this template, see https://github.com/jboss-container-images/redhat-sso-7-openshift-image/docs.
     iconClass: icon-sso
-    openshift.io/display-name: Red Hat Single Sign-On CD 7 Tech Preview (Ephemeral)
+    openshift.io/display-name: Red Hat Single Sign-On 7.3 (Ephemeral)
     openshift.io/provider-display-name: Red Hat, Inc.
     tags: sso,keycloak,jboss
     template.openshift.io/documentation-url: https://access.redhat.com/documentation/en/red-hat-single-sign-on/
     template.openshift.io/long-description: This template defines resources needed
-      to develop Red Hat Single Sign-On CD 7 server based deployment, securing RH-SSO
+      to develop Red Hat Single Sign-On 7.3 server based deployment, securing RH-SSO
       communication using re-encrypt TLS.
     template.openshift.io/support-url: https://access.redhat.com
-    version: "7"
-  name: sso-cd-x509-https
+    version: 7.3.8.GA
+  name: sso73-ocp4-x509-https
   namespace: openshift
 objects:
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    annotations:
+      description: ConfigMap providing service ca bundle.
+      service.beta.openshift.io/inject-cabundle: "true"
+    labels:
+      application: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}-service-ca
 - apiVersion: v1
   kind: Service
   metadata:
@@ -108,7 +117,7 @@ objects:
           - name: OPENSHIFT_DNS_PING_SERVICE_PORT
             value: "8888"
           - name: X509_CA_BUNDLE
-            value: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            value: /var/run/configmaps/service-ca/service-ca.crt /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
           - name: JGROUPS_CLUSTER_PASSWORD
             value: ${JGROUPS_CLUSTER_PASSWORD}
           - name: SSO_ADMIN_USERNAME
@@ -160,6 +169,9 @@ objects:
           - mountPath: /etc/x509/jgroups
             name: sso-x509-jgroups-volume
             readOnly: true
+          - mountPath: /var/run/configmaps/service-ca
+            name: service-ca
+            readOnly: true
         terminationGracePeriodSeconds: 75
         volumes:
         - name: sso-x509-https-volume
@@ -168,6 +180,9 @@ objects:
         - name: sso-x509-jgroups-volume
           secret:
             secretName: sso-x509-jgroups-secret
+        - configMap:
+            name: ${APPLICATION_NAME}-service-ca
+          name: service-ca
     triggers:
     - imageChangeParams:
         automatic: true
@@ -175,7 +190,7 @@ objects:
         - ${APPLICATION_NAME}
         from:
           kind: ImageStreamTag
-          name: redhat-sso-cd-openshift-rhel8:7
+          name: redhat-sso73-openshift:1.0
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: ImageChange
     - type: ConfigChange

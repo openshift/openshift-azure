@@ -1,7 +1,7 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhsso: 7.3.7.GA
+  rhsso: 7.3.8.GA
   template: sso73-mysql-persistent
 message: 'A new persistent RH-SSO service (using MySQL) has been created in your project.
   The admin username/password for accessing the master realm via the RH-SSO console
@@ -26,7 +26,7 @@ metadata:
       for MySQL using persistence, and securing RH-SSO communication using passthrough
       TLS.
     template.openshift.io/support-url: https://access.redhat.com
-    version: 7.3.7.GA
+    version: 7.3.8.GA
   name: sso73-mysql-persistent
   namespace: openshift
 objects:

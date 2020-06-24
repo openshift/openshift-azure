@@ -405,7 +405,7 @@ objects:
           - name: KIE_MBEANS
             value: ${KIE_MBEANS}
           - name: KIE_SERVER_CONTROLLER_OPENSHIFT_ENABLED
-            value: "false"
+            value: "true"
           - name: KIE_SERVER_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED
             value: ${KIE_SERVER_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED}
           - name: KIE_SERVER_CONTROLLER_OPENSHIFT_PREFER_KIESERVER_SERVICE
@@ -606,7 +606,10 @@ objects:
     selector:
       deploymentConfig: ${APPLICATION_NAME}-kieserver
     strategy:
-      type: Recreate
+      rollingParams:
+        maxSurge: 100%
+        maxUnavailable: 0
+      type: Rolling
     template:
       metadata:
         labels:
@@ -675,7 +678,7 @@ objects:
           - name: KIE_SERVER_ROUTE_NAME
             value: insecure-${APPLICATION_NAME}-kieserver
           - name: KIE_SERVER_STARTUP_STRATEGY
-            value: ControllerBasedStartupStrategy
+            value: OpenShiftStartupStrategy
           - name: MAVEN_MIRROR_URL
             value: ${MAVEN_MIRROR_URL}
           - name: MAVEN_MIRROR_OF
@@ -1214,7 +1217,7 @@ parameters:
   displayName: DataGrid Image
   name: DATAGRID_IMAGE
   required: true
-  value: registry.redhat.io/jboss-datagrid-7/datagrid73-openshift:1.4
+  value: registry.redhat.io/jboss-datagrid-7/datagrid73-openshift:1.5
 - description: DataGrid Container CPU limit.
   displayName: DataGrid Container CPU Limit
   name: DATAGRID_CPU_LIMIT
@@ -1294,11 +1297,11 @@ parameters:
   name: KIE_SERVER_IMAGE_STREAM_NAME
   required: true
   value: rhpam-kieserver-rhel8
-- description: A named pointer to an image in an image stream. Default is "7.7.0".
+- description: A named pointer to an image in an image stream. Default is "7.7.1".
   displayName: ImageStream Tag
   name: IMAGE_STREAM_TAG
   required: true
-  value: 7.7.0
+  value: 7.7.1
 - description: Maven mirror that Business Central and KIE server must use. If you
     configure a mirror, this mirror must contain all artifacts that are required for
     building and deploying your services.

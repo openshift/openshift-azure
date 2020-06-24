@@ -1,8 +1,8 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rh-sso: 7.2-v1.4.0
-  template: sso72-x509-https
+  rhsso: 7.4.0.GA
+  template: sso74-ocp4-x509-https
 message: A new RH-SSO service has been created in your project. The admin username/password
   for accessing the master realm via the RH-SSO console is ${SSO_ADMIN_USERNAME}/${SSO_ADMIN_PASSWORD}.
   The HTTPS keystore used for serving secure content, the JGroups keystore used for
@@ -11,21 +11,30 @@ message: A new RH-SSO service has been created in your project. The admin userna
   secrets.
 metadata:
   annotations:
-    description: An example RH-SSO 7 application. For more information about using
-      this template, see https://github.com/jboss-openshift/application-templates.
+    description: An example application based on RH-SSO 7.4 on OpenJDK image. For
+      more information about using this template, see https://github.com/jboss-container-images/redhat-sso-7-openshift-image/tree/sso74-dev/docs.
     iconClass: icon-sso
-    openshift.io/display-name: Red Hat Single Sign-On 7.2 (Ephemeral)
+    openshift.io/display-name: Red Hat Single Sign-On 7.4 on OpenJDK (Ephemeral)
     openshift.io/provider-display-name: Red Hat, Inc.
     tags: sso,keycloak,jboss
     template.openshift.io/documentation-url: https://access.redhat.com/documentation/en/red-hat-single-sign-on/
     template.openshift.io/long-description: This template defines resources needed
-      to develop Red Hat Single Sign-On 7.2 server based deployment, securing RH-SSO
-      communication using re-encrypt TLS.
+      to develop Red Hat Single Sign-On 7.4 on OpenJDK server based deployment, securing
+      RH-SSO communication using re-encrypt TLS.
     template.openshift.io/support-url: https://access.redhat.com
-    version: rh-sso-7.2-v1.4.0
-  name: sso72-x509-https
+    version: 7.4.0.GA
+  name: sso74-ocp4-x509-https
   namespace: openshift
 objects:
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    annotations:
+      description: ConfigMap providing service ca bundle.
+      service.beta.openshift.io/inject-cabundle: "true"
+    labels:
+      application: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}-service-ca
 - apiVersion: v1
   kind: Service
   metadata:
@@ -47,6 +56,7 @@ objects:
     annotations:
       description: The JGroups ping port for clustering.
       service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+      service.alpha.openshift.io/serving-cert-secret-name: sso-x509-jgroups-secret
     labels:
       application: ${APPLICATION_NAME}
     name: ${APPLICATION_NAME}-ping
@@ -92,6 +102,8 @@ objects:
       spec:
         containers:
         - env:
+          - name: SSO_HOSTNAME
+            value: ${SSO_HOSTNAME}
           - name: DB_MIN_POOL_SIZE
             value: ${DB_MIN_POOL_SIZE}
           - name: DB_MAX_POOL_SIZE
@@ -105,11 +117,9 @@ objects:
           - name: OPENSHIFT_DNS_PING_SERVICE_PORT
             value: "8888"
           - name: X509_CA_BUNDLE
-            value: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+            value: /var/run/configmaps/service-ca/service-ca.crt /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
           - name: JGROUPS_CLUSTER_PASSWORD
             value: ${JGROUPS_CLUSTER_PASSWORD}
-          - name: JGROUPS_ENCRYPT_PROTOCOL
-            value: ASYM_ENCRYPT
           - name: SSO_ADMIN_USERNAME
             value: ${SSO_ADMIN_USERNAME}
           - name: SSO_ADMIN_PASSWORD
@@ -156,11 +166,23 @@ objects:
           - mountPath: /etc/x509/https
             name: sso-x509-https-volume
             readOnly: true
+          - mountPath: /etc/x509/jgroups
+            name: sso-x509-jgroups-volume
+            readOnly: true
+          - mountPath: /var/run/configmaps/service-ca
+            name: service-ca
+            readOnly: true
         terminationGracePeriodSeconds: 75
         volumes:
         - name: sso-x509-https-volume
           secret:
             secretName: sso-x509-https-secret
+        - name: sso-x509-jgroups-volume
+          secret:
+            secretName: sso-x509-jgroups-secret
+        - configMap:
+            name: ${APPLICATION_NAME}-service-ca
+          name: service-ca
     triggers:
     - imageChangeParams:
         automatic: true
@@ -168,7 +190,7 @@ objects:
         - ${APPLICATION_NAME}
         from:
           kind: ImageStreamTag
-          name: redhat-sso72-openshift:1.4
+          name: sso74-openshift-rhel8:7.4
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: ImageChange
     - type: ConfigChange
@@ -178,6 +200,9 @@ parameters:
   name: APPLICATION_NAME
   required: true
   value: sso
+- description: Custom hostname for the RH-SSO server.
+  displayName: Custom RH-SSO Server Hostname
+  name: SSO_HOSTNAME
 - description: The password for the JGroups cluster.
   displayName: JGroups Cluster Password
   from: '[a-zA-Z0-9]{32}'

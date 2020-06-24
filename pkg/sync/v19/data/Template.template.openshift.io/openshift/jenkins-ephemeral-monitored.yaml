@@ -83,6 +83,8 @@ objects:
             value: ${JNLP_SERVICE_NAME}
           - name: JENKINS_UC_INSECURE
             value: ${JENKINS_UC_INSECURE}
+          - name: CASC_JENKINS_CONFIG
+            value: /var/lib/jenkins/proxy.yaml
           image: ' '
           imagePullPolicy: IfNotPresent
           livenessProbe:

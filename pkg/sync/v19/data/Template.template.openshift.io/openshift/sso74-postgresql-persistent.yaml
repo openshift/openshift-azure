@@ -1,34 +1,52 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhsso: 7.3.7.GA
-  template: sso73-x509-postgresql-persistent
-message: A new persistent RH-SSO service (using PostgreSQL) has been created in your
+  rhsso: 7.4.0.GA
+  template: sso74-postgresql-persistent
+message: 'A new persistent RH-SSO service (using PostgreSQL) has been created in your
   project. The admin username/password for accessing the master realm via the RH-SSO
   console is ${SSO_ADMIN_USERNAME}/${SSO_ADMIN_PASSWORD}. The username/password for
   accessing the PostgreSQL database "${DB_DATABASE}" is ${DB_USERNAME}/${DB_PASSWORD}.
-  The HTTPS keystore used for serving secure content, the JGroups keystore used for
-  securing JGroups communications, and server truststore used for securing RH-SSO
-  requests were automatically created via OpenShift's service serving x509 certificate
-  secrets.
+  Please be sure to create the following secrets: "${HTTPS_SECRET}" containing the
+  ${HTTPS_KEYSTORE} file used for serving secure content; "${JGROUPS_ENCRYPT_SECRET}"
+  containing the ${JGROUPS_ENCRYPT_KEYSTORE} file used for securing JGroups communications;
+  "${SSO_TRUSTSTORE_SECRET}" containing the ${SSO_TRUSTSTORE} file used for securing
+  RH-SSO requests.'
 metadata:
   annotations:
-    description: An example application based on RH-SSO 7.3 image. For more information
-      about using this template, see https://github.com/jboss-container-images/redhat-sso-7-openshift-image/docs.
+    description: An example application based on RH-SSO 7.4 on OpenJDK image. For
+      more information about using this template, see https://github.com/jboss-container-images/redhat-sso-7-openshift-image/tree/sso74-dev/docs.
     iconClass: icon-sso
-    openshift.io/display-name: Red Hat Single Sign-On 7.3 + PostgreSQL (Persistent)
+    openshift.io/display-name: Red Hat Single Sign-On 7.4 on OpenJDK + PostgreSQL
+      (Persistent with passthrough TLS)
     openshift.io/provider-display-name: Red Hat, Inc.
-    tags: sso,keycloak,jboss
+    tags: sso,keycloak,jboss,hidden
     template.openshift.io/documentation-url: https://access.redhat.com/documentation/en/red-hat-single-sign-on/
     template.openshift.io/long-description: This template defines resources needed
-      to develop Red Hat Single Sign-On 7.3 server based deployment, deployment configuration
-      for PostgreSQL using persistence, and securing RH-SSO communication using re-encrypt
-      TLS.
+      to develop Red Hat Single Sign-On 7.4 on OpenJDK server based deployment, deployment
+      configuration for PostgreSQL using persistence, and securing RH-SSO communication
+      using passthrough TLS.
     template.openshift.io/support-url: https://access.redhat.com
-    version: 7.3.7.GA
-  name: sso73-x509-postgresql-persistent
+    version: 7.4.0.GA
+  name: sso74-postgresql-persistent
   namespace: openshift
 objects:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: The web server's http port.
+      service.alpha.openshift.io/dependencies: '[{"name": "${APPLICATION_NAME}-postgresql",
+        "kind": "Service"}]'
+    labels:
+      application: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}
+  spec:
+    ports:
+    - port: 8080
+      targetPort: 8080
+    selector:
+      deploymentConfig: ${APPLICATION_NAME}
 - apiVersion: v1
   kind: Service
   metadata:
@@ -36,10 +54,9 @@ objects:
       description: The web server's https port.
       service.alpha.openshift.io/dependencies: '[{"name": "${APPLICATION_NAME}-postgresql",
         "kind": "Service"}]'
-      service.alpha.openshift.io/serving-cert-secret-name: sso-x509-https-secret
     labels:
       application: ${APPLICATION_NAME}
-    name: ${APPLICATION_NAME}
+    name: secure-${APPLICATION_NAME}
   spec:
     ports:
     - port: 8443
@@ -66,7 +83,6 @@ objects:
     annotations:
       description: The JGroups ping port for clustering.
       service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
-      service.alpha.openshift.io/serving-cert-secret-name: sso-x509-jgroups-secret
     labels:
       application: ${APPLICATION_NAME}
     name: ${APPLICATION_NAME}-ping
@@ -78,6 +94,19 @@ objects:
     selector:
       deploymentConfig: ${APPLICATION_NAME}
 - apiVersion: v1
+  id: ${APPLICATION_NAME}-http
+  kind: Route
+  metadata:
+    annotations:
+      description: Route for application's http service.
+    labels:
+      application: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}
+  spec:
+    host: ${HOSTNAME_HTTP}
+    to:
+      name: ${APPLICATION_NAME}
+- apiVersion: v1
   id: ${APPLICATION_NAME}-https
   kind: Route
   metadata:
@@ -85,12 +114,13 @@ objects:
       description: Route for application's https service.
     labels:
       application: ${APPLICATION_NAME}
-    name: ${APPLICATION_NAME}
+    name: secure-${APPLICATION_NAME}
   spec:
+    host: ${HOSTNAME_HTTPS}
     tls:
-      termination: reencrypt
+      termination: passthrough
     to:
-      name: ${APPLICATION_NAME}
+      name: secure-${APPLICATION_NAME}
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -138,8 +168,26 @@ objects:
             value: ${APPLICATION_NAME}-ping
           - name: OPENSHIFT_DNS_PING_SERVICE_PORT
             value: "8888"
-          - name: X509_CA_BUNDLE
-            value: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          - name: HTTPS_KEYSTORE_DIR
+            value: /etc/eap-secret-volume
+          - name: HTTPS_KEYSTORE
+            value: ${HTTPS_KEYSTORE}
+          - name: HTTPS_KEYSTORE_TYPE
+            value: ${HTTPS_KEYSTORE_TYPE}
+          - name: HTTPS_NAME
+            value: ${HTTPS_NAME}
+          - name: HTTPS_PASSWORD
+            value: ${HTTPS_PASSWORD}
+          - name: JGROUPS_ENCRYPT_SECRET
+            value: ${JGROUPS_ENCRYPT_SECRET}
+          - name: JGROUPS_ENCRYPT_KEYSTORE_DIR
+            value: /etc/jgroups-encrypt-secret-volume
+          - name: JGROUPS_ENCRYPT_KEYSTORE
+            value: ${JGROUPS_ENCRYPT_KEYSTORE}
+          - name: JGROUPS_ENCRYPT_NAME
+            value: ${JGROUPS_ENCRYPT_NAME}
+          - name: JGROUPS_ENCRYPT_PASSWORD
+            value: ${JGROUPS_ENCRYPT_PASSWORD}
           - name: JGROUPS_CLUSTER_PASSWORD
             value: ${JGROUPS_CLUSTER_PASSWORD}
           - name: SSO_ADMIN_USERNAME
@@ -152,6 +200,12 @@ objects:
             value: ${SSO_SERVICE_USERNAME}
           - name: SSO_SERVICE_PASSWORD
             value: ${SSO_SERVICE_PASSWORD}
+          - name: SSO_TRUSTSTORE
+            value: ${SSO_TRUSTSTORE}
+          - name: SSO_TRUSTSTORE_DIR
+            value: /etc/sso-secret-volume
+          - name: SSO_TRUSTSTORE_PASSWORD
+            value: ${SSO_TRUSTSTORE_PASSWORD}
           image: ${APPLICATION_NAME}
           imagePullPolicy: Always
           livenessProbe:
@@ -185,20 +239,26 @@ objects:
             limits:
               memory: ${MEMORY_LIMIT}
           volumeMounts:
-          - mountPath: /etc/x509/https
-            name: sso-x509-https-volume
+          - mountPath: /etc/eap-secret-volume
+            name: eap-keystore-volume
             readOnly: true
-          - mountPath: /etc/x509/jgroups
-            name: sso-x509-jgroups-volume
+          - mountPath: /etc/jgroups-encrypt-secret-volume
+            name: eap-jgroups-keystore-volume
+            readOnly: true
+          - mountPath: /etc/sso-secret-volume
+            name: sso-truststore-volume
             readOnly: true
         terminationGracePeriodSeconds: 75
         volumes:
-        - name: sso-x509-https-volume
+        - name: eap-keystore-volume
           secret:
-            secretName: sso-x509-https-secret
-        - name: sso-x509-jgroups-volume
+            secretName: ${HTTPS_SECRET}
+        - name: eap-jgroups-keystore-volume
           secret:
-            secretName: sso-x509-jgroups-secret
+            secretName: ${JGROUPS_ENCRYPT_SECRET}
+        - name: sso-truststore-volume
+          secret:
+            secretName: ${SSO_TRUSTSTORE_SECRET}
     triggers:
     - imageChangeParams:
         automatic: true
@@ -206,7 +266,7 @@ objects:
         - ${APPLICATION_NAME}
         from:
           kind: ImageStreamTag
-          name: redhat-sso73-openshift:1.0
+          name: sso74-openshift-rhel8:7.4
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: ImageChange
     - type: ConfigChange
@@ -305,15 +365,17 @@ parameters:
   name: APPLICATION_NAME
   required: true
   value: sso
+- description: 'Custom hostname for http service route. Leave blank for default hostname,
+    e.g.: <application-name>.<project>.<default-domain-suffix>'
+  displayName: Custom http Route Hostname
+  name: HOSTNAME_HTTP
+- description: 'Custom hostname for https service route. Leave blank for default hostname,
+    e.g.: <application-name>.<project>.<default-domain-suffix>'
+  displayName: Custom https Route Hostname
+  name: HOSTNAME_HTTPS
 - description: Custom hostname for the RH-SSO server.
   displayName: Custom RH-SSO Server Hostname
   name: SSO_HOSTNAME
-- description: The password for the JGroups cluster.
-  displayName: JGroups Cluster Password
-  from: '[a-zA-Z0-9]{32}'
-  generate: expression
-  name: JGROUPS_CLUSTER_PASSWORD
-  required: true
 - description: Database JNDI name used by application to resolve the datasource, e.g.
     java:/jboss/datasources/postgresql
   displayName: Database JNDI Name
@@ -324,6 +386,23 @@ parameters:
   name: DB_DATABASE
   required: true
   value: root
+- description: The name of the secret containing the keystore file
+  displayName: Server Keystore Secret Name
+  name: HTTPS_SECRET
+  value: sso-app-secret
+- description: The name of the keystore file within the secret
+  displayName: Server Keystore Filename
+  name: HTTPS_KEYSTORE
+  value: keystore.jks
+- description: The type of the keystore file (JKS or JCEKS)
+  displayName: Server Keystore Type
+  name: HTTPS_KEYSTORE_TYPE
+- description: The name associated with the server certificate (e.g. jboss)
+  displayName: Server Certificate Name
+  name: HTTPS_NAME
+- description: The password for the keystore and certificate (e.g. mykeystorepass)
+  displayName: Server Keystore Password
+  name: HTTPS_PASSWORD
 - description: Sets xa-pool/min-pool-size for the configured datasource.
   displayName: Datasource Minimum Pool Size
   name: DB_MIN_POOL_SIZE
@@ -348,7 +427,7 @@ parameters:
   required: true
 - description: Database user password
   displayName: Database Password
-  from: '[a-zA-Z0-9]{32}'
+  from: '[a-zA-Z0-9]{8}'
   generate: expression
   name: DB_PASSWORD
   required: true
@@ -357,6 +436,26 @@ parameters:
   name: VOLUME_CAPACITY
   required: true
   value: 1Gi
+- description: The name of the secret containing the keystore file
+  displayName: JGroups Secret Name
+  name: JGROUPS_ENCRYPT_SECRET
+  value: sso-app-secret
+- description: The name of the keystore file within the secret
+  displayName: JGroups Keystore Filename
+  name: JGROUPS_ENCRYPT_KEYSTORE
+  value: jgroups.jceks
+- description: The name associated with the server certificate (e.g. secret-key)
+  displayName: JGroups Certificate Name
+  name: JGROUPS_ENCRYPT_NAME
+- description: The password for the keystore and certificate (e.g. password)
+  displayName: JGroups Keystore Password
+  name: JGROUPS_ENCRYPT_PASSWORD
+- description: JGroups cluster password
+  displayName: JGroups Cluster Password
+  from: '[a-zA-Z0-9]{8}'
+  generate: expression
+  name: JGROUPS_CLUSTER_PASSWORD
+  required: true
 - description: Namespace in which the ImageStreams for Red Hat Middleware images are
     installed. These ImageStreams are normally installed in the openshift namespace.
     You should only need to modify this if you've installed the ImageStreams in a
@@ -373,7 +472,7 @@ parameters:
   required: true
 - description: RH-SSO Server administrator password
   displayName: RH-SSO Administrator Password
-  from: '[a-zA-Z0-9]{32}'
+  from: '[a-zA-Z0-9]{8}'
   generate: expression
   name: SSO_ADMIN_PASSWORD
   required: true
@@ -387,8 +486,19 @@ parameters:
 - description: The password for the RH-SSO service user.
   displayName: RH-SSO Service Password
   name: SSO_SERVICE_PASSWORD
-- description: The tag to use for the "postgresql" image stream.  Typically, this
-    aligns with the major.minor version of PostgreSQL.
+- description: The name of the truststore file within the secret (e.g. truststore.jks)
+  displayName: RH-SSO Trust Store
+  name: SSO_TRUSTSTORE
+- description: The password for the truststore and certificate (e.g. mykeystorepass)
+  displayName: RH-SSO Trust Store Password
+  name: SSO_TRUSTSTORE_PASSWORD
+- description: The name of the secret containing the truststore file (e.g. truststore-secret).
+    Used for volume secretName
+  displayName: RH-SSO Trust Store Secret
+  name: SSO_TRUSTSTORE_SECRET
+  value: sso-app-secret
+- description: The tag to use for the "postgresql" image stream. Typically, this aligns
+    with the major.minor version of PostgreSQL.
   displayName: PostgreSQL Image Stream Tag
   name: POSTGRESQL_IMAGE_STREAM_TAG
   required: true

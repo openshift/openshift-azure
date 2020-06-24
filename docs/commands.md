@@ -38,11 +38,19 @@
 
 /test upgrade-private-v16.1
 
+/test upgrade-private-v17.0
+
+/test upgrade-private-v18.0
+
 /test upgrade-v15.0
 
 /test upgrade-v16.0
 
 /test upgrade-v16.1
+
+/test upgrade-v17.0
+
+/test upgrade-v18.0
 
 /test vmimage
 
