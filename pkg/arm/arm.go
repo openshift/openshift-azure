@@ -38,7 +38,7 @@ func New(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster
 	case "v19.0":
 		return v19.New(ctx, log, cs, testConfig), nil
 	case "v20.0":
-		return v19.New(ctx, log, cs, testConfig), nil
+		return v20.New(ctx, log, cs, testConfig), nil
 	}
 
 	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)
