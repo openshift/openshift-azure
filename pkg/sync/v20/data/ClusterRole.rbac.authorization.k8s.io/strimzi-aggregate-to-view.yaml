@@ -1,0 +1,22 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app: strimzi
+    rbac.authorization.k8s.io/aggregate-to-view: "true"
+  name: strimzi-aggregate-to-view
+rules:
+- apiGroups:
+  - kafka.strimzi.io
+  resources:
+  - kafkas
+  - kafkaconnects
+  - kafkaconnects2is
+  - kafkamirrormakers
+  - kafkausers
+  - kafkatopics
+  - kafkabridges
+  verbs:
+  - get
+  - list
+  - watch
