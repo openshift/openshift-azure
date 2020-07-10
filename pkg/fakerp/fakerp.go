@@ -111,68 +111,65 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, conf *clien
 		log.Info("check PE existence")
 		exist := nm.privateEndpointExists(ctx, fmt.Sprintf("%s-%s", armconst.PrivateEndpointNamePrefix, cs.Name))
 
-		// If we dont check plugin version prefix, code gets triggered on v9 single image updates
-		// TODO remove when v9 goes away
-		if strings.HasPrefix(cs.Config.PluginVersion, "v1") {
-			if !exist && cs.Properties.PrivateAPIServer {
-				log.Info("applying PLS deployment")
-				plsTemplate, err := arm.GenerateClusterSide(ctx, cs)
-				if err != nil {
-					return nil, err
-				}
-
-				future, err = deployments.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "plsdeploy", azresources.Deployment{
-					Properties: &azresources.DeploymentProperties{
-						Template: plsTemplate,
-						Mode:     azresources.Incremental,
-					},
-				})
-				if err != nil {
-					return nil, err
-				}
-
-				log.Info("waiting for arm template deployment to complete")
-				err = future.WaitForCompletionRef(ctx, deployments.Client())
-				if err != nil {
-					log.Warnf("deployment failed: %#v", err)
-					debugDeployerError(ctx, log, cs, testConfig)
-					return nil, err
-				}
-
-				log.Info("applying PE deployment")
-				peTemplate, err := arm.GenerateRPSide(ctx, cs, conf)
-				if err != nil {
-					return nil, err
-				}
-
-				future, err = deployments.CreateOrUpdate(ctx, conf.ManagementResourceGroup, fmt.Sprintf("pedeploy-%d", time.Now().Unix()), azresources.Deployment{
-					Properties: &azresources.DeploymentProperties{
-						Template: peTemplate,
-						Mode:     azresources.Incremental,
-					},
-				})
-				if err != nil {
-					return nil, err
-				}
-
-				log.Info("waiting for arm template deployment to complete")
-				err = future.WaitForCompletionRef(ctx, deployments.Client())
-				if err != nil {
-					log.Warnf("deployment failed: %#v", err)
-					debugDeployerError(ctx, log, cs, testConfig)
-					return nil, err
-				}
+		if !exist && cs.Properties.PrivateAPIServer {
+			log.Info("applying PLS deployment")
+			plsTemplate, err := arm.GenerateClusterSide(ctx, cs)
+			if err != nil {
+				return nil, err
 			}
-			if cs.Properties.PrivateAPIServer {
-				log.Info("get PE IP address")
-				peIP, err := nm.getPrivateEndpointIP(ctx, fmt.Sprintf("%s-%s", armconst.PrivateEndpointNamePrefix, cs.Name))
-				if err != nil {
-					return nil, err
-				}
-				log.Debugf("PE IP Address %s ", peIP)
-				return &peIP, nil
+
+			future, err = deployments.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "plsdeploy", azresources.Deployment{
+				Properties: &azresources.DeploymentProperties{
+					Template: plsTemplate,
+					Mode:     azresources.Incremental,
+				},
+			})
+			if err != nil {
+				return nil, err
+			}
+
+			log.Info("waiting for arm template deployment to complete")
+			err = future.WaitForCompletionRef(ctx, deployments.Client())
+			if err != nil {
+				log.Warnf("deployment failed: %#v", err)
+				debugDeployerError(ctx, log, cs, testConfig)
+				return nil, err
+			}
+
+			log.Info("applying PE deployment")
+			peTemplate, err := arm.GenerateRPSide(ctx, cs, conf)
+			if err != nil {
+				return nil, err
+			}
+
+			future, err = deployments.CreateOrUpdate(ctx, conf.ManagementResourceGroup, fmt.Sprintf("pedeploy-%d", time.Now().Unix()), azresources.Deployment{
+				Properties: &azresources.DeploymentProperties{
+					Template: peTemplate,
+					Mode:     azresources.Incremental,
+				},
+			})
+			if err != nil {
+				return nil, err
+			}
+
+			log.Info("waiting for arm template deployment to complete")
+			err = future.WaitForCompletionRef(ctx, deployments.Client())
+			if err != nil {
+				log.Warnf("deployment failed: %#v", err)
+				debugDeployerError(ctx, log, cs, testConfig)
+				return nil, err
 			}
 		}
+		if cs.Properties.PrivateAPIServer {
+			log.Info("get PE IP address")
+			peIP, err := nm.getPrivateEndpointIP(ctx, fmt.Sprintf("%s-%s", armconst.PrivateEndpointNamePrefix, cs.Name))
+			if err != nil {
+				return nil, err
+			}
+			log.Debugf("PE IP Address %s ", peIP)
+			return &peIP, nil
+		}
+
 		return nil, nil
 	}
 }
