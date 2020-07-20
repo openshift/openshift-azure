@@ -47,7 +47,7 @@ func (v *PluginAPIValidator) Validate(c *pluginapi.Config) (errs []error) {
 		errs = append(errs, fmt.Errorf("missing versions key %q", c.PluginVersion))
 	}
 
-	errs = append(errs, validateCertificateConfig(&c.Certificates)...)
+	errs = append(errs, validateCertificateConfig(c, &c.Certificates)...)
 
 	if c.GenevaLoggingSector == "" {
 		errs = append(errs, fmt.Errorf("invalid genevaLoggingSector %q", c.GenevaLoggingSector))
@@ -302,7 +302,7 @@ func validateImageConfig(path, version string, i *pluginapi.ImageConfig) (errs [
 	return
 }
 
-func validateCertificateConfig(c *pluginapi.CertificateConfig) (errs []error) {
+func validateCertificateConfig(config *pluginapi.Config, c *pluginapi.CertificateConfig) (errs []error) {
 	if c == nil {
 		errs = append(errs, fmt.Errorf("certificateConfig cannot be nil"))
 		return
@@ -312,7 +312,9 @@ func validateCertificateConfig(c *pluginapi.CertificateConfig) (errs []error) {
 
 	errs = append(errs, validateCertKeyPair("certificates.genevaMetrics", &c.GenevaMetrics)...)
 
-	errs = append(errs, validateCertKeyPair("certificates.packageRepository", &c.PackageRepository)...)
+	if len(config.SecurityPatchPackages) > 0 {
+		errs = append(errs, validateCertKeyPair("certificates.packageRepository", &c.PackageRepository)...)
+	}
 
 	return
 }
