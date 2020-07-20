@@ -40,7 +40,7 @@ func New(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster
 		return v17.New(ctx, log, cs, testConfig), nil
 	case "v18.0":
 		return v18.New(ctx, log, cs, testConfig), nil
-	case "v19.0":
+	case "v19.0", "v19.1":
 		return v19.New(ctx, log, cs, testConfig), nil
 	}
 

@@ -2,7 +2,7 @@
 ## Plugin config template.
 ## This template file is manually curated for the particular OSA version
 ##
-pluginVersion: v19.0
+pluginVersion: v19.1
 ## List of RPM packages that fix security issues
 securityPatchPackages: []
 ## Openshift component logging levels
@@ -144,7 +144,7 @@ versions:
       startup: osarpint.azurecr.io/openshift-on-azure/azure:v17.0
       sync: osarpint.azurecr.io/openshift-on-azure/azure:v17.0
       tlsProxy: osarpint.azurecr.io/openshift-on-azure/azure:v17.0
-  v19.0:
+  v19.1:
     imageOffer: osa
     imagePublisher: redhat
     imageSku: osa_311
