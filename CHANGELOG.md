@@ -1,3 +1,8 @@
+## v19.1
+
+- If SecurityPatchPackages is not set, do not validate its corresponding certificate ([#2324](https://github.com/openshift/openshift-azure/pull/2324), [@ehashman](https://github.com/ehashman), 20/07/2020)
+- Update OMSAgent with July hotfix ([#2323](https://github.com/openshift/openshift-azure/pull/2323), [@ehashman](https://github.com/ehashman), 17/07/2020)
+
 ## v19.0
 
 - Upgrade OpenShift to [3.11.232](https://docs.openshift.com/container-platform/3.11/release_notes/ocp_3_11_release_notes.html#ocp-3-11-232) ([#2316](https://github.com/openshift/openshift-azure/pull/2316), [@ehashman](https://github.com/ehashman), 08/07/2020)
