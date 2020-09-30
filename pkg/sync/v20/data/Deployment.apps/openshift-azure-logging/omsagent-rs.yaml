@@ -17,7 +17,7 @@ spec:
     metadata:
       annotations:
         agentVersion: 1.10.0.1
-        dockerProviderVersion: 10.0.0-3
+        dockerProviderVersion: 10.0.0-4
         schema-versions: v1
       labels:
         rsName: omsagent-rs
