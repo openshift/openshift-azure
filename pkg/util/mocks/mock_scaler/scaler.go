@@ -19,30 +19,30 @@ import (
 	compute0 "github.com/openshift/openshift-azure/pkg/util/azureclient/compute"
 )
 
-// MockFactory is a mock of Factory interface
+// MockFactory is a mock of Factory interface.
 type MockFactory struct {
 	ctrl     *gomock.Controller
 	recorder *MockFactoryMockRecorder
 }
 
-// MockFactoryMockRecorder is the mock recorder for MockFactory
+// MockFactoryMockRecorder is the mock recorder for MockFactory.
 type MockFactoryMockRecorder struct {
 	mock *MockFactory
 }
 
-// NewMockFactory creates a new mock instance
+// NewMockFactory creates a new mock instance.
 func NewMockFactory(ctrl *gomock.Controller) *MockFactory {
 	mock := &MockFactory{ctrl: ctrl}
 	mock.recorder = &MockFactoryMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockFactory) EXPECT() *MockFactoryMockRecorder {
 	return m.recorder
 }
 
-// New mocks base method
+// New mocks base method.
 func (m *MockFactory) New(log *logrus.Entry, ssc compute0.VirtualMachineScaleSetsClient, vmc compute0.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Interface, resourceGroup string, ss *compute.VirtualMachineScaleSet, testConfig api.TestConfig, sshkey *rsa.PrivateKey) scaler.Scaler {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "New", log, ssc, vmc, kubeclient, resourceGroup, ss, testConfig, sshkey)
@@ -50,36 +50,36 @@ func (m *MockFactory) New(log *logrus.Entry, ssc compute0.VirtualMachineScaleSet
 	return ret0
 }
 
-// New indicates an expected call of New
+// New indicates an expected call of New.
 func (mr *MockFactoryMockRecorder) New(log, ssc, vmc, kubeclient, resourceGroup, ss, testConfig, sshkey interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "New", reflect.TypeOf((*MockFactory)(nil).New), log, ssc, vmc, kubeclient, resourceGroup, ss, testConfig, sshkey)
 }
 
-// MockScaler is a mock of Scaler interface
+// MockScaler is a mock of Scaler interface.
 type MockScaler struct {
 	ctrl     *gomock.Controller
 	recorder *MockScalerMockRecorder
 }
 
-// MockScalerMockRecorder is the mock recorder for MockScaler
+// MockScalerMockRecorder is the mock recorder for MockScaler.
 type MockScalerMockRecorder struct {
 	mock *MockScaler
 }
 
-// NewMockScaler creates a new mock instance
+// NewMockScaler creates a new mock instance.
 func NewMockScaler(ctrl *gomock.Controller) *MockScaler {
 	mock := &MockScaler{ctrl: ctrl}
 	mock.recorder = &MockScalerMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockScaler) EXPECT() *MockScalerMockRecorder {
 	return m.recorder
 }
 
-// Scale mocks base method
+// Scale mocks base method.
 func (m *MockScaler) Scale(ctx context.Context, count int64) *api.PluginError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Scale", ctx, count)
@@ -87,7 +87,7 @@ func (m *MockScaler) Scale(ctx context.Context, count int64) *api.PluginError {
 	return ret0
 }
 
-// Scale indicates an expected call of Scale
+// Scale indicates an expected call of Scale.
 func (mr *MockScalerMockRecorder) Scale(ctx, count interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Scale", reflect.TypeOf((*MockScaler)(nil).Scale), ctx, count)
