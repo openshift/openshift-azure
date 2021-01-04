@@ -12,30 +12,30 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockWriter is a mock of Writer interface.
+// MockWriter is a mock of Writer interface
 type MockWriter struct {
 	ctrl     *gomock.Controller
 	recorder *MockWriterMockRecorder
 }
 
-// MockWriterMockRecorder is the mock recorder for MockWriter.
+// MockWriterMockRecorder is the mock recorder for MockWriter
 type MockWriterMockRecorder struct {
 	mock *MockWriter
 }
 
-// NewMockWriter creates a new mock instance.
+// NewMockWriter creates a new mock instance
 func NewMockWriter(ctrl *gomock.Controller) *MockWriter {
 	mock := &MockWriter{ctrl: ctrl}
 	mock.recorder = &MockWriterMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockWriter) EXPECT() *MockWriterMockRecorder {
 	return m.recorder
 }
 
-// Close mocks base method.
+// Close mocks base method
 func (m *MockWriter) Close() error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Close")
@@ -43,13 +43,13 @@ func (m *MockWriter) Close() error {
 	return ret0
 }
 
-// Close indicates an expected call of Close.
+// Close indicates an expected call of Close
 func (mr *MockWriterMockRecorder) Close() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockWriter)(nil).Close))
 }
 
-// MkdirAll mocks base method.
+// MkdirAll mocks base method
 func (m *MockWriter) MkdirAll(path string, perm os.FileMode) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MkdirAll", path, perm)
@@ -57,13 +57,13 @@ func (m *MockWriter) MkdirAll(path string, perm os.FileMode) error {
 	return ret0
 }
 
-// MkdirAll indicates an expected call of MkdirAll.
+// MkdirAll indicates an expected call of MkdirAll
 func (mr *MockWriterMockRecorder) MkdirAll(path, perm interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MkdirAll", reflect.TypeOf((*MockWriter)(nil).MkdirAll), path, perm)
 }
 
-// WriteFile mocks base method.
+// WriteFile mocks base method
 func (m *MockWriter) WriteFile(path string, b []byte, perm os.FileMode) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "WriteFile", path, b, perm)
@@ -71,36 +71,36 @@ func (m *MockWriter) WriteFile(path string, b []byte, perm os.FileMode) error {
 	return ret0
 }
 
-// WriteFile indicates an expected call of WriteFile.
+// WriteFile indicates an expected call of WriteFile
 func (mr *MockWriterMockRecorder) WriteFile(path, b, perm interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteFile", reflect.TypeOf((*MockWriter)(nil).WriteFile), path, b, perm)
 }
 
-// MockpkgtarWriter is a mock of pkgtarWriter interface.
+// MockpkgtarWriter is a mock of pkgtarWriter interface
 type MockpkgtarWriter struct {
 	ctrl     *gomock.Controller
 	recorder *MockpkgtarWriterMockRecorder
 }
 
-// MockpkgtarWriterMockRecorder is the mock recorder for MockpkgtarWriter.
+// MockpkgtarWriterMockRecorder is the mock recorder for MockpkgtarWriter
 type MockpkgtarWriterMockRecorder struct {
 	mock *MockpkgtarWriter
 }
 
-// NewMockpkgtarWriter creates a new mock instance.
+// NewMockpkgtarWriter creates a new mock instance
 func NewMockpkgtarWriter(ctrl *gomock.Controller) *MockpkgtarWriter {
 	mock := &MockpkgtarWriter{ctrl: ctrl}
 	mock.recorder = &MockpkgtarWriterMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockpkgtarWriter) EXPECT() *MockpkgtarWriterMockRecorder {
 	return m.recorder
 }
 
-// Write mocks base method.
+// Write mocks base method
 func (m *MockpkgtarWriter) Write(p []byte) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Write", p)
@@ -109,13 +109,13 @@ func (m *MockpkgtarWriter) Write(p []byte) (int, error) {
 	return ret0, ret1
 }
 
-// Write indicates an expected call of Write.
+// Write indicates an expected call of Write
 func (mr *MockpkgtarWriterMockRecorder) Write(p interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Write", reflect.TypeOf((*MockpkgtarWriter)(nil).Write), p)
 }
 
-// Close mocks base method.
+// Close mocks base method
 func (m *MockpkgtarWriter) Close() error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Close")
@@ -123,13 +123,13 @@ func (m *MockpkgtarWriter) Close() error {
 	return ret0
 }
 
-// Close indicates an expected call of Close.
+// Close indicates an expected call of Close
 func (mr *MockpkgtarWriterMockRecorder) Close() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockpkgtarWriter)(nil).Close))
 }
 
-// WriteHeader mocks base method.
+// WriteHeader mocks base method
 func (m *MockpkgtarWriter) WriteHeader(arg0 *tar.Header) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "WriteHeader", arg0)
@@ -137,7 +137,7 @@ func (m *MockpkgtarWriter) WriteHeader(arg0 *tar.Header) error {
 	return ret0
 }
 
-// WriteHeader indicates an expected call of WriteHeader.
+// WriteHeader indicates an expected call of WriteHeader
 func (mr *MockpkgtarWriterMockRecorder) WriteHeader(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteHeader", reflect.TypeOf((*MockpkgtarWriter)(nil).WriteHeader), arg0)

@@ -13,30 +13,30 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockZonesClient is a mock of ZonesClient interface.
+// MockZonesClient is a mock of ZonesClient interface
 type MockZonesClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockZonesClientMockRecorder
 }
 
-// MockZonesClientMockRecorder is the mock recorder for MockZonesClient.
+// MockZonesClientMockRecorder is the mock recorder for MockZonesClient
 type MockZonesClientMockRecorder struct {
 	mock *MockZonesClient
 }
 
-// NewMockZonesClient creates a new mock instance.
+// NewMockZonesClient creates a new mock instance
 func NewMockZonesClient(ctrl *gomock.Controller) *MockZonesClient {
 	mock := &MockZonesClient{ctrl: ctrl}
 	mock.recorder = &MockZonesClientMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockZonesClient) EXPECT() *MockZonesClientMockRecorder {
 	return m.recorder
 }
 
-// CreateOrUpdate mocks base method.
+// CreateOrUpdate mocks base method
 func (m *MockZonesClient) CreateOrUpdate(arg0 context.Context, arg1, arg2 string, arg3 dns.Zone, arg4, arg5 string) (dns.Zone, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrUpdate", arg0, arg1, arg2, arg3, arg4, arg5)
@@ -45,13 +45,13 @@ func (m *MockZonesClient) CreateOrUpdate(arg0 context.Context, arg1, arg2 string
 	return ret0, ret1
 }
 
-// CreateOrUpdate indicates an expected call of CreateOrUpdate.
+// CreateOrUpdate indicates an expected call of CreateOrUpdate
 func (mr *MockZonesClientMockRecorder) CreateOrUpdate(arg0, arg1, arg2, arg3, arg4, arg5 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrUpdate", reflect.TypeOf((*MockZonesClient)(nil).CreateOrUpdate), arg0, arg1, arg2, arg3, arg4, arg5)
 }
 
-// Delete mocks base method.
+// Delete mocks base method
 func (m *MockZonesClient) Delete(arg0 context.Context, arg1, arg2, arg3 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0, arg1, arg2, arg3)
@@ -59,36 +59,36 @@ func (m *MockZonesClient) Delete(arg0 context.Context, arg1, arg2, arg3 string) 
 	return ret0
 }
 
-// Delete indicates an expected call of Delete.
+// Delete indicates an expected call of Delete
 func (mr *MockZonesClientMockRecorder) Delete(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockZonesClient)(nil).Delete), arg0, arg1, arg2, arg3)
 }
 
-// MockRecordSetsClient is a mock of RecordSetsClient interface.
+// MockRecordSetsClient is a mock of RecordSetsClient interface
 type MockRecordSetsClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockRecordSetsClientMockRecorder
 }
 
-// MockRecordSetsClientMockRecorder is the mock recorder for MockRecordSetsClient.
+// MockRecordSetsClientMockRecorder is the mock recorder for MockRecordSetsClient
 type MockRecordSetsClientMockRecorder struct {
 	mock *MockRecordSetsClient
 }
 
-// NewMockRecordSetsClient creates a new mock instance.
+// NewMockRecordSetsClient creates a new mock instance
 func NewMockRecordSetsClient(ctrl *gomock.Controller) *MockRecordSetsClient {
 	mock := &MockRecordSetsClient{ctrl: ctrl}
 	mock.recorder = &MockRecordSetsClientMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockRecordSetsClient) EXPECT() *MockRecordSetsClientMockRecorder {
 	return m.recorder
 }
 
-// CreateOrUpdate mocks base method.
+// CreateOrUpdate mocks base method
 func (m *MockRecordSetsClient) CreateOrUpdate(arg0 context.Context, arg1, arg2, arg3 string, arg4 dns.RecordType, arg5 dns.RecordSet, arg6, arg7 string) (dns.RecordSet, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrUpdate", arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
@@ -97,13 +97,13 @@ func (m *MockRecordSetsClient) CreateOrUpdate(arg0 context.Context, arg1, arg2, 
 	return ret0, ret1
 }
 
-// CreateOrUpdate indicates an expected call of CreateOrUpdate.
+// CreateOrUpdate indicates an expected call of CreateOrUpdate
 func (mr *MockRecordSetsClientMockRecorder) CreateOrUpdate(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrUpdate", reflect.TypeOf((*MockRecordSetsClient)(nil).CreateOrUpdate), arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
 }
 
-// Delete mocks base method.
+// Delete mocks base method
 func (m *MockRecordSetsClient) Delete(arg0 context.Context, arg1, arg2, arg3 string, arg4 dns.RecordType, arg5 string) (autorest.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0, arg1, arg2, arg3, arg4, arg5)
@@ -112,13 +112,13 @@ func (m *MockRecordSetsClient) Delete(arg0 context.Context, arg1, arg2, arg3 str
 	return ret0, ret1
 }
 
-// Delete indicates an expected call of Delete.
+// Delete indicates an expected call of Delete
 func (mr *MockRecordSetsClientMockRecorder) Delete(arg0, arg1, arg2, arg3, arg4, arg5 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockRecordSetsClient)(nil).Delete), arg0, arg1, arg2, arg3, arg4, arg5)
 }
 
-// Get mocks base method.
+// Get mocks base method
 func (m *MockRecordSetsClient) Get(arg0 context.Context, arg1, arg2, arg3 string, arg4 dns.RecordType) (dns.RecordSet, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", arg0, arg1, arg2, arg3, arg4)
@@ -127,7 +127,7 @@ func (m *MockRecordSetsClient) Get(arg0 context.Context, arg1, arg2, arg3 string
 	return ret0, ret1
 }
 
-// Get indicates an expected call of Get.
+// Get indicates an expected call of Get
 func (mr *MockRecordSetsClientMockRecorder) Get(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockRecordSetsClient)(nil).Get), arg0, arg1, arg2, arg3, arg4)

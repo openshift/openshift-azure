@@ -11,30 +11,30 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockSimpleHTTPClient is a mock of SimpleHTTPClient interface.
+// MockSimpleHTTPClient is a mock of SimpleHTTPClient interface
 type MockSimpleHTTPClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockSimpleHTTPClientMockRecorder
 }
 
-// MockSimpleHTTPClientMockRecorder is the mock recorder for MockSimpleHTTPClient.
+// MockSimpleHTTPClientMockRecorder is the mock recorder for MockSimpleHTTPClient
 type MockSimpleHTTPClientMockRecorder struct {
 	mock *MockSimpleHTTPClient
 }
 
-// NewMockSimpleHTTPClient creates a new mock instance.
+// NewMockSimpleHTTPClient creates a new mock instance
 func NewMockSimpleHTTPClient(ctrl *gomock.Controller) *MockSimpleHTTPClient {
 	mock := &MockSimpleHTTPClient{ctrl: ctrl}
 	mock.recorder = &MockSimpleHTTPClientMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockSimpleHTTPClient) EXPECT() *MockSimpleHTTPClientMockRecorder {
 	return m.recorder
 }
 
-// Do mocks base method.
+// Do mocks base method
 func (m *MockSimpleHTTPClient) Do(req *http.Request) (*http.Response, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Do", req)
@@ -43,7 +43,7 @@ func (m *MockSimpleHTTPClient) Do(req *http.Request) (*http.Response, error) {
 	return ret0, ret1
 }
 
-// Do indicates an expected call of Do.
+// Do indicates an expected call of Do
 func (mr *MockSimpleHTTPClientMockRecorder) Do(req interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Do", reflect.TypeOf((*MockSimpleHTTPClient)(nil).Do), req)
