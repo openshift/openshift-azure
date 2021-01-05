@@ -89,7 +89,7 @@ export RESOURCEGROUP="ci-$pullnumber$(basename "$0" .sh)-$(cat /dev/urandom | tr
 echo "RESOURCEGROUP is $RESOURCEGROUP"
 echo
 
-. ./secrets/secret
+. /secrets/secret
 export AZURE_CLIENT_ID="$AZURE_CI_CLIENT_ID"
 export AZURE_CLIENT_SECRET="$AZURE_CI_CLIENT_SECRET"
 export AZURE_AAD_CLIENT_ID="$AZURE_AAD_CI_CLIENT_ID"
