@@ -12,7 +12,7 @@ all: azure
 secrets:
 	@rm -rf secrets
 	@mkdir secrets
-	@oc extract -n azure secret/cluster-secrets-azure --to=secrets >/dev/null
+	@oc extract -n ci secret/cluster-secrets-azure --to=secrets >/dev/null
 
 clean:
 	rm -f coverage.out azure releasenotes testinsights fakerp
