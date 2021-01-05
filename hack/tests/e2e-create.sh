@@ -10,7 +10,10 @@ cleanup() {
 
 trap cleanup EXIT
 
+pwd
+
 . hack/tests/ci-prepare.sh
+
 
 start_monitoring
 set_build_images
