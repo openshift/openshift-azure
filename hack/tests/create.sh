@@ -8,6 +8,8 @@ cleanup() {
     delete
 }
 
+pwd
+
 . hack/tests/ci-prepare.sh
 
 start_monitoring
