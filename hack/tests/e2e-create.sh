@@ -16,6 +16,9 @@ echo "Prepate CI"
 
 echo "RESOURCEGROUP is $RESOURCEGROUP"
 
+ls -la /
+ls -la /secrets/
+
 start_monitoring
 set_build_images
 
