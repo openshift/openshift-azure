@@ -14,7 +14,7 @@ echo "Prepate CI"
 
 mkdir -p  $(pwd)/secrets
 cp -R /secrets $(pwd)/secrets
-chown -R $(whoami):root $(pwd)/secrets
+chown -R $HOST_USER_ID $(pwd)/secrets
 
 . hack/tests/ci-prepare.sh
 
