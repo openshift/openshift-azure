@@ -10,6 +10,8 @@ cleanup() {
 
 trap cleanup EXIT
 
+echo "Prepate CI"
+
 . hack/tests/ci-prepare.sh
 
 start_monitoring
