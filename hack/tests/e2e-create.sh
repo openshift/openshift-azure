@@ -15,6 +15,7 @@ echo "Prepate CI"
 . hack/tests/ci-prepare.sh
 
 echo "RESOURCEGROUP is $RESOURCEGROUP"
+echo $AZURE_CLIENT_ID
 
 ls -la /
 ls -la /secrets/
