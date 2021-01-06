@@ -14,6 +14,8 @@ echo "Prepate CI"
 
 . hack/tests/ci-prepare.sh
 
+echo "RESOURCEGROUP is $RESOURCEGROUP"
+
 start_monitoring
 set_build_images
 
