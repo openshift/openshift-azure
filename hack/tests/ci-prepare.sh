@@ -1,11 +1,11 @@
 #!/bin/bash -e
 
 # turn off xtrace if enabled
-xtrace=false
-if echo $SHELLOPTS | egrep -q ':?xtrace:?'; then
-  xtrace=true
-  set +x
-fi
+#xtrace=false
+#if echo $SHELLOPTS | egrep -q ':?xtrace:?'; then
+#  xtrace=true
+#  set +x
+#fi
 
 reset_xtrace() {
     if $xtrace; then
@@ -91,11 +91,5 @@ echo
 
 
 . ./secrets/secret
-export AZURE_CLIENT_ID="$AZURE_CI_CLIENT_ID"
-export AZURE_CLIENT_SECRET="$AZURE_CI_CLIENT_SECRET"
-export AZURE_AAD_CLIENT_ID="$AZURE_AAD_CI_CLIENT_ID"
-export AZURE_AAD_CLIENT_SECRET="$AZURE_AAD_CI_CLIENT_SECRET"
-
-az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${AZURE_TENANT_ID} >/dev/null
 
 reset_xtrace
