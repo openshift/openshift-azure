@@ -12,10 +12,6 @@ trap cleanup EXIT
 
 echo "Prepate CI"
 
-mkdir -p  $(pwd)/secrets
-cp -R /secrets $(pwd)/
-chown -R $HOST_USER_ID:$HOST_GROUP_ID $(pwd)/secrets
-
 . hack/tests/ci-prepare.sh
 
 
