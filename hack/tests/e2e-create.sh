@@ -21,8 +21,8 @@ chown -R $HOST_USER_ID:$HOST_GROUP_ID $(pwd)/secrets
 
 echo "RESOURCEGROUP is $RESOURCEGROUP"
 
-ls -la /
-ls -la /secrets/
+ls -la .
+ls -la $(pwd)/secrets
 
 start_monitoring
 set_build_images
