@@ -1,19 +1,6 @@
 #!/bin/bash -e
 
-# turn off xtrace if enabled
-xtrace=false
-if echo $SHELLOPTS | egrep -q ':?xtrace:?'; then
-  xtrace=true
-  set +x
-fi
-
-reset_xtrace() {
-    if $xtrace; then
-        set -x
-    else
-        set +x
-    fi
-}
+set +x
 
 set_build_images() {
     if [[ ! -e /var/run/secrets/kubernetes.io ]]; then
@@ -73,10 +60,9 @@ ci_notify() {
   fi
 }
 
-if [[ ! -e /var/run/secrets/kubernetes.io ]]; then
-    reset_xtrace
-    return
-fi
+mkdir -p  $(pwd)/secrets
+cp -R /secrets $(pwd)/
+chown -R $HOST_USER_ID:$HOST_GROUP_ID $(pwd)/secrets
 
 export NO_WAIT=true
 export RESOURCEGROUP_TTL=4h
@@ -89,14 +75,11 @@ export RESOURCEGROUP="ci-$pullnumber$(basename "$0" .sh)-$(cat /dev/urandom | tr
 echo "RESOURCEGROUP is $RESOURCEGROUP"
 echo
 
-make secrets
-
 . ./secrets/secret
+
 export AZURE_CLIENT_ID="$AZURE_CI_CLIENT_ID"
 export AZURE_CLIENT_SECRET="$AZURE_CI_CLIENT_SECRET"
 export AZURE_AAD_CLIENT_ID="$AZURE_AAD_CI_CLIENT_ID"
 export AZURE_AAD_CLIENT_SECRET="$AZURE_AAD_CI_CLIENT_SECRET"
 
 az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${AZURE_TENANT_ID} >/dev/null
-
-reset_xtrace

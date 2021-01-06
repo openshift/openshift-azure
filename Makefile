@@ -66,7 +66,6 @@ content:
 
 verify:
 	go test -c -tags=content -run=TestContent ./pkg/sync/$(LATEST_PLUGIN_VERSION) && rm $(LATEST_PLUGIN_VERSION).test
-	./hack/verify/validate-generated.sh
 	go vet ./...
 	./hack/verify/validate-code-format.sh
 	./hack/verify/validate-util.sh
