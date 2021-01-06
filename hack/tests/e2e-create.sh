@@ -12,13 +12,12 @@ trap cleanup EXIT
 
 echo "Prepate CI"
 
+cp - R /secrets $(pwd)/secrets
+
 . hack/tests/ci-prepare.sh
 
 
 echo "RESOURCEGROUP is $RESOURCEGROUP"
-
-pwd
-ls -la .
 
 ls -la /
 ls -la /secrets/
