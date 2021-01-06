@@ -75,7 +75,6 @@ ci_notify() {
 
 if [[ ! -e /var/run/secrets/kubernetes.io ]]; then
     reset_xtrace
-    return
 else
     mkdir -p  $(pwd)/secrets
     cp -R /secrets $(pwd)/
