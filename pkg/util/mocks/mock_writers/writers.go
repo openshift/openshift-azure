@@ -100,6 +100,20 @@ func (m *MockpkgtarWriter) EXPECT() *MockpkgtarWriterMockRecorder {
 	return m.recorder
 }
 
+// Close mocks base method.
+func (m *MockpkgtarWriter) Close() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Close")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Close indicates an expected call of Close.
+func (mr *MockpkgtarWriterMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockpkgtarWriter)(nil).Close))
+}
+
 // Write mocks base method.
 func (m *MockpkgtarWriter) Write(p []byte) (int, error) {
 	m.ctrl.T.Helper()
@@ -113,20 +127,6 @@ func (m *MockpkgtarWriter) Write(p []byte) (int, error) {
 func (mr *MockpkgtarWriterMockRecorder) Write(p interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Write", reflect.TypeOf((*MockpkgtarWriter)(nil).Write), p)
-}
-
-// Close mocks base method.
-func (m *MockpkgtarWriter) Close() error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Close")
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Close indicates an expected call of Close.
-func (mr *MockpkgtarWriterMockRecorder) Close() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockpkgtarWriter)(nil).Close))
 }
 
 // WriteHeader mocks base method.
