@@ -92,10 +92,15 @@ Add new branch config file in `ci-operator/config/openshift/openshift-azure/open
 Add new test jobs for release branch:
 `ci-operator/jobs/openshift/openshift-azure/openshift-openshift-azure-release-vx-presubmits.yaml`
 
+Add job exculsion to pin jobs to specific build cluster:
+`core-services/sanitize-prow-jobs/_config.yaml`
+
+Helper: https://gist.github.com/mjudeikis/08582e888ad33c9f3a2a7fd9512f4053 
+
+
 Run prowgen to validate configuration:
 ```
-docker pull registry.svc.ci.openshift.org/ci/ci-operator-prowgen:latest
-docker run -it -v $(pwd)/ci-operator:/ci-operator:z registry.svc.ci.openshift.org/ci/ci-operator-prowgen:latest --from-dir /ci-operator/config/ --to-dir /ci-operator/jobs
+make jobs
 ```
 
 Merge it to release repository. After this is done, all PR's on the release
