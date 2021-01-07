@@ -267,3 +267,15 @@ references, removing old directories, and removing references to that version
 in the pluginconfig.
 
 Sample PR: https://github.com/openshift/openshift-azure/pull/2123
+
+
+# go-mock & go-bindata
+
+CI is running on an older version of CI Base image based on 3.11. Your local development environment can be ahead.
+For you might want to run code generation using CI image too.
+
+```
+docker run --privileged --user 0  -e GOPATH=/go -v $(pwd):/go/src/github.com/openshift/openshift-azure:z -it registry.ci.openshift.org/azure/ci-base:latest
+cd /go/src/github.com/openshift/openshift-azure
+make generate
+```
