@@ -132,6 +132,10 @@ EOF
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
 yum -y update
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=1913817
+yum install docker-1.13.1-162.git64e9980.el7_8.x86_64 -y
+
 yum -y install \
     ansible \
     atomic \
@@ -147,7 +151,6 @@ yum -y install \
     device-mapper-multipath \
     dhclient \
     dnsmasq \
-    docker \
     dracut-fips \
     e2fsprogs \
     firewalld \
