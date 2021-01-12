@@ -68,7 +68,10 @@ export SASURI='{{ .Config.WorkerStartupSASURI }}'
 set -x
 
 # run the startup --init to bootstrap DNS setup
-docker run --privileged --rm --network host -v /:/host:z -e SASURI {{ .Config.Images.Startup }} startup --init-network
+docker run --privileged --rm --network host -v /:/host -e SASURI {{ .Config.Images.Startup }} startup --init-network
+
+# relable files to the right context
+restorecon -R /etc /root
 
 # restart network manager to pick up new host settings in the dhclient
 /bin/systemctl restart NetworkManager
