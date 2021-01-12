@@ -84,7 +84,11 @@ restorecon -R /etc /root
 # if waagent runs before dns is known to the node we end up with empty string
 while [[ $(hostname -d) == "" ]]; do sleep 1; done
 
-docker run --privileged --rm --network host -v /:/host:z -e SASURI {{ .Config.Images.Startup }} startup
+docker run --privileged --rm --network host -v /:/host -e SASURI {{ .Config.Images.Startup }} startup
+
+# relable files to the right context
+restorecon -R /etc /root
+
 unset SASURI
 
 update-ca-trust
