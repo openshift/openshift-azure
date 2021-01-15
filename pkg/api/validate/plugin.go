@@ -119,16 +119,16 @@ func validateComponentLogLevel(c *pluginapi.ComponentLogLevel) (errs []error) {
 }
 
 func validateVersionConfig(path string, version string, vc *pluginapi.VersionConfig) (errs []error) {
-	if vc.ImageOffer != "osa" {
+	if vc.ImageOffer != "osa" && vc.ImageOffer != "azureredhatopenshift" {
 		errs = append(errs, fmt.Errorf("invalid %s.imageOffer %q", path, vc.ImageOffer))
 	}
 
-	if vc.ImagePublisher != "redhat" {
+	if vc.ImagePublisher != "redhat" && vc.ImagePublisher != "azureopenshift" {
 		errs = append(errs, fmt.Errorf("invalid %s.imagePublisher %q", path, vc.ImagePublisher))
 	}
 
 	switch vc.ImageSKU {
-	case "osa_311":
+	case "osa_311", "aro_311":
 	default:
 		errs = append(errs, fmt.Errorf("invalid %s.imageSKU %q", path, vc.ImageSKU))
 	}
