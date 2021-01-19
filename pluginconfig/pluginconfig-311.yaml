@@ -234,7 +234,7 @@ versions:
     imageOffer: azureredhatopenshift
     imagePublisher: azureopenshift
     imageSku: aro_311
-    imageVersion: 311.346.20210113
+    imageVersion: 311.346.20210118
     images:
       alertManager: registry.access.redhat.com/openshift3/prometheus-alertmanager:v3.11.346
       ansibleServiceBroker: registry.access.redhat.com/openshift3/ose-ansible-service-broker:v3.11.346
