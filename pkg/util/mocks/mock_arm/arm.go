@@ -52,21 +52,6 @@ func (mr *MockInterfaceMockRecorder) Generate(ctx, backupBlob, isUpdate, suffix 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Generate", reflect.TypeOf((*MockInterface)(nil).Generate), ctx, backupBlob, isUpdate, suffix)
 }
 
-// Vmss mocks base method.
-func (m *MockInterface) Vmss(app *api.AgentPoolProfile, backupBlob, suffix string) (*compute.VirtualMachineScaleSet, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Vmss", app, backupBlob, suffix)
-	ret0, _ := ret[0].(*compute.VirtualMachineScaleSet)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Vmss indicates an expected call of Vmss.
-func (mr *MockInterfaceMockRecorder) Vmss(app, backupBlob, suffix interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Vmss", reflect.TypeOf((*MockInterface)(nil).Vmss), app, backupBlob, suffix)
-}
-
 // Hash mocks base method.
 func (m *MockInterface) Hash(app *api.AgentPoolProfile) ([]byte, error) {
 	m.ctrl.T.Helper()
@@ -80,4 +65,19 @@ func (m *MockInterface) Hash(app *api.AgentPoolProfile) ([]byte, error) {
 func (mr *MockInterfaceMockRecorder) Hash(app interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Hash", reflect.TypeOf((*MockInterface)(nil).Hash), app)
+}
+
+// Vmss mocks base method.
+func (m *MockInterface) Vmss(app *api.AgentPoolProfile, backupBlob, suffix string) (*compute.VirtualMachineScaleSet, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Vmss", app, backupBlob, suffix)
+	ret0, _ := ret[0].(*compute.VirtualMachineScaleSet)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Vmss indicates an expected call of Vmss.
+func (mr *MockInterfaceMockRecorder) Vmss(app, backupBlob, suffix interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Vmss", reflect.TypeOf((*MockInterface)(nil).Vmss), app, backupBlob, suffix)
 }

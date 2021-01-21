@@ -37,18 +37,18 @@ func (m *MockInterface) EXPECT() *MockInterfaceMockRecorder {
 	return m.recorder
 }
 
-// WriteFiles mocks base method.
-func (m *MockInterface) WriteFiles(ctx context.Context) error {
+// GetWorkerCs mocks base method.
+func (m *MockInterface) GetWorkerCs() *api.OpenShiftManagedCluster {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WriteFiles", ctx)
-	ret0, _ := ret[0].(error)
+	ret := m.ctrl.Call(m, "GetWorkerCs")
+	ret0, _ := ret[0].(*api.OpenShiftManagedCluster)
 	return ret0
 }
 
-// WriteFiles indicates an expected call of WriteFiles.
-func (mr *MockInterfaceMockRecorder) WriteFiles(ctx interface{}) *gomock.Call {
+// GetWorkerCs indicates an expected call of GetWorkerCs.
+func (mr *MockInterfaceMockRecorder) GetWorkerCs() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteFiles", reflect.TypeOf((*MockInterface)(nil).WriteFiles), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetWorkerCs", reflect.TypeOf((*MockInterface)(nil).GetWorkerCs))
 }
 
 // Hash mocks base method.
@@ -66,18 +66,18 @@ func (mr *MockInterfaceMockRecorder) Hash(role interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Hash", reflect.TypeOf((*MockInterface)(nil).Hash), role)
 }
 
-// GetWorkerCs mocks base method.
-func (m *MockInterface) GetWorkerCs() *api.OpenShiftManagedCluster {
+// WriteFiles mocks base method.
+func (m *MockInterface) WriteFiles(ctx context.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetWorkerCs")
-	ret0, _ := ret[0].(*api.OpenShiftManagedCluster)
+	ret := m.ctrl.Call(m, "WriteFiles", ctx)
+	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// GetWorkerCs indicates an expected call of GetWorkerCs.
-func (mr *MockInterfaceMockRecorder) GetWorkerCs() *gomock.Call {
+// WriteFiles indicates an expected call of WriteFiles.
+func (mr *MockInterfaceMockRecorder) WriteFiles(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetWorkerCs", reflect.TypeOf((*MockInterface)(nil).GetWorkerCs))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteFiles", reflect.TypeOf((*MockInterface)(nil).WriteFiles), ctx)
 }
 
 // WriteSearchDomain mocks base method.
