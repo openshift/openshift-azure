@@ -231,9 +231,9 @@ versions:
       sync: osarpint.azurecr.io/openshift-on-azure/azure:v20.0
       tlsProxy: osarpint.azurecr.io/openshift-on-azure/azure:v20.0
   v21.0:
-    imageOffer: azureredhatopenshift
-    imagePublisher: azureopenshift
-    imageSku: aro_311
+    imageOffer: osa
+    imagePublisher: redhat
+    imageSku: osa_311
     imageVersion: 311.346.20210118
     images:
       alertManager: registry.access.redhat.com/openshift3/prometheus-alertmanager:v3.11.346
