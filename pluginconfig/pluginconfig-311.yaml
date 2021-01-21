@@ -263,7 +263,7 @@ versions:
       genevaLogging: osarpint.azurecr.io/acs/mdsd:master.20190228.1
       genevaStatsd: osarpint.azurecr.io/acs/mdm:git-a909a2e76
       genevaTDAgent: osarpint.azurecr.io/acs/td-agent:master.20190228.1
-      logAnalyticsAgent: mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod11092020
+      logAnalyticsAgent: mcr.microsoft.com/azuremonitor/containerinsights/ciprod:ciprod01112021
       metricsServer: registry.access.redhat.com/openshift3/ose-metrics-server:v3.11.346
       azureControllers: quay.io/openshift-on-azure/ci-azure:latest
       aroAdmissionController: quay.io/openshift-on-azure/ci-azure:latest
