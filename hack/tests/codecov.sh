@@ -28,4 +28,4 @@ export CI_BUILD_ID=$JOB_NAME
 export CI_JOB_ID=$BUILD_ID
 
 # bash <(curl -s https://codecov.io/bash) -Z -f coverage.out -r $REPO_OWNER/$REPO_NAME $REF_FLAGS
-env
+ls -l ./secrets
