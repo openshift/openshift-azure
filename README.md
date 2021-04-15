@@ -121,5 +121,3 @@ Read more about how to work with our CI system [here](https://github.com/openshi
 For any infrastructure-related issues, make sure to contact the Developer Productivity
 team who is responsible for managing the OpenShift CI Infrastructure at #forum-testplatform
 in [Slack](https://coreos.slack.com/).
-
-
