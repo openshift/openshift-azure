@@ -12,30 +12,30 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// MockInterface is a mock of Interface interface
+// MockInterface is a mock of Interface interface.
 type MockInterface struct {
 	ctrl     *gomock.Controller
 	recorder *MockInterfaceMockRecorder
 }
 
-// MockInterfaceMockRecorder is the mock recorder for MockInterface
+// MockInterfaceMockRecorder is the mock recorder for MockInterface.
 type MockInterfaceMockRecorder struct {
 	mock *MockInterface
 }
 
-// NewMockInterface creates a new mock instance
+// NewMockInterface creates a new mock instance.
 func NewMockInterface(ctrl *gomock.Controller) *MockInterface {
 	mock := &MockInterface{ctrl: ctrl}
 	mock.recorder = &MockInterfaceMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockInterface) EXPECT() *MockInterfaceMockRecorder {
 	return m.recorder
 }
 
-// BackupCluster mocks base method
+// BackupCluster mocks base method.
 func (m *MockInterface) BackupCluster(arg0 context.Context, arg1 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "BackupCluster", arg0, arg1)
@@ -43,13 +43,13 @@ func (m *MockInterface) BackupCluster(arg0 context.Context, arg1 string) error {
 	return ret0
 }
 
-// BackupCluster indicates an expected call of BackupCluster
+// BackupCluster indicates an expected call of BackupCluster.
 func (mr *MockInterfaceMockRecorder) BackupCluster(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BackupCluster", reflect.TypeOf((*MockInterface)(nil).BackupCluster), arg0, arg1)
 }
 
-// DeleteMaster mocks base method
+// DeleteMaster mocks base method.
 func (m *MockInterface) DeleteMaster(arg0 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteMaster", arg0)
@@ -57,13 +57,13 @@ func (m *MockInterface) DeleteMaster(arg0 string) error {
 	return ret0
 }
 
-// DeleteMaster indicates an expected call of DeleteMaster
+// DeleteMaster indicates an expected call of DeleteMaster.
 func (mr *MockInterfaceMockRecorder) DeleteMaster(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMaster", reflect.TypeOf((*MockInterface)(nil).DeleteMaster), arg0)
 }
 
-// DrainAndDeleteWorker mocks base method
+// DrainAndDeleteWorker mocks base method.
 func (m *MockInterface) DrainAndDeleteWorker(arg0 context.Context, arg1 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DrainAndDeleteWorker", arg0, arg1)
@@ -71,13 +71,13 @@ func (m *MockInterface) DrainAndDeleteWorker(arg0 context.Context, arg1 string) 
 	return ret0
 }
 
-// DrainAndDeleteWorker indicates an expected call of DrainAndDeleteWorker
+// DrainAndDeleteWorker indicates an expected call of DrainAndDeleteWorker.
 func (mr *MockInterfaceMockRecorder) DrainAndDeleteWorker(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DrainAndDeleteWorker", reflect.TypeOf((*MockInterface)(nil).DrainAndDeleteWorker), arg0, arg1)
 }
 
-// EnsureSyncPod mocks base method
+// EnsureSyncPod mocks base method.
 func (m *MockInterface) EnsureSyncPod(arg0 context.Context, arg1 string, arg2 []byte) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "EnsureSyncPod", arg0, arg1, arg2)
@@ -85,13 +85,13 @@ func (m *MockInterface) EnsureSyncPod(arg0 context.Context, arg1 string, arg2 []
 	return ret0
 }
 
-// EnsureSyncPod indicates an expected call of EnsureSyncPod
+// EnsureSyncPod indicates an expected call of EnsureSyncPod.
 func (mr *MockInterfaceMockRecorder) EnsureSyncPod(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnsureSyncPod", reflect.TypeOf((*MockInterface)(nil).EnsureSyncPod), arg0, arg1, arg2)
 }
 
-// GetControlPlanePods mocks base method
+// GetControlPlanePods mocks base method.
 func (m *MockInterface) GetControlPlanePods(arg0 context.Context) ([]v1.Pod, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetControlPlanePods", arg0)
@@ -100,13 +100,13 @@ func (m *MockInterface) GetControlPlanePods(arg0 context.Context) ([]v1.Pod, err
 	return ret0, ret1
 }
 
-// GetControlPlanePods indicates an expected call of GetControlPlanePods
+// GetControlPlanePods indicates an expected call of GetControlPlanePods.
 func (mr *MockInterfaceMockRecorder) GetControlPlanePods(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetControlPlanePods", reflect.TypeOf((*MockInterface)(nil).GetControlPlanePods), arg0)
 }
 
-// WaitForReadyMaster mocks base method
+// WaitForReadyMaster mocks base method.
 func (m *MockInterface) WaitForReadyMaster(arg0 context.Context, arg1 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "WaitForReadyMaster", arg0, arg1)
@@ -114,13 +114,13 @@ func (m *MockInterface) WaitForReadyMaster(arg0 context.Context, arg1 string) er
 	return ret0
 }
 
-// WaitForReadyMaster indicates an expected call of WaitForReadyMaster
+// WaitForReadyMaster indicates an expected call of WaitForReadyMaster.
 func (mr *MockInterfaceMockRecorder) WaitForReadyMaster(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForReadyMaster", reflect.TypeOf((*MockInterface)(nil).WaitForReadyMaster), arg0, arg1)
 }
 
-// WaitForReadySyncPod mocks base method
+// WaitForReadySyncPod mocks base method.
 func (m *MockInterface) WaitForReadySyncPod(arg0 context.Context) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "WaitForReadySyncPod", arg0)
@@ -128,13 +128,13 @@ func (m *MockInterface) WaitForReadySyncPod(arg0 context.Context) error {
 	return ret0
 }
 
-// WaitForReadySyncPod indicates an expected call of WaitForReadySyncPod
+// WaitForReadySyncPod indicates an expected call of WaitForReadySyncPod.
 func (mr *MockInterfaceMockRecorder) WaitForReadySyncPod(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForReadySyncPod", reflect.TypeOf((*MockInterface)(nil).WaitForReadySyncPod), arg0)
 }
 
-// WaitForReadyWorker mocks base method
+// WaitForReadyWorker mocks base method.
 func (m *MockInterface) WaitForReadyWorker(arg0 context.Context, arg1 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "WaitForReadyWorker", arg0, arg1)
@@ -142,7 +142,7 @@ func (m *MockInterface) WaitForReadyWorker(arg0 context.Context, arg1 string) er
 	return ret0
 }
 
-// WaitForReadyWorker indicates an expected call of WaitForReadyWorker
+// WaitForReadyWorker indicates an expected call of WaitForReadyWorker.
 func (mr *MockInterfaceMockRecorder) WaitForReadyWorker(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForReadyWorker", reflect.TypeOf((*MockInterface)(nil).WaitForReadyWorker), arg0, arg1)
