@@ -14,30 +14,30 @@ import (
 	storage0 "github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 )
 
-// MockClient is a mock of Client interface.
+// MockClient is a mock of Client interface
 type MockClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockClientMockRecorder
 }
 
-// MockClientMockRecorder is the mock recorder for MockClient.
+// MockClientMockRecorder is the mock recorder for MockClient
 type MockClientMockRecorder struct {
 	mock *MockClient
 }
 
-// NewMockClient creates a new mock instance.
+// NewMockClient creates a new mock instance
 func NewMockClient(ctrl *gomock.Controller) *MockClient {
 	mock := &MockClient{ctrl: ctrl}
 	mock.recorder = &MockClientMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockClient) EXPECT() *MockClientMockRecorder {
 	return m.recorder
 }
 
-// GetBlobService mocks base method.
+// GetBlobService mocks base method
 func (m *MockClient) GetBlobService() storage0.BlobStorageClient {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetBlobService")
@@ -45,36 +45,36 @@ func (m *MockClient) GetBlobService() storage0.BlobStorageClient {
 	return ret0
 }
 
-// GetBlobService indicates an expected call of GetBlobService.
+// GetBlobService indicates an expected call of GetBlobService
 func (mr *MockClientMockRecorder) GetBlobService() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBlobService", reflect.TypeOf((*MockClient)(nil).GetBlobService))
 }
 
-// MockBlobStorageClient is a mock of BlobStorageClient interface.
+// MockBlobStorageClient is a mock of BlobStorageClient interface
 type MockBlobStorageClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockBlobStorageClientMockRecorder
 }
 
-// MockBlobStorageClientMockRecorder is the mock recorder for MockBlobStorageClient.
+// MockBlobStorageClientMockRecorder is the mock recorder for MockBlobStorageClient
 type MockBlobStorageClientMockRecorder struct {
 	mock *MockBlobStorageClient
 }
 
-// NewMockBlobStorageClient creates a new mock instance.
+// NewMockBlobStorageClient creates a new mock instance
 func NewMockBlobStorageClient(ctrl *gomock.Controller) *MockBlobStorageClient {
 	mock := &MockBlobStorageClient{ctrl: ctrl}
 	mock.recorder = &MockBlobStorageClientMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockBlobStorageClient) EXPECT() *MockBlobStorageClientMockRecorder {
 	return m.recorder
 }
 
-// GetContainerReference mocks base method.
+// GetContainerReference mocks base method
 func (m *MockBlobStorageClient) GetContainerReference(arg0 string) storage0.Container {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetContainerReference", arg0)
@@ -82,36 +82,36 @@ func (m *MockBlobStorageClient) GetContainerReference(arg0 string) storage0.Cont
 	return ret0
 }
 
-// GetContainerReference indicates an expected call of GetContainerReference.
+// GetContainerReference indicates an expected call of GetContainerReference
 func (mr *MockBlobStorageClientMockRecorder) GetContainerReference(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetContainerReference", reflect.TypeOf((*MockBlobStorageClient)(nil).GetContainerReference), arg0)
 }
 
-// MockContainer is a mock of Container interface.
+// MockContainer is a mock of Container interface
 type MockContainer struct {
 	ctrl     *gomock.Controller
 	recorder *MockContainerMockRecorder
 }
 
-// MockContainerMockRecorder is the mock recorder for MockContainer.
+// MockContainerMockRecorder is the mock recorder for MockContainer
 type MockContainerMockRecorder struct {
 	mock *MockContainer
 }
 
-// NewMockContainer creates a new mock instance.
+// NewMockContainer creates a new mock instance
 func NewMockContainer(ctrl *gomock.Controller) *MockContainer {
 	mock := &MockContainer{ctrl: ctrl}
 	mock.recorder = &MockContainerMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockContainer) EXPECT() *MockContainerMockRecorder {
 	return m.recorder
 }
 
-// CreateIfNotExists mocks base method.
+// CreateIfNotExists mocks base method
 func (m *MockContainer) CreateIfNotExists(arg0 *storage.CreateContainerOptions) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateIfNotExists", arg0)
@@ -120,13 +120,13 @@ func (m *MockContainer) CreateIfNotExists(arg0 *storage.CreateContainerOptions) 
 	return ret0, ret1
 }
 
-// CreateIfNotExists indicates an expected call of CreateIfNotExists.
+// CreateIfNotExists indicates an expected call of CreateIfNotExists
 func (mr *MockContainerMockRecorder) CreateIfNotExists(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateIfNotExists", reflect.TypeOf((*MockContainer)(nil).CreateIfNotExists), arg0)
 }
 
-// Exists mocks base method.
+// Exists mocks base method
 func (m *MockContainer) Exists() (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Exists")
@@ -135,13 +135,13 @@ func (m *MockContainer) Exists() (bool, error) {
 	return ret0, ret1
 }
 
-// Exists indicates an expected call of Exists.
+// Exists indicates an expected call of Exists
 func (mr *MockContainerMockRecorder) Exists() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exists", reflect.TypeOf((*MockContainer)(nil).Exists))
 }
 
-// GetBlobReference mocks base method.
+// GetBlobReference mocks base method
 func (m *MockContainer) GetBlobReference(arg0 string) storage0.Blob {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetBlobReference", arg0)
@@ -149,13 +149,13 @@ func (m *MockContainer) GetBlobReference(arg0 string) storage0.Blob {
 	return ret0
 }
 
-// GetBlobReference indicates an expected call of GetBlobReference.
+// GetBlobReference indicates an expected call of GetBlobReference
 func (mr *MockContainerMockRecorder) GetBlobReference(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBlobReference", reflect.TypeOf((*MockContainer)(nil).GetBlobReference), arg0)
 }
 
-// ListBlobs mocks base method.
+// ListBlobs mocks base method
 func (m *MockContainer) ListBlobs(arg0 storage.ListBlobsParameters) (storage.BlobListResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListBlobs", arg0)
@@ -164,36 +164,36 @@ func (m *MockContainer) ListBlobs(arg0 storage.ListBlobsParameters) (storage.Blo
 	return ret0, ret1
 }
 
-// ListBlobs indicates an expected call of ListBlobs.
+// ListBlobs indicates an expected call of ListBlobs
 func (mr *MockContainerMockRecorder) ListBlobs(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListBlobs", reflect.TypeOf((*MockContainer)(nil).ListBlobs), arg0)
 }
 
-// MockBlob is a mock of Blob interface.
+// MockBlob is a mock of Blob interface
 type MockBlob struct {
 	ctrl     *gomock.Controller
 	recorder *MockBlobMockRecorder
 }
 
-// MockBlobMockRecorder is the mock recorder for MockBlob.
+// MockBlobMockRecorder is the mock recorder for MockBlob
 type MockBlobMockRecorder struct {
 	mock *MockBlob
 }
 
-// NewMockBlob creates a new mock instance.
+// NewMockBlob creates a new mock instance
 func NewMockBlob(ctrl *gomock.Controller) *MockBlob {
 	mock := &MockBlob{ctrl: ctrl}
 	mock.recorder = &MockBlobMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockBlob) EXPECT() *MockBlobMockRecorder {
 	return m.recorder
 }
 
-// CreateBlockBlob mocks base method.
+// CreateBlockBlob mocks base method
 func (m *MockBlob) CreateBlockBlob(arg0 *storage.PutBlobOptions) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateBlockBlob", arg0)
@@ -201,13 +201,13 @@ func (m *MockBlob) CreateBlockBlob(arg0 *storage.PutBlobOptions) error {
 	return ret0
 }
 
-// CreateBlockBlob indicates an expected call of CreateBlockBlob.
+// CreateBlockBlob indicates an expected call of CreateBlockBlob
 func (mr *MockBlobMockRecorder) CreateBlockBlob(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateBlockBlob", reflect.TypeOf((*MockBlob)(nil).CreateBlockBlob), arg0)
 }
 
-// CreateBlockBlobFromReader mocks base method.
+// CreateBlockBlobFromReader mocks base method
 func (m *MockBlob) CreateBlockBlobFromReader(arg0 io.Reader, arg1 *storage.PutBlobOptions) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateBlockBlobFromReader", arg0, arg1)
@@ -215,13 +215,13 @@ func (m *MockBlob) CreateBlockBlobFromReader(arg0 io.Reader, arg1 *storage.PutBl
 	return ret0
 }
 
-// CreateBlockBlobFromReader indicates an expected call of CreateBlockBlobFromReader.
+// CreateBlockBlobFromReader indicates an expected call of CreateBlockBlobFromReader
 func (mr *MockBlobMockRecorder) CreateBlockBlobFromReader(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateBlockBlobFromReader", reflect.TypeOf((*MockBlob)(nil).CreateBlockBlobFromReader), arg0, arg1)
 }
 
-// Delete mocks base method.
+// Delete mocks base method
 func (m *MockBlob) Delete(arg0 *storage.DeleteBlobOptions) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0)
@@ -229,13 +229,13 @@ func (m *MockBlob) Delete(arg0 *storage.DeleteBlobOptions) error {
 	return ret0
 }
 
-// Delete indicates an expected call of Delete.
+// Delete indicates an expected call of Delete
 func (mr *MockBlobMockRecorder) Delete(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockBlob)(nil).Delete), arg0)
 }
 
-// Exists mocks base method.
+// Exists mocks base method
 func (m *MockBlob) Exists() (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Exists")
@@ -244,13 +244,13 @@ func (m *MockBlob) Exists() (bool, error) {
 	return ret0, ret1
 }
 
-// Exists indicates an expected call of Exists.
+// Exists indicates an expected call of Exists
 func (mr *MockBlobMockRecorder) Exists() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exists", reflect.TypeOf((*MockBlob)(nil).Exists))
 }
 
-// Get mocks base method.
+// Get mocks base method
 func (m *MockBlob) Get(arg0 *storage.GetBlobOptions) (io.ReadCloser, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", arg0)
@@ -259,13 +259,13 @@ func (m *MockBlob) Get(arg0 *storage.GetBlobOptions) (io.ReadCloser, error) {
 	return ret0, ret1
 }
 
-// Get indicates an expected call of Get.
+// Get indicates an expected call of Get
 func (mr *MockBlobMockRecorder) Get(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockBlob)(nil).Get), arg0)
 }
 
-// GetSASURI mocks base method.
+// GetSASURI mocks base method
 func (m *MockBlob) GetSASURI(arg0 storage.BlobSASOptions) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSASURI", arg0)
@@ -274,13 +274,13 @@ func (m *MockBlob) GetSASURI(arg0 storage.BlobSASOptions) (string, error) {
 	return ret0, ret1
 }
 
-// GetSASURI indicates an expected call of GetSASURI.
+// GetSASURI indicates an expected call of GetSASURI
 func (mr *MockBlobMockRecorder) GetSASURI(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSASURI", reflect.TypeOf((*MockBlob)(nil).GetSASURI), arg0)
 }
 
-// PutBlock mocks base method.
+// PutBlock mocks base method
 func (m *MockBlob) PutBlock(arg0 string, arg1 []byte, arg2 *storage.PutBlockOptions) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PutBlock", arg0, arg1, arg2)
@@ -288,13 +288,13 @@ func (m *MockBlob) PutBlock(arg0 string, arg1 []byte, arg2 *storage.PutBlockOpti
 	return ret0
 }
 
-// PutBlock indicates an expected call of PutBlock.
+// PutBlock indicates an expected call of PutBlock
 func (mr *MockBlobMockRecorder) PutBlock(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PutBlock", reflect.TypeOf((*MockBlob)(nil).PutBlock), arg0, arg1, arg2)
 }
 
-// PutBlockList mocks base method.
+// PutBlockList mocks base method
 func (m *MockBlob) PutBlockList(arg0 []storage.Block, arg1 *storage.PutBlockListOptions) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PutBlockList", arg0, arg1)
@@ -302,7 +302,7 @@ func (m *MockBlob) PutBlockList(arg0 []storage.Block, arg1 *storage.PutBlockList
 	return ret0
 }
 
-// PutBlockList indicates an expected call of PutBlockList.
+// PutBlockList indicates an expected call of PutBlockList
 func (mr *MockBlobMockRecorder) PutBlockList(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PutBlockList", reflect.TypeOf((*MockBlob)(nil).PutBlockList), arg0, arg1)

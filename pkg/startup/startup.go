@@ -19,6 +19,7 @@ import (
 	v19 "github.com/openshift/openshift-azure/pkg/startup/v19"
 	v20 "github.com/openshift/openshift-azure/pkg/startup/v20"
 	v21 "github.com/openshift/openshift-azure/pkg/startup/v21"
+	v22 "github.com/openshift/openshift-azure/pkg/startup/v22"
 )
 
 // Interface is a singleton interface to interact with startup
@@ -44,6 +45,8 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.Test
 		return v20.New(log, cs, testConfig), nil
 	case "v21.0":
 		return v21.New(log, cs, testConfig), nil
+	case "v22.0":
+		return v22.New(log, cs, testConfig), nil
 	}
 
 	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)

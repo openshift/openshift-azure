@@ -12,30 +12,30 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockActivityLogsClient is a mock of ActivityLogsClient interface.
+// MockActivityLogsClient is a mock of ActivityLogsClient interface
 type MockActivityLogsClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockActivityLogsClientMockRecorder
 }
 
-// MockActivityLogsClientMockRecorder is the mock recorder for MockActivityLogsClient.
+// MockActivityLogsClientMockRecorder is the mock recorder for MockActivityLogsClient
 type MockActivityLogsClientMockRecorder struct {
 	mock *MockActivityLogsClient
 }
 
-// NewMockActivityLogsClient creates a new mock instance.
+// NewMockActivityLogsClient creates a new mock instance
 func NewMockActivityLogsClient(ctrl *gomock.Controller) *MockActivityLogsClient {
 	mock := &MockActivityLogsClient{ctrl: ctrl}
 	mock.recorder = &MockActivityLogsClientMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockActivityLogsClient) EXPECT() *MockActivityLogsClientMockRecorder {
 	return m.recorder
 }
 
-// List mocks base method.
+// List mocks base method
 func (m *MockActivityLogsClient) List(arg0 context.Context, arg1, arg2 string) (insights.EventDataCollectionPage, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", arg0, arg1, arg2)
@@ -44,7 +44,7 @@ func (m *MockActivityLogsClient) List(arg0 context.Context, arg1, arg2 string) (
 	return ret0, ret1
 }
 
-// List indicates an expected call of List.
+// List indicates an expected call of List
 func (mr *MockActivityLogsClientMockRecorder) List(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockActivityLogsClient)(nil).List), arg0, arg1, arg2)

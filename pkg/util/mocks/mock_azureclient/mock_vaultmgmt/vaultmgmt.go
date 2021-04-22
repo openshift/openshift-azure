@@ -12,30 +12,30 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockVaultMgmtClient is a mock of VaultMgmtClient interface.
+// MockVaultMgmtClient is a mock of VaultMgmtClient interface
 type MockVaultMgmtClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockVaultMgmtClientMockRecorder
 }
 
-// MockVaultMgmtClientMockRecorder is the mock recorder for MockVaultMgmtClient.
+// MockVaultMgmtClientMockRecorder is the mock recorder for MockVaultMgmtClient
 type MockVaultMgmtClientMockRecorder struct {
 	mock *MockVaultMgmtClient
 }
 
-// NewMockVaultMgmtClient creates a new mock instance.
+// NewMockVaultMgmtClient creates a new mock instance
 func NewMockVaultMgmtClient(ctrl *gomock.Controller) *MockVaultMgmtClient {
 	mock := &MockVaultMgmtClient{ctrl: ctrl}
 	mock.recorder = &MockVaultMgmtClientMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockVaultMgmtClient) EXPECT() *MockVaultMgmtClientMockRecorder {
 	return m.recorder
 }
 
-// CreateOrUpdate mocks base method.
+// CreateOrUpdate mocks base method
 func (m *MockVaultMgmtClient) CreateOrUpdate(arg0 context.Context, arg1, arg2 string, arg3 keyvault.VaultCreateOrUpdateParameters) (keyvault.Vault, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrUpdate", arg0, arg1, arg2, arg3)
@@ -44,7 +44,7 @@ func (m *MockVaultMgmtClient) CreateOrUpdate(arg0 context.Context, arg1, arg2 st
 	return ret0, ret1
 }
 
-// CreateOrUpdate indicates an expected call of CreateOrUpdate.
+// CreateOrUpdate indicates an expected call of CreateOrUpdate
 func (mr *MockVaultMgmtClientMockRecorder) CreateOrUpdate(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrUpdate", reflect.TypeOf((*MockVaultMgmtClient)(nil).CreateOrUpdate), arg0, arg1, arg2, arg3)

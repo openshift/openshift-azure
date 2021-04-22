@@ -20,6 +20,7 @@ import (
 	v19 "github.com/openshift/openshift-azure/pkg/arm/v19"
 	v20 "github.com/openshift/openshift-azure/pkg/arm/v20"
 	v21 "github.com/openshift/openshift-azure/pkg/arm/v21"
+	v22 "github.com/openshift/openshift-azure/pkg/arm/v22"
 )
 
 type Interface interface {
@@ -42,6 +43,8 @@ func New(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster
 		return v20.New(ctx, log, cs, testConfig), nil
 	case "v21.0":
 		return v21.New(ctx, log, cs, testConfig), nil
+	case "v22.0":
+		return v22.New(ctx, log, cs, testConfig), nil
 	}
 
 	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)
