@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    scheduler.alpha.kubernetes.io/critical-pod: ""
+  labels:
+    openshift.io/component: aro-admission-controller
+    openshift.io/control-plane: "true"
+  name: aro-admission-controller
+  namespace: kube-system
+spec:
+  containers:
+    - args:
+      - admissioncontroller
+      command:
+      - azure
+      env:
+      - name: masterNodeName
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: spec.nodeName
+      image: {{ .Config.Images.AroAdmissionController | quote }}
+      imagePullPolicy: Always
+      name: aro-admission-controller
+      readinessProbe:
+        httpGet:
+          path: healthz/ready
+          port: 8443
+          scheme: HTTPS
+        initialDelaySeconds: 10
+        timeoutSeconds: 10
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - mountPath: /_data/_out
+          name: azureconfig
+          readOnly: true
+        - mountPath: /_data/aro-admission-controller
+          name: etc-aac
+          readOnly: true
+  hostNetwork: true
+  priorityClassName: system-node-critical
+  volumes:
+    - hostPath:
+        path: /etc/origin/cloudprovider
+      name: azureconfig
+    - hostPath:
+        path: /etc/aro-admission-controller
+      name: etc-aac

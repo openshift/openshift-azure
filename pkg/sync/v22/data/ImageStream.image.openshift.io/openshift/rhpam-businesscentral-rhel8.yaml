@@ -1,0 +1,26 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  annotations:
+    openshift.io/display-name: Red Hat Process Automation Manager Business Central
+      7.7
+    openshift.io/provider-display-name: Red Hat, Inc.
+  name: rhpam-businesscentral-rhel8
+  namespace: openshift
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+  - annotations:
+      description: Red Hat Process Automation Manager 7.7 - Business Central image.
+      iconClass: icon-jboss
+      supports: rhpam:7.7
+      tags: rhpam
+      version: 7.7.0
+    from:
+      kind: DockerImage
+      name: registry.redhat.io/rhpam-7/rhpam-businesscentral-rhel8:7.7.0
+    importPolicy: {}
+    name: 7.7.0
+    referencePolicy:
+      type: Local

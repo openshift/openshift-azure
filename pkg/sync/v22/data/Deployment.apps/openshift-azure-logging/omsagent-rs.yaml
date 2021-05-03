@@ -1,0 +1,144 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    azure.openshift.io/sync-pod-optionally-apply: '*** GENERATED ***'
+    azure.openshift.io/sync-pod-wait-for-readiness: "false"
+    component: oms-agent
+    tier: node
+  name: omsagent-rs
+  namespace: openshift-azure-logging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      rsName: omsagent-rs
+  template:
+    metadata:
+      annotations:
+        agentVersion: 1.10.0.1
+        dockerProviderVersion: 10.0.0-4
+        schema-versions: v1
+      labels:
+        rsName: omsagent-rs
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - labelSelector: null
+              matchExpressions:
+              - key: type
+                operator: NotIn
+                values:
+                - virtual-kubelet
+      containers:
+      - command:
+        - /opt/main-wrapper.sh
+        env:
+        - name: AKS_RESOURCE_ID
+          value: '*** GENERATED ***'
+        - name: AKS_REGION
+          value: '*** GENERATED ***'
+        - name: CONTROLLER_TYPE
+          value: ReplicaSet
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        - name: USER_ASSIGNED_IDENTITY_CLIENT_ID
+          value: ""
+        image: '*** GENERATED ***'
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - /opt/livenessprobe.sh
+          initialDelaySeconds: 60
+          periodSeconds: 60
+        name: omsagent
+        ports:
+        - containerPort: 25226
+        - containerPort: 25225
+        - containerPort: 25224
+          protocol: UDP
+        - containerPort: 25227
+          name: in-rs-tcp
+        resources:
+          limits:
+            cpu: 950m
+            memory: 750Mi
+          requests:
+            cpu: 150m
+            memory: 250Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /hostfs
+          name: host-root
+          readOnly: true
+        - mountPath: /var/run/host
+          name: var-run
+        - mountPath: /var/log
+          name: host-log
+        - mountPath: /var/lib/docker/containers
+          name: containerlog-path
+        - mountPath: /etc/kubernetes/host
+          name: azure-json-path
+        - mountPath: /etc/omsagent-secret
+          name: omsagent-secret
+          readOnly: true
+        - mountPath: /etc/config
+          name: omsagent-rs-config
+        - mountPath: /etc/config/settings
+          name: settings-vol-config
+          readOnly: true
+        - mountPath: /opt/main-wrapper.sh
+          name: omsagent-entrypoint
+          subPath: main-wrapper.sh
+      nodeSelector:
+        beta.kubernetes.io/os: linux
+        node-role.kubernetes.io/compute: "true"
+      serviceAccountName: omsagent
+      tolerations:
+      - effect: NoExecute
+        operator: Exists
+      - effect: NoSchedule
+        operator: Exists
+      volumes:
+      - hostPath:
+          path: /
+        name: host-root
+      - hostPath:
+          path: /var/run
+        name: var-run
+      - hostPath:
+          path: /etc/hostname
+        name: container-hostname
+      - hostPath:
+          path: /var/log
+        name: host-log
+      - hostPath:
+          path: /var/lib/docker/containers
+        name: containerlog-path
+      - hostPath:
+          path: /etc/kubernetes
+        name: azure-json-path
+      - name: omsagent-secret
+        secret:
+          defaultMode: 288
+          secretName: omsagent-secret
+      - configMap:
+          name: omsagent-rs-config
+        name: omsagent-rs-config
+      - configMap:
+          name: container-azm-ms-agentconfig
+          optional: true
+        name: settings-vol-config
+      - configMap:
+          defaultMode: 509
+          name: omsagent-entrypoint
+        name: omsagent-entrypoint
