@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"path/filepath"
 	"strings"
 
 	azgraphrbac "github.com/Azure/azure-sdk-for-go/services/graphrbac/1.6/graphrbac"
@@ -156,21 +157,41 @@ func (c Client) createOrUpdateAdmin(ctx context.Context) (*v20191027preview.Open
 	if err != nil {
 		return nil, fmt.Errorf("failed reading admin manifest: %v", err)
 	}
-	c.log.Info("creating/updating cluster")
-	resonse, err := c.ac.CreateOrUpdate(ctx, c.conf.ResourceGroup, c.conf.ResourceGroup, oc)
-	if err != nil {
-		return nil, err
+	baseManifestName := filepath.Base(*adminManifest)
+	switch baseManifestName {
+	case "admin-rotate-certs.yaml":
+		c.log.Info("rotating certificates")
+		err := c.ac.RotateCertificates(ctx, c.conf.ResourceGroup, c.conf.ResourceGroup)
+		if err != nil {
+			return nil, err
+		}
+		c.log.Info("rotated certificates")
+		cluster, err := c.rpcs["2019-10-27-preview"].(v20191027previewclient.OpenShiftManagedClustersClient).Get(ctx, c.conf.ResourceGroup, c.conf.ResourceGroup)
+		if err != nil {
+			return nil, err
+		}
+		return &cluster, nil
+
+	case "admin-update":
+		c.log.Info("creating/updating cluster")
+		resonse, err := c.ac.CreateOrUpdate(ctx, c.conf.ResourceGroup, c.conf.ResourceGroup, oc)
+		if err != nil {
+			return nil, err
+		}
+		c.log.Info("created/updated cluster")
+		err = fakerp.WriteClusterConfigToManifest(resonse, "_data/manifest.yaml")
+		if err != nil {
+			return nil, err
+		}
+		cluster, err := c.rpcs["2019-10-27-preview"].(v20191027previewclient.OpenShiftManagedClustersClient).Get(ctx, c.conf.ResourceGroup, c.conf.ResourceGroup)
+		if err != nil {
+			return nil, err
+		}
+		return &cluster, nil
+
+	default:
+		return nil, fmt.Errorf("unknown admin manifest")
 	}
-	c.log.Info("created/updated cluster")
-	err = fakerp.WriteClusterConfigToManifest(resonse, "_data/manifest.yaml")
-	if err != nil {
-		return nil, err
-	}
-	cluster, err := c.rpcs["2019-10-27-preview"].(v20191027previewclient.OpenShiftManagedClustersClient).Get(ctx, c.conf.ResourceGroup, c.conf.ResourceGroup)
-	if err != nil {
-		return nil, err
-	}
-	return &cluster, nil
 }
 
 func main() {
@@ -270,7 +291,6 @@ func (c Client) Delete(ctx context.Context) {
 	if err := unlinkClusterFromAadApp(ctx, c.log, &c.aadClient, &aadApp, c.conf); err != nil {
 		log.Fatal(err)
 	}
-	return
 }
 
 func (c Client) Create(ctx context.Context) (string, error) {

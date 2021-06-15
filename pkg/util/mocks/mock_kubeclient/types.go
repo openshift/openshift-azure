@@ -106,6 +106,34 @@ func (mr *MockInterfaceMockRecorder) GetControlPlanePods(arg0 interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetControlPlanePods", reflect.TypeOf((*MockInterface)(nil).GetControlPlanePods), arg0)
 }
 
+// RemoveSyncPod mocks base method.
+func (m *MockInterface) RemoveSyncPod(arg0 context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveSyncPod", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveSyncPod indicates an expected call of RemoveSyncPod.
+func (mr *MockInterfaceMockRecorder) RemoveSyncPod(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveSyncPod", reflect.TypeOf((*MockInterface)(nil).RemoveSyncPod), arg0)
+}
+
+// RemoveValidatingWebhookConfiguration mocks base method.
+func (m *MockInterface) RemoveValidatingWebhookConfiguration(arg0 context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveValidatingWebhookConfiguration", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveValidatingWebhookConfiguration indicates an expected call of RemoveValidatingWebhookConfiguration.
+func (mr *MockInterfaceMockRecorder) RemoveValidatingWebhookConfiguration(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveValidatingWebhookConfiguration", reflect.TypeOf((*MockInterface)(nil).RemoveValidatingWebhookConfiguration), arg0)
+}
+
 // WaitForReadyMaster mocks base method.
 func (m *MockInterface) WaitForReadyMaster(arg0 context.Context, arg1 string) error {
 	m.ctrl.T.Helper()

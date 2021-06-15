@@ -282,6 +282,20 @@ func (mr *MockUpgraderMockRecorder) ListVMHostnames(arg0 interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListVMHostnames", reflect.TypeOf((*MockUpgrader)(nil).ListVMHostnames), arg0)
 }
 
+// PreSecretRotation mocks base method.
+func (m *MockUpgrader) PreSecretRotation(arg0 context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PreSecretRotation", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PreSecretRotation indicates an expected call of PreSecretRotation.
+func (mr *MockUpgraderMockRecorder) PreSecretRotation(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PreSecretRotation", reflect.TypeOf((*MockUpgrader)(nil).PreSecretRotation), arg0)
+}
+
 // Reimage mocks base method.
 func (m *MockUpgrader) Reimage(arg0 context.Context, arg1, arg2 string) error {
 	m.ctrl.T.Helper()
@@ -294,6 +308,34 @@ func (m *MockUpgrader) Reimage(arg0 context.Context, arg1, arg2 string) error {
 func (mr *MockUpgraderMockRecorder) Reimage(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Reimage", reflect.TypeOf((*MockUpgrader)(nil).Reimage), arg0, arg1, arg2)
+}
+
+// RemoveSyncPod mocks base method.
+func (m *MockUpgrader) RemoveSyncPod(arg0 context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveSyncPod", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveSyncPod indicates an expected call of RemoveSyncPod.
+func (mr *MockUpgraderMockRecorder) RemoveSyncPod(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveSyncPod", reflect.TypeOf((*MockUpgrader)(nil).RemoveSyncPod), arg0)
+}
+
+// RemoveValidatingWebhookConfiguration mocks base method.
+func (m *MockUpgrader) RemoveValidatingWebhookConfiguration(arg0 context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveValidatingWebhookConfiguration", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveValidatingWebhookConfiguration indicates an expected call of RemoveValidatingWebhookConfiguration.
+func (mr *MockUpgraderMockRecorder) RemoveValidatingWebhookConfiguration(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveValidatingWebhookConfiguration", reflect.TypeOf((*MockUpgrader)(nil).RemoveValidatingWebhookConfiguration), arg0)
 }
 
 // ResetUpdateBlob mocks base method.
