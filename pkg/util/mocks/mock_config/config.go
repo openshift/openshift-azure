@@ -9,7 +9,6 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 
-	api "github.com/openshift/openshift-azure/pkg/api"
 	plugin "github.com/openshift/openshift-azure/pkg/api/plugin"
 )
 
@@ -48,21 +47,6 @@ func (m *MockInterface) Generate(template *plugin.Config, setVersionFields bool)
 func (mr *MockInterfaceMockRecorder) Generate(template, setVersionFields interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Generate", reflect.TypeOf((*MockInterface)(nil).Generate), template, setVersionFields)
-}
-
-// GenerateStartup mocks base method.
-func (m *MockInterface) GenerateStartup() (*api.OpenShiftManagedCluster, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GenerateStartup")
-	ret0, _ := ret[0].(*api.OpenShiftManagedCluster)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GenerateStartup indicates an expected call of GenerateStartup.
-func (mr *MockInterfaceMockRecorder) GenerateStartup() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateStartup", reflect.TypeOf((*MockInterface)(nil).GenerateStartup))
 }
 
 // InvalidateCertificates mocks base method.
