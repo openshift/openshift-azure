@@ -468,6 +468,11 @@ func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftMana
 
 func (p *plugin) RotateClusterCertificates(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn) *api.PluginError {
 	p.log.Info("invalidating certificates")
+	clusterUpgrader, err := p.upgraderFactory(ctx, p.log, cs, true, true, p.testConfig)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+	}
+
 	configInterface, err := p.configInterfaceFactory(cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
@@ -480,16 +485,33 @@ func (p *plugin) RotateClusterCertificates(ctx context.Context, cs *api.OpenShif
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInvalidateClusterCertificates}
 	}
+
 	p.log.Info("regenerating config including certificates and private keys")
 	err = p.GenerateConfig(ctx, cs, true)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepRegenerateClusterSecrets}
 	}
 
+	p.log.Info("removing pre-upgrade resources")
+	err = clusterUpgrader.PreSecretRotation(ctx)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepCreateSyncPod}
+	}
+
 	p.log.Info("running CreateOrUpdate")
 	if err := p.createOrUpdateExt(ctx, cs, updateTypeMasterFast, deployFn, false); err != nil {
 		return err
 	}
+
+	err = clusterUpgrader.CreateOrUpdateSyncPod(ctx)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepCreateSyncPod}
+	}
+	err = clusterUpgrader.WaitForReadySyncPod(ctx)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepCreateSyncPodWaitForReady}
+	}
+
 	return nil
 }
 

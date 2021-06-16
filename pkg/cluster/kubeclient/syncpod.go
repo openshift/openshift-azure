@@ -190,3 +190,11 @@ func (u *Kubeclientset) EnsureSyncPod(ctx context.Context, syncImage string, has
 
 	return nil
 }
+
+func (u *Kubeclientset) RemoveSyncPod(ctx context.Context) error {
+	return u.Client.AppsV1().Deployments("kube-system").Delete("sync", &metav1.DeleteOptions{})
+}
+
+func (u *Kubeclientset) RemoveValidatingWebhookConfiguration(ctx context.Context) error {
+	return u.Client.AdmissionregistrationV1beta1().ValidatingWebhookConfigurations().Delete("aro-admission-controller.aro.openshift.io", &metav1.DeleteOptions{})
+}

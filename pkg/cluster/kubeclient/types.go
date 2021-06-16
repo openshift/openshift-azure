@@ -21,6 +21,8 @@ type Interface interface {
 	DrainAndDeleteWorker(ctx context.Context, hostname string) error
 	DeleteMaster(hostname string) error
 	EnsureSyncPod(ctx context.Context, syncImage string, hash []byte) error
+	RemoveSyncPod(ctx context.Context) error
+	RemoveValidatingWebhookConfiguration(ctx context.Context) error
 	GetControlPlanePods(ctx context.Context) ([]corev1.Pod, error)
 	WaitForReadyMaster(ctx context.Context, hostname string) error
 	WaitForReadyWorker(ctx context.Context, hostname string) error

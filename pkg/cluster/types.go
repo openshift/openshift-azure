@@ -50,6 +50,7 @@ type Upgrader interface {
 	UpdateMasterAgentPoolTogether(ctx context.Context, app *api.AgentPoolProfile) *api.PluginError
 	UpdateWorkerAgentPool(ctx context.Context, app *api.AgentPoolProfile, suffix string) *api.PluginError
 	CreateOrUpdateSyncPod(ctx context.Context) error
+	PreSecretRotation(ctx context.Context) error
 	EtcdListBackups(ctx context.Context) ([]azstorage.Blob, error)
 	EtcdRestoreDeleteMasterScaleSet(ctx context.Context) *api.PluginError
 	EtcdRestoreDeleteMasterScaleSetHashes(ctx context.Context) *api.PluginError

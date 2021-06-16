@@ -481,11 +481,21 @@ func (g *simpleGenerator) Generate(template *pluginapi.Config, setVersionFields 
 
 // InvalidateCertificates removes some certificates from an OpenShiftManagedCluster.Config
 func (g *simpleGenerator) InvalidateCertificates() (err error) {
-	g.cs.Config.Certificates.EtcdCa = api.CertKeyPair{}
 	g.cs.Config.Certificates.EtcdClient = api.CertKeyPair{}
 	g.cs.Config.Certificates.EtcdServer = api.CertKeyPair{}
 	g.cs.Config.Certificates.EtcdPeer = api.CertKeyPair{}
-
+	g.cs.Config.Certificates.Admin = api.CertKeyPair{}
+	g.cs.Config.Certificates.OpenShiftMaster = api.CertKeyPair{}
+	g.cs.Config.Certificates.ServiceCatalogCa = api.CertKeyPair{}
+	g.cs.Config.Certificates.AroAdmissionController = api.CertKeyPair{}
+	g.cs.Config.Certificates.AroAdmissionControllerClient = api.CertKeyPair{}
+	g.cs.Config.Certificates.NodeBootstrap = api.CertKeyPair{}
+	g.cs.Config.Certificates.BlackBoxMonitor = api.CertKeyPair{}
+	g.cs.Config.Certificates.RegistryConsole = api.CertKeyPair{}
+	g.cs.Config.Certificates.Registry = api.CertKeyPair{}
+	g.cs.Config.Certificates.FrontProxyCa = api.CertKeyPair{}
+	g.cs.Config.Certificates.MasterKubeletClient = api.CertKeyPair{}
+	g.cs.Config.Certificates.MetricsServer = api.CertKeyPair{}
 	g.cs.Config.Certificates.MasterProxyClient = api.CertKeyPair{}
 	g.cs.Config.Certificates.MasterServer = api.CertKeyPair{}
 	g.cs.Config.Certificates.AggregatorFrontProxy = api.CertKeyPair{}
@@ -518,4 +528,8 @@ func (g *simpleGenerator) InvalidateSecrets() (err error) {
 	g.cs.Config.EtcdMetricsUsername = ""
 
 	return
+}
+
+func (g *simpleGenerator) GenerateStartup() (cs *api.OpenShiftManagedCluster, err error) {
+	return g.cs, nil
 }
