@@ -172,7 +172,7 @@ func (c Client) createOrUpdateAdmin(ctx context.Context) (*v20191027preview.Open
 		}
 		return &cluster, nil
 
-	case "admin-update":
+	default:
 		c.log.Info("creating/updating cluster")
 		resonse, err := c.ac.CreateOrUpdate(ctx, c.conf.ResourceGroup, c.conf.ResourceGroup, oc)
 		if err != nil {
@@ -188,9 +188,6 @@ func (c Client) createOrUpdateAdmin(ctx context.Context) (*v20191027preview.Open
 			return nil, err
 		}
 		return &cluster, nil
-
-	default:
-		return nil, fmt.Errorf("unknown admin manifest")
 	}
 }
 
