@@ -4,9 +4,6 @@ exec 2>&1
 export HOME=/root
 cd
 
-lvextend -l +50%FREE /dev/rootvg/rootlv
-xfs_growfs /
-
 lvextend -l +100%FREE /dev/rootvg/varlv
 xfs_growfs /var
 
