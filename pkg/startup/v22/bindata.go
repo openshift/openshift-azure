@@ -25,6 +25,10 @@
 // data/master/etc/origin/master/ca.crt
 // data/master/etc/origin/master/ca.key
 // data/master/etc/origin/master/client.secret
+// data/master/etc/origin/master/custom/registry.crt
+// data/master/etc/origin/master/custom/registry.key
+// data/master/etc/origin/master/custom/router.crt
+// data/master/etc/origin/master/custom/router.key
 // data/master/etc/origin/master/front-proxy-ca.crt
 // data/master/etc/origin/master/master-config.yaml
 // data/master/etc/origin/master/master.etcd-ca.crt
@@ -625,6 +629,86 @@ func masterEtcOriginMasterClientSecret() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "master/etc/origin/master/client.secret", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _masterEtcOriginMasterCustomRegistryCrt = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xaa\xae\x56\x70\x4e\x2d\x2a\x71\x2c\x76\xaa\x2c\x49\x2d\x56\xd0\x73\xce\xcf\x4b\xcb\x4c\xd7\x03\x89\x65\xa6\x65\x26\x27\x96\xa4\x16\xeb\x05\xa5\xa6\x67\x16\x97\x14\x55\x82\x45\x15\x6a\x14\x82\x4b\x8a\x32\xf3\xd2\x15\x6a\x6b\xb9\x00\x01\x00\x00\xff\xff\x22\x0b\x7b\xb9\x3e\x00\x00\x00")
+
+func masterEtcOriginMasterCustomRegistryCrtBytes() ([]byte, error) {
+	return bindataRead(
+		_masterEtcOriginMasterCustomRegistryCrt,
+		"master/etc/origin/master/custom/registry.crt",
+	)
+}
+
+func masterEtcOriginMasterCustomRegistryCrt() (*asset, error) {
+	bytes, err := masterEtcOriginMasterCustomRegistryCrtBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "master/etc/origin/master/custom/registry.crt", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _masterEtcOriginMasterCustomRegistryKey = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xaa\xae\x56\x08\x28\xca\x2c\x4b\x2c\x49\xf5\x4e\xad\x74\x2c\x76\xaa\x2c\x49\x2d\x56\xd0\x73\xce\xcf\x4b\xcb\x4c\xd7\x73\x4e\x2d\x2a\xc9\x4c\xcb\x4c\x4e\x2c\x49\x2d\xd6\x0b\x4a\x4d\xcf\x2c\x2e\x29\xaa\xd4\xf3\x4e\xad\x54\xa8\x51\x08\x2e\x29\xca\xcc\x4b\x57\xa8\xad\xe5\x02\x04\x00\x00\xff\xff\x48\xd0\xad\x1c\x43\x00\x00\x00")
+
+func masterEtcOriginMasterCustomRegistryKeyBytes() ([]byte, error) {
+	return bindataRead(
+		_masterEtcOriginMasterCustomRegistryKey,
+		"master/etc/origin/master/custom/registry.key",
+	)
+}
+
+func masterEtcOriginMasterCustomRegistryKey() (*asset, error) {
+	bytes, err := masterEtcOriginMasterCustomRegistryKeyBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "master/etc/origin/master/custom/registry.key", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _masterEtcOriginMasterCustomRouterCrt = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xaa\xae\x56\x70\x4e\x2d\x2a\x71\xce\x48\xcc\xcc\x73\x2c\x76\xaa\x2c\x49\x2d\x56\xd0\x73\xce\xcf\x4b\xcb\x4c\xd7\x03\x49\x64\xa6\x65\x26\x27\x96\xa4\x16\xeb\x05\xe5\x97\x96\xa4\x16\x81\xc5\x8a\x15\x6a\x14\x82\x4b\x8a\x32\xf3\xd2\x15\x6a\x6b\xb9\x00\x01\x00\x00\xff\xff\x9b\xa5\x06\x6e\x42\x00\x00\x00")
+
+func masterEtcOriginMasterCustomRouterCrtBytes() ([]byte, error) {
+	return bindataRead(
+		_masterEtcOriginMasterCustomRouterCrt,
+		"master/etc/origin/master/custom/router.crt",
+	)
+}
+
+func masterEtcOriginMasterCustomRouterCrt() (*asset, error) {
+	bytes, err := masterEtcOriginMasterCustomRouterCrtBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "master/etc/origin/master/custom/router.crt", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _masterEtcOriginMasterCustomRouterKey = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xaa\xae\x56\x08\x28\xca\x2c\x4b\x2c\x49\xf5\x4e\xad\x74\x2c\x76\xaa\x2c\x49\x2d\x56\xd0\x73\xce\xcf\x4b\xcb\x4c\xd7\x73\x4e\x2d\x2a\xc9\x4c\xcb\x4c\x4e\x2c\x49\x2d\xd6\x0b\xca\x2f\x2d\x49\x2d\xd2\xf3\x4e\xad\x54\xa8\x51\x08\x2e\x29\xca\xcc\x4b\x57\xa8\xad\xe5\x02\x04\x00\x00\xff\xff\x0d\xd6\x84\x56\x41\x00\x00\x00")
+
+func masterEtcOriginMasterCustomRouterKeyBytes() ([]byte, error) {
+	return bindataRead(
+		_masterEtcOriginMasterCustomRouterKey,
+		"master/etc/origin/master/custom/router.key",
+	)
+}
+
+func masterEtcOriginMasterCustomRouterKey() (*asset, error) {
+	bytes, err := masterEtcOriginMasterCustomRouterKeyBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "master/etc/origin/master/custom/router.key", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1665,6 +1749,10 @@ var _bindata = map[string]func() (*asset, error){
 	"master/etc/origin/master/ca.crt":                                   masterEtcOriginMasterCaCrt,
 	"master/etc/origin/master/ca.key":                                   masterEtcOriginMasterCaKey,
 	"master/etc/origin/master/client.secret":                            masterEtcOriginMasterClientSecret,
+	"master/etc/origin/master/custom/registry.crt":                      masterEtcOriginMasterCustomRegistryCrt,
+	"master/etc/origin/master/custom/registry.key":                      masterEtcOriginMasterCustomRegistryKey,
+	"master/etc/origin/master/custom/router.crt":                        masterEtcOriginMasterCustomRouterCrt,
+	"master/etc/origin/master/custom/router.key":                        masterEtcOriginMasterCustomRouterKey,
 	"master/etc/origin/master/front-proxy-ca.crt":                       masterEtcOriginMasterFrontProxyCaCrt,
 	"master/etc/origin/master/master-config.yaml":                       masterEtcOriginMasterMasterConfigYaml,
 	"master/etc/origin/master/master.etcd-ca.crt":                       masterEtcOriginMasterMasterEtcdCaCrt,
@@ -1804,17 +1892,23 @@ var _bintree = &bintree{nil, map[string]*bintree{
 					"ca.crt":                       {masterEtcOriginMasterCaCrt, map[string]*bintree{}},
 					"ca.key":                       {masterEtcOriginMasterCaKey, map[string]*bintree{}},
 					"client.secret":                {masterEtcOriginMasterClientSecret, map[string]*bintree{}},
-					"front-proxy-ca.crt":           {masterEtcOriginMasterFrontProxyCaCrt, map[string]*bintree{}},
-					"master-config.yaml":           {masterEtcOriginMasterMasterConfigYaml, map[string]*bintree{}},
-					"master.etcd-ca.crt":           {masterEtcOriginMasterMasterEtcdCaCrt, map[string]*bintree{}},
-					"master.etcd-client.crt":       {masterEtcOriginMasterMasterEtcdClientCrt, map[string]*bintree{}},
-					"master.etcd-client.key":       {masterEtcOriginMasterMasterEtcdClientKey, map[string]*bintree{}},
-					"master.kubelet-client.crt":    {masterEtcOriginMasterMasterKubeletClientCrt, map[string]*bintree{}},
-					"master.kubelet-client.key":    {masterEtcOriginMasterMasterKubeletClientKey, map[string]*bintree{}},
-					"master.proxy-client.crt":      {masterEtcOriginMasterMasterProxyClientCrt, map[string]*bintree{}},
-					"master.proxy-client.key":      {masterEtcOriginMasterMasterProxyClientKey, map[string]*bintree{}},
-					"master.server.crt":            {masterEtcOriginMasterMasterServerCrt, map[string]*bintree{}},
-					"master.server.key":            {masterEtcOriginMasterMasterServerKey, map[string]*bintree{}},
+					"custom": {nil, map[string]*bintree{
+						"registry.crt": {masterEtcOriginMasterCustomRegistryCrt, map[string]*bintree{}},
+						"registry.key": {masterEtcOriginMasterCustomRegistryKey, map[string]*bintree{}},
+						"router.crt":   {masterEtcOriginMasterCustomRouterCrt, map[string]*bintree{}},
+						"router.key":   {masterEtcOriginMasterCustomRouterKey, map[string]*bintree{}},
+					}},
+					"front-proxy-ca.crt":        {masterEtcOriginMasterFrontProxyCaCrt, map[string]*bintree{}},
+					"master-config.yaml":        {masterEtcOriginMasterMasterConfigYaml, map[string]*bintree{}},
+					"master.etcd-ca.crt":        {masterEtcOriginMasterMasterEtcdCaCrt, map[string]*bintree{}},
+					"master.etcd-client.crt":    {masterEtcOriginMasterMasterEtcdClientCrt, map[string]*bintree{}},
+					"master.etcd-client.key":    {masterEtcOriginMasterMasterEtcdClientKey, map[string]*bintree{}},
+					"master.kubelet-client.crt": {masterEtcOriginMasterMasterKubeletClientCrt, map[string]*bintree{}},
+					"master.kubelet-client.key": {masterEtcOriginMasterMasterKubeletClientKey, map[string]*bintree{}},
+					"master.proxy-client.crt":   {masterEtcOriginMasterMasterProxyClientCrt, map[string]*bintree{}},
+					"master.proxy-client.key":   {masterEtcOriginMasterMasterProxyClientKey, map[string]*bintree{}},
+					"master.server.crt":         {masterEtcOriginMasterMasterServerCrt, map[string]*bintree{}},
+					"master.server.key":         {masterEtcOriginMasterMasterServerKey, map[string]*bintree{}},
 					"named": {nil, map[string]*bintree{
 						"console.crt": {masterEtcOriginMasterNamedConsoleCrt, map[string]*bintree{}},
 						"console.key": {masterEtcOriginMasterNamedConsoleKey, map[string]*bintree{}},

@@ -33,6 +33,7 @@ func (u *Upgrade) PreSecretRotation(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+
 	u.Log.Infof("removing ValidatingWebhookConfiguration")
 	err = u.Interface.RemoveValidatingWebhookConfiguration(ctx)
 	if err != nil {
