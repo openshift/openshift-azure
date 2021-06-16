@@ -147,7 +147,7 @@ func (builder *Builder) vmImageReference() *compute.ImageReference {
 		return &compute.ImageReference{
 			Publisher: to.StringPtr("RedHat"),
 			Offer:     to.StringPtr("RHEL"),
-			Sku:       to.StringPtr("7-RAW"),
+			Sku:       to.StringPtr("7-LVM"),
 			Version:   to.StringPtr("latest"),
 		}
 	}

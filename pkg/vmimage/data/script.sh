@@ -4,9 +4,8 @@ exec 2>&1
 export HOME=/root
 cd
 
-echo ,+ | sfdisk --force -u S -N 2 /dev/sda || true
-partprobe
-xfs_growfs /dev/sda2
+lvextend -l +100%FREE /dev/rootvg/varlv
+xfs_growfs /var
 
 yum -y update -x WALinuxAgent # updating WALinuxAgent kills this script
 yum -y install git libguestfs-tools-c libvirt-daemon-config-network virt-install
