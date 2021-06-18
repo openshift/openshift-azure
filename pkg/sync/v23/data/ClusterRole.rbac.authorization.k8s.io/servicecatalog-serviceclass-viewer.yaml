@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: servicecatalog-serviceclass-viewer
+rules:
+- apiGroups:
+  - servicecatalog.k8s.io
+  resources:
+  - clusterserviceclasses
+  - clusterserviceplans
+  verbs:
+  - list
+  - watch
+  - get

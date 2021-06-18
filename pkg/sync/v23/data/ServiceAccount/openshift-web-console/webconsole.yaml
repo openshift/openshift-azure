@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: openshift-web-console
+  name: webconsole
+  namespace: openshift-web-console
