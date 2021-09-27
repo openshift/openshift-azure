@@ -490,6 +490,7 @@ func (g *simpleGenerator) InvalidateCertificates() (err error) {
 	g.cs.Config.Certificates.AroAdmissionController = api.CertKeyPair{}
 	g.cs.Config.Certificates.AroAdmissionControllerClient = api.CertKeyPair{}
 	g.cs.Config.Certificates.NodeBootstrap = api.CertKeyPair{}
+	g.cs.Config.Certificates.SDN = api.CertKeyPair{}
 	g.cs.Config.Certificates.BlackBoxMonitor = api.CertKeyPair{}
 	g.cs.Config.Certificates.RegistryConsole = api.CertKeyPair{}
 	g.cs.Config.Certificates.Registry = api.CertKeyPair{}
