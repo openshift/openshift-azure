@@ -9,11 +9,6 @@ LATEST_PLUGIN_VERSION=$(shell go run hack/dev-version/dev-version.go)
 
 all: azure
 
-secrets:
-	@rm -rf secrets
-	@mkdir secrets
-	@oc extract -n azure secret/cluster-secrets-azure --to=secrets >/dev/null
-
 clean:
 	rm -f coverage.out azure releasenotes testinsights fakerp
 
