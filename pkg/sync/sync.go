@@ -26,7 +26,7 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (
 		return v20.New(log, cs, initClients)
 	case "v21.0":
 		return v21.New(log, cs, initClients)
-	case "v22.0":
+	case "v22.0", "v22.1":
 		return v22.New(log, cs, initClients)
 	}
 
@@ -43,7 +43,7 @@ func AssetNames(cs *api.OpenShiftManagedCluster) ([]string, error) {
 		return v20.AssetNames(), nil
 	case "v21.0":
 		return v21.AssetNames(), nil
-	case "v22.0":
+	case "v22.0", "v22.1":
 		return v22.AssetNames(), nil
 	}
 
@@ -56,7 +56,7 @@ func Asset(cs *api.OpenShiftManagedCluster, name string) ([]byte, error) {
 		return v20.Asset(name)
 	case "v21.0":
 		return v21.Asset(name)
-	case "v22.0":
+	case "v22.0", "v22.1":
 		return v22.Asset(name)
 	}
 
