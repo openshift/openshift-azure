@@ -42,11 +42,15 @@ have permissions that you may not have.
 
    `go get github.com/openshift/openshift-azure/...`
 
-1. **Secrets**.  Retrieve cluster creation secrets from the CI cluster:
+1. **Secrets**.  Retrieve cluster creation secrets from the vault:
+
    ```
-   cd ${GOPATH:-$HOME/go}/src/github.com/openshift/openshift-azure
-   make secrets
+   export VAULT_ADDR=https://vault.ci.openshift.org
+   ./vault login $TOKEN_FROM_THE_VAULT
+   ./vault kv get -format=json "kv/selfservice/azure/cluster-secrets-azure/" | jq ".data.data"  > vault-secrets.json
+   python3 vault-secrets.py
    ```
+
 
 1. **Environment file**.  Create an environment file:
 
