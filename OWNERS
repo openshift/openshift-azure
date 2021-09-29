@@ -1,14 +1,15 @@
 approvers:
-- jim-minter
+- bennerv
+- jewzaam
+- m1kola
 - mjudeikis
 reviewers:
-- grantomation
+- bennerv
+- gvanderpotte
 - hawkowl
-- jim-minter
+- jewzaam
 - m1kola
 - makdaam
 - mjudeikis
-- olga-mir
-- troy0820
 - nilsanderselde
-- gvanderpotte
+- petrkotas
