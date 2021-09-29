@@ -12,6 +12,7 @@ coverage.out
 cscope.files
 cscope.out
 /secrets
+vault-secrets.json
 /fakerp
 /artifacts
 /monitoring
